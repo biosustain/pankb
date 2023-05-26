@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Species list</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-fixed/">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href= "https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href= "https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"> </script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"> </script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"> </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+
+
+    <style>
+        .table_padding {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top:50px;
+            padding-bottom:80px;
+        }
+
+        /* Add this to make the DataTable pagination centered */
+        .dataTables_wrapper .dataTables_paginate {
+            float: none;
+            text-align: center;
+        }
+
+        .table-container {
+            width: 100%;
+            text-align: center;
+        }
+
+        .table-container table {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        tr, th{
+            font-size: 15px;
+            text-align:center;
+            vertical-align: middle;
+        }
+
+        td {
+            font-size: 15px;
+            text-align: center !important;
+            vertical-align: middle !important;
+            padding: 10px;
+            width: 14.2%;
+        }
+
+        .dataTables_wrapper .dataTables_filter {
+            display: none;
+        }
+
+        .dataTables_wrapper thead th {
+            text-align: center;
+            vertical-align: middle;
+            padding: 5px;
+        }
+
+        .dataTables_wrapper tbody td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            margin-right: 20px;
+        }
+
+        #table-container .dataTables_paginate {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px; !important
+        }
+
+    </style>
+
+
+
+</head>
+<body data-bs-spy="scroll" data-bs-target="#navbar-example">
+
+<br>
+
+<h2 class = 'text-center'>This page is to show more details about genes in pangenome analyses. Will add more later...</h2>
+
+<div class = "table_padding overflow-auto">
+    <div style="width:80%;">
+        <table id="example" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
+            <thead>
+            <tr>
+                <th class="text-center align-middle">locus_tag</th>
+                <th class="text-center align-middle">inference</th>
+                <th class="text-center align-middle">translation</th>
+                <th class="text-center align-middle">product</th>
+                <th class="text-center align-middle">Genome_id</th>
+            </tr>
+            </thead>
+
+            <tbody class = "text-center align-middle" id = "tbody">
+
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+<!-- Datatable -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const geneName = urlParams.get('gene');
+        console.log(geneName);
+
+        try {
+            const data = await $.ajax({
+                'url': 'https://pankb.blob.core.windows.net/data/PanKB/gene_locustag/gene_locustag/' + geneName + '.json',
+                'dataType': 'json'
+            });
+
+            var geneData = data; // Convert the data object to an array for DataTables
+
+            let table = $('#example').DataTable({
+                data: geneData,
+                columns: [
+                    { data: 'locus_tag' },
+                    { data: 'inference' },
+                    { data: 'translation' },
+                    { data: 'product' },
+                    { data: 'Genome_id' }
+                ],
+                columnDefs: [
+                    {
+                        targets: [1, 2, 3], // Apply the function to the inference, translation, and product columns
+                        render: function(data, type, row) {
+                            if (type === 'display' && data.length > 30) {
+                                return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 20) + '...</span>';
+                            } else {
+                                return data;
+                            }
+                        }
+                    }
+                ],
+                "language": {
+                    "emptyTable": "Loading..."
+                },
+                "order": [],
+                "bSort": true,
+                "searching": false
+            });
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
+
+        $('body').on('click', '.truncated', function() {
+            var fullText = $(this).attr('data-fulltext');
+            var truncatedText = $(this).text();
+            if (fullText !== truncatedText) { // check if fullText is not equal to truncatedText
+                $(this).text(fullText);
+            } else {
+                $(this).text(fullText.substr(0, 20) + '...');
+            }
+        });
+
+        $('[data-toggle="tooltip"]').tooltip();
+
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

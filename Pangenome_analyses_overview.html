@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="generator" content="Hugo 0.84.0">
+  <title>Pangenome analyses</title>
+
+  <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-fixed/">
+
+
+
+  <!-- Bootstrap core CSS -->
+  <link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+
+    .row {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .figure-container_above {
+      height: 450px; /* This is 50% of the viewport height */
+      margin-bottom: 0;
+      margin-top: 0;
+    }
+
+    .figure-container_below {
+      height: 450px; /* This is 50% of the viewport height */
+      margin-bottom: 0;
+      margin-top: 0;
+    }
+
+    .border-container {
+      border: 2px solid rgba(0, 0, 0, 0.09);
+      /* Add other styles as needed */
+    }
+
+    .navbar_fixed {
+      position: fixed;
+      height: 100%;
+    }
+
+    .services-section img {
+      margin: auto;
+      display: block;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .responsive-iframe {
+      position: relative;
+      width: 100%;
+      padding-bottom: 0;
+    }
+
+    .responsive-iframe iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 10%;
+      right: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .row-spacing {
+      margin-bottom: 0vh; /* Adjust this value */
+    }
+
+    /* Remove spacing from Bootstrap columns */
+    .col-12.col-md-6 > *:not(:last-child) {
+      margin-bottom: 0; /* Change this value */
+    }
+
+
+  </style>
+
+  <!-- Custom styles for this template -->
+  <link href="navbar-top-fixed.css" rel="stylesheet">
+  <link href="./bootstrap-5.0.2-examples/sidebars/sidebars.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="./index.html">PanKB</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        <li class="nav-item">
+          <a class="nav-link " aria-current="page" href="./About.html">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="./Species_list.html">Organism</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="#">Download</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="#" tabindex="-1" aria-disabled="true">Publications</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="vh-100">
+  <div class="row">
+    <div class="col-2 container-fluid">
+      <div class="flex-shrink-0 p-3 bg-light navbar_fixed">
+        <a href="./Pangenome_analyses_overview.html" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom justify-content-center">
+          <span class="fs-5 fw-semibold">Pangenome analyses</span>
+        </a>
+        <ul class="list-unstyled ps-0">
+          <li class="mb-1">
+            <a href="./Pangenome_analyses_overview.html" class="btn  align-items-center " role="button">
+              Overview
+            </a>
+          </li>
+          <li class="mb-1">
+            <a href="./gene_annotation.html" class="btn  align-items-center " role="button">
+              Gene annotation
+            </a>
+          </li>
+
+          <li class="mb-1 ">
+            <a href="./Pangenome_analyses_phylogetic_tree.html" class="btn  align-items-center" role="button">
+              Phylogenetic tree
+            </a>
+          </li>
+          <li class="border-top my-3"></li>
+          <!--
+          <li class="mb-1">
+            <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">
+              More features
+            </button>
+            <div class="collapse" id="account-collapse">
+              <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                <li><a href="#" class="link-dark rounded">New...</a></li>
+                <li><a href="#" class="link-dark rounded">Profile</a></li>
+                <li><a href="#" class="link-dark rounded">Settings</a></li>
+                <li><a href="#" class="link-dark rounded">Sign out</a></li>
+              </ul>
+            </div>
+          </li>
+          -->
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-10">
+      <div class="container-fluid">
+        <div class="row row-spacing border-container gx-0 gx-md-2">
+          <h2 class="text-center">Heap's law and gene frequency</h2>
+          <div class="col-12 col-md-6">
+            <div class="figure-container_above responsive-iframe">
+              <iframe src="./Interactive_figures/gene_freq/heaps_law.html" style="border:0;" title="Heaps Law"></iframe>
+            </div>
+            <div class="figure-container_below responsive-iframe">
+              <iframe src="./Interactive_figures/pie/pie.html" name="Pie chart" style="border:0;"></iframe>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="figure-container_above responsive-iframe">
+              <iframe src="./Interactive_figures/gene_freq/gene_freq.html" style="border:0;" title="Gene frequency"></iframe>
+            </div>
+            <div class="figure-container_below responsive-iframe">
+              <iframe src="./Interactive_figures/gene_freq/cumulative_freq.html" style="border:0;" title="Cumulative Frequency"></iframe>
+            </div>
+          </div>
+        </div>
+        <br>
+        <br>
+        <br>
+        <div class="row border-container" style="height: 900px;">
+          <div class="col-12" style="height: 800px;">
+            <h2 class="text-center">Presence/absence matrix</h2>
+            <br>
+            <div class="d-flex justify-content-center align-items-center h-100" >
+              <iframe src="./hotmap/demo/index.html" name="heatmap" class="w-100 h-100" style="border:0;"></iframe>
+            </div>
+          </div>
+        </div>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="row border-container" style="height: 1050px;">
+          <div class="col-12" style="height: 800px;">
+            <h2 class="text-center">Intra-species analyses(naive) of microbial genetic diversity</h2>
+            <br>
+            <p style="text-align:justify; font-size: 18px;">The below heatmap shows simple intra-species analyses (there might be more complicated analyses coming out later).
+              Genes (column) in the heatmap were selected by the following criteria: for each gene, calculating its frequency in each
+              phylogeny group. If one gene's frequency is > 70% in one phylogeny group but < 30% in all other phylogeny groups, it will be selected.
+              The column (gene) of this heatmap is sorted by the phylogeny group: genes have frequency > 70% in phylogeny group A but < 30% in all others,
+              genes have frequency > 70% in phylogeny group B but < 30% in all others, etc.
+            </p>
+            <div class="d-flex justify-content-center align-items-center h-100">
+              <iframe src="./hotmap/demo/target_gene.html" name="heatmap" class="w-100 h-100" style="border:0;"></iframe>
+            </div>
+          </div>
+        </div>
+        <br>
+        <br>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  if (window.innerWidth === 3024 && window.innerHeight === 1964) {
+    var iframes = document.querySelectorAll('iframe');
+    iframes.forEach(function(iframe) {
+      iframe.style.paddingBottom = '70%';
+    });
+  }
+</script>
+
+</body>
+</html>

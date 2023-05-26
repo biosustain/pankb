@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Species list</title>
+
+  <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-fixed/">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href= "https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href= "https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"> </script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"> </script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"> </script>
+
+
+
+
+  <script>
+    $(document).ready(function () {
+      $('#example').DataTable({
+        "language": {
+          "emptyTable": "Loading..."
+        },
+        "order": [],
+        "bSort": true,
+        "searching": false
+      });
+    });
+  </script>
+
+
+
+  <style>
+
+    .table_padding{
+      padding-top:50px;
+      padding-bottom:80px;
+      padding-right:60px;
+      padding-left:0px;
+    }
+
+    tr, th{
+      font-size: 15px;
+      text-align:center;
+      vertical-align: middle;
+    }
+
+    td {
+      font-size: 15px;
+      text-align: center !important;
+      padding: 10px;
+      width: 14.2%;
+    }
+
+    .dataTables_wrapper .dataTables_filter {
+      display: none;
+    }
+
+    thead th {
+      height: 100px;
+      position: relative;
+      vertical-align: top;
+      padding-top: 0px;
+      text-align: center;
+      padding: 0px;
+    }
+
+    thead th input {
+      position: absolute;
+      bottom: 10px;
+      width: 50%;
+      margin: auto;
+      left: 0;
+      right: 0;
+    }
+
+    .dataTables_wrapper tbody td {
+      text-align: center;
+      vertical-align: middle;
+      padding: 10px;
+    }
+
+
+
+  </style>
+
+
+
+</head>
+<body data-bs-spy="scroll" data-bs-target="#navbar-example">
+
+<div class = "table_padding">
+  <table id="example" class="table table-hover" style="width:100%; table-layout: fixed;">
+    <thead>
+    <tr>
+      <th class="text-center align-middle">Gene</th>
+      <th class="text-center align-middle">Pangenome class</th>
+      <th class="text-center align-middle">COG category</th>
+      <th class="text-center align-middle">COG category name</th>
+      <th class="text-center align-middle">Description</th>
+      <th class="text-center align-middle">Annotation</th>
+      <th class="text-center align-middle">PFAMs</th>
+      <th class="text-center align-middle">Gene frequency</th>
+    </tr>
+    </thead>
+    <tbody class = "text-center align-middle" id = "tbody">
+    </tbody>
+  </table>
+</div>
+
+
+<!-- Datatable -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', async function() {
+    window.linkText = localStorage.getItem('linkText'); // Retrieve the link text from localStorage
+    console.log(window.linkText);
+
+    try {
+      const data = await $.ajax({
+        'url': 'https://pankb.blob.core.windows.net/data/PanKB/Interactive_figures/data/' + window.linkText + '/All.json',
+        'dataType': 'json'
+      });
+
+      var Gene = data;
+      // Use the Gene data here
+      console.log(Gene);
+
+      let table = $('#example').DataTable({
+        destroy: true, // Destroy the initial table instance
+        data: Gene, // Pass the data directly to DataTables
+        columns: [
+          {
+            data: '0',
+            render: function(data, type, row) {
+              return '<a href="./locustag.html?gene=' + encodeURIComponent(data) + '"target="_blank">' + data + '</a>';
+            }
+          },
+          { data: '7' },
+          { data: '1' },
+          { data: '2' },
+          { data: '3' },
+          { data: '4' },
+          { data: '5' },
+          { data: '6' }
+        ],
+        language: {
+          loadingRecords: "Loading...",
+          zeroRecords: "test"
+        },
+        initComplete: function() {
+          var api = this.api();
+
+          // Add search inputs under each header
+          $(this.api().table().header()).find('th').each(function(index, th) {
+            var columnHeader = $(th);
+            var columnIndex = index;
+
+            var searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 80%;" />')
+                    .on('keyup change clear', function() {
+                      api.column(columnIndex).search(this.value).draw();
+                    });
+
+            $(searchInput).appendTo(columnHeader);
+          });
+        }
+      });
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  });
+
+
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

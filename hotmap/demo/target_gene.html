@@ -1,0 +1,68 @@
+
+<html>
+<head>
+  <link href="../dist/app.css" rel="stylesheet">
+
+  <script src="https://unpkg.com/vanilla-picker@2"></script>
+  <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"> </script>
+
+  <style>
+    /* let's have the body act as container */
+    body { margin: 0; }
+  </style>
+
+  <title>Hotmap</title>
+</head>
+
+<body>
+
+<!--<button class="update-btn">update chart</button> -->
+<div id="chart"></div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+
+    window.linkText = localStorage.getItem('linkText'); // Retrieve the link text from localStorage
+    console.log(window.linkText); // Log the link text for testing purposes
+
+    var source_info = null;
+    $.ajax({
+      'async': false,
+      'global': false,
+      'url': "https://pankb.blob.core.windows.net/data/PanKB/Interactive_figures/data/" + window.linkText + "/source_info.json",
+      'dataType': "json",
+      'success': function (data) {
+        source_info = data;
+        window.source_info = source_info; // Store source_info globally
+
+        // After source_info is loaded, then load app.js
+      }
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    window.linkText = localStorage.getItem('linkText'); // Retrieve the link text from localStorage
+    console.log(window.linkText); // Log the link text for testing purposes
+
+    var locustag = null;
+    $.ajax({
+      'async': false,
+      'global': false,
+      'url': "https://pankb.blob.core.windows.net/data/PanKB/Interactive_figures/data/" + window.linkText + "/locustag_target.json",
+      'dataType': "json",
+      'success': function (data) {
+        locustag = data;
+        window.locustag = locustag; // Store locustag globally
+
+        // After source_info is loaded, then load app.js
+      }
+    });
+  });
+
+</script>
+
+<script src="../dist/target_gene.js"></script>
+</body>
+
+
+</html>

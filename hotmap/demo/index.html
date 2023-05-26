@@ -1,0 +1,70 @@
+<html>
+<head>
+  <link href="../dist/app.css" rel="stylesheet">
+
+  <script src="https://unpkg.com/vanilla-picker@2"></script>
+  <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"> </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.11/pako_inflate.min.js"></script>
+
+
+  <style>
+    /* let's have the body act as container */
+    body { margin: 0; }
+  </style>
+
+  <title>Hotmap</title>
+</head>
+
+<body>
+
+<!--<button class="update-btn">update chart</button> -->
+<div id="chart"></div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    window.linkText = localStorage.getItem('linkText'); // Retrieve the link text from localStorage
+
+    var source_info = null;
+    $.ajax({
+      'async': false,
+      'global': false,
+      'url': "https://pankb.blob.core.windows.net/data/PanKB/Interactive_figures/data/" + window.linkText + "/source_info.json",
+      'dataType': "json",
+      'success': function (data) {
+        source_info = data;
+        window.source_info = source_info; // Store source_info globally
+      }
+    });
+  });
+
+
+  document.addEventListener('DOMContentLoaded', function() {
+    window.linkText = localStorage.getItem('linkText'); // Retrieve the link text from localStorage
+    console.log(window.linkText); // Log the link text for testing purposes
+
+    fetch("https://pankb.blob.core.windows.net/data/PanKB/Interactive_figures/data/" + window.linkText + "/locustag.json.gz")
+            .then(response => {
+              if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+              }
+              return response.arrayBuffer();
+            })
+            .then(buffer => {
+              var decompressedData = pako.inflate(new Uint8Array(buffer), { to: 'string' });
+              var locustag = JSON.parse(decompressedData);
+              window.locustag = locustag; // Store locustag globally
+            })
+            .catch(function(error) {
+              console.log('Fetch error:', error);
+            });
+  });
+
+
+
+
+</script>
+
+<script src="../dist/app.js"></script>
+</body>
+
+
+</html>

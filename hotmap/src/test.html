@@ -1,0 +1,83 @@
+<html>
+<head>
+    <meta charSet="utf-8">
+    <title>Phylogenetic Tree</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+<svg id="tree"></svg>
+<script>
+    const treeData = "(A,(B,(C,D)));"; // Replace with your own data
+
+    const width = 600;
+    const height = 400;
+
+    const svg = d3.select("#tree")
+        .attr("width", width)
+        .attr("height", height);
+
+    const treeLayout = d3.tree().size([height, width - 100]);
+
+    const tree = d3.hierarchy(parseNewick(treeData));
+    treeLayout(tree);
+
+    const link = svg.selectAll(".link")
+        .data(tree.links())
+        .join("path")
+        .attr("class", "link")
+        .attr("d", d3.linkHorizontal()
+            .x(d => d.y)
+            .y(d => d.x));
+
+    const node = svg.selectAll(".node")
+        .data(tree.descendants())
+        .join("g")
+        .attr("class", "node")
+        .attr("transform", d => `translate(${d.y},${d.x})`);
+
+    node.append("circle")
+        .attr("r", 4);
+
+    node.append("text")
+        .attr("x", 8)
+        .attr("y", 4)
+        .text(d => d.data.name);
+
+    function parseNewick(s) {
+        const ancestors = [];
+        let tree = {children: []};
+        let tokens = s.split(/\s*(;|\(|\)|,|:)\s*/);
+        for (let i = 0; i < tokens.length; i++) {
+            let token = tokens[i];
+            switch (token) {
+                case '(': // new branchset
+                    let subtree = {children: []};
+                    tree.children.push(subtree);
+                    ancestors.push(tree);
+                    tree = subtree;
+                    break;
+                case ',': // another branch
+                    let sibling = {children: []};
+                    ancestors[ancestors.length - 1].children.push(sibling);
+                    tree = sibling;
+                    break;
+                case ')': // optional name next
+                    tree = ancestors.pop();
+                    break;
+                case ':': // optional length next
+                    break;
+                default:
+                    let x = tokens[i - 1];
+                    if (x == ')' || x == '(' || x == ',') {
+                        tree.name = token;
+                    } else if (x == ':') {
+                        tree.length = parseFloat(token);
+                    }
+            }
+        }
+        return tree;
+    }
+
+</script>
+</body>
+</html>
