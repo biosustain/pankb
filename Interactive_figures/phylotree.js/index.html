@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <!-- Latest compiled and minified CSS -->
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+
+  <link
+          rel="stylesheet"
+          href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous"
+  />
+  <link
+          href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css"
+          rel="stylesheet"
+  />
+
+  <!-- Optional theme -->
+  <link
+          rel="stylesheet"
+          href="//stackpath.bootstrapcdn.com/bootswatch/4.1.1/spacelab/bootstrap.min.css"
+  />
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script
+          src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+          integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+          crossorigin="anonymous"
+  ></script>
+  <script
+          src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+          integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+          crossorigin="anonymous"
+  ></script>
+
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+  <script src="//d3js.org/d3.v6.js"></script>
+  <script src="./dist/phylotree.js"></script>
+  <link href="phylotree.css" rel="stylesheet" />
+
+  <style>
+    nav {
+      margin-bottom: 25px;
+    }
+
+    .fa-rotate-45 {
+      -webkit-transform: rotate(45deg);
+      -moz-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      -o-transform: rotate(45deg);
+      transform: rotate(45deg);
+    }
+
+    .fa-rotate-135 {
+      -webkit-transform: rotate(135deg);
+      -moz-transform: rotate(135deg);
+      -ms-transform: rotate(135deg);
+      -o-transform: rotate(135deg);
+      transform: rotate(135deg);
+    }
+
+    @media (max-width: 1075px) {
+      .container {
+        padding-top: 50px;
+      }
+    }
+
+    .btn {
+      height: 30px;
+    }
+    .center{
+      text-align: center;
+    }
+
+    #toolbar {
+      display: flex;
+      justify-content: space-between;
+      width: 550px;
+    }
+
+    #controls {
+      position: fixed;
+      left: 5px;
+    }
+  </style>
+</head>
+
+<body>
+<!--
+###############################################################################################################################
+-->
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+  <ul class="nav navbar-nav mr-auto">
+    <li class="nav-item dropdown">
+      <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+      >
+        Tag
+      </a>
+      <div
+              class="dropdown-menu"
+              aria-labelledby="navbarDropdown"
+              id="selection_name_dropdown"
+      >
+        <a id="selection_new" class="dropdown-item" href="#"
+        >New selection set</a
+        >
+        <a id="selection_delete" class="dropdown-item" href="#"
+        >Delete selection set</a
+        >
+        <a id="selection_rename" class="dropdown-item" href="#"
+        >Rename selection set</a
+        >
+        <div class="dropdown-divider"></div>
+      </div>
+    </li>
+
+    <li>
+      <form class="form-inline my-2 my-lg-0">
+        <input
+                type="text"
+                id="selection_name_box"
+                class="form-control mr-sm-2"
+                value="Foreground"
+                disabled
+                size="40"
+        />
+      </form>
+    </li>
+
+    <li id="save_selection_name" style="display:none;" class="my-auto">
+      <a href="#"
+      ><button id="cancel_selection_button" class="btn btn-info btn-sm">
+        Cancel
+      </button></a
+      >
+      <a href="#"
+      ><button id="save_selection_button" class="btn btn-info btn-sm">
+        Save
+      </button></a
+      >
+    </li>
+
+    <li class="nav-item dropdown">
+      <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+      >
+        Selection
+      </a>
+      <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <a id="filter_add" class="dropdown-item" href="#"
+        >Add filtered nodes to selection</a
+        >
+        <a id="filter_remove" class="dropdown-item" href="#"
+        >Select all but filtered nodes</a
+        >
+        <div class="dropdown-divider"></div>
+        <a id="select_all" class="dropdown-item" href="#">Select all</a>
+        <a id="select_all_internal" class="dropdown-item" href="#"
+        >Select all internal nodes</a
+        >
+        <a id="select_all_leaves" class="dropdown-item" href="#"
+        >Select all leaf nodes</a
+        >
+        <a id="clear_internal" class="dropdown-item" href="#"
+        >Clear all internal nodes</a
+        >
+        <a id="clear_leaves" class="dropdown-item" href="#"
+        >Clear all leaves</a
+        >
+        <a id="select_none" class="dropdown-item" href="#"
+        >Clear selection</a
+        >
+        <div class="dropdown-divider"></div>
+        <a id="mp_label" class="dropdown-item" href="#"
+        >Label internal nodes using maximum parsimony</a
+        >
+        <a id="and_label" class="dropdown-item" href="#"
+        >Label internal nodes using conjunction (AND)</a
+        >
+        <a id="or_label" class="dropdown-item" href="#"
+        >Label internal nodes using disjunction (OR)</a
+        >
+      </div>
+    </li>
+  </ul>
+
+  <ul class="navbar-nav ml-auto">
+    <li>
+      <form class="form-inline my-2 my-lg-0">
+        <input
+                type="text"
+                id="branch_filter"
+                class="form-control mr-sm-2"
+                placeholder="Filter branches on"
+                onkeypress="return event.keyCode != 13"
+        />
+      </form>
+    </li>
+  </ul>
+  </div>
+  <!-- /.container-fluid -->
+</nav>
+
+<div class="modal" id="newick_modal" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Newick string to render</h4>
+        <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-hidden="true"
+        >
+          &times;
+        </button>
+      </div>
+      <div class="modal-body" id="newick_body">
+            <textarea
+                    id="nwk_spec"
+                    autofocus="true"
+                    placeholder=""
+                    style="width: 100%; height: 100%"
+                    rows="20"
+                    selectionStart="1"
+                    selectionEnd="1000"
+            >
+(a : 0.1, (b : 0.11, (c : 0.12, d : 0.13) : 0.14) : 0.15)</textarea
+            >
+      </div>
+      <div class="modal-footer">
+        <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                id="validate_newick"
+        >
+          Display this tree
+        </button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="modal" id="newick_export_modal" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body" id="newick_body">
+            <textarea
+                    id="nwk_export_spec"
+                    autofocus="true"
+                    placeholder=""
+                    style="width: 100%; height: 100%"
+                    rows="20"
+            ></textarea>
+      </div>
+      <div class="modal-footer">
+        <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                data-dismiss="modal"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="modal" id="progress_model">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-hidden="true"
+        >
+          &times;
+        </button>
+        <h4 class="modal-title">Task in progress</h4>
+      </div>
+      <div class="modal-body" id="progress_model_body"></div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div id="controls">
+  <form id="controls_form" style="width:200px;"></form>
+</div>
+
+<div class="container-fluid" id="main_display">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="btn-toolbar" role="toolbar" id="toolbar">
+        <div class="btn-group">
+          <button
+                  type="button"
+                  class="btn btn-light btn-sm"
+                  data-direction="vertical"
+                  data-amount="1"
+                  title="Expand vertical spacing"
+          >
+            <i class="fa fa-arrows-v"></i>
+          </button>
+          <button
+                  type="button"
+                  class="btn btn-light btn-sm"
+                  data-direction="vertical"
+                  data-amount="-1"
+                  title="Compress vertical spacing"
+          >
+            <i class="fa  fa-compress fa-rotate-135"></i>
+          </button>
+          <button
+                  type="button"
+                  class="btn btn-light btn-sm"
+                  data-direction="horizontal"
+                  data-amount="1"
+                  title="Expand horizonal spacing"
+          >
+            <i class="fa fa-arrows-h"></i>
+          </button>
+          <button
+                  type="button"
+                  class="btn btn-light btn-sm"
+                  data-direction="horizontal"
+                  data-amount="-1"
+                  title="Compress horizonal spacing"
+          >
+            <i class="fa  fa-compress fa-rotate-45"></i>
+          </button>
+          <button
+                  type="button"
+                  class="btn btn-light btn-sm"
+                  id="sort_ascending"
+                  title="Sort deepest clades to the bototm"
+          >
+            <i class="fa fa-sort-amount-asc"></i>
+          </button>
+          <button
+                  type="button"
+                  class="btn btn-light btn-sm"
+                  id="sort_descending"
+                  title="Sort deepsest clades to the top"
+          >
+            <i class="fa fa-sort-amount-desc"></i>
+          </button>
+          <button
+                  type="button"
+                  class="btn btn-light btn-sm"
+                  id="sort_original"
+                  title="Restore original order"
+          >
+            <i class="fa fa-sort"></i>
+          </button>
+          <button
+                  type="button"
+                  class="btn btn-light btn-sm"
+                  id="save_image"
+                  title="Save image"
+          >
+            <i class="fa fa-picture-o"></i>
+          </button>
+        </div>
+        <div class="btn-group" role="group">
+          <button
+                  class="btn btn-light btn-sm active phylotree-layout-mode"
+                  data-mode="linear"
+          >
+            Linear
+          </button>
+          <button
+                  class="btn btn-light btn-sm phylotree-layout-mode"
+                  data-mode="radial"
+          >
+            Radial
+          </button>
+        </div>
+        <div class="btn-group" role="group">
+          <button
+                  class="btn btn-light btn-sm active phylotree-align-toggler"
+                  data-align="left"
+          >
+            <i class="fa fa-align-left"></i>
+          </button>
+          <button
+                  class="btn btn-light btn-sm phylotree-align-toggler"
+                  data-align="right"
+          >
+            <i class="fa fa-align-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <label
+      ><b>Selected</b>
+        <span class="badge badge-secondary" id="selected_branch_counter"
+        >0</span
+        >
+        <b>branches with current label</b></label
+      >
+    </div>
+  </div>
+
+  <div class="row center">
+    <div class="col-md-12">
+      <div id="tree_container" class="tree-widget"></div>
+    </div>
+  </div>
+</div>
+
+<!--
+###############################################################################################################################
+-->
+
+<script>
+  var phylotree_extensions = new Object();
+
+  $("#newick_export_modal").on("show.bs.modal", function(e) {
+    $('textarea[id$="nwk_export_spec"]').val(
+            tree.getNewick(function(node) {
+              var tags = [];
+              selection_set.forEach(function(d) {
+                if (node[d]) {
+                  tags.push(d);
+                }
+              });
+              if (tags.length) {
+                return "{" + tags.join(",") + "}";
+              }
+              return "";
+            })
+    );
+  });
+
+  $("#newick_file").on("change", function(e) {
+    var files = e.target.files; // FileList object
+
+    if (files.length == 1) {
+      var f = files[0];
+      var reader = new FileReader();
+
+      reader.onload = function(e) {
+        var res = e.target.result;
+        var warning_div = d3
+                .select("#main_display")
+                .insert("div", ":first-child");
+
+        tree = new phylotree.phylotree(res);
+        global_tree = tree;
+
+        if (!tree["json"]) {
+          warning_div
+                  .attr("class", "alert alert-danger alert-dismissable")
+                  .html(
+                          "<strong>Newick parser error for file " +
+                          f.name +
+                          ": </strong> In file " +
+                          res["error"]
+                  );
+        } else {
+          tree.render({
+            container: "#tree_container",
+            "draw-size-bubbles": false,
+            "left-right-spacing": "fixed-step",
+            "node-styler": node_colorizer,
+            "edge-styler": edge_colorizer
+          });
+
+          tree.display.selectionLabel(current_selection_name);
+
+          tree.display.countHandler(count => {
+            $("#selected_branch_counter").text(function(d) {
+              return count[current_selection_name];
+            });
+          });
+
+          // Get selection set names from parsed newick
+          if (tree.parsed_tags.length) {
+            selection_set = tree.parsed_tags;
+          }
+
+          update_selection_names();
+
+          $("#newick_modal").modal("hide");
+
+          $(tree.display.container).empty();
+          $(tree.display.container).html(tree.display.show());
+        }
+      };
+
+      $("#newick-dropdown").dropdown("toggle");
+      reader.readAsText(f);
+    }
+  });
+
+  function getNewickFromURL(url) {
+    d3.text(url).then(res => {
+
+      var warning_div = d3
+              .select("#main_display")
+              .insert("div", ":first-child");
+
+      tree = new phylotree.phylotree(res);
+      global_tree = tree;
+
+      if (!tree["json"]) {
+        warning_div
+                .attr("class", "alert alert-danger alert-dismissable")
+                .html(
+                        "<strong>Newick parser error for file " +
+                        f.name +
+                        ": </strong> In file " +
+                        res["error"]
+                );
+      } else {
+        tree.render({
+          container: "#tree_container",
+          "draw-size-bubbles": false,
+          "left-right-spacing": "fixed-step",
+          "node-styler": node_colorizer,
+          "edge-styler": edge_colorizer
+        });
+
+        tree.display.selectionLabel(current_selection_name);
+
+        tree.display.countHandler(count => {
+          $("#selected_branch_counter").text(function(d) {
+            return count[current_selection_name];
+          });
+        });
+
+        // Get selection set names from parsed newick
+        if (tree.parsed_tags.length) {
+          selection_set = tree.parsed_tags;
+        }
+
+        update_selection_names();
+
+        $("#newick_modal").modal("hide");
+
+        $(tree.display.container).empty();
+        $(tree.display.container).html(tree.display.show());
+      }
+    });
+  }
+
+
+  $("#newick_url_btn").on("click", function(e) {
+
+    let url = $("#newick_url").val();
+    getNewickFromURL(url);
+    $("#newick-dropdown").dropdown("toggle");
+
+  });
+
+
+  $("#newick_url").on("change", function(e) {
+
+    let url = $(e.target).val();
+    getNewickFromURL(url);
+    $("#newick-dropdown").dropdown("toggle");
+
+  });
+
+
+  $("#display_tree").on("click", function(e) {
+    tree.options({ branches: "straight" }, true);
+  });
+
+  $("#mp_label").on("click", function(e) {
+    tree.maxParsimony(true, "Foreground");
+  });
+
+  $("[data-direction]").on("click", function(e) {
+    var which_function =
+            $(this).data("direction") == "vertical"
+                    ? tree.display.spacing_x.bind(tree.display)
+                    : tree.display.spacing_y.bind(tree.display);
+    which_function(which_function() + +$(this).data("amount")).update();
+  });
+
+  $(".phylotree-layout-mode").on("click", function(e) {
+    if (tree.display.radial() != ($(this).data("mode") == "radial")) {
+      $(".phylotree-layout-mode").toggleClass("active");
+      tree.display.radial(!tree.display.radial()).update();
+    }
+  });
+
+  $("#toggle_animation").on("click", function(e) {
+    var current_mode = $(this).hasClass("active");
+    $(this).toggleClass("active");
+    tree.options({ transitions: !current_mode });
+  });
+
+  $(".phylotree-align-toggler").on("click", function(e) {
+    var button_align = $(this).data("align");
+    var tree_align = tree.display.options.alignTips;
+
+    if (tree_align != button_align) {
+      tree.display.alignTips(button_align == "right");
+      $(".phylotree-align-toggler").toggleClass("active");
+      tree.display.update();
+    }
+  });
+
+  function sort_nodes(asc) {
+    tree.resortChildren(function(a, b) {
+      return (b.height - a.height || b.value - a.value) * (asc ? 1 : -1);
+    });
+  }
+
+  $("#sort_original").on("click", function(e) {
+    tree.resortChildren(function(a, b) {
+      return a["original_child_order"] - b["original_child_order"];
+    });
+  });
+
+  $("#sort_ascending").on("click", function(e) {
+    sort_nodes(true);
+    tree.display.update();
+  });
+
+  $("#sort_descending").on("click", function(e) {
+    sort_nodes(false);
+    tree.display.update();
+  });
+
+  $("#and_label").on("click", function(e) {
+    tree.display.internalLabel(function(d) {
+      return d.reduce(function(prev, curr) {
+        return curr[current_selection_name] && prev;
+      }, true);
+    }, true);
+  });
+
+  $("#or_label").on("click", function(e) {
+    tree.display.internalLabel(function(d) {
+      return d.reduce(function(prev, curr) {
+        return curr[current_selection_name] || prev;
+      }, false);
+    }, true);
+  });
+
+  $("#filter_add").on("click", function(e) {
+    tree.display
+            .modifySelection(function(d) {
+              return d.tag || d[current_selection_name];
+            })
+            .modifySelection(
+                    function(d) {
+                      return false;
+                    },
+                    "tag",
+                    false,
+                    false
+            );
+  });
+
+  $("#filter_remove").on("click", function(e) {
+    tree.display.modifySelection(function(d) {
+      return !d.tag;
+    });
+  });
+
+  $("#select_all").on("click", function(e) {
+    tree.display.modifySelection(function(d) {
+      return true;
+    });
+  });
+
+  $("#select_all_internal").on("click", function(e) {
+    tree.display.modifySelection(function(d) {
+      return !tree.isLeafNode(d.target);
+    });
+  });
+
+  $("#select_all_leaves").on("click", function(e) {
+    tree.display.modifySelection(function(d) {
+      return tree.isLeafNode(d.target);
+    });
+  });
+
+  $("#select_none").on("click", function(e) {
+    tree.display.modifySelection(function(d) {
+      return false;
+    });
+  });
+
+  $("#clear_internal").on("click", function(e) {
+    tree.display.modifySelection(function(d) {
+      return tree.isLeafNode(d.target)
+              ? d.target[current_selection_name]
+              : false;
+    });
+  });
+
+  $("#clear_leaves").on("click", function(e) {
+    tree.display.modifySelection(function(d) {
+      return !tree.isLeafNode(d.target)
+              ? d.target[current_selection_name]
+              : false;
+    });
+  });
+
+  $("#display_dengrogram").on("click", function(e) {
+    tree.display.options({ branches: "step" }, true);
+  });
+
+  $("#branch_filter").on("input propertychange", function(e) {
+    var filter_value = $(this).val();
+
+    var rx = new RegExp(filter_value, "i");
+
+    tree.display.modifySelection(n => {
+      if (!n.target.data.name) {
+        return false;
+      }
+      m = n.target.data.name.search(rx);
+      return filter_value.length && m != -1;
+    }, "tag");
+  });
+
+  $("#validate_newick").on("click", function(e) {
+    let test_string = $('textarea[id$="nwk_spec"]').val();
+
+    tree = new phylotree.phylotree(test_string);
+    global_tree = tree;
+
+    if (!tree["json"]) {
+      var warning_div = d3
+              .select("#newick_body")
+              .selectAll("div  .alert-danger")
+              .data([res["error"]]);
+      warning_div.enter().append("div");
+      warning_div
+              .html(function(d) {
+                return d;
+              })
+              .attr("class", "alert-danger");
+    } else {
+      tree.render({
+        container: "#tree_container",
+        "draw-size-bubbles": false,
+        "node-styler": node_colorizer,
+        zoom: false,
+        "edge-styler": edge_colorizer
+      });
+
+      tree.display.selectionLabel(current_selection_name);
+
+      tree.display.countHandler(count => {
+        $("#selected_branch_counter").text(function(d) {
+          return count[current_selection_name];
+        });
+      });
+
+      // Get selection set names from parsed newick
+      if (tree.parsed_tags.length) {
+        selection_set = tree.parsed_tags;
+      }
+
+      update_selection_names();
+
+      $("#newick_modal").modal("hide");
+      $(tree.display.container).html(tree.display.show());
+    }
+  });
+
+  function default_tree_settings() {
+    tree = phylotree();
+    tree.branchLength(null);
+    tree.branchName(null);
+    tree.display.radial(false).separation(function(a, b) {
+      return 0;
+    });
+  }
+
+  function node_colorizer(element, data) {
+    try {
+      var count_class = 0;
+
+      selection_set.forEach(function(d, i) {
+        if (data[d]) {
+          count_class++;
+          element.style(
+                  "fill",
+                  color_scheme(i),
+                  i == current_selection_id ? "important" : null
+          );
+        }
+      });
+
+      if (count_class > 1) {
+      } else {
+        if (count_class == 0) {
+          element.style("fill", null);
+        }
+      }
+    } catch (e) {}
+  }
+
+  function edge_colorizer(element, data) {
+
+    try {
+      var count_class = 0;
+
+      selection_set.forEach(function(d, i) {
+        if (data[d]) {
+          count_class++;
+          element.style(
+                  "stroke",
+                  color_scheme(i),
+                  i == current_selection_id ? "important" : null
+          );
+        }
+      });
+
+      if (count_class > 1) {
+        element.classed("branch-multiple", true);
+      } else if (count_class == 0) {
+        element.style("stroke", null).classed("branch-multiple", false);
+      }
+    } catch (e) {}
+  }
+
+  var valid_id = new RegExp("^[\\w]+$");
+
+  $("#selection_name_box").on("input propertychange", function(e) {
+    var name = $(this).val();
+
+    var accept_name =
+            selection_set.indexOf(name) < 0 && valid_id.exec(name);
+
+    d3.select("#save_selection_button").classed(
+            "disabled",
+            accept_name ? null : true
+    );
+  });
+
+  $("#selection_rename").on("click", function(e) {
+    d3.select("#save_selection_button")
+            .classed("disabled", true)
+            .on("click", function(e) {
+              // save selection handler
+              var old_selection_name = current_selection_name;
+              selection_set[current_selection_id] = current_selection_name = $(
+                      "#selection_name_box"
+              ).val();
+
+              if (old_selection_name != current_selection_name) {
+                tree.update_key_name(old_selection_name, current_selection_name);
+                update_selection_names(current_selection_id);
+              }
+              send_click_event_to_menu_objects(
+                      new CustomEvent(selection_menu_element_action, {
+                        detail: ["save", this]
+                      })
+              );
+            });
+
+    d3.select("#cancel_selection_button")
+            .classed("disabled", false)
+            .on("click", function(e) {
+              // save selection handler
+              $("#selection_name_box").val(current_selection_name);
+              send_click_event_to_menu_objects(
+                      new CustomEvent(selection_menu_element_action, {
+                        detail: ["cancel", this]
+                      })
+              );
+            });
+
+    send_click_event_to_menu_objects(
+            new CustomEvent(selection_menu_element_action, {
+              detail: ["rename", this]
+            })
+    );
+    e.preventDefault();
+  });
+
+  $("#selection_delete").on("click", function(e) {
+    tree.display.updateKeyName(selection_set[current_selection_id], null);
+    selection_set.splice(current_selection_id, 1);
+
+    if (current_selection_id > 0) {
+      current_selection_id--;
+    }
+    current_selection_name = selection_set[current_selection_id];
+    update_selection_names(current_selection_id);
+    $("#selection_name_box").val(current_selection_name);
+
+    send_click_event_to_menu_objects(
+            new CustomEvent(selection_menu_element_action, {
+              detail: ["save", this]
+            })
+    );
+    e.preventDefault();
+  });
+
+  $("#selection_new").on("click", function(e) {
+    d3.select("#save_selection_button")
+            .classed("disabled", true)
+            .on("click", function(e) {
+              // save selection handler
+              current_selection_name = $("#selection_name_box").val();
+              current_selection_id = selection_set.length;
+              selection_set.push(current_selection_name);
+              update_selection_names(current_selection_id);
+              send_click_event_to_menu_objects(
+                      new CustomEvent(selection_menu_element_action, {
+                        detail: ["save", this]
+                      })
+              );
+            });
+
+    d3.select("#cancel_selection_button")
+            .classed("disabled", false)
+            .on("click", function(e) {
+              // save selection handler
+              $("#selection_name_box").val(current_selection_name);
+              send_click_event_to_menu_objects(
+                      new CustomEvent(selection_menu_element_action, {
+                        detail: ["cancel", this]
+                      })
+              );
+            });
+
+    send_click_event_to_menu_objects(
+            new CustomEvent(selection_menu_element_action, {
+              detail: ["new", this]
+            })
+    );
+    e.preventDefault();
+  });
+
+  function send_click_event_to_menu_objects(e) {
+    $(
+            "#selection_new, #selection_delete, #selection_rename, #save_selection_name, #selection_name_box, #selection_name_dropdown"
+    )
+            .get()
+            .forEach(function(d) {
+              d.dispatchEvent(e);
+            });
+  }
+
+  function update_selection_names(id, skip_rebuild) {
+    skip_rebuild = skip_rebuild || false;
+    id = id || 0;
+
+    current_selection_name = selection_set[id];
+    current_selection_id = id;
+
+    if (!skip_rebuild) {
+      d3.selectAll(".selection_set").remove();
+
+      d3.select("#selection_name_dropdown")
+              .selectAll(".selection_set")
+              .data(selection_set)
+              .enter()
+              .append("a")
+              .attr("class", "selection_set dropdown-item")
+              .attr("href", "#")
+              .text(function(d) {
+                return d;
+              })
+              .style("color", function(d, i) {
+                return color_scheme(i);
+              })
+              .on("click", function(d, name) {
+                // Pass the index of name
+                let i = _.indexOf(selection_set, name);
+                update_selection_names(i, true);
+              });
+    }
+
+    d3.select("#selection_name_box")
+            .style("color", color_scheme(id))
+            .property("value", current_selection_name);
+
+    // Loop through all selection_sets
+    _.each(selection_set, function(id) {
+      tree.display.selectionLabel(id);
+      tree.display.update();
+    });
+
+    console.log('Setting label within the tree display');
+    console.log(id);
+    console.log(selection_set[id]);
+    tree.display.selectionLabel(selection_set[id]);
+    tree.display.update();
+  }
+
+  var width = 800, //$(container_id).width(),
+          height = 800, //$(container_id).height()
+          selection_set = ["Foreground"],
+          current_selection_name = $("#selection_name_box").val(),
+          current_selection_id = 0,
+          max_selections = 10;
+  (color_scheme = d3.scaleOrdinal(d3.schemeCategory10)),
+          (selection_menu_element_action = "phylotree_menu_element_action");
+
+  var test_string = '(GCF_0133052651:0.0000020356,((((((((((((((((((((((((((((((((GCF_0027380551:0.0000000000,GCF_0013083051:0.0000000000):0.0000000000,GCF_0027379951:0.0000000000):0.0000000000,GCF_0141317351:0.0000000000):0.0000000000,GCF_0016336451:0.0000000000):0.0000000000,GCF_0196558751:0.0000000000):0.0000000000,GCF_0027378251:0.0000000000):0.0000000000,GCF_0001437451:0.0000000000):0.0000000000,GCF_0027379351:0.0000000000):0.0000000000,GCF_0014341751:0.0000000000):0.0000000000,GCF_0034283551:0.0000000000):0.0000000000,GCF_0079891451:0.0000000000):0.0000026576,GCF_0027506751:0.0000027745)100:0.0001186031,(GCF_0016336051:0.0001181661,((((((GCF_0110097551:0.0000000000,GCF_0033461751:0.0000000000):0.0000000000,GCF_0033253951:0.0000000000):0.0000000000,GCF_0018886551:0.0000000000):0.0000027926,GCF_0039528851:0.0000027926)11:0.0000027926,GCF_0018886651:0.0000027926)13:0.0000028014,(GCF_0099378251:0.0001188241,(GCF_9000950551:0.0000025510,GCF_0016430651:0.0000028263)100:0.0001186117)24:0.0000028176)31:0.0000028406)100:0.0001188235)46:0.0000028376,(((GCF_0021173051:0.0000000000,GCF_0013319252:0.0000000000):0.0000000000,GCF_0097205851:0.0000000000):0.0000000000,GCF_0019821251:0.0000000000):0.0000027926)12:0.0000022166,GCF_0099148051:0.0000027926)51:0.0000027760,GCF_0016336751:0.0001188162)76:0.0002367680,((GCF_0133777051:0.0000000000,GCF_0148409951:0.0000000000):0.0000027319,GCF_0196414151:0.0000021569)100:0.0003561115)73:0.0001188279,((((GCF_0018884851:0.0000000000,GCF_0018887251:0.0000000000):0.0000028519,GCF_0018887451:0.0000028317)100:0.0001186221,(((GCF_0105869451:0.0000000000,GCF_0183512951:0.0000000000):0.0000022174,GCF_0043549951:0.0000027920)100:0.0001186907,(GCF_0015960951:0.0000027926,GCF_0177428751:0.0000027926)93:0.0000023340)100:0.0002376531)100:0.0002373333,(GCF_0097627451:0.0001187323,(((((GCF_0193117251:0.0000000000,GCF_0022343951:0.0000000000):0.0000000000,GCF_0044030451:0.0000000000):0.0000000000,GCF_0010101751:0.0000000000):0.0000000000,GCF_0044041251:0.0000000000):0.0000028372,GCF_0016334151:0.0000028022)95:0.0000028456)100:0.0001188124)100:0.0001186097)79:0.0001181665,((((GCF_9006953651:0.0000000000,GCF_0019817851:0.0000000000):0.0000000000,GCF_0019818751:0.0000000000):0.0000000000,GCF_0027498751:0.0000000000):0.0000023174,GCF_9006952951:0.0000023133)100:0.0007133547)68:0.0003565625,(GCF_0179635251:0.0001183379,GCF_0022498251:0.0000028465)100:0.0004753405)52:0.0000028237,(GCF_0021172451:0.0000027926,GCF_0021172651:0.0000027926)72:0.0000022265)60:0.0001182287,(((GCF_0002477351:0.0000000000,GCF_0007438951:0.0000000000):0.0000021057,GCF_0016332851:0.0000020345)100:0.0003566378,(((GCF_0033453751:0.0014272552,(((((((((GCF_0205525951:0.0000000000,GCF_0205526251:0.0000000000):0.0000000000,GCF_0205525851:0.0000000000):0.0000000000,GCF_0205526351:0.0000000000):0.0000027071,GCF_0205525251:0.0000026897)100:0.0001188597,GCF_0035459851:0.0000028379)94:0.0000024488,((GCF_0137538851:0.0000000000,GCF_0030531851:0.0000000000):0.0000028458,GCF_0030530251:0.0000028459)100:0.0002376911)100:0.0005943653,(GCF_0019823451:0.0007133813,GCF_0028723551:0.0002377254)98:0.0003560644)92:0.0002377098,GCF_0028952451:0.0000028485)96:0.0002376142,GCF_0029000751:0.0005943226)86:0.0004756600)66:0.0002375494,((((((((((((GCF_0017202851:0.0000000000,GCF_0034295851:0.0000000000):0.0000000000,GCF_0041186151:0.0000000000):0.0000027926,GCF_0039909851:0.0000027926)100:0.0004746160,GCF_0018801852:0.0002376906)34:0.0000027622,GCF_0099139751:0.0000027926)4:0.0000027645,GCF_0016394851:0.0000027926)5:0.0000028326,(GCF_0099136751:0.0001183320,GCF_0097598451:0.0001188271)12:0.0000024585)12:0.0000028459,GCF_0099136951:0.0002376848)80:0.0000489231,GCF_0168944051:0.0004264630)95:0.0002372442,(GCF_0099138551:0.0000020843,GCF_0099138351:0.0000021544)100:0.0007613493)82:0.0001892385,GCF_0019824051:0.0001188455)69:0.0001186127,(((GCF_0179635351:0.0002368261,GCF_0041015051:0.0001183147)100:0.0004755112,(GCF_0012780151:0.0001188276,GCF_0035775051:0.0002377320)91:0.0000028467)95:0.0001188261,GCF_0017429651:0.0001197683)100:0.0008314304)47:0.0000028430)54:0.0002375980,GCF_0030456651:0.0007129526)55:0.0001185952)52:0.0001179713)50:0.0001185727,(GCF_0015409251:0.0004754542,GCF_0019901451:0.0003565376)90:0.0002377044)58:0.0002376739,((GCF_0015961951:0.0000027926,GCF_0015976051:0.0000027926)91:0.0000021540,GCF_0019821651:0.0002376635)100:0.0002373277)61:0.0002377331,((((((GCF_0177983051:0.0000000000,GCF_0002038553:0.0000000000):0.0000021583,GCF_0019822651:0.0000021583)100:0.0005942570,(GCF_0133677151:0.0000027926,GCF_0012960951:0.0000027926)95:0.0000028142)74:0.0001183637,GCF_0016499851:0.0001187600)74:0.0001188309,GCF_0155474051:0.0008319025)77:0.0001181625,(GCF_0007318551:0.0002376970,GCF_0038131251:0.0003566102)83:0.0003561954)48:0.0000028350)35:0.0000023753,((((((GCF_0016337251:0.0000000000,GCF_0098899951:0.0000000000):0.0000000000,GCF_0041028851:0.0000000000):0.0000000000,GCF_0016395851:0.0000000000):0.0000027926,GCF_0029068751:0.0002367845)22:0.0000023584,GCF_0032869551:0.0000027926)83:0.0000023851,(GCF_0190768051:0.0000026162,GCF_0017046451:0.0000026399)100:0.0001193955)100:0.0003565703)56:0.0001186089,((((((((((((((((((GCF_0019818651:0.0000000000,GCF_0027505751:0.0000000000):0.0000000000,GCF_0019816651:0.0000000000):0.0000000000,GCF_0019816551:0.0000000000):0.0000027926,GCF_0019815751:0.0000027926)100:0.0001186989,GCF_0016628951:0.0003565621)100:0.0002367805,(GCF_0016338051:0.0000028376,GCF_0016394251:0.0000027528)100:0.0001186043)9:0.0000028374,(((GCF_0016334951:0.0000027926,GCF_0016334851:0.0000027926)100:0.0001183281,GCF_0041418951:0.0001183197)100:0.0004754645,((GCF_0021656551:0.0006045016,GCF_0021657251:0.0000028067)100:0.0002368170,GCF_0164156051:0.0001195393)100:0.0003562036)13:0.0000022911)84:0.0000024685,GCF_0155563551:0.0003559090)98:0.0003568869,((((((((((((((((GCF_0185523051:0.0000000000,GCF_0185515251:0.0000000000):0.0000000000,GCF_0185523351:0.0000000000):0.0000000000,GCF_0098900951:0.0000000000):0.0000027926,GCF_0185515951:0.0000027926)95:0.0000027926,GCF_0092957751:0.0001188303)100:0.0001186152,((((GCF_0018885951:0.0000000000,GCF_0018886451:0.0000000000):0.0000000000,GCF_0018885851:0.0000000000):0.0000000000,GCF_0018885751:0.0000000000):0.0000020178,GCF_0018886751:0.0000020178)100:0.0041702018)62:0.0000028405,(GCF_0189170851:0.0001183566,GCF_0099137951:0.0005940686)99:0.0002372890)22:0.0000028103,((GCF_0014691451:0.0000028374,GCF_0016394451:0.0000028374)100:0.0001188483,GCF_0205524551:0.0004754822)28:0.0000027951)11:0.0000023769,GCF_0079895251:0.0000027926)48:0.0000024207,(GCF_0036411651:0.0005943150,((((GCF_0033460851:0.0000027926,GCF_0204006951:0.0001188248)100:0.0002367646,GCF_0035976351:0.0001187241)100:0.0003565828,GCF_0012735851:0.0007132942)100:0.0004756866,(((GCF_0016394551:0.0034067656,(GCF_0185522951:0.0000027926,GCF_0185515651:0.0000027926)100:0.0015939799)97:0.0008471619,GCF_0016396251:0.0009562305)98:0.0010507526,GCF_0179634851:0.0014426869)88:0.0006983896)84:0.0003564819)88:0.0005943243)86:0.0001328673,GCF_0202956551:0.0011757246)100:0.0026178711,GCF_0204833451:0.0009660982)100:0.0027729031,GCF_9006182151:0.0022126887)82:0.0001190028,(GCF_0209164051:0.0001188264,(GCF_0030457251:0.0001190637,GCF_0030456451:0.0000028404)100:0.0001186123)100:0.0007846614)91:0.0002855877,GCF_0047309651:0.0020229568)42:0.0000022947,GCF_0182571551:0.0007128355)46:0.0001184433)32:0.0000023884,(GCF_0036110151:0.0000023355,GCF_0043287451:0.0000023354)100:0.0027362063)64:0.0002377137,(GCF_0030975951:0.0010702166,(GCF_0040879951:0.0001188007,(GCF_0040554351:0.0000027926,GCF_0040543051:0.0000027926)99:0.0000023024)100:0.0003559432)63:0.0001185742)34:0.0001187991,(((((((((((((GCF_0036927251:0.0000000000,GCF_0019815651:0.0000000000):0.0000000000,GCF_0030531651:0.0000000000):0.0000000000,GCF_0198907551:0.0000000000):0.0000000000,GCF_0016335051:0.0000000000):0.0000000000,GCF_0027496551:0.0000000000):0.0000000000,GCF_0016335951:0.0000000000):0.0000000000,GCF_0029947251:0.0000000000):0.0000000000,GCF_0019816451:0.0000000000):0.0000027926,GCF_0016333851:0.0000027926)42:0.0000028226,(GCF_0026317751:0.0001184071,GCF_0023709651:0.0001187018)34:0.0000028373)37:0.0000028372,(((GCF_0211990951:0.0000000000,GCF_0153775251:0.0000000000):0.0000000000,GCF_0006041051:0.0000000000):0.0000028376,GCF_0000230851:0.0000028376)100:0.0001186074)100:0.0002376984,((GCF_0030457051:0.0001184974,(GCF_0016332451:0.0001184096,GCF_0080164151:0.0018032536)100:0.0002372411)69:0.0000026771,GCF_0134878051:0.0000027926)70:0.0000028449)100:0.0002372231,((((GCF_0138085351:0.0000000000,GCF_0017540051:0.0000000000):0.0000000000,GCF_0138085251:0.0000000000):0.0000027926,GCF_0138085051:0.0000027926)100:0.0003566446,GCF_0110222951:0.0003565426)100:0.0001184398)98:0.0001185043)17:0.0000027180,((((((GCF_0039996051:0.0000000000,GCF_0015818951:0.0000000000):0.0000000000,GCF_0019819551:0.0000000000):0.0000000000,GCF_0019819851:0.0000000000):0.0000028374,GCF_0175925851:0.0000028374)100:0.0001187765,(((GCF_0016335451:0.0001196099,GCF_0113045951:0.0000023884)100:0.0003564865,GCF_0009561951:0.0002369159)52:0.0000023889,GCF_0043684851:0.0001188244)43:0.0000028334)99:0.0002371457,GCF_0040283151:0.0010702517)76:0.0002376149)27:0.0002375669,GCF_0033474451:0.0011889811)26:0.0000028372,(((GCF_0096194951:0.0000027926,GCF_0098640151:0.0000027926)94:0.0000027690,GCF_0110403751:0.0001187837)100:0.0002372512,GCF_0016337651:0.0005941063)98:0.0002377382)5:0.0000021129,((((((((((((GCF_0205523251:0.0000000000,GCF_0205522851:0.0000000000):0.0000000000,GCF_0205520951:0.0000000000):0.0000000000,GCF_0205524051:0.0000000000):0.0000000000,GCF_0205524351:0.0000000000):0.0000000000,GCF_0205524451:0.0000000000):0.0000000000,GCF_0205524251:0.0000000000):0.0000000000,GCF_0205522151:0.0000000000):0.0000000000,GCF_0205522351:0.0000000000):0.0000000000,GCF_0205520751:0.0000000000):0.0000027831,GCF_0205520651:0.0000028372)100:0.0001186052,((GCF_0016597451:0.0000020718,GCF_0036273551:0.0000021268)100:0.0003562146,(GCF_0205520451:0.0000022280,GCF_0205521851:0.0000022071)100:0.0003565530)57:0.0000028317)56:0.0000023854,(GCF_0003381152:0.0002374301,GCF_0099140951:0.0003561118)100:0.0002376462)100:0.0007127885)73:0.0003560184,((((((((((GCF_0155581851:0.0000024514,(GCF_0008305351:0.0000024776,GCF_0043376151:0.0001185144)100:0.0005943510)100:0.0008325080,(GCF_0018884951:0.0000021656,GCF_0018885051:0.0000021720)100:0.0007129642)77:0.0002035327,((((GCF_0018884251:0.0000000000,GCF_0018883551:0.0000000000):0.0000000000,GCF_0018883251:0.0000000000):0.0000024362,GCF_0018883351:0.0000024686)100:0.0009173242,(((GCF_0018883451:0.0000000000,GCF_0018884151:0.0000000000):0.0000023763,GCF_0018884051:0.0000028310)100:0.0001183855,GCF_0018882651:0.0000027059)100:0.0018196159)90:0.0002374984)64:0.0000342674,((((GCF_0016333551:0.0000028349,GCF_0016396451:0.0000028350)100:0.0002377693,((GCF_0114216651:0.0000027926,GCF_0120706351:0.0000027926)100:0.0001188561,(GCF_0018882451:0.0000027926,GCF_0018885651:0.0000027926)100:0.0001186526)95:0.0000028377)100:0.0001188705,(((GCF_0080841251:0.0003566929,GCF_0016192651:0.0002377670)94:0.0000028381,GCF_0175809751:0.0003566521)100:0.0001186252,GCF_0155598751:0.0003566696)93:0.0000028181)100:0.0002377748,GCF_0018882551:0.0002381038)100:0.0002371078)66:0.0001185799,(GCF_0027506951:0.0009513983,(GCF_0175769651:0.0000023955,GCF_0195994251:0.0000028560)100:0.0008320555)100:0.0002376706)70:0.0003558537,((GCF_9002900851:0.0000000000,GCF_9002901351:0.0000000000):0.0000020280,GCF_9002901251:0.0000020319)100:0.0011896780)62:0.0003564364,(((((GCF_0055769351:0.0000000000,GCF_0033448251:0.0000000000):0.0000020551,GCF_0155612251:0.0000020159)100:0.0003548905,(GCF_0019823351:0.0003561428,((GCF_0160295351:0.0000000000,GCF_0023709251:0.0000000000):0.0000027088,GCF_0080841351:0.0000028453)100:0.0002372821)86:0.0000020956)100:0.0011224323,(GCF_0016336651:0.0000022299,GCF_0016334051:0.0000020276)100:0.0006627466)99:0.0006896661,(GCF_0019821151:0.0012123742,GCF_0019821951:0.0028348386)96:0.0003046378)74:0.0003116561)78:0.0000027091,GCF_0033474551:0.0026471166)99:0.0005935605,((GCF_0034707651:0.0000000000,GCF_0030460751:0.0000000000):0.0000026397,GCF_0175810651:0.0000026204)100:0.0009518178)100:0.0028585621,((((((((((GCF_0175809551:0.0000000000,GCF_0193116951:0.0000000000):0.0000000000,GCF_0190389951:0.0000000000):0.0000027926,(((GCF_0189911951:0.0000000000,GCF_0189932851:0.0000000000):0.0000028448,GCF_0189918551:0.0000016198)100:0.0002372059,GCF_0025321251:0.0003560693)46:0.0000028454)19:0.0000028378,GCF_0004669053:0.0000027926)47:0.0000027731,GCF_0041015451:0.0001183011)100:0.0004753772,((GCF_0032586151:0.0000027926,GCF_0099356751:0.0000027926)100:0.0002368024,((GCF_0098072151:0.0000000000,GCF_0098072051:0.0000000000):0.0000028371,GCF_0098071951:0.0000021637)100:0.0001185887)100:0.0003565227)29:0.0000023873,(GCF_0175810451:0.0001187993,(GCF_0016600251:0.0002386384,GCF_0198791651:0.0001188024)18:0.0000027926)5:0.0000028517)7:0.0000027869,GCF_0185886051:0.0000027926)24:0.0000023464,GCF_0029209351:0.0002376268)99:0.0003563110,(((GCF_9007002751:0.0000000000,GCF_9006954251:0.0000000000):0.0000027973,GCF_9002891551:0.0000028285)100:0.0001186107,((GCF_0040007051:0.0001198372,GCF_0028687551:0.0000027926)92:0.0000023039,GCF_0022208151:0.0004754892)100:0.0008318177)74:0.0001186691)81:0.0003564543)71:0.0003565739)7:0.0000023236,(((GCF_0019823851:0.0004755376,GCF_0136943051:0.0005945168)45:0.0001184048,((GCF_0067705051:0.0008321141,GCF_0131551451:0.0002377171)42:0.0001186019,(GCF_0160669151:0.0000023886,GCF_0165987351:0.0000023900)100:0.0003555952)34:0.0000028894)49:0.0001185129,((((GCF_0018884651:0.0000028451,GCF_0018887751:0.0000028452)100:0.0002372370,GCF_0157147751:0.0002382672)73:0.0000028456,GCF_0013687751:0.0007133508)85:0.0002376460,((GCF_0156939251:0.0007126256,GCF_0182570751:0.0001187998)65:0.0000028656,GCF_0201313351:0.0000028135)91:0.0005940840)62:0.0001186077)63:0.0002372232)53:0.0003564281)9:0.0000024573,(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((GCF_0043023451:0.0000000000,GCF_0043024151:0.0000000000):0.0000000000,GCF_0043011551:0.0000000000):0.0000000000,GCF_0043025851:0.0000000000):0.0000000000,GCF_0043014251:0.0000000000):0.0000000000,GCF_0043015651:0.0000000000):0.0000000000,GCF_0043022951:0.0000000000):0.0000000000,GCF_0043020051:0.0000000000):0.0000000000,GCF_0043013051:0.0000000000):0.0000000000,GCF_0043016851:0.0000000000):0.0000000000,GCF_0043014351:0.0000000000):0.0000000000,GCF_0043026151:0.0000000000):0.0000000000,GCF_0043022151:0.0000000000):0.0000000000,GCF_0181381851:0.0000000000):0.0000000000,GCF_0043023951:0.0000000000):0.0000000000,GCF_0043010351:0.0000000000):0.0000000000,GCF_0043009451:0.0000000000):0.0000000000,GCF_0043018051:0.0000000000):0.0000000000,GCF_0043026951:0.0000000000):0.0000000000,GCF_0043019951:0.0000000000):0.0000000000,GCF_0043017951:0.0000000000):0.0000000000,GCF_0043012351:0.0000000000):0.0000000000,GCF_0043015451:0.0000000000):0.0000000000,GCF_0043012551:0.0000000000):0.0000000000,GCF_0043012051:0.0000000000):0.0000000000,GCF_0043012451:0.0000000000):0.0000000000,GCF_0043016551:0.0000000000):0.0000000000,GCF_0043022551:0.0000000000):0.0000000000,GCF_0043009651:0.0000000000):0.0000000000,GCF_0043015851:0.0000000000):0.0000000000,GCF_0043010551:0.0000000000):0.0000000000,GCF_0043014851:0.0000000000):0.0000000000,GCF_0043013551:0.0000000000):0.0000000000,GCF_0043025051:0.0000000000):0.0000000000,GCF_0043018651:0.0000000000):0.0000000000,GCF_0043017651:0.0000000000):0.0000000000,GCF_0043013951:0.0000000000):0.0000000000,GCF_0043019551:0.0000000000):0.0000000000,GCF_0043025351:0.0000000000):0.0000000000,GCF_0043021851:0.0000000000):0.0000000000,GCF_0181382651:0.0000000000):0.0000000000,GCF_0043009351:0.0000000000):0.0000000000,GCF_0043024851:0.0000000000):0.0000000000,GCF_0003924853:0.0000000000):0.0000000000,GCF_0043024051:0.0000000000):0.0000000000,GCF_0043015951:0.0000000000):0.0000000000,GCF_0043027151:0.0000000000):0.0000000000,GCF_0181382451:0.0000000000):0.0000000000,GCF_0181382851:0.0000000000):0.0000000000,GCF_0043021151:0.0000000000):0.0000000000,GCF_0043023051:0.0000000000):0.0000000000,GCF_0043019751:0.0000000000):0.0000000000,GCF_0043013451:0.0000000000):0.0000000000,GCF_0043026251:0.0000000000):0.0000000000,GCF_0043020551:0.0000000000):0.0000000000,GCF_0043021351:0.0000000000):0.0000000000,GCF_0043022051:0.0000000000):0.0000000000,GCF_0043016451:0.0000000000):0.0000000000,GCF_0043018851:0.0000000000):0.0000000000,GCF_0043011451:0.0000000000):0.0000000000,GCF_0041230351:0.0000000000):0.0000000000,GCF_0043025151:0.0000000000):0.0000000000,GCF_0043019151:0.0000000000):0.0000000000,GCF_0043021951:0.0000000000):0.0000000000,GCF_0043012251:0.0000000000):0.0000000000,GCF_0181381751:0.0000000000):0.0000000000,GCF_0043017251:0.0000000000):0.0000000000,GCF_0043024451:0.0000000000):0.0000000000,GCF_0043018751:0.0000000000):0.0000000000,GCF_0043027451:0.0000000000):0.0000000000,GCF_0181382051:0.0000000000):0.0000000000,GCF_0043014451:0.0000000000):0.0000000000,GCF_0043021051:0.0000000000):0.0000000000,GCF_0043026451:0.0000000000):0.0000000000,GCF_0043020351:0.0000000000):0.0000000000,GCF_0043017751:0.0000000000):0.0000000000,GCF_0043015551:0.0000000000):0.0000000000,GCF_0043019051:0.0000000000):0.0000000000,GCF_0043013351:0.0000000000):0.0000000000,GCF_0043009551:0.0000000000):0.0000000000,GCF_0043016951:0.0000000000):0.0000000000,GCF_0043027251:0.0000000000):0.0000000000,GCF_0043013251:0.0000000000):0.0000000000,GCF_0043009251:0.0000000000):0.0000000000,GCF_0043014551:0.0000000000):0.0000000000,GCF_0181381651:0.0000000000):0.0000000000,GCF_0043022851:0.0000000000):0.0000000000,GCF_0043018151:0.0000000000):0.0000000000,GCF_0043023151:0.0000000000):0.0000000000,GCF_0043010251:0.0000000000):0.0000000000,GCF_0043023851:0.0000000000):0.0000000000,GCF_0043017051:0.0000000000):0.0000000000,GCF_0043024951:0.0000000000):0.0000000000,GCF_0043020651:0.0000000000):0.0000000000,GCF_0040282951:0.0000000000):0.0000000000,GCF_0043026851:0.0000000000):0.0000027926,GCF_0043021251:0.0000027926)38:0.0000027926,GCF_0043010751:0.0000027926)75:0.0000028409,GCF_0043010451:0.0000027926)100:0.0001182449,((((GCF_0042121951:0.0000000000,GCF_0064944651:0.0000000000):0.0000000000,GCF_0016395051:0.0000000000):0.0000000000,GCF_0041028451:0.0000000000):0.0000021272,GCF_0016395251:0.0000028453)100:0.0002368311)100:0.0001188961,((((((GCF_0016334351:0.0000000000,GCF_0004122051:0.0000000000):0.0000021569,GCF_0175810251:0.0000021570)100:0.0005941350,GCF_0121093551:0.0002370526)28:0.0000029334,GCF_0208446751:0.0001188218)28:0.0000028408,GCF_0018741251:0.0002377148)100:0.0001186494,(GCF_0016192751:0.0003565333,(GCF_0016336851:0.0000021541,GCF_0019815951:0.0000021548)100:0.0005934697)100:0.0001186166)100:0.0001198255)71:0.0000020990,(GCF_0097661951:0.0001182372,(GCF_0033461051:0.0000027926,GCF_0003475151:0.0000028535)97:0.0000028497)100:0.0004755133)100:0.0001185897,(GCF_0041417551:0.0002377259,GCF_0033460751:0.0007132367)89:0.0001192801)100:0.0004756127,GCF_0193083851:0.0004756082)88:0.0002371306,((((((((((GCF_0016333251:0.0000023876,GCF_0016333351:0.0001196040)100:0.0003563027,GCF_0018885251:0.0008312574)77:0.0000023870,GCF_0022862751:0.0000027926)36:0.0000020194,((GCF_0168386451:0.0000000000,GCF_0016192951:0.0000000000):0.0000000000,GCF_0021169551:0.0000000000):0.0000028379)78:0.0000028409,(((((((GCF_0021094051:0.0000000000,GCF_0041013251:0.0000000000):0.0000000000,GCF_0040786451:0.0000000000):0.0000027926,GCF_0040785351:0.0000027926)62:0.0000020279,GCF_0041016451:0.0003566077)88:0.0000027619,GCF_0041418751:0.0003565212)100:0.0019035247,(GCF_0189933251:0.0002374044,GCF_0019822051:0.0003565587)98:0.0004756653)7:0.0001185403,(((((GCF_0192117851:0.0000000000,GCF_0010058051:0.0000000000):0.0000000000,GCF_0033257751:0.0000000000):0.0000027926,GCF_0192117651:0.0000027926)71:0.0000025886,GCF_0009314252:0.0001188255)81:0.0000028376,GCF_0170682351:0.0020102443)100:0.0001189180)6:0.0001182235)63:0.0003574188,((GCF_0016395451:0.0001188021,GCF_0028687751:0.0002384097)78:0.0000021156,((GCF_0122729351:0.0000027926,GCF_0148782251:0.0000027926)99:0.0000023525,GCF_0067704851:0.0001187898)100:0.0001188515)87:0.0000024198)7:0.0001804255,(((GCF_0175809251:0.0009512069,((GCF_0017540251:0.0001187754,GCF_0097598251:0.0004751467)100:0.0002369219,GCF_0013026451:0.0009510158)100:0.0001184673)91:0.0000023907,(((GCF_0080168451:0.0000000000,GCF_0080168551:0.0000000000):0.0000023903,GCF_0080169251:0.0000020440)100:0.0007130502,GCF_0009664751:0.0008322891)100:0.0003565267)100:0.0004143152,((GCF_0016395951:0.0002376737,GCF_0021736551:0.0001184212)89:0.0000028571,GCF_0016720351:0.0002386436)100:0.0005375407)71:0.0001185300)12:0.0001758274,(GCF_0140840651:0.0001188277,GCF_0030288351:0.0001187304)100:0.0016651535)3:0.0000027419,(((((GCF_0030764351:0.0001188374,GCF_0021172851:0.0000021030)100:0.0001186435,GCF_0179635051:0.0001188215)100:0.0001188374,((((GCF_9018304351:0.0000000000,GCF_0025321151:0.0000000000):0.0000028559,GCF_0007629551:0.0000021116)93:0.0000021322,GCF_0020053852:0.0001178411)100:0.0002372252,GCF_0133073051:0.0001188521)99:0.0001184370)35:0.0000021478,(GCF_0041016251:0.0006026711,GCF_0005070451:0.0007129809)39:0.0000022567)11:0.0000025499,GCF_0040554151:0.0000020634)14:0.0000020181)20:0.0001194963,(((((GCF_0021657151:0.0000000000,GCF_0041229651:0.0000000000):0.0000027926,GCF_0040283351:0.0000027926)100:0.0001184773,(((((GCF_0193999151:0.0000000000,GCF_0193901151:0.0000000000):0.0000000000,GCF_0024073951:0.0000000000):0.0000000000,GCF_0193901451:0.0000000000):0.0000028087,GCF_0193900951:0.0000028092)100:0.0001186262,((GCF_0022057752:0.0000000000,GCF_0012679051:0.0000000000):0.0000027926,GCF_0033521251:0.0000027926)94:0.0000023688)100:0.0001187654)100:0.0001182100,(GCF_0029435451:0.0002374456,GCF_0167756851:0.0001180523)100:0.0005939488)100:0.0004754928,((GCF_0058642751:0.0000027926,GCF_0019815851:0.0000027926)100:0.0003563703,(GCF_0029482151:0.0000022703,GCF_0129745451:0.0001195959)100:0.0003566144)51:0.0000020179)33:0.0001182492)20:0.0001187984)43:0.0001186106,(((((((((((((GCF_0033448451:0.0000000000,GCF_0016175252:0.0000000000):0.0000000000,GCF_0173019351:0.0000000000):0.0000000000,GCF_0001488152:0.0000000000):0.0000000000,GCF_0040251651:0.0000000000):0.0000000000,GCF_0036273351:0.0000000000):0.0000000000,GCF_0041230951:0.0000000000):0.0000000000,GCF_0021094251:0.0000000000):0.0000000000,GCF_0078335951:0.0000000000):0.0000026612,(GCF_0014840051:0.0000027926,(((((((((((((GCF_0098898951:0.0000000000,GCF_0098898351:0.0000000000):0.0000000000,GCF_0098899251:0.0000000000):0.0000000000,GCF_0098897351:0.0000000000):0.0000000000,GCF_0025768351:0.0000000000):0.0000000000,GCF_0098900551:0.0000000000):0.0000000000,GCF_0098899351:0.0000000000):0.0000000000,GCF_0023709851:0.0000000000):0.0000000000,GCF_0098898851:0.0000000000):0.0000000000,GCF_0098899651:0.0000000000):0.0000000000,GCF_0098898651:0.0000000000):0.0000000000,GCF_0017045951:0.0000000000):0.0000028374,GCF_0098898251:0.0000028374)100:0.0001186166,GCF_0007642851:0.0001188233)58:0.0000028009)10:0.0000029001)65:0.0000028111,(GCF_0035897251:0.0000026466,GCF_9023866451:0.0000026657)100:0.0001186007)100:0.0001186097,(((((((GCF_0185886651:0.0000000000,GCF_0098897751:0.0000000000):0.0000000000,GCF_0016518451:0.0000000000):0.0000000000,GCF_0208819351:0.0000000000):0.0000000000,GCF_0156890551:0.0000000000):0.0000000000,GCF_0018887351:0.0000000000):0.0000000000,GCF_0016395651:0.0000000000):0.0000027926,GCF_0185886151:0.0000027926)93:0.0000028001)100:0.0001187865,(((((((GCF_0019822851:0.0000000000,GCF_0014368551:0.0000000000):0.0000000000,GCF_0019820351:0.0000000000):0.0000000000,GCF_0019823251:0.0000000000):0.0000000000,GCF_0205228851:0.0000000000):0.0000000000,GCF_0019820051:0.0000000000):0.0000027926,(((GCF_0140418951:0.0001188403,(GCF_0016335751:0.0002368426,(GCF_9028253851:0.0000028374,GCF_0014444951:0.0000028374)100:0.0001186185)47:0.0000028374)9:0.0000028371,(GCF_0184037051:0.0001188247,GCF_0134583351:0.0001188389)22:0.0000028378)7:0.0000027771,GCF_0032694051:0.0000027926)5:0.0000027926)37:0.0000024489,((((((GCF_0013073251:0.0000000000,GCF_0017043351:0.0000000000):0.0000000000,GCF_0004746951:0.0000000000):0.0000000000,GCF_0022201751:0.0000000000):0.0000000000,GCF_0156943251:0.0000000000):0.0000027926,GCF_0017043151:0.0000027926)86:0.0000021635,(GCF_0022901851:0.0001188484,GCF_0141321751:0.0001187638)88:0.0000027926)100:0.0001187604)100:0.0002377208)56:0.0002375858,(GCF_0155491451:0.0000023887,GCF_0111701851:0.0002383428)100:0.0007133055)4:0.0000027557)0:0.0000026914)3:0.0000027044,(((((GCF_0098900251:0.0000000000,GCF_0098899751:0.0000000000):0.0000027926,GCF_0098900451:0.0000027926)100:0.0002375923,GCF_0129324051:0.0002376428)100:0.0003562728,((GCF_0039992751:0.0000023247,GCF_0016754251:0.0000020228)100:0.0007132977,((GCF_0100924851:0.0000027926,GCF_0175810051:0.0001188019)95:0.0000023887,GCF_0194256951:0.0002381376)100:0.0003562739)66:0.0001196542)46:0.0001188458,((((GCF_0099136551:0.0000000000,GCF_0099136351:0.0000000000):0.0000000000,GCF_0099136151:0.0000000000):0.0000027514,GCF_0021741951:0.0000025269)100:0.0003565537,(GCF_0098639351:0.0001188189,GCF_0194694651:0.0000027926)92:0.0000020619)100:0.0003561008)45:0.0000023476)38:0.0001185927,((((GCF_0173519951:0.0002372643,((GCF_0036925951:0.0000027926,GCF_0043196651:0.0000027926)100:0.0001186041,GCF_0019823051:0.0002368062)95:0.0001188409)100:0.0002370199,((GCF_9000785251:0.0000000000,GCF_0143241751:0.0000000000):0.0000023904,GCF_9000802051:0.0000024791)100:0.0003568046)86:0.0002367379,GCF_9001762351:0.0011884008)42:0.0000029494,(GCF_0041034951:0.0000022745,GCF_0041035151:0.0000022095)100:0.0002372187)48:0.0001183772)19:0.0000028340,GCF_0168120751:0.0007132927)44:0.0000029558,((((((((GCF_0208446851:0.0002378439,GCF_0088684951:0.0003556134)55:0.0000027926,GCF_0208446651:0.0001186941)5:0.0000021066,GCF_0097569651:0.0000027926)2:0.0000028376,GCF_0012723152:0.0000027926)93:0.0001184989,(((GCF_0030200051:0.0000027926,GCF_0017156151:0.0000027926)100:0.0005941805,GCF_0016335651:0.0005950626)77:0.0000021592,GCF_0039668551:0.0007133024)79:0.0005934844)64:0.0000021575,GCF_0037094151:0.0002382944)66:0.0001179293,(GCF_0015409651:0.0001188362,GCF_0175809351:0.0000028379)74:0.0000026199)69:0.0002391147,(((((((((((GCF_0030238251:0.0000000000,GCF_0030617651:0.0000000000):0.0000000000,GCF_0030617251:0.0000000000):0.0000000000,GCF_0030617851:0.0000000000):0.0000000000,GCF_0030530351:0.0000000000):0.0000000000,GCF_0030530451:0.0000000000):0.0000000000,GCF_0030618051:0.0000000000):0.0000000000,GCF_0020248451:0.0000000000):0.0000000000,GCF_0212790051:0.0000000000):0.0000027926,GCF_0063649751:0.0000027926)94:0.0000027033,(((((GCF_0031439151:0.0000000000,GCF_0035864851:0.0000000000):0.0000000000,GCF_0035975951:0.0000000000):0.0000000000,GCF_0132569651:0.0000000000):0.0000000000,GCF_0029149651:0.0000000000):0.0000023155,GCF_0035976151:0.0000028372)100:0.0001188008)100:0.0002371240,GCF_0006874951:0.0002377490)99:0.0002369530)100:0.0007127827)100:0.0002363131,GCF_0183956552:0.0001187990);'
+  var container_id = "#tree_container";
+
+  //var tree = phylotree.phylotree(test_string);
+  //.size([height, width]);
+
+  //window.setInterval (function () {});
+
+  var example_controls = d3.select("#controls_form").append("form");
+
+  //var svg = d3.select(container_id).append("svg")
+  //    .attr("width", width)
+  //    .attr("height", height);
+
+  function selection_handler_name_box(e) {
+    var name_box = d3.select(this);
+    switch (e.detail[0]) {
+      case "save":
+      case "cancel":
+        name_box
+                .property("disabled", true)
+                .style("color", color_scheme(current_selection_id));
+
+        break;
+      case "new":
+        name_box
+                .property("disabled", false)
+                .property("value", "new_selection_name")
+                .style("color", color_scheme(selection_set.length));
+        break;
+      case "rename":
+        name_box.property("disabled", false);
+        break;
+    }
+  }
+
+  function selection_handler_new(e) {
+    var element = d3.select(this);
+    $(this).data("tooltip", false);
+    switch (e.detail[0]) {
+      case "save":
+      case "cancel":
+        if (selection_set.length == max_selections) {
+          element.classed("disabled", true);
+          $(this).tooltip({
+            title: "Up to " + max_selections + " are allowed",
+            placement: "left"
+          });
+        } else {
+          element.classed("disabled", null);
+        }
+        break;
+      default:
+        element.classed("disabled", true);
+        break;
+    }
+  }
+
+  function selection_handler_rename(e) {
+    var element = d3.select(this);
+    element.classed(
+            "disabled",
+            e.detail[0] == "save" || e.detail[0] == "cancel" ? null : true
+    );
+  }
+
+  function selection_handler_save_selection_name(e) {
+    var element = d3.select(this);
+    element.style(
+            "display",
+            e.detail[0] == "save" || e.detail[0] == "cancel" ? "none" : null
+    );
+  }
+
+  function selection_handler_name_dropdown(e) {
+    var element = d3.select(this).selectAll(".selection_set");
+    element.classed(
+            "disabled",
+            e.detail[0] == "save" || e.detail[0] == "cancel" ? null : true
+    );
+  }
+
+  function selection_handler_delete(e) {
+    var element = d3.select(this);
+    $(this).tooltip("dispose");
+    switch (e.detail[0]) {
+      case "save":
+      case "cancel":
+        if (selection_set.length == 1) {
+          element.classed("disabled", true);
+          $(this).tooltip({
+            title:
+                    "At least one named selection set <br> is required;<br>it can be empty, however",
+            placement: "bottom",
+            html: true
+          });
+        } else {
+          element.classed("disabled", null);
+        }
+        break;
+      default:
+        element.classed("disabled", true);
+        break;
+    }
+  }
+
+  var datamonkey_save_image = function(type, container) {
+    var prefix = {
+      xmlns: "http://www.w3.org/2000/xmlns/",
+      xlink: "http://www.w3.org/1999/xlink",
+      svg: "http://www.w3.org/2000/svg"
+    };
+
+    function get_styles(doc) {
+      function process_stylesheet(ss) {
+        try {
+          if (ss.cssRules) {
+            for (var i = 0; i < ss.cssRules.length; i++) {
+              var rule = ss.cssRules[i];
+              if (rule.type === 3) {
+                // Import Rule
+                process_stylesheet(rule.styleSheet);
+              } else {
+                // hack for illustrator crashing on descendent selectors
+                if (rule.selectorText) {
+                  if (rule.selectorText.indexOf(">") === -1) {
+                    styles += "\n" + rule.cssText;
+                  }
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.log("Could not process stylesheet : " + ss); // eslint-disable-line
+        }
+      }
+
+      var styles = "",
+              styleSheets = doc.styleSheets;
+
+      if (styleSheets) {
+        for (var i = 0; i < styleSheets.length; i++) {
+          process_stylesheet(styleSheets[i]);
+        }
+      }
+
+      return styles;
+    }
+
+    var svg = $(container).find("svg")[0];
+    if (!svg) {
+      svg = $(container)[0];
+    }
+
+    var styles = get_styles(window.document);
+
+    svg.setAttribute("version", "1.1");
+
+    var defsEl = document.createElement("defs");
+    svg.insertBefore(defsEl, svg.firstChild);
+
+    var styleEl = document.createElement("style");
+    defsEl.appendChild(styleEl);
+    styleEl.setAttribute("type", "text/css");
+
+    // removing attributes so they aren't doubled up
+    svg.removeAttribute("xmlns");
+    svg.removeAttribute("xlink");
+
+    // These are needed for the svg
+    if (!svg.hasAttributeNS(prefix.xmlns, "xmlns")) {
+      svg.setAttributeNS(prefix.xmlns, "xmlns", prefix.svg);
+    }
+
+    if (!svg.hasAttributeNS(prefix.xmlns, "xmlns:xlink")) {
+      svg.setAttributeNS(prefix.xmlns, "xmlns:xlink", prefix.xlink);
+    }
+
+    var source = new XMLSerializer()
+            .serializeToString(svg)
+            .replace("</style>", "<![CDATA[" + styles + "]]></style>");
+    var doctype =
+            '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
+    var to_download = [doctype + source];
+    var image_string =
+            "data:image/svg+xml;base66," + encodeURIComponent(to_download);
+
+    if (navigator.msSaveBlob) {
+      // IE10
+      download(image_string, "image.svg", "image/svg+xml");
+    } else if (type == "png") {
+      b64toBlob(
+              image_string,
+              function(blob) {
+                var url = window.URL.createObjectURL(blob);
+                var pom = document.createElement("a");
+                pom.setAttribute("download", "image.png");
+                pom.setAttribute("href", url);
+                $("body").append(pom);
+                pom.click();
+                pom.remove();
+              },
+              function(error) {
+                console.log(error); // eslint-disable-line
+              }
+      );
+    } else {
+      var pom = document.createElement("a");
+      pom.setAttribute("download", "image.svg");
+      pom.setAttribute("href", image_string);
+      $("body").append(pom);
+      pom.click();
+      pom.remove();
+    }
+  };
+
+  $(document).ready(function() {
+    tree = new phylotree.phylotree(test_string);
+    global_tree = tree;
+
+    tree.render({
+      container: "#tree_container",
+      "draw-size-bubbles": false,
+      "bubble-styler": d => { return 5 },
+      "node-styler": node_colorizer,
+      zoom: false,
+      "edge-styler": edge_colorizer,
+    });
+
+    $('#tree_container').on('reroot', function (e) {
+      update_selection_names();
+
+      tree.display.countHandler(count => {
+        $("#selected_branch_counter").text(function(d) {
+          return count[current_selection_name];
+        });
+      });
+
+    });
+
+    tree.display.selectionLabel(current_selection_name);
+
+    tree.display.countHandler(count => {
+      $("#selected_branch_counter").text(function(d) {
+        return count[current_selection_name];
+      });
+    });
+
+    // Get selection set names from parsed newick
+    if (tree.parsed_tags.length) {
+      selection_set = tree.parsed_tags;
+    }
+
+    // Until a cleaner solution to supporting both Observable and regular HTML
+    $(tree.display.container).append(tree.display.show());
+
+    $("#selection_new")
+            .get(0)
+            .addEventListener(
+                    selection_menu_element_action,
+                    selection_handler_new,
+                    false
+            );
+    $("#selection_rename")
+            .get(0)
+            .addEventListener(
+                    selection_menu_element_action,
+                    selection_handler_rename,
+                    false
+            );
+    $("#selection_delete")
+            .get(0)
+            .addEventListener(
+                    selection_menu_element_action,
+                    selection_handler_delete,
+                    false
+            );
+    $("#selection_delete")
+            .get(0)
+            .dispatchEvent(
+                    new CustomEvent(selection_menu_element_action, {
+                      detail: ["cancel", null]
+                    })
+            );
+    $("#selection_name_box")
+            .get(0)
+            .addEventListener(
+                    selection_menu_element_action,
+                    selection_handler_name_box,
+                    false
+            );
+    $("#save_selection_name")
+            .get(0)
+            .addEventListener(
+                    selection_menu_element_action,
+                    selection_handler_save_selection_name,
+                    false
+            );
+    $("#selection_name_dropdown")
+            .get(0)
+            .addEventListener(
+                    selection_menu_element_action,
+                    selection_handler_name_dropdown,
+                    false
+            );
+
+    update_selection_names();
+
+    $("#save_image").on("click", function(e) {
+      datamonkey_save_image("svg", "#tree_container");
+    });
+  });
+</script>
+
+<script>
+  var _warn = console.warn;
+
+  console.warn = function() {
+    if (arguments[0].includes("Phylotree User Warning")) {
+      var warning_div = d3
+              .select("#main_display")
+              .insert("div", ":first-child");
+      warning_div
+              .attr("class", "alert alert-danger alert-dismissable")
+              .html(arguments[0]);
+    }
+    return _warn.apply(console, arguments);
+  };
+</script>
+</body>
+</html>

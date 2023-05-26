@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    html, body, #plot {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+<script>
+  // Function to load JSON file and create the plot
+  function loadJSONAndCreatePlot() {
+    window.linkText = localStorage.getItem('linkText'); // Retrieve the link text from localStorage
+    console.log(window.linkText);
+    fetch('https://pankb.blob.core.windows.net/data/PanKB/Interactive_figures/data/' + window.linkText + '/gene_freq.json')
+            .then(response => response.json())
+            .then(data => {
+              // Data
+              const frequency = data['frequency'];
+              const x15 = data['x15'];
+              const x99 = data['x99'];
+              const rare_max_freq = data['rare_max_freq'];
+              const accessory_max_freq = data['accessory_max_freq'];
+              const core_max_freq = data['core_max_freq'];
+              const max_frequency_count = data['max_frequency_count'];
+
+              const trace1 = {
+                x: frequency.filter(value => value <= x15),
+                type: 'histogram',
+                name: 'Rare',
+                histfunc: 'count',
+                autobinx: false,
+                xbins: {
+                  start: Math.min(...frequency),
+                  end: x15,
+                  size: 1
+                },
+                marker: {
+                  color: 'green',
+                  line: {
+                    color:  'black',
+                    width: 1
+                  }
+                },
+                opacity: 0.3
+              };
+
+              const trace2 = {
+                x: frequency.filter(value => value > x15 && value <= x99),
+                type: 'histogram',
+                name: 'Accessory',
+                histfunc: 'count',
+                autobinx: false,
+                xbins: {
+                  start: x15,
+                  end: x99,
+                  size: 1
+                },
+                marker: {
+                  color: 'orange',
+                  line: {
+                    color:  'black',
+                    width: 1
+                  }
+                },
+                opacity: 0.3
+              };
+
+              const trace3 = {
+                x: frequency.filter(value => value > x99),
+                type: 'histogram',
+                name: 'Core',
+                histfunc: 'count',
+                autobinx: false,
+                xbins: {
+                  start: x99,
+                  end: Math.max(...frequency),
+                  size: 1
+                },
+                marker: {
+                  color: 'purple',
+                  line: {
+                    color:  'black',
+                    width: 1
+                  }
+                },
+                opacity: 0.3
+              };
+
+              const layout = {
+                autosize: true,
+                title: {
+                  text: "Gene frequency",
+                  titlefont: {
+                    size: 16,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                  },
+                  tickfont: {
+                    size: 12,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                  },
+                  xref: 'paper',
+                  x: 0.5,
+                },
+                xaxis: {
+                  title: 'Number of Genomes',
+                  showgrid: false,  // Remove x-axis grid lines
+                  showline: true,  // Show x-axis line
+                  titlefont: {
+                    size: 14,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                  },
+                  tickfont: {
+                    size: 12,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                  }
+                },
+                yaxis: {
+                  title: 'Gene frequency',
+                  showgrid: false,  // Remove y-axis grid lines
+                  showline: true,  // Show y-axis line
+                  range: [0, max_frequency_count * 1.1],
+                  tickformat: '1s', // Format y-axis labels as '1k'
+                  linewidth: 1,
+                  titlefont: {
+                    size: 14,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                  },
+                  tickfont: {
+                    size: 12,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                  }
+                },
+                showlegend: true,  // Show legend
+                legend: {
+                  x: 0.5,  // Position the legend at the center of the plot
+                  y: 1.1,
+                  xanchor: 'center',
+                  yanchor: 'bottom',
+                  orientation: 'h',  // Set legend orientation to horizontal
+                  itemclick: false,  // Disable legend item click
+                  itemdoubleclick: false,  // Disable legend item double-click
+                  itemwidth: 30,  // Adjust legend item width as needed
+                  itemheight: 20,  // Adjust legend item height as needed
+                  itemorder: 'normal',  // Preserve the order of legend items
+                  bgcolor: 'rgba(0,0,0,0)',  // Set legend background color to transparent
+                  bordercolor: 'rgba(0,0,0,0)',  // Set legend border color to transparent
+                  font: {
+                    family: 'Arial, sans-serif',
+                    size: 12,
+                    color: '#000000'
+                  },
+                  xref: 'paper',  // Set x-coordinate reference to 'paper'
+                  yref: 'paper',  // Set y-coordinate reference to 'paper'
+                  xanchor: 'center',  // Center the legend horizontally
+                  yanchor: 'middle',  // Center the legend vertically
+                },
+                shapes: [
+                  {
+                    type: 'line',
+                    x0: x15,
+                    y0: 0,
+                    x1: x15,
+                    y1: max_frequency_count,
+                    yref: 'y',
+                    line: {
+                      color: 'black',
+                      width: 2,
+                      dash: 'dot'
+                    }
+                  },
+
+                  {
+                    type: 'line',
+                    x0: x99,
+                    y0: 0,
+                    x1: x99,
+                    y1: max_frequency_count,
+                    yref: 'y',
+                    line: {
+                      color: 'black',
+                      width: 2,
+                      dash: 'dot'
+                    }
+                  },
+                  {
+                    type: 'rect',
+                    x0: Math.min(...frequency),
+                    y0: 0,
+                    x1: x15,
+                    y1: rare_max_freq,
+                    yref: 'y',
+                    fillcolor: 'green',
+                    opacity: 0.3,
+                    line: {
+                      width: 0
+                    }
+                  },
+                  {
+                    type: 'rect',
+                    x0: x15,
+                    y0: 0,
+                    x1: x99,
+                    y1: accessory_max_freq,
+                    yref: 'y',
+                    fillcolor: 'orange',
+                    opacity: 0.3,
+                    line: {
+                      width: 0
+                    }
+                  },
+                  {
+                    type: 'rect',
+                    x0: x99,
+                    y0: 0,
+                    x1: Math.max(...frequency),
+                    y1: core_max_freq,
+                    yref: 'y',
+                    fillcolor: 'purple',
+                    opacity: 0.3,
+                    line: {
+                      width: 0
+                    }
+                  }
+                ],
+              };
+
+              const config = {
+                displayModeBar: false,  // Enable the display of the mode bar
+              }
+
+              var data = [trace1, trace2, trace3];
+              Plotly.newPlot('plot', data, layout, config);
+            });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    loadJSONAndCreatePlot();
+  });
+</script>
+
+<div id="plot"></div>
+
+</body>
+</html>
