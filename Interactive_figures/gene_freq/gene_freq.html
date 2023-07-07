@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <!--  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
   <style>
     html, body, #plot {
       height: 100%;
@@ -11,15 +11,29 @@
       padding: 0;
       overflow: hidden;
     }
+
+    .legend text {
+      opacity: 0.6 !important;
+    }
+
+    /* Legend styles */
+    .legend {
+      opacity: 1 !important;  /* Set the opacity of the legend */
+    }
+
+    /* Figure styles */
+
+
   </style>
 </head>
 <body>
 <script>
   // Function to load JSON file and create the plot
   function loadJSONAndCreatePlot() {
-    window.linkText = localStorage.getItem('linkText'); // Retrieve the link text from localStorage
-    console.log(window.linkText);
-    fetch('https://pankb.blob.core.windows.net/data/PanKB/Interactive_figures/data/' + window.linkText + '/gene_freq.json')
+    const urlParams = new URLSearchParams(window.location.search);
+    const species = urlParams.get('species');
+
+    fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/gene_freq.json')
             .then(response => response.json())
             .then(data => {
               // Data
@@ -96,6 +110,13 @@
 
               const layout = {
                 autosize: true,
+                margin: {
+                  l: 80,  // left margin
+                  r: 60,  // right margin
+                  b: 60, // bottom margin
+                  t: 60, // top margin
+                  pad: 0 // padding
+                },
                 title: {
                   text: "Gene frequency",
                   titlefont: {
@@ -111,6 +132,7 @@
                 },
                 xaxis: {
                   title: 'Number of Genomes',
+                  x: 0.5,
                   showgrid: false,  // Remove x-axis grid lines
                   showline: true,  // Show x-axis line
                   titlefont: {
@@ -123,11 +145,17 @@
                   }
                 },
                 yaxis: {
-                  title: 'Gene frequency',
+                  title: 'Frequency',
+                  titlefont: {
+                    size: 14,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                  },
+                  type: 'log',
+                  dtick: 1,
+                  autorange: true,
                   showgrid: false,  // Remove y-axis grid lines
                   showline: true,  // Show y-axis line
                   range: [0, max_frequency_count * 1.1],
-                  tickformat: '1s', // Format y-axis labels as '1k'
                   linewidth: 1,
                   titlefont: {
                     size: 14,
@@ -141,7 +169,7 @@
                 showlegend: true,  // Show legend
                 legend: {
                   x: 0.5,  // Position the legend at the center of the plot
-                  y: 1.1,
+                  y: 1,
                   xanchor: 'center',
                   yanchor: 'bottom',
                   orientation: 'h',  // Set legend orientation to horizontal
@@ -155,7 +183,7 @@
                   font: {
                     family: 'Arial, sans-serif',
                     size: 12,
-                    color: '#000000'
+                    color: 'grey'
                   },
                   xref: 'paper',  // Set x-coordinate reference to 'paper'
                   yref: 'paper',  // Set y-coordinate reference to 'paper'
@@ -248,5 +276,6 @@
 
 <div id="plot"></div>
 
+<script src="../plotly/plotly.min.js"></script>
 </body>
 </html>

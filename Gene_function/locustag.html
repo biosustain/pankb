@@ -19,8 +19,6 @@
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"> </script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 
-
-
     <style>
         .table_padding {
             display: flex;
@@ -47,9 +45,9 @@
             margin-right: auto;
         }
 
-        tr, th{
+        tr, th {
             font-size: 15px;
-            text-align:center;
+            text-align: center;
             vertical-align: middle;
         }
 
@@ -69,67 +67,80 @@
             text-align: center;
             vertical-align: middle;
             padding: 5px;
+            position: relative;
+        }
+
+        .dataTables_wrapper thead th input {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            margin-bottom: 10px;
         }
 
         .dataTables_wrapper tbody td {
             text-align: center;
             vertical-align: middle;
             padding: 10px;
+            word-break: break-word;
+        }
+
+        .dataTables_wrapper .dataTables_filter {
+            text-align: center;
         }
 
         .dataTables_wrapper .dataTables_filter input {
-            margin-right: 20px;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
         }
 
         #table-container .dataTables_paginate {
             display: flex;
             justify-content: center;
-            margin-top: 15px; !important
+            margin-top: 15px !important;
         }
-
     </style>
-
-
-
 </head>
 <body data-bs-spy="scroll" data-bs-target="#navbar-example">
 
 <br>
 
-<h2 class = 'text-center'>This page is to show more details about genes in pangenome analyses. Will add more later...</h2>
+<h2 class="text-center">This page is to show more details about genes in pangenome analyses. Will add more later...</h2>
 
-<div class = "table_padding overflow-auto">
+<div class="table_padding overflow-auto">
     <div style="width:80%;">
         <table id="example" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
             <thead>
             <tr>
-                <th class="text-center align-middle">locus_tag</th>
-                <th class="text-center align-middle">inference</th>
-                <th class="text-center align-middle">translation</th>
-                <th class="text-center align-middle">product</th>
-                <th class="text-center align-middle">Genome_id</th>
+                <th class="text-center align-middle">Locus Tag</th>
+                <th class="text-center align-middle">Genome ID</th>
+                <th class="text-center align-middle">Prokka Annotation</th>
+                <th class="text-center align-middle">Start Position</th>
+                <th class="text-center align-middle">End Position</th>
+                <th class="text-center align-middle">Nucleotide Seq</th>
+                <th class="text-center align-middle">Amino Acid Seq</th>
             </tr>
             </thead>
 
-            <tbody class = "text-center align-middle" id = "tbody">
+            <tbody class="text-center align-middle" id="tbody">
 
             </tbody>
-
         </table>
     </div>
 </div>
 
 <!-- Datatable -->
-
 <script>
     document.addEventListener('DOMContentLoaded', async function() {
         const urlParams = new URLSearchParams(window.location.search);
-        const geneName = urlParams.get('gene');
-        console.log(geneName);
+        const species = urlParams.get('species');
+        const gene = urlParams.get('gene');
 
         try {
             const data = await $.ajax({
-                'url': 'https://pankb.blob.core.windows.net/data/PanKB/gene_locustag/gene_locustag/' + geneName + '.json',
+                'url': 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/'+ species + '/gene_locustag/' + gene + '.json',
                 'dataType': 'json'
             });
 
@@ -138,30 +149,32 @@
             let table = $('#example').DataTable({
                 data: geneData,
                 columns: [
-                    { data: 'locus_tag' },
-                    { data: 'inference' },
-                    { data: 'translation' },
-                    { data: 'product' },
-                    { data: 'Genome_id' }
+                    { data: 'Locus_Tag' },
+                    { data: 'Genome_ID' },
+                    { data: 'Prokka_Annotation' },
+                    { data: 'Start_Position' },
+                    { data: 'End_Position' },
+                    { data: 'Nucleotide_Seq' },
+                    { data: 'Amino_Acid_Seq' }
                 ],
                 columnDefs: [
                     {
-                        targets: [1, 2, 3], // Apply the function to the inference, translation, and product columns
+                        targets: [2, 5, 6], // Apply the function to the inference, translation, and product columns
                         render: function(data, type, row) {
                             if (type === 'display' && data.length > 30) {
-                                return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 20) + '...</span>';
+                                return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 30) + '...</span>';
                             } else {
                                 return data;
                             }
                         }
                     }
                 ],
-                "language": {
-                    "emptyTable": "Loading..."
+                language: {
+                    emptyTable: 'Loading...'
                 },
-                "order": [],
-                "bSort": true,
-                "searching": false
+                order: [],
+                bSort: true,
+                searching: true
             });
 
         } catch (error) {
@@ -171,27 +184,21 @@
         $('body').on('click', '.truncated', function() {
             var fullText = $(this).attr('data-fulltext');
             var truncatedText = $(this).text();
+            var cell = $(this).closest('td');
+
             if (fullText !== truncatedText) { // check if fullText is not equal to truncatedText
                 $(this).text(fullText);
+                cell.addClass('expanded');
             } else {
                 $(this).text(fullText.substr(0, 20) + '...');
+                cell.removeClass('expanded');
             }
+
+            table.draw(false); // Redraw the DataTable to readjust the layout
         });
 
-        $('[data-toggle="tooltip"]').tooltip();
 
     });
 </script>
-
-
-
-
-
-
-
-
-
-
-
 </body>
 </html>

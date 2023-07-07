@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="generator" content="Hugo 0.84.0">
+  <title>About PanKB</title>
+
+  <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-fixed/">
+
+
+
+  <!-- Bootstrap core CSS -->
+  <link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-fixed/">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0"></script>
+
+  <style>
+    .table_padding {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding-top:50px;
+      padding-bottom:80px;
+    }
+
+    /* Add this to make the DataTable pagination centered */
+    .dataTables_wrapper .dataTables_paginate {
+      float: none;
+      text-align: center;
+    }
+
+    .table-container {
+      width: 100%;
+      text-align: center;
+    }
+
+    .table-container table {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    tr, th {
+      font-size: 15px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    td {
+      font-size: 15px;
+      text-align: center !important;
+      vertical-align: middle !important;
+      padding: 10px;
+      width: 14.2%;
+    }
+
+    .dataTables_wrapper .dataTables_filter {
+      text-align: left;
+    }
+
+    .dataTables_wrapper thead th {
+      text-align: center;
+      vertical-align: middle;
+      padding: 20px 5px;
+      position: relative;
+    }
+
+    .dataTables_wrapper thead th input {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      margin-bottom: 10px;
+    }
+
+    .dataTables_wrapper tbody td {
+      text-align: center;
+      vertical-align: middle;
+      padding: 10px;
+      word-break: break-word;
+    }
+
+    .dataTables_wrapper .dataTables_filter {
+      text-align: center;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    #table-container .dataTables_paginate {
+      display: flex;
+      justify-content: center;
+      margin-top: 15px !important;
+    }
+  </style>
+
+
+
+
+
+  <!-- Custom styles for this template -->
+  <link href="navbar-top-fixed.css" rel="stylesheet">
+</head>
+<body>
+
+
+
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="./index.html">PanKB</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="./About.html">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " href="./Species_list.html">Species</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Download</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="./Publications.html" tabindex="-1" aria-disabled="true">Publications</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
+
+<div class="table_padding overflow-auto">
+  <div style="width:80%;">
+    <table id="example" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
+      <thead>
+      <tr>
+        <th class="text-center align-middle">Title</th>
+        <th class="text-center align-middle">DOI</th>
+        <th class="text-center align-middle">Family / Species</th>
+      </tr>
+      </thead>
+
+      <tbody class="text-center align-middle" id="tbody">
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Datatable -->
+<script>
+  document.addEventListener('DOMContentLoaded', async function() {
+    try {
+      const response = await fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/publications.csv'); // replace with the actual path to your CSV file
+      const csvString = await response.text();
+
+      const data = Papa.parse(csvString, {
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        transformHeader: header => header.trim()
+      }).data;
+
+      let table = $('#example').DataTable({
+        data: data,
+        columns: [
+          { data: 'Title' },
+          { data: 'DOI',
+            render: function(data, type, row) {
+              if (type === 'display') {
+                return '<a href="' + data + '" target="_blank">' + data + '</a>';
+              } else {
+                return data;
+              }
+            }
+          },
+          { data: 'Species' } // here the data field is updated to 'Species'
+        ],
+        columnDefs: [
+          {
+            targets: [0, 1, 2],
+            render: function(data, type, row) {
+              if (type === 'display' && data && data.length > 150) {
+                return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 150) + '...</span>';
+              } else {
+                return data;
+              }
+            }
+          }
+        ],
+        language: {
+          emptyTable: 'Loading...'
+        },
+        order: [],
+        bSort: true,
+        searching: true
+      });
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+    $('body').on('click', '.truncated', function() {
+      var fullText = $(this).attr('data-fulltext');
+      var truncatedText = $(this).text();
+      var cell = $(this).closest('td');
+
+      if (fullText !== truncatedText) {
+        $(this).text(fullText);
+        cell.addClass('expanded');
+      } else {
+        $(this).text(fullText.substr(0, 150) + '...');
+        cell.removeClass('expanded');
+      }
+
+      table.draw(false);
+    });
+  });
+
+</script>
+
+
+
+</body>
+</html>

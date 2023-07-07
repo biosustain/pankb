@@ -16,12 +16,11 @@
     <link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        .bd-placeholder-img {
-            font-size: 1.125rem;
-            text-anchor: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            user-select: none;
+        html, body {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: auto;
         }
 
         @media (min-width: 768px) {
@@ -30,24 +29,50 @@
             }
         }
 
-        .center{
-            text-align: center;
-        }
+        /*.col-2 {*/
+        /*    flex: 0 0 12.5% !important;*/
+        /*    max-width: 12.5% !important;*/
+        /*    padding:0;*/
+        /*}*/
 
-        .link_button{
-            text-align: center;
-            padding: 15px 32px;
-            font-size: 24px;
-        }
+        /*.col-10 {*/
+        /*    flex: 0 0 87.5% !important;*/
+        /*    max-width: 87.5% !important;*/
+
+        /*}*/
 
         .navbar_fixed {
             position: fixed;
             height: 100%;
+            width: 16.666667%;
         }
+
+        .navbar_fixed .btn {
+            border-color: transparent;
+        }
+
+        .navbar-dark .navbar-nav .nav-link {
+            color: #fff;
+        }
+
+        .navbar-dark .navbar-nav .nav-link:focus,
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: #fff;
+            background-color: transparent !important;
+        }
+
+        .link_not_activate{
+            color: grey !important;
+        }
+
+        .iframe_center {
+            height: 100vh;
+            width: 100%;
+            border: none;
+            padding-left: 20px;
+        }
+
     </style>
-
-
-
 
 
     <!-- Custom styles for this template -->
@@ -68,16 +93,16 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="./About.html">About</a>
+                    <a class="nav-link link_not_activate" aria-current="page" href="./About.html">About</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="./Species_list.html">Organism</a>
+                    <a class="nav-link link_not_activate" href="./Species_list.html">Species</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="#">Download</a>
+                    <a class="nav-link link_not_activate" href="#">Download</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link " href="#" tabindex="-1" aria-disabled="true">Publications</a>
+                    <a class="nav-link link_not_activate" href="#" tabindex="-1" aria-disabled="true">Publications</a>
                 </li>
             </ul>
         </div>
@@ -89,65 +114,61 @@
     <div class="row">
         <div class="col-2">
             <div class="flex-shrink-0 p-3 bg-light navbar_fixed">
-                <a href="./Pangenome_analyses_overview.html" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom justify-content-center">
+                <a id = 'Pangenome_analyses' class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom justify-content-center">
                     <span class="fs-5 fw-semibold">Pangenome analyses</span>
                 </a>
                 <ul class="list-unstyled ps-0">
-                    <li class="mb-1 ">
-                        <a href = "./Pangenome_analyses_overview.html" class="btn  align-items-center" role ="button">
+                    <li class="mb-1">
+                        <a id = 'Overview' class="btn  align-items-center " role="button">
                             Overview
                         </a>
                     </li>
                     <li class="mb-1">
-                        <a href = "./gene_annotation.html" class="btn  align-items-center " role = "button">
+                        <a id = 'Gene_annotation' class="btn  align-items-center " role="button">
                             Gene annotation
                         </a>
                     </li>
-                    <!--
-                    <li class="mb-1">
-                      <button class="btn dropdown-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#Gene_annotation" aria-expanded="false">
-                        Gene annotation
-                      </button>
-                      <div class="collapse" id="Gene_annotation">
-                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                          <li><a href="./Pangenome_analyses_gene_annotation_overview.html" class="link-dark rounded">Overview</a></li>
-                          <li><a href="./gene_annotation_core.html" class="link-dark rounded">Core</a></li>
-                          <li><a href="./gene_annotation_accessory.html" class="link-dark rounded">Accessory</a></li>
-                          <li><a href="./gene_annotation_rare.html" class="link-dark rounded">Rare</a></li>
-                        </ul>
-                      </div>
-                    </li>
-                    -->
                     <li class="mb-1 ">
-                        <a href = "./Pangenome_analyses_phylogetic_tree.html" class="btn  align-items-center" role ="button">
+                        <a id = 'Phylogenetic_tree'  class="btn  align-items-center" role="button">
                             Phylogenetic tree
                         </a>
                     </li>
                     <li class="border-top my-3"></li>
-
                     <!--
                     <li class="mb-1">
-                        <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">
-                            More feature
-                        </button>
-                        <div class="collapse" id="account-collapse">
-                            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                                <li><a href="#" class="link-dark rounded">New...</a></li>
-                                <li><a href="#" class="link-dark rounded">Profile</a></li>
-                                <li><a href="#" class="link-dark rounded">Settings</a></li>
-                                <li><a href="#" class="link-dark rounded">Sign out</a></li>
-                            </ul>
-                        </div>
+                      <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">
+                        More features
+                      </button>
+                      <div class="collapse" id="account-collapse">
+                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                          <li><a href="#" class="link-dark rounded">New...</a></li>
+                          <li><a href="#" class="link-dark rounded">Profile</a></li>
+                          <li><a href="#" class="link-dark rounded">Settings</a></li>
+                          <li><a href="#" class="link-dark rounded">Sign out</a></li>
+                        </ul>
+                      </div>
                     </li>
                     -->
-
                 </ul>
+
+                <!-- Card -->
+                <div class="card" id="speciesCard">
+                    <div class="card-body text-left">
+                        <p id="species"></p>
+                        <p id="numGenome"></p>
+                        <p id="core"></p>
+                        <p id="accessory"></p>
+                        <p id="rare"></p>
+                        <p id="openness"></p>
+                    </div>
+                </div>
+
             </div>
         </div>
 
         <div class="col-10">
             <div class = "d-flex align-items-center justify-content-center">
-                <iframe class = "iframe_center " src="./Interactive_figures/phylotree.js/index.html" width="1500" height="1800" ></iframe>
+                <iframe id = 'Phylotree' class = 'iframe_center' height= '100%' ></iframe>
             </div>
         </div>
     </div>
@@ -157,6 +178,44 @@
 
 <script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const species = urlParams.get('species');
+
+        const Pangenome_analyses = document.getElementById('Pangenome_analyses');
+        Pangenome_analyses.href = './Pangenome_analyses_overview.html?species=' + species;
+
+        const Overview = document.getElementById('Overview');
+        Overview.href = './Pangenome_analyses_overview.html?species=' + species;
+
+        const Gene_annotation = document.getElementById('Gene_annotation');
+        Gene_annotation.href = './Pangenome_analyses_gene_annotation.html?species=' + species;
+
+        const Phylogenetic_tree = document.getElementById('Phylogenetic_tree');
+        Phylogenetic_tree.href = './Pangenome_analyses_phylogetic_tree.html?species=' + species;
+
+        // set src for different elements
+        const Phylotree = document.getElementById('Phylotree');
+        Phylotree.src = './Interactive_figures/phylotree.js/index.html?species=' + species;
+
+        fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json')
+            .then(response => response.json())
+            .then(speciesData => {
+
+                // Select the species to show in the card
+                if (speciesData) {
+                    document.getElementById('species').innerHTML = '<b>Species:</b><br>' + speciesData.Species;
+                    document.getElementById('numGenome').innerHTML = '<b>Number of genome:</b><br>' + speciesData.Number_of_genome;
+                    document.getElementById('core').innerHTML = '<b>Core:</b><br>' + speciesData.Gene_class[0];
+                    document.getElementById('accessory').innerHTML = '<b>Accessory:</b><br>' + speciesData.Gene_class[1];
+                    document.getElementById('rare').innerHTML= '<b>Rare:</b><br>' + speciesData.Gene_class[2];
+                    document.getElementById('openness').innerHTML = '<b>Openness:</b><br>' + speciesData.Openness;
+                }
+            });
+
+    });
+</script>
 
 </body>
 </html>

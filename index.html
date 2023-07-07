@@ -11,7 +11,6 @@
   <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-fixed/">
 
 
-
   <!-- Bootstrap core CSS -->
   <link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -19,8 +18,8 @@
     .bd-placeholder-img {
       font-size: 1.125rem;
       text-anchor: middle;
-      -webkit-user-select: none;
       -moz-user-select: none;
+      -webkit-user-select: none;
       user-select: none;
     }
 
@@ -39,10 +38,29 @@
       padding: 15px 32px;
       font-size: 24px;
     }
+
+    .responsive-iframe {
+      position: relative;
+      padding: 0 !important;
+      margin:0 !important;
+      width: 100% !important;
+      height: 45% !important;
+    }
+
+    .responsive-iframe iframe {
+      position: relative;
+      padding: 0 !important;
+      margin:0 !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .card {
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* This adds a shadow effect */
+      transition: 0.3s; /* This adds a transition effect */
+      border-radius: 5px; /* This makes the corners round (5px round corner) */
+    }
   </style>
-
-
-
 
 
   <!-- Custom styles for this template -->
@@ -64,7 +82,7 @@
           <a class="nav-link " aria-current="page" href="./About.html">About</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="./Species_list.html">Organism</a>
+          <a class="nav-link " href="./Species_list.html">Species</a>
         </li>
         <li class="nav-item">
           <a class="nav-link " href="#">Download</a>
@@ -77,60 +95,93 @@
   </div>
 </nav>
 
-<div class="container px-4 py-5" id="featured-3">
-  <br>
-  <br>
+<div class = "container-fluid">
 
   <p class="display-2 center" >
     Pangenome Knowledge Base
   </p>
 
   <br>
+  <div class="row">
+    <div class="col-3">
 
-  <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-
-    <div class="feature col">
-      <div class="feature-icon bg-white center">
-        <object data="https://pankb.blob.core.windows.net/data/PanKB/svg/bacteria.svg" width="150" height="150"> </object>
-      </div>
-      <br>
-      <h3 class = "center"> 1 Species </h3>
     </div>
 
-    <div class="feature col">
-      <div class="feature-icon bg-white center">
-        <object data="https://pankb.blob.core.windows.net/data/PanKB/svg/genome.svg" width="150" height="150"> </object>
+    <div class="col-6">
+      <div class="card"> <!-- This is the wrapper -->
+        <div class="card-body"> <!-- The card-body class adds padding around your content -->
+          <div class="row" style="height:70vh">
+            <div class="responsive-iframe" style="margin-top: 0;">
+              <iframe src='./Interactive_figures/barplot/dimension.html'></iframe>
+            </div>
+
+            <div class="col-12">
+              <hr style="width:80%; border: 0.5px solid gray; margin: 20px auto;">
+            </div>
+
+            <div class="responsive-iframe" style="margin-top: 0;">
+              <iframe src='./Interactive_figures/gene_freq/genome_alpha.html'></iframe>
+            </div>
+          </div>
+        </div>
       </div>
-      <br>
-      <h3 class = "center"> 611 Genomes </h3>
     </div>
 
+    <div class="col-3">
 
-    <div class="feature col">
-      <div class="feature-icon bg-white center">
-        <object data='https://pankb.blob.core.windows.net/data/PanKB/svg/analysis.svg' width="150" height="150"> </object>
-      </div>
-      <br>
-      <h3 class = "center"> 9 Analytics</h3>
     </div>
-
   </div>
 </div>
 
-<main class="container">
-  <div class="bg-light p-5 rounded center">
-    <h2 >
-      Click the button below to check different organism's pangenome analyses
-    </h2>
-    <br>
-    <div>
-      <a class="btn btn-lg btn-primary link_button" href="./Species_list.html" >Select an organism &raquo;</a>
+<br>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-3">
+      <!-- Leave this empty for the same effect as above -->
+    </div>
+
+    <div class="col-6">
+      <div class="card">
+        <div class="card-body center">
+          <main class="container">
+            <div class=" p-5 rounded center">
+              <h2>
+                Click to explore pangenome analyses
+              </h2>
+              <br>
+              <div>
+                <a class="btn btn-lg btn-primary link_button" href="./Species_list.html" >Select a species &raquo;</a>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-3">
+      <!-- Leave this empty for the same effect as above -->
     </div>
   </div>
-</main>
+</div>
+
 
 
 <script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const sasToken = '?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2023-06-29T16:35:45Z&st=2023-06-29T08:35:45Z&spr=https&sig=97tFqE85sVLfsXgGkme1wCyIFncvrvqJXfngGkLdN4I%3D';
+
+  fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species_list.json' + sasToken)
+          .then(response => response.json())
+          .then(data => {
+            const speciesCount = data.Species.length;
+            const genomeCount = data.N_of_genome.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+            document.getElementById("speciesCount").textContent = speciesCount + " Species";
+            document.getElementById("genomeCount").textContent = genomeCount + " Genome";
+          })
+
+</script>
 
 
 </body>

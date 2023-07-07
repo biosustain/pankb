@@ -33,23 +33,23 @@
       height: 100%;
     }
 
-    .col-2 {
-      flex: 0 0 12.5% !important;
-      max-width: 12.5% !important;
-      padding:0;
-    }
+    /*.col-2 {*/
+    /*  flex: 0 0 12.5% !important;*/
+    /*  max-width: 12.5% !important;*/
+    /*  padding:0;*/
+    /*}*/
 
-    .col-10 {
-      flex: 0 0 87.5% !important;
-      max-width: 87.5% !important;
+    /*.col-10 {*/
+    /*  flex: 0 0 87.5% !important;*/
+    /*  max-width: 87.5% !important;*/
 
-    }
+    /*}*/
 
 
     .navbar_fixed {
       position: fixed;
       height: 100%;
-      width: 12.5% !important;
+      width: 16.666667%;
     }
 
     .navbar_fixed .btn {
@@ -79,6 +79,8 @@
       overflow-x: hidden !important;
       overflow-y: auto !important;
       max-height: 80vh;  /* adjust based on your needs */
+      padding-left: 50px;  /* adjust as needed */
+      padding-right: 20px;
     }
 
     tr,
@@ -96,13 +98,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      /* max-width: 0; */ /* Remove or modify this line */
-    }
-
-    .expanded-row td {
-      white-space: normal;
-      word-wrap: break-word;
-      max-width: none; /* Add this line to override max-width */
+      max-width: 0;
     }
 
     tbody td {
@@ -149,6 +145,7 @@
     .link_not_activate{
       color: grey !important;
     }
+
 
 
 
@@ -230,6 +227,19 @@
           </li>
           -->
         </ul>
+
+        <!-- Card -->
+        <div class="card" id="speciesCard">
+          <div class="card-body text-left">
+            <p id="species"></p>
+            <p id="numGenome"></p>
+            <p id="core"></p>
+            <p id="accessory"></p>
+            <p id="rare"></p>
+            <p id="openness"></p>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -237,46 +247,46 @@
     <div class="col-10 center-container">
       <h2 class="text-center">Gene annotation table</h2>
       <div class="table_padding">
-        <div class="table-responsive">
-          <table id="example" class="table table-hover" style="table-layout: fixed;">
-            <thead>
-            <tr>
-              <th class="text-center">Gene</th>
-              <th class="text-center">Class</th>
-              <th class="text-center">COG category</th>
-              <th class="text-center">COG name</th>
-              <th class="text-center">Description</th>
-              <th class="text-center">Annotation</th>
-              <th class="text-center">PFAMs</th>
-              <th class="text-center">Frequency</th>
-            </tr>
-            </thead>
-            <tbody class="text-center align-middle" id="tbody">
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table id="example" class="table table-hover" style="table-layout: fixed;">
+              <thead>
+              <tr>
+                <th class="text-center">Gene</th>
+                <th class="text-center">Class</th>
+                <th class="text-center">COG category</th>
+                <th class="text-center">COG name</th>
+                <th class="text-center">Description</th>
+                <th class="text-center">Annotation</th>
+                <th class="text-center">PFAMs</th>
+                <th class="text-center">Frequency</th>
+              </tr>
+              </thead>
+              <tbody class="text-center align-middle" id="tbody">
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
 
       <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
       <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
       <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 
       <script>
-        document.addEventListener('DOMContentLoaded', async function() {
+        $(document).ready(async function () {
           const urlParams = new URLSearchParams(window.location.search);
           const species = urlParams.get('species');
-          console.log()
 
           try {
             const data = await $.ajax({
-              'url': 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/All.json',
-              'dataType': 'json'
+              url: 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/All.json',
+              dataType: 'json'
             });
 
-            var geneData = data; // Convert the data object to an array for DataTables
+            var Gene = data;
 
             let table = $('#example').DataTable({
-              data: geneData,
+              destroy: true,
+              data: Gene,
               columns: [
                 {
                   data: '0',
@@ -284,29 +294,19 @@
                     return '<a href="../Gene_function/locustag.html?species=' + species + '&gene=' + encodeURIComponent(data) + '" target="_blank">' + data + '</a>';
                   }
                 },
-                { data: 7 },
-                { data: 1 },
-                { data: 2 },
-                { data: 3 },
-                { data: 4 },
-                { data: 5 },
-                { data: 6 }
-              ],
-              columnDefs: [
-                {
-                  targets: [3,4,5,6], // Apply the function to the inference, translation, and product columns
-                  render: function(data, type, row) {
-                    if (type === 'display' && data.length > 30) {
-                      return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 30) + '...</span>';
-                    } else {
-                      return data;
-                    }
-                  }
-                }
+                {data: '7'},
+                {data: '1'},
+                {data: '2'},
+                {data: '3'},
+                {data: '4'},
+                {data: '5'},
+                {data: '6'}
               ],
               language: {
-                emptyTable: 'Loading...'
+                loadingRecords: 'Loading...',
+                zeroRecords: 'test'
               },
+
               initComplete: function () {
                 var api = this.api();
 
@@ -325,34 +325,26 @@
 
                   $(searchInput).appendTo(columnHeader);
                 });
-              },
-              order: [],
-              bSort: true,
-              searching: true
+              }
             });
 
+            // Expand row on click
+            $('#example tbody').on('click', 'td', function () {
+              var cellText = $(this).text().trim();
+              var rowIndex = $(this).closest('tr').index();
+              var row = table.row(rowIndex);
+              if (row.child.isShown()) {
+                row.child.hide();
+                $(this).closest('tr').removeClass('expanded-row');
+              } else {
+                var expandedRowContent = '<td colspan="8" style="white-space: normal; word-wrap: break-word;">' + cellText + '</td>';
+                row.child(expandedRowContent).show();
+                $(this).closest('tr').addClass('expanded-row');
+              }
+            });
           } catch (error) {
             console.error('Error:', error);
           }
-
-          $('body').on('click', '.truncated', function() {
-            var fullText = $(this).attr('data-fulltext');
-            var truncatedText = $(this).text();
-            var cell = $(this).closest('td');
-
-            if (fullText !== truncatedText) { // check if fullText is not equal to truncatedText
-              $(this).text(fullText);
-              cell.addClass('expanded');
-            } else {
-              $(this).text(fullText.substr(0, 20) + '...');
-              cell.removeClass('expanded');
-            }
-
-            table.draw(false); // Redraw the DataTable to readjust the layout
-          });
-
-          $('[data-toggle="tooltip"]').tooltip();
-
         });
       </script>
     </div>
@@ -381,10 +373,23 @@
     const Phylogenetic_tree = document.getElementById('Phylogenetic_tree');
     Phylogenetic_tree.href = './Pangenome_analyses_phylogetic_tree.html?species=' + species;
 
-    // set src for different elements
-    const Gene_function_table = document.getElementById('Gene_function_table');
-    Gene_function_table.src = './Gene_function/All.html?species=' + species;
+    // // set src for different elements
+    // const Gene_function_table = document.getElementById('Gene_function_table');
+    // Gene_function_table.src = './Gene_function/All.html?species=' + species;
 
+    fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json')
+            .then(response => response.json())
+            .then(speciesData => {
+              // Select the species to show in the card
+              if (speciesData) {
+                document.getElementById('species').innerHTML = '<b>Species:</b><br>' + speciesData.Species;
+                document.getElementById('numGenome').innerHTML = '<b>Number of genome:</b><br>' + speciesData.Number_of_genome;
+                document.getElementById('core').innerHTML = '<b>Core:</b><br>' + speciesData.Gene_class[0];
+                document.getElementById('accessory').innerHTML = '<b>Accessory:</b><br>' + speciesData.Gene_class[1];
+                document.getElementById('rare').innerHTML= '<b>Rare:</b><br>' + speciesData.Gene_class[2];
+                document.getElementById('openness').innerHTML = '<b>Openness:</b><br>' + speciesData.Openness;
+              }
+            });
   });
 </script>
 

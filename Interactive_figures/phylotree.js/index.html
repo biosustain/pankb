@@ -38,6 +38,9 @@
   <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
   <script src="//d3js.org/d3.v6.js"></script>
   <script src="./dist/phylotree.js"></script>
+
+
+
   <link href="phylotree.css" rel="stylesheet" />
 
   <style>
@@ -1245,102 +1248,115 @@
     }
   };
 
-  $(document).ready(function() {
-    tree = new phylotree.phylotree(test_string);
-    global_tree = tree;
+  var urlParams = new URLSearchParams(window.location.search);
+  var species = urlParams.get('species');
 
-    tree.render({
-      container: "#tree_container",
-      "draw-size-bubbles": false,
-      "bubble-styler": d => { return 5 },
-      "node-styler": node_colorizer,
-      zoom: false,
-      "edge-styler": edge_colorizer,
-    });
+  fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/phylogenetic_tree.newick')
+          .then(response => response.text())
+          .then(data => {
+              var newick_string = data;
+              // Initialize tree here
+              $(document).ready(function() {
+                tree = new phylotree.phylotree(newick_string);
+                global_tree = tree;
 
-    $('#tree_container').on('reroot', function (e) {
-      update_selection_names();
+                tree.render({
+                  container: "#tree_container",
+                  "draw-size-bubbles": false,
+                  "bubble-styler": d => { return 5 },
+                  "node-styler": node_colorizer,
+                  zoom: false,
+                  "edge-styler": edge_colorizer,
+                });
 
-      tree.display.countHandler(count => {
-        $("#selected_branch_counter").text(function(d) {
-          return count[current_selection_name];
-        });
-      });
+                $('#tree_container').on('reroot', function (e) {
+                  update_selection_names();
 
-    });
+                  tree.display.countHandler(count => {
+                    $("#selected_branch_counter").text(function(d) {
+                      return count[current_selection_name];
+                    });
+                  });
 
-    tree.display.selectionLabel(current_selection_name);
+                });
 
-    tree.display.countHandler(count => {
-      $("#selected_branch_counter").text(function(d) {
-        return count[current_selection_name];
-      });
-    });
+                tree.display.selectionLabel(current_selection_name);
 
-    // Get selection set names from parsed newick
-    if (tree.parsed_tags.length) {
-      selection_set = tree.parsed_tags;
-    }
+                tree.display.countHandler(count => {
+                  $("#selected_branch_counter").text(function(d) {
+                    return count[current_selection_name];
+                  });
+                });
 
-    // Until a cleaner solution to supporting both Observable and regular HTML
-    $(tree.display.container).append(tree.display.show());
+                // Get selection set names from parsed newick
+                if (tree.parsed_tags.length) {
+                  selection_set = tree.parsed_tags;
+                }
 
-    $("#selection_new")
-            .get(0)
-            .addEventListener(
-                    selection_menu_element_action,
-                    selection_handler_new,
-                    false
-            );
-    $("#selection_rename")
-            .get(0)
-            .addEventListener(
-                    selection_menu_element_action,
-                    selection_handler_rename,
-                    false
-            );
-    $("#selection_delete")
-            .get(0)
-            .addEventListener(
-                    selection_menu_element_action,
-                    selection_handler_delete,
-                    false
-            );
-    $("#selection_delete")
-            .get(0)
-            .dispatchEvent(
-                    new CustomEvent(selection_menu_element_action, {
-                      detail: ["cancel", null]
-                    })
-            );
-    $("#selection_name_box")
-            .get(0)
-            .addEventListener(
-                    selection_menu_element_action,
-                    selection_handler_name_box,
-                    false
-            );
-    $("#save_selection_name")
-            .get(0)
-            .addEventListener(
-                    selection_menu_element_action,
-                    selection_handler_save_selection_name,
-                    false
-            );
-    $("#selection_name_dropdown")
-            .get(0)
-            .addEventListener(
-                    selection_menu_element_action,
-                    selection_handler_name_dropdown,
-                    false
-            );
+                // Until a cleaner solution to supporting both Observable and regular HTML
+                $(tree.display.container).append(tree.display.show());
 
-    update_selection_names();
+                $("#selection_new")
+                        .get(0)
+                        .addEventListener(
+                                selection_menu_element_action,
+                                selection_handler_new,
+                                false
+                        );
+                $("#selection_rename")
+                        .get(0)
+                        .addEventListener(
+                                selection_menu_element_action,
+                                selection_handler_rename,
+                                false
+                        );
+                $("#selection_delete")
+                        .get(0)
+                        .addEventListener(
+                                selection_menu_element_action,
+                                selection_handler_delete,
+                                false
+                        );
+                $("#selection_delete")
+                        .get(0)
+                        .dispatchEvent(
+                                new CustomEvent(selection_menu_element_action, {
+                                  detail: ["cancel", null]
+                                })
+                        );
+                $("#selection_name_box")
+                        .get(0)
+                        .addEventListener(
+                                selection_menu_element_action,
+                                selection_handler_name_box,
+                                false
+                        );
+                $("#save_selection_name")
+                        .get(0)
+                        .addEventListener(
+                                selection_menu_element_action,
+                                selection_handler_save_selection_name,
+                                false
+                        );
+                $("#selection_name_dropdown")
+                        .get(0)
+                        .addEventListener(
+                                selection_menu_element_action,
+                                selection_handler_name_dropdown,
+                                false
+                        );
 
-    $("#save_image").on("click", function(e) {
-      datamonkey_save_image("svg", "#tree_container");
-    });
-  });
+                update_selection_names();
+
+                $("#save_image").on("click", function(e) {
+                  datamonkey_save_image("svg", "#tree_container");
+                });
+              });
+            })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
+
 </script>
 
 <script>

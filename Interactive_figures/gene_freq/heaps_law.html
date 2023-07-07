@@ -2,153 +2,185 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <style>
-        html, body, #plot {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-    </style>
-</head>
-<body>
-<script>
-    // Function to load JSON file and create the plot
-    function loadJSONAndCreatePlot() {
-        window.linkText = localStorage.getItem('linkText'); // Retrieve the link text from localStorage
-        console.log(window.linkText);
-        fetch('https://pankb.blob.core.windows.net/data/PanKB/Interactive_figures/data/' + window.linkText + '/gene_freq.json')
-            .then(response => response.json())
-            .then(data => {
-                // Data
-                const x_core = data['x_core'];
-                const avg_core = data['avg_core'];
-                const x_acc = data['x_acc'];
-                const avg_acc = data['avg_acc'];
-                const x_pan = data['x_pan'];
-                const avg_pan = data['avg_pan'];
 
-                // Create trace for core genome
-                var traceCore = {
-                    x: x_core,
-                    y: avg_core,
-                    fill: 'tozeroy',
-                    fillcolor: 'rgba(0, 128, 0, 0.8)',
-                    line: { color: 'rgba(0, 128, 0, 0.8)'},
-                    name: 'Core genome'
-                };
 
-                // Create trace for accessory genome
-                var traceAcc = {
-                    x: x_acc,
-                    y: avg_acc,
-                    fill: 'tozeroy',
-                    fillcolor: 'rgba(255, 165, 0, 0.2)',
-                    line: { color: 'rgba(255, 165, 0, 0.8)' },
-                    name: 'Accessory genome'
-                };
+<!--    <script src="https://cdn.plot.ly/plotly-2.23.1.min.js" charset="utf-8"></script> -->
 
-                // Create trace for pangenome
-                var tracePan = {
-                    x: x_pan,
-                    y: avg_pan,
-                    fill: 'tozeroy',
-                    fillcolor: 'rgba(128, 0, 128, 0.1)',
-                    line: { color: 'rgba(128, 0, 128, 0.8)' },
-                    name: 'Pangenome'
-                };
+        <style>
+            html, body, #plot {
+                height: 100%;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body>
+    <script>
+        // Function to load JSON file and create the plot
+        function loadJSONAndCreatePlot() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const species = urlParams.get('species');
 
-                // Layout
-                var layout = {
-                    width: document.getElementById('plot').clientWidth,
-                    height: document.getElementById('plot').clientHeight,
-                    xaxis: {
-                        title: 'Number of genomes',
-                        titlefont: {
-                            size: 14,
-                            family: 'Arial, sans-serif' // Use Arial font family
-                        },
-                        tickfont: {
-                            size: 12,
-                            family: 'Arial, sans-serif' // Use Arial font family
-                        },
-                        showgrid: false
-                    },
-                    yaxis: {
-                        title: 'Pangenome size',
-                        titlefont: {
-                            size: 14,
-                            family: 'Arial, sans-serif' // Use Arial font family
-                        },
-                        tickfont: {
-                            size: 12,
-                            family: 'Arial, sans-serif' // Use Arial font family
-                        },
-                        showgrid: false
-                    },
-                    title: {
-                        text: "Heap's law",
-                        font: { size: 16 },
-                        xref: 'paper',
-                        x: 0.5
-                    },
-                    legend: {
-                        x: 0.05,
-                        xanchor: 'left',
-                        y: 1.15,
-                        yanchor: 'top'
-                    }
-                };
-                const config = {
-                    displayModeBar: false,  // Enable the display of the mode bar
-                }
+            fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/gene_freq.json')
+                .then(response => response.json())
+                .then(data => {
+                    // Data
+                    const x_core = data['x_core'];
+                    const avg_core = data['avg_core'];
+                    const x_acc = data['x_acc'];
+                    const avg_acc = data['avg_acc'];
+                    const x_pan = data['x_pan'];
+                    const avg_pan = data['avg_pan'];
+                    const max_frequency_count = data['max_frequency_count'];
+                    const alpha = data['alpha'].toFixed(3)
 
-                // Create data array
-                var data = [traceCore, traceAcc, tracePan];
-                // Plot the graph
-                Plotly.newPlot('plot', data, layout, config).then(function() {
-                    window.dispatchEvent(new Event('resize'));
-                });
+                    // Create trace for core genome
+                    var traceCore = {
+                        x: x_core,
+                        y: avg_core,
+                        fill: 'tozeroy',
+                        fillcolor: 'rgba(128, 0, 128, 0.8)',
+                        line: { color: 'rgba(128, 0, 128, 0.8)'},
+                        name: 'Core genome'
+                    };
 
-                // Handle window resize event
-                window.onresize = function() {
-                    const update = {
+                    // Create trace for accessory genome
+                    var traceAcc = {
+                        x: x_acc,
+                        y: avg_acc,
+                        fill: 'tozeroy',
+                        fillcolor: 'rgba(255, 165, 0, 0.2)',
+                        line: { color: 'rgba(255, 165, 0, 0.8)' },
+                        name: 'Accessory genome'
+                    };
+
+                    // Create trace for pangenome
+                    var tracePan = {
+                        x: x_pan,
+                        y: avg_pan,
+                        fill: 'tozeroy',
+                        fillcolor: 'rgba(0, 128, 0, 0.05)',
+                        line: { color: 'rgba(0, 128, 0, 0.8)'},
+                        name: 'Pangenome'
+                    };
+
+                    // Layout
+                    var layout = {
                         width: document.getElementById('plot').clientWidth,
                         height: document.getElementById('plot').clientHeight,
+                        autosize: true,
+                        margin: {
+                            l: 80,  // left margin
+                            r: 10,  // right margin
+                            b: 40, // bottom margin
+                            t: 80, // top margin
+                            pad: 0 // padding
+                        },
+                        xaxis: {
+                            title: 'Number of genomes',
+                            titlefont: {
+                                size: 14,
+                                family: 'Arial, sans-serif' // Use Arial font family
+                            },
+                            tickfont: {
+                                size: 12,
+                                family: 'Arial, sans-serif' // Use Arial font family
+                            },
+                            showgrid: false,
+
+                        },
+                        yaxis: {
+                            title: 'Pangenome size',
+                            titlefont: {
+                                size: 14,
+                                family: 'Arial, sans-serif' // Use Arial font family
+                            },
+                            tickfont: {
+                                size: 12,
+                                family: 'Arial, sans-serif' // Use Arial font family
+                            },
+                            autorange: true,
+                            tickformat: '1s', // Format y-axis labels as '1k'
+                            showgrid: false,  // Remove y-axis grid lines
+                            showline: true,  // Show y-axis line
+                        },
+                        title: {
+                            text: "Heap's law",
+                            titlefont: {
+                                size: 16,
+                                family: 'Arial, sans-serif' // Use Arial font family
+                            },                            xref: 'paper',
+                            x: 0.5
+                        },
+                        legend: {
+                            x: 0.05,
+                            xanchor: 'left',
+                            y: 1.15,
+                            yanchor: 'top'
+                        },
+                        annotations: [
+                            {
+                                x: 0.058,
+                                y: 0.85,
+                                xref: 'paper',
+                                yref: 'paper',
+                                text: '\u03B1 = ' + alpha,
+                                showarrow: false,
+                                font: {
+                                    size: 14,
+                                    color: 'black'
+                                }
+                            }
+                        ],
                     };
-                    Plotly.relayout('plot', update);
+                    const config = {
+                        displayModeBar: false,  // Enable the display of the mode bar
+                    }
+
+                    // Create data array
+                    var data = [traceCore, traceAcc, tracePan];
+                    // Plot the graph
+                    Plotly.newPlot('plot', data, layout, config).then(function() {
+                        window.dispatchEvent(new Event('resize'));
+                    });
+
+                    // Handle window resize event
+                    window.onresize = function() {
+                        const update = {
+                            width: document.getElementById('plot').clientWidth,
+                            height: document.getElementById('plot').clientHeight,
+                        };
+                        Plotly.relayout('plot', update);
+                    };
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+            // Function to resize plot
+            function resizePlot() {
+                const update = {
+                    width: document.getElementById('plot').clientWidth,
+                    height: document.getElementById('plot').clientHeight,
                 };
-
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-
-        // Function to resize plot
-        function resizePlot() {
-            const update = {
-                width: document.getElementById('plot').clientWidth,
-                height: document.getElementById('plot').clientHeight,
-            };
-            Plotly.relayout('plot', update);
+                Plotly.relayout('plot', update);
+            }
         }
-    }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        loadJSONAndCreatePlot();
+        document.addEventListener('DOMContentLoaded', function() {
+            loadJSONAndCreatePlot();
 
-        // Resize plot after a delay to allow iframe to finish loading
-        setTimeout(resizePlot, 100); // Adjust delay as needed
-    });
+        });
 
-    // Resize plot when window is resized
-    window.onresize = resizePlot;
 
-</script>
+    </script>
 
-<div id="plot"></div>
+    <div id="plot"></div>
 
-</body>
-</html>
+    <script src="../plotly/plotly.min.js"></script>
+
+    </body>
+    </html>

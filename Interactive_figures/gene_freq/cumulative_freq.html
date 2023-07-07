@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<!--  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
   <style>
     html, body, #plot {
       height: 100%;
@@ -11,15 +11,21 @@
       padding: 0;
       overflow: hidden;
     }
+
+    .legend text {
+      opacity: 1 !important;
+    }
   </style>
 </head>
 <body>
 <script>
   // Function to load JSON file and create the plot
   function loadJSONAndCreatePlot() {
-    window.linkText = localStorage.getItem('linkText'); // Retrieve the link text from localStorage
-    console.log(window.linkText);
-    fetch('https://pankb.blob.core.windows.net/data/PanKB/Interactive_figures/data/' + window.linkText + '/gene_freq.json')            .then(response => response.json())
+    const urlParams = new URLSearchParams(window.location.search);
+    const species = urlParams.get('species');
+
+    fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/gene_freq.json')
+            .then(response => response.json())
             .then(data => {
               // Data
               const x = data['data'];
@@ -53,9 +59,9 @@
                 marker: {
                   color: 'green',
                   symbol: 'square',
-                  size: 8
+                  size: 12
                 },
-                visible: 'legendonly' // Hide in the figure, but keep in the legend
+                visible: 'legendonly'
               };
 
               const trace3 = {
@@ -67,9 +73,9 @@
                 marker: {
                   color: 'orange',
                   symbol: 'square',
-                  size: 8
+                  size: 12
                 },
-                visible: 'legendonly' // Hide in the figure, but keep in the legend
+                visible: 'legendonly'
               };
 
               const trace4 = {
@@ -81,13 +87,20 @@
                 marker: {
                   color: 'purple',
                   symbol: 'square',
-                  size: 8
+                  size: 12
                 },
-                visible: 'legendonly' // Hide in the figure, but keep in the legend
+                visible: 'legendonly'
               };
 
               const layout = {
                 autosize: true,
+                margin: {
+                  l: 80,  // left margin
+                  r: 60,  // right margin
+                  b: 40, // bottom margin
+                  t: 80, // top margin
+                  pad: 0 // padding
+                },
                 title: {
                   text: "Cumulative gene distribution",
                   titlefont: {
@@ -99,6 +112,10 @@
                 },
                 xaxis: {
                   title: 'Number of Genomes',
+                  titlefont: {
+                    size: 14,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                  },
                   range: [0, Math.max(...x) + 1], // Adjust x-axis range
                   showgrid: false, // Remove x-axis grid lines
                   showline: true, // Show x-axis line
@@ -114,6 +131,10 @@
                 },
                 yaxis: {
                   title: 'Pangenome size',
+                  titlefont: {
+                    size: 14,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                  },
                   range: [0, Math.max(...cumulativeFrequency) + 1000], // Adjust y-axis range
                   tickformat: '1s', // Format y-axis labels as '1k'
                   showgrid: false, // Remove y-axis grid lines
@@ -128,14 +149,13 @@
                     family: 'Arial, sans-serif' // Use Arial font family
                   }
                 },
-                showlegend: false,
+                showlegend: true,
                 legend: {
                   x: 0.5,  // Position the legend at the center of the plot
-                  y: 1.1,
+                  y: 1,
                   xanchor: 'center',
                   yanchor: 'bottom',
                   orientation: 'h',  // Set legend orientation to horizontal
-                  itemsizing: 'constant',  // Keep legend item sizes constant
                   itemclick: false,  // Disable legend item click
                   itemdoubleclick: false,  // Disable legend item double-click
                   itemwidth: 30,  // Adjust legend item width as needed
@@ -146,7 +166,7 @@
                   font: {
                     family: 'Arial, sans-serif',
                     size: 12,
-                    color: '#000000'
+                    color: 'grey'
                   },
                   xref: 'paper',  // Set x-coordinate reference to 'paper'
                   yref: 'paper',  // Set y-coordinate reference to 'paper'
@@ -223,7 +243,20 @@
                 displayModeBar: false,  // Enable the display of the mode bar
               }
               var data = [trace1, trace2, trace3, trace4];
-              Plotly.newPlot('plot', data, layout,config);
+              Plotly.newPlot('plot', data, layout, config)
+                      .then(function(gd) {
+                        gd.on('plotly_relayout', function(eventData) {
+                          const legendItemClicked = Object.keys(eventData)[0].startsWith('hiddenlabels');
+                          if (legendItemClicked) {
+                            const svgTextItems = document.querySelectorAll('.legend text');
+                            svgTextItems.forEach(function(item) {
+                              if (item.style.opacity !== '1') {
+                                item.style.opacity = '1';
+                              }
+                            });
+                          }
+                        });
+                      });
             });
   }
 
@@ -233,6 +266,8 @@
 </script>
 
 <div id="plot"></div>
+
+<script src="../plotly/plotly.min.js"></script>
 
 </body>
 </html>
