@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-fixed/">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"> </script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"> </script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+
+    <link href="../../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .h2_center{
+            text-align: center;
+        }
+
+        .table_padding{
+            padding-top:15px;
+            padding-bottom:15px;
+            padding-right:120px;
+            padding-left:120px;
+        }
+
+        th, td{
+            height:50px;
+            font-size: 18px;
+        }
+
+        .dataTables_wrapper thead th {
+            text-align: center;
+            vertical-align: middle;
+            padding: 5px;
+            position: relative;
+        }
+
+        .dataTables_wrapper thead th input {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            margin-bottom: 10px;
+        }
+
+        .dataTables_wrapper tbody td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+            word-break: break-word;
+        }
+
+
+        .responsive-iframe iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 10%;
+            right: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .card {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* This adds a shadow effect */
+            transition: 0.3s; /* This adds a transition effect */
+            border-radius: 5px; /* This makes the corners round (5px round corner) */
+        }
+
+    </style>
+</head>
+<body>
+
+<!--<h2 class = h2_center>Genome page</h2>-->
+<!--<h2 class = h2_center>Will show more information about the genome(strain) that user is looking at</h2>-->
+
+<div class="row">
+    <div class="col-1">
+    </div>
+
+    <div class="col-10">
+        <br>
+        <br>
+        <div class="card"> <!-- This is the wrapper -->
+            <div class="card-body"> <!-- The card-body class adds padding around your content -->
+                <div class="table_padding">
+                    <table id="genome_info" class="table table-hover" style="width:100%; table-layout: fixed;">
+                        <thead>
+                        <tr>
+                            <th class="text-center align-middle">Genome id</th>
+                            <th class="text-center align-middle">Species</th>
+                            <th class="text-center align-middle">Source</th>
+                            <th class="text-center align-middle">GC content</th>
+                            <th class="text-center align-middle">Genome length</th>
+                            <th class="text-center align-middle">Taxonomy id</th>
+                            <th class="text-center align-middle">Gene class distribution</th>
+                        </tr>
+                        </thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+
+
+                <div class="table_padding">
+                    <table id="gene_info" class="table table-hover" style="width:100%; table-layout: fixed;">
+                        <thead>
+                        <tr>
+                            <th class="text-center align-middle">Gene id</th>
+                            <th class="text-center align-middle">Locus tag</th>
+                            <th class="text-center align-middle">Prokka annotation</th>
+                            <th class="text-center align-middle">Start position</th>
+                            <th class="text-center align-middle">End position</th>
+                            <th class="text-center align-middle">Nucleotide seq</th>
+                            <th class="text-center align-middle">Amino acid seq</th>
+                        </tr>
+                        </thead>
+
+                        <tbody class="text-center align-middle" id="tbody">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <br>
+        <br>
+
+        <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+            <iframe id="Genome_page_COG_distribution" src="Interactive_figures/hotmap/demo/target_gene.html" class="w-100 h-100" style="border:0;"></iframe>
+        </div>
+    </div>
+    <div class="col-1">
+    </div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const species = urlParams.get('species');
+    const genome_id = urlParams.get('genome_id');
+    const gene_id = urlParams.get('gene_id');
+
+    // Load the JSON file
+    fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/genome_page/' + genome_id + '/genome_info.json')
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('table-body');
+
+            const geneClassDistribution = data[genome_id]['Gene_class_distribution'];
+
+            const total = geneClassDistribution[0] + geneClassDistribution[1] + geneClassDistribution[2];
+            const coreWidth = (geneClassDistribution[0] / total) * 100;
+            const accessoryWidth = (geneClassDistribution[1] / total) * 100;
+            const rareWidth = (geneClassDistribution[2] / total) * 100;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="text-center align-middle">${genome_id}</td>
+                <td class="text-center align-middle">${data[genome_id]['full_name']}</td>
+                <td class="text-center align-middle">${data[genome_id]['source']}</td>
+                <td class="text-center align-middle">${data[genome_id]['gc_content'].toFixed(3)}</td>
+                <td class="text-center align-middle">${data[genome_id]['genome_len']}</td>
+                <td class="text-center align-middle">${data[genome_id]['tax_id']}</td>
+                <td class="text-center align-middle">
+                    <div style="display: flex; height: 20px; max-width: 80%; margin: auto; border-radius: 10px; overflow: hidden;">
+                        <div style="width: ${coreWidth}%; background-color: rgba(128,0,128,0.8);" data-toggle="tooltip" title="Core: ${geneClassDistribution[0]}"></div>
+                        <div style="width: ${accessoryWidth}%; background-color: rgba(255,165,0,0.8);" data-toggle="tooltip" title="Accessory: ${geneClassDistribution[1]}"></div>
+                        <div style="width: ${rareWidth}%; background-color: rgba(0,128,0,0.8);" data-toggle="tooltip" title="Rare: ${geneClassDistribution[2]}"></div>
+                    </div>
+                </td>
+            `;
+            tableBody.appendChild(row);
+
+            // Initialize tooltips
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+            // Initialize DataTable
+            $('#species_list').DataTable();
+        })
+        .catch(error => console.error(error));
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            const data = await $.ajax({
+                'url': 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/'+ species + '/gene_locustag/' + gene_id + '.json',
+                'dataType': 'json'
+            });
+
+            var geneData = data; // Convert the data object to an array for DataTables
+
+            // Filter the geneData based on the Genome ID
+            const matchedEntry = geneData.find(entry => entry.Genome_ID === genome_id);
+            geneData = matchedEntry ? [matchedEntry] : [];
+
+            let table = $('#gene_info').DataTable({
+                data: geneData,
+                columns: [
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            // Render the gene_id value here
+                            return '<a href="../../Gene_function/locustag.html?species=' + species + '&gene=' + encodeURIComponent(gene_id) + '" target="_blank">' + gene_id + '</a>';
+                        }
+                    },
+                    { data: 'Locus_Tag' },
+                    { data: 'Prokka_Annotation' },
+                    { data: 'Start_Position' },
+                    { data: 'End_Position' },
+                    { data: 'Nucleotide_Seq' },
+                    { data: 'Amino_Acid_Seq' }
+                ],
+                columnDefs: [
+                    {
+                        targets: [5, 6], // Apply the function to the inference, translation, and product columns
+                        render: function(data, type, row) {
+                            if (type === 'display' && data.length > 20) {
+                                return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 20) + '...</span>';
+                            } else {
+                                return data;
+                            }
+                        }
+                    }
+                ],
+                dom: 'Bfrtip', // Remove the toolbar
+                info: false, // Remove the entry info
+                paging: false, // Remove the page counter
+                searching: false, // Remove the search bar
+                language: {
+                    emptyTable: 'Loading...'
+                },
+                order: [],
+                bSort: true
+            });
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
+
+        $('body').on('click', '.truncated', function() {
+            var fullText = $(this).attr('data-fulltext');
+            var truncatedText = $(this).text();
+            var cell = $(this).closest('td');
+
+            if (fullText !== truncatedText) { // check if fullText is not equal to truncatedText
+                $(this).text(fullText);
+                cell.addClass('expanded');
+            } else {
+                $(this).text(fullText.substr(0, 20) + '...');
+                cell.removeClass('expanded');
+            }
+
+            table.draw(false); // Redraw the DataTable to readjust the layout
+        });
+    });
+
+    const Genome_page_COG_distribution = document.getElementById('Genome_page_COG_distribution');
+    Genome_page_COG_distribution.src = './barplot.html?species=' + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id) ;
+
+</script>
+
+</body>
+</html>

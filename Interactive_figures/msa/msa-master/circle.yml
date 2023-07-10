@@ -1,0 +1,19 @@
+dependencies:
+  override:
+    - npm install
+    - pip install awscli
+  cache_directories:
+    - "node_modules"
+test:
+  override:
+    - npm test
+deployment:
+  release:
+    tag: /v.*/
+    owner: wilzbach
+    commands:
+      - ./cdn.sh
+  production:
+    branch: master
+    commands:
+      - ./cdn.sh

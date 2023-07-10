@@ -19921,9 +19921,11 @@
                             alert("Selected ".concat(t.length, " cell(s)\n\n") + JSON.stringify(t, null, 4).slice(0, 1e4))
                         },
                         onClick: function(t) {
-                            const genome_id = t.colName;
-                            const gene_id = t.rowName;
-                            const url = './on_click.html?genome_id=' + encodeURIComponent(genome_id) + '&' +'gene_id=' + encodeURIComponent(gene_id);
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const species = urlParams.get('species');
+                            const genome_id = t.rowName;
+                            const gene_id = t.colName;
+                            const url = '../../genome_page/genome_page.html?species=' + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id) + '&' +'gene_id=' + encodeURIComponent(gene_id);
                             window.open(url, '_blank');
                         },
                     })

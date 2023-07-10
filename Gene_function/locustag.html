@@ -111,7 +111,7 @@
 
 <div class="table_padding overflow-auto">
     <div style="width:80%;">
-        <table id="example" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
+        <table id="gene_table" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
             <thead>
             <tr>
                 <th class="text-center align-middle">Locus Tag</th>
@@ -146,7 +146,7 @@
 
             var geneData = data; // Convert the data object to an array for DataTables
 
-            let table = $('#example').DataTable({
+            let table = $('#gene_table').DataTable({
                 data: geneData,
                 columns: [
                     { data: 'Locus_Tag' },
@@ -196,7 +196,6 @@
 
             table.draw(false); // Redraw the DataTable to readjust the layout
         });
-
 
     });
 </script>
