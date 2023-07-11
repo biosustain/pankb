@@ -83,8 +83,8 @@
 </head>
 <body>
 
-<br>
-<h2 id = 'genome_page_title' class = h2_center> </h2>
+<!--<h2 class = h2_center>Genome page</h2>-->
+<!--<h2 class = h2_center>Will show more information about the genome(strain) that user is looking at</h2>-->
 
 <div class="row">
     <div class="col-1">
@@ -113,25 +113,25 @@
                 </div>
 
 
-                <div class="table_padding">
-                    <table id="gene_info" class="table table-hover" style="width:100%; table-layout: fixed;">
-                        <thead>
-                        <tr>
-                            <th class="text-center align-middle">Gene id</th>
-                            <th class="text-center align-middle">Locus tag</th>
-                            <th class="text-center align-middle">Prokka annotation</th>
-                            <th class="text-center align-middle">Start position</th>
-                            <th class="text-center align-middle">End position</th>
-                            <th class="text-center align-middle">Nucleotide seq</th>
-                            <th class="text-center align-middle">Amino acid seq</th>
-                        </tr>
-                        </thead>
+<!--                <div class="table_padding">-->
+<!--                    <table id="gene_info" class="table table-hover" style="width:100%; table-layout: fixed;">-->
+<!--                        <thead>-->
+<!--                        <tr>-->
+<!--                            <th class="text-center align-middle">Gene id</th>-->
+<!--                            <th class="text-center align-middle">Locus tag</th>-->
+<!--                            <th class="text-center align-middle">Prokka annotation</th>-->
+<!--                            <th class="text-center align-middle">Start position</th>-->
+<!--                            <th class="text-center align-middle">End position</th>-->
+<!--                            <th class="text-center align-middle">Nucleotide seq</th>-->
+<!--                            <th class="text-center align-middle">Amino acid seq</th>-->
+<!--                        </tr>-->
+<!--                        </thead>-->
 
-                        <tbody class="text-center align-middle" id="tbody">
+<!--                        <tbody class="text-center align-middle" id="tbody">-->
 
-                        </tbody>
-                    </table>
-                </div>
+<!--                        </tbody>-->
+<!--                    </table>-->
+<!--                </div>-->
             </div>
         </div>
 
@@ -152,7 +152,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');
     const genome_id = urlParams.get('genome_id');
-    const gene_id = urlParams.get('gene_id');
 
     // Load the JSON file
     fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/genome_page/' + genome_id + '/genome_info.json')
@@ -194,84 +193,82 @@
         })
         .catch(error => console.error(error));
 
-    document.addEventListener('DOMContentLoaded', async function() {
-        try {
-            const data = await $.ajax({
-                'url': 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/'+ species + '/gene_locustag/' + gene_id + '.json',
-                'dataType': 'json'
-            });
-
-            var geneData = data; // Convert the data object to an array for DataTables
-
-            // Filter the geneData based on the Genome ID
-            const matchedEntry = geneData.find(entry => entry.Genome_ID === genome_id);
-            geneData = matchedEntry ? [matchedEntry] : [];
-
-            let table = $('#gene_info').DataTable({
-                data: geneData,
-                columns: [
-                    {
-                        data: null,
-                        render: function(data, type, row) {
-                            // Render the gene_id value here
-                            return '<a href="../../Gene_function/locustag.html?species=' + species + '&gene=' + encodeURIComponent(gene_id) + '" target="_blank">' + gene_id + '</a>';
-                        }
-                    },
-                    { data: 'Locus_Tag' },
-                    { data: 'Prokka_Annotation' },
-                    { data: 'Start_Position' },
-                    { data: 'End_Position' },
-                    { data: 'Nucleotide_Seq' },
-                    { data: 'Amino_Acid_Seq' }
-                ],
-                columnDefs: [
-                    {
-                        targets: [5, 6], // Apply the function to the inference, translation, and product columns
-                        render: function(data, type, row) {
-                            if (type === 'display' && data.length > 20) {
-                                return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 20) + '...</span>';
-                            } else {
-                                return data;
-                            }
-                        }
-                    }
-                ],
-                dom: 'Bfrtip', // Remove the toolbar
-                info: false, // Remove the entry info
-                paging: false, // Remove the page counter
-                searching: false, // Remove the search bar
-                language: {
-                    emptyTable: 'Loading...'
-                },
-                order: [],
-                bSort: true
-            });
-
-        } catch (error) {
-            console.error('Error:', error);
-        }
-
-        $('body').on('click', '.truncated', function() {
-            var fullText = $(this).attr('data-fulltext');
-            var truncatedText = $(this).text();
-            var cell = $(this).closest('td');
-
-            if (fullText !== truncatedText) { // check if fullText is not equal to truncatedText
-                $(this).text(fullText);
-                cell.addClass('expanded');
-            } else {
-                $(this).text(fullText.substr(0, 20) + '...');
-                cell.removeClass('expanded');
-            }
-
-            table.draw(false); // Redraw the DataTable to readjust the layout
-        });
-    });
+    // document.addEventListener('DOMContentLoaded', async function() {
+    //     try {
+    //         const data = await $.ajax({
+    //             'url': 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/'+ species + '/gene_locustag/' + gene_id + '.json',
+    //             'dataType': 'json'
+    //         });
+    //
+    //         var geneData = data; // Convert the data object to an array for DataTables
+    //
+    //         // Filter the geneData based on the Genome ID
+    //         const matchedEntry = geneData.find(entry => entry.Genome_ID === genome_id);
+    //         geneData = matchedEntry ? [matchedEntry] : [];
+    //
+    //         let table = $('#gene_info').DataTable({
+    //             data: geneData,
+    //             columns: [
+    //                 {
+    //                     data: null,
+    //                     render: function(data, type, row) {
+    //                         // Render the gene_id value here
+    //                         return '<a href="../../Gene_function/locustag.html?species=' + species + '&gene=' + encodeURIComponent(gene_id) + '" target="_blank">' + gene_id + '</a>';
+    //                     }
+    //                 },
+    //                 { data: 'Locus_Tag' },
+    //                 { data: 'Prokka_Annotation' },
+    //                 { data: 'Start_Position' },
+    //                 { data: 'End_Position' },
+    //                 { data: 'Nucleotide_Seq' },
+    //                 { data: 'Amino_Acid_Seq' }
+    //             ],
+    //             columnDefs: [
+    //                 {
+    //                     targets: [5, 6], // Apply the function to the inference, translation, and product columns
+    //                     render: function(data, type, row) {
+    //                         if (type === 'display' && data.length > 20) {
+    //                             return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 20) + '...</span>';
+    //                         } else {
+    //                             return data;
+    //                         }
+    //                     }
+    //                 }
+    //             ],
+    //             dom: 'Bfrtip', // Remove the toolbar
+    //             info: false, // Remove the entry info
+    //             paging: false, // Remove the page counter
+    //             searching: false, // Remove the search bar
+    //             language: {
+    //                 emptyTable: 'Loading...'
+    //             },
+    //             order: [],
+    //             bSort: true
+    //         });
+    //
+    //     } catch (error) {
+    //         console.error('Error:', error);
+    //     }
+    //
+    //     $('body').on('click', '.truncated', function() {
+    //         var fullText = $(this).attr('data-fulltext');
+    //         var truncatedText = $(this).text();
+    //         var cell = $(this).closest('td');
+    //
+    //         if (fullText !== truncatedText) { // check if fullText is not equal to truncatedText
+    //             $(this).text(fullText);
+    //             cell.addClass('expanded');
+    //         } else {
+    //             $(this).text(fullText.substr(0, 20) + '...');
+    //             cell.removeClass('expanded');
+    //         }
+    //
+    //         table.draw(false); // Redraw the DataTable to readjust the layout
+    //     });
+    // });
 
     const Genome_page_COG_distribution = document.getElementById('Genome_page_COG_distribution');
     Genome_page_COG_distribution.src = './barplot.html?species=' + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id) ;
-
-    document.getElementById('genome_page_title').innerHTML= 'This page shows details of gene: ' + '<b>' +  gene_id  + '</b>' + ' in genome(strain): ' + '<b>'  + genome_id + '</b>';
 
 </script>
 

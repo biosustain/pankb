@@ -105,6 +105,7 @@
 </head>
 <body data-bs-spy="scroll" data-bs-target="#navbar-example">
 
+
 <br>
 
 <h2 class="text-center">This page is to show more details about genes in pangenome analyses. Will add more later...</h2>
@@ -133,11 +134,11 @@
 
 <!-- Datatable -->
 <script>
-    document.addEventListener('DOMContentLoaded', async function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const species = urlParams.get('species');
-        const gene = urlParams.get('gene');
+    const urlParams = new URLSearchParams(window.location.search);
+    const species = urlParams.get('species');
+    const gene = urlParams.get('gene');
 
+    document.addEventListener('DOMContentLoaded', async function() {
         try {
             const data = await $.ajax({
                 'url': 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/'+ species + '/gene_locustag/' + gene + '.json',
@@ -150,7 +151,12 @@
                 data: geneData,
                 columns: [
                     { data: 'Locus_Tag' },
-                    { data: 'Genome_ID' },
+                    {
+                        data: 'Genome_ID',
+                        render: function(data, type, row) {
+                                return '<a href="./genome_page/genome_page.html?species=' + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(data) + '"target="_blank">' + data + '</a>';
+                            }
+                    },
                     { data: 'Prokka_Annotation' },
                     { data: 'Start_Position' },
                     { data: 'End_Position' },

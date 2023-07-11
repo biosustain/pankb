@@ -2571,9 +2571,10 @@
             .text("Search for this strain")
             .on("click", d => {
               // Replace "url" with the URL of the page you want to open
-              const nodename = node.data.name;
-              localStorage.setItem("nodename", nodename);
-              let url = "./on_click.html";
+              const urlParams = new URLSearchParams(window.location.search);
+              const species = urlParams.get('species');
+              const nodename = node.data.name.substring(0, node.data.name.length - 1) + '.' + node.data.name.substring(node.data.name.length - 1);
+              let url = "../../Gene_function/genome_page/genome_page.html?species=" + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(nodename)
               window.open(url, "_blank");
             });
 
