@@ -30,8 +30,8 @@
         .table_padding{
             padding-top:15px;
             padding-bottom:15px;
-            padding-right:120px;
-            padding-left:120px;
+            padding-right:50px;
+            padding-left:50px;
         }
 
         th, td{
@@ -83,8 +83,10 @@
 </head>
 <body>
 
-<!--<h2 class = h2_center>Genome page</h2>-->
-<!--<h2 class = h2_center>Will show more information about the genome(strain) that user is looking at</h2>-->
+<br>
+
+<h2 id = 'genome_page_title' style = 'text-align: center';></h2>
+
 
 <div class="row">
     <div class="col-1">
@@ -102,9 +104,12 @@
                             <th class="text-center align-middle">Genome id</th>
                             <th class="text-center align-middle">Species</th>
                             <th class="text-center align-middle">Source</th>
+                            <th class="text-center align-middle">Isolation source</th>
+                            <th class="text-center align-middle">Country</th>
+                            <th class="text-center align-middle">Geological location name</th>
                             <th class="text-center align-middle">GC content</th>
                             <th class="text-center align-middle">Genome length</th>
-                            <th class="text-center align-middle">Taxonomy id</th>
+                            <th class="text-center align-middle">Number of genes</th>
                             <th class="text-center align-middle">Gene class distribution</th>
                         </tr>
                         </thead>
@@ -165,15 +170,19 @@
             const coreWidth = (geneClassDistribution[0] / total) * 100;
             const accessoryWidth = (geneClassDistribution[1] / total) * 100;
             const rareWidth = (geneClassDistribution[2] / total) * 100;
+            const number_of_genes = geneClassDistribution.reduce((a, b) => a + b, 0);
 
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="text-center align-middle">${genome_id}</td>
                 <td class="text-center align-middle">${data[genome_id]['full_name']}</td>
-                <td class="text-center align-middle">${data[genome_id]['source']}</td>
+                <td class="text-center align-middle"><a href="https://www.ncbi.nlm.nih.gov/datasets/genome/${genome_id}" target="_blank">${data[genome_id]['source']}</a></td>
+                <td class="text-center align-middle">${data[genome_id]['isolation_source']}</td>
+                <td class="text-center align-middle">${data[genome_id]['Country']}</td>
+                <td class="text-center align-middle">${data[genome_id]['geo_loc_name']}</td>
                 <td class="text-center align-middle">${data[genome_id]['gc_content'].toFixed(3)}</td>
                 <td class="text-center align-middle">${data[genome_id]['genome_len']}</td>
-                <td class="text-center align-middle">${data[genome_id]['tax_id']}</td>
+                <td class="text-center align-middle">${number_of_genes}</td>
                 <td class="text-center align-middle">
                     <div style="display: flex; height: 20px; max-width: 80%; margin: auto; border-radius: 10px; overflow: hidden;">
                         <div style="width: ${coreWidth}%; background-color: rgba(128,0,128,0.8);" data-toggle="tooltip" title="Core: ${geneClassDistribution[0]}"></div>
@@ -269,6 +278,8 @@
 
     const Genome_page_COG_distribution = document.getElementById('Genome_page_COG_distribution');
     Genome_page_COG_distribution.src = './barplot.html?species=' + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id) ;
+
+    document.getElementById('genome_page_title').innerHTML= 'Genome(strain): ' + '<b>'  + genome_id + '</b>';
 
 </script>
 

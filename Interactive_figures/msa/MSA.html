@@ -1,0 +1,170 @@
+<html>
+
+<head>
+	<meta charSet="UTF-8">
+	<meta name="description" content="Simple BioJS example"/>
+
+	<!-- include MSA js + css -->
+	<script src="./dist/msa_readable.js"></script>
+	<script src="//d3js.org/d3.v6.js"></script>
+	<link href="../../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+	<style>
+		#tooltip {
+			position: absolute;
+			padding: 10px;
+			background: red;
+			border-radius: 5px;
+			width: 400px; /* Adjust the width here */
+			height: 600px; /* Adjust the height here */
+			opacity: 0.85;
+			transition: visibility 0s, opacity 0.5s linear;
+			z-index: 9999; /* New line */
+
+		}
+
+		/* New classes for show and hide the tooltip */
+		.tooltip-showing {
+			visibility: visible;
+			opacity: 0.85
+		}
+
+		.tooltip-hidden {
+			visibility: hidden;
+			opacity: 0;
+		}
+
+
+	</style>
+
+
+
+	<div id="tooltip" class="tooltip-hidden" style="position: absolute; padding: 10px;; background: lightpink; border-radius: 5px;">
+		Frequency information will go here.
+	</div>
+</head>
+
+<body>
+
+
+
+<!--A simple website with left and right bars-->
+<div class="row">
+
+	<div class="col-1">
+	</div>
+
+	<div class="col-10">
+		<div>
+			<div style="width: 100%; display: inline-block">
+				<div id="menuDiv"></div>
+				<div id="yourDiv" style="position: relative;">Loading ...</div>
+				<script>
+					//msa = require("msa");
+					//msa = window.msa;
+					console.log(window.innerWidth );
+
+					var opts = {};
+
+					opts.el = document.getElementById("yourDiv");
+					opts.vis = {
+						conserv: false,
+						overviewbox: true,
+						seqlogo: true,
+						leftHeader: false,
+						labelId: false,
+						gapHeader: false,
+
+					};
+					opts.conf = {
+						dropImport: false,
+						registerMouseClicks: true, // make sure to register mouse clicks
+						registerMouseHover: true
+					};
+					opts.zoomer = {
+						menuFontsize: "12px",
+						autoResize: true,
+						labelPadding: 20,
+						boxRectWidth: 10,
+						overviewboxWidth: 100,
+						overviewboxHeight: 200,
+						alignmentHeight: 800,
+						markerFontsize: "12px",
+						markerStepSize: 2,
+						overviewboxPaddingTop: 30,
+					};
+
+					// init msa
+					var m = new msa(opts);
+
+
+
+
+					function renderMSA() {
+						// call render at the end to display the whole MSA
+						m.render();
+
+						// Add a click listener on rows
+						m.g.on("row:click", function(data) {
+							// Get the sequence object
+							var sequence = m.seqs.at(data.seqId);
+
+							console.log(data)
+
+							// Get the name of the sequence
+							var sequenceName = sequence.get('name');
+
+							// Define a unique URL for each sequence
+							var url = "./popup.html?=" + sequenceName;
+
+							// Open a new page
+							window.open(url, '_blank');
+						});
+
+						m.g.on("column:click", function(data) {
+							// Create text to be shown in the panel
+							var text = 'Column: ' + data.rowPos;
+							console.log(text);
+							console.log(data.evt);
+							// Show the text in the panel
+							var tooltip = document.getElementById('tooltip');
+							tooltip.textContent = text;
+
+							var rect = document.getElementById('yourDiv').getBoundingClientRect();
+
+							tooltip.style.left = (data.evt.pageX - rect.left - 50) + 'px';  // position the tooltip at the mouse pointer
+							tooltip.style.top = (data.evt.pageY - rect.top + 10) + 'px';
+							tooltip.classList.remove('tooltip-hidden');
+							tooltip.classList.add('tooltip-showing');
+						});
+
+						// And don't forget to handle the mouseout event to hide the panel:
+						m.g.on("column:mouseout", function(data) {
+							var tooltip = document.getElementById('tooltip');
+							tooltip.classList.remove('tooltip-showing');
+							tooltip.classList.add('tooltip-hidden');
+						});
+
+					}
+
+					var defaultURL = "./fer3.clustal";
+
+					function getURLParameter(name) {
+						return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null;
+					}
+
+					var url = getURLParameter('seq') || defaultURL;
+					m.u.file.importURL(url, renderMSA);
+
+				</script>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-1">
+	</div>
+</div>
+
+</body>
+</html>

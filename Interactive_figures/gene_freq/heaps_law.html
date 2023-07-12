@@ -43,7 +43,7 @@
                         fill: 'tozeroy',
                         fillcolor: 'rgba(128, 0, 128, 0.8)',
                         line: { color: 'rgba(128, 0, 128, 0.8)'},
-                        name: 'Core genome'
+                        name: 'Core'
                     };
 
                     // Create trace for accessory genome
@@ -53,7 +53,7 @@
                         fill: 'tozeroy',
                         fillcolor: 'rgba(255, 165, 0, 0.2)',
                         line: { color: 'rgba(255, 165, 0, 0.8)' },
-                        name: 'Accessory genome'
+                        name: 'Accessory'
                     };
 
                     // Create trace for pangenome
@@ -111,14 +111,16 @@
                             titlefont: {
                                 size: 16,
                                 family: 'Arial, sans-serif' // Use Arial font family
-                            },                            xref: 'paper',
+                            },
+                            xref: 'paper',
                             x: 0.5
                         },
                         legend: {
-                            x: 0.05,
-                            xanchor: 'left',
-                            y: 1.15,
-                            yanchor: 'top'
+                            x: 0.5,
+                            xanchor: 'center',
+                            y: 1,
+                            yanchor: 'bottom',
+                            orientation: 'h'  // Set this to make the legend horizontal
                         },
                         annotations: [
                             {

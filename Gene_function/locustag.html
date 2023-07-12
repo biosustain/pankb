@@ -101,34 +101,44 @@
             justify-content: center;
             margin-top: 15px !important;
         }
+
+        .card {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* This adds a shadow effect */
+            transition: 0.3s; /* This adds a transition effect */
+            border-radius: 5px; /* This makes the corners round (5px round corner) */
+        }
     </style>
 </head>
 <body data-bs-spy="scroll" data-bs-target="#navbar-example">
 
-
 <br>
 
-<h2 class="text-center">This page is to show more details about genes in pangenome analyses. Will add more later...</h2>
+<h2 id = 'gene_table_title' style = 'text-align: center';></h2>
+
 
 <div class="table_padding overflow-auto">
     <div style="width:80%;">
-        <table id="gene_table" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
-            <thead>
-            <tr>
-                <th class="text-center align-middle">Locus Tag</th>
-                <th class="text-center align-middle">Genome ID</th>
-                <th class="text-center align-middle">Prokka Annotation</th>
-                <th class="text-center align-middle">Start Position</th>
-                <th class="text-center align-middle">End Position</th>
-                <th class="text-center align-middle">Nucleotide Seq</th>
-                <th class="text-center align-middle">Amino Acid Seq</th>
-            </tr>
-            </thead>
+        <div class="card"> <!-- This is the wrapper -->
+            <div class="card-body"> <!-- The card-body class adds padding around your content -->
+                <table id="gene_table" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
+                    <thead>
+                    <tr>
+                        <th class="text-center align-middle">Locus Tag</th>
+                        <th class="text-center align-middle">Genome ID</th>
+                        <th class="text-center align-middle">Prokka Annotation</th>
+                        <th class="text-center align-middle">Start Position</th>
+                        <th class="text-center align-middle">End Position</th>
+                        <th class="text-center align-middle">Nucleotide Seq</th>
+                        <th class="text-center align-middle">Amino Acid Seq</th>
+                    </tr>
+                    </thead>
 
-            <tbody class="text-center align-middle" id="tbody">
+                    <tbody class="text-center align-middle" id="tbody">
 
-            </tbody>
-        </table>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -204,6 +214,9 @@
         });
 
     });
+
+    document.getElementById('gene_table_title').innerHTML= 'Gene: ' + '<b>' +  gene  + '</b>'
+
 </script>
 </body>
 </html>
