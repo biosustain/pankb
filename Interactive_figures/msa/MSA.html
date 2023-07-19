@@ -11,29 +11,29 @@
 
 
 	<style>
+
+		body {
+			overflow-x: hidden; /* Block horizontal overflow */
+		}
+
 		#tooltip {
 			position: absolute;
 			padding: 10px;
 			background: red;
 			border-radius: 5px;
-			width: 400px; /* Adjust the width here */
-			height: 600px; /* Adjust the height here */
+			width: 350px; /* Adjust the width here */
+			height: 550px; /* Adjust the height here */
 			opacity: 0.85;
 			transition: visibility 0s, opacity 0.5s linear;
 			z-index: 9999; /* New line */
 
 		}
 
-		/* New classes for show and hide the tooltip */
-		.tooltip-showing {
-			visibility: visible;
-			opacity: 0.85
-		}
-
 		.tooltip-hidden {
 			visibility: hidden;
 			opacity: 0;
 		}
+
 
 
 	</style>
@@ -52,22 +52,18 @@
 <!--A simple website with left and right bars-->
 <div class="row">
 
-	<div class="col-1">
-	</div>
-
-	<div class="col-10">
+	<div class="col-12">
 		<div>
 			<div style="width: 100%; display: inline-block">
 				<div id="menuDiv"></div>
-				<div id="yourDiv" style="position: relative;">Loading ...</div>
+				<div id="MSA" style="position: relative;">Loading ...</div>
 				<script>
 					//msa = require("msa");
 					//msa = window.msa;
-					console.log(window.innerWidth );
 
 					var opts = {};
 
-					opts.el = document.getElementById("yourDiv");
+					opts.el = document.getElementById("MSA");
 					opts.vis = {
 						conserv: false,
 						overviewbox: true,
@@ -83,16 +79,20 @@
 						registerMouseHover: true
 					};
 					opts.zoomer = {
-						menuFontsize: "12px",
 						autoResize: true,
-						labelPadding: 20,
-						boxRectWidth: 10,
-						overviewboxWidth: 100,
+						columnWidth: 30,
+						labelPadding: 100,
 						overviewboxHeight: 200,
-						alignmentHeight: 800,
-						markerFontsize: "12px",
+						boxRectWidth: 0.1,
+						alignmentHeight: 600,
+						labelNameLength: 120,
+
+
+						markerFontsize: "10px",
 						markerStepSize: 2,
 						overviewboxPaddingTop: 30,
+						stepSize: 1,
+						markerHeight: 30,
 					};
 
 					// init msa
@@ -106,32 +106,151 @@
 						m.render();
 
 						// Add a click listener on rows
+						// Create a variable to hold the panel and the current sequence ID outside the event
+						var panel = null;
+						var currentSeqId = null;
+
+						var sequenceName;
+
+
 						m.g.on("row:click", function(data) {
 							// Get the sequence object
-							var sequence = m.seqs.at(data.seqId);
-
-							console.log(data)
+							const sequence = m.seqs.at(data.seqId);
+							const urlParams = new URLSearchParams(window.location.search);
+							const species = urlParams.get('species');
 
 							// Get the name of the sequence
-							var sequenceName = sequence.get('name');
+							sequenceName = sequence.get('name');
 
-							// Define a unique URL for each sequence
-							var url = "./popup.html?=" + sequenceName;
+							// If clicking on the same row, hide the panel and return
+							if (currentSeqId === data.seqId) {
+								panel.style.display = 'none';
+								currentSeqId = null;
+								return;
+							}
 
-							// Open a new page
-							window.open(url, '_blank');
+							// Otherwise, store the current sequence ID
+							currentSeqId = data.seqId;
+
+							// If the panel doesn't exist, create it
+							if (!panel) {
+								panel = createPanel(species, sequenceName);
+							}
+
+							// Update the panel position and make it visible
+							panel.style.left = data.evt.pageX + 'px'; // position the panel at the mouse pointer
+							panel.style.top = data.evt.pageY + 'px';
+							panel.style.display = 'block';
 						});
 
-						m.g.on("column:click", function(data) {
-							// Create text to be shown in the panel
-							var text = 'Column: ' + data.rowPos;
-							console.log(text);
-							console.log(data.evt);
-							// Show the text in the panel
-							var tooltip = document.getElementById('tooltip');
-							tooltip.textContent = text;
+						function createPanel(species, genome_id) {
+							var panel = document.createElement('div');
 
-							var rect = document.getElementById('yourDiv').getBoundingClientRect();
+
+							panel.style.position = "absolute";
+							panel.style.background = "#fff";
+							panel.style.padding = "10px";
+							panel.style.border = "1px solid #000";
+							panel.style.zIndex = 1000; // put the panel in front
+
+							// Add card classes
+							panel.classList.add("card");
+
+							// Option 1: Jump to new page
+							var jumpBtn = document.createElement('button');
+							jumpBtn.setAttribute("type", "button");
+							jumpBtn.classList.add("btn", "btn-primary", "btn-sm", "mb-1"); // Add margin bottom class
+							jumpBtn.innerHTML = "Info of " + sequenceName;
+							jumpBtn.onclick = function() {
+								// Define a unique URL for each sequence
+								var url = '../../Gene_function/genome_page/genome_page.html?species=' + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id)
+
+								// Open a new page
+								window.open(url, '_blank');
+
+								// Hide panel
+								panel.style.display = 'none';
+								currentSeqId = null;
+							};
+							panel.appendChild(jumpBtn);
+
+							// Add an empty line (line break)
+							panel.appendChild(document.createElement('br'));
+
+							// Option 2: Copy row label text
+							var copyBtn = document.createElement('button');
+							copyBtn.setAttribute("type", "button");
+							copyBtn.classList.add("btn", "btn-primary", "btn-sm");
+							copyBtn.innerHTML = "Copy genome id";
+							copyBtn.onclick = function() {
+								// Copy sequenceName to clipboard
+								navigator.clipboard.writeText(sequenceName).then(function() {
+									console.log('Copying to clipboard was successful!');
+								}, function(err) {
+									console.error('Could not copy text: ', err);
+								});
+
+								// Hide panel
+								panel.style.display = 'none';
+								currentSeqId = null;
+							};
+							panel.appendChild(copyBtn);
+
+							// Append the panel to body
+							document.body.appendChild(panel);
+
+							return panel;
+						}
+
+
+
+
+						m.g.on("column:click", async function(data) {
+							// Fetch the JSON data
+							const response = await fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/alleleome/' + gene +'/AA_freq.json');
+							const jsonData = await response.json();
+							const Amino_Acid = {
+								'A': 'Alanine&nbsp;[A]',
+								'R': 'Arginine&nbsp;[R]',
+								'N': 'Asparagine&nbsp;[N]',
+								'D': 'Aspartic&nbsp;Acid&nbsp;[D]',
+								'C': 'Cysteine&nbsp;[C]',
+								'Q': 'Glutamine&nbsp;[Q]',
+								'E': 'Glutamic&nbsp;Acid&nbsp;[E]',
+								'G': 'Glycine&nbsp;[G]',
+								'H': 'Histidine&nbsp;[H]',
+								'I': 'Isoleucine&nbsp;[I]',
+								'L': 'Leucine&nbsp;[L]',
+								'K': 'Lysine&nbsp;[K]',
+								'M': 'Methionine&nbsp;[M]',
+								'F': 'Phenylalanine&nbsp;[F]',
+								'P': 'Proline&nbsp;[P]',
+								'S': 'Serine&nbsp;[S]',
+								'T': 'Threonine&nbsp;[T]',
+								'W': 'Tryptophan&nbsp;[W]',
+								'Y': 'Tyrosine&nbsp;[Y]',
+								'V': 'Valine&nbsp;[V]',
+								'-': '-'
+							};
+
+
+							// Get the data for the column that was clicked
+							const columnData = jsonData[(data.rowPos + 1).toString()];
+
+							// Generate the HTML string for the tooltip
+							let tooltipHtml = "<div style='text-align:center;'><strong>Position " + (data.rowPos + 1) + "</strong></div><br><table style='width: 100%; table-layout: fixed;'>";
+							tooltipHtml += `<thead><tr><th style='width: 33%; text-align: center;'>Residue</th><th style='width: 33%; text-align: center;'>Count</th><th style='width: 33%; text-align: center;'>Frequency</th></tr></thead><tbody>`;
+							for (const [aminoAcid, values] of Object.entries(columnData)) {
+								tooltipHtml += `<tr><td style= 'text-align: center;'>${Amino_Acid[aminoAcid]}</td><td style= 'text-align: center;'>${values[0]}</td><td style= 'text-align: center;'>${values[1]}%</td></tr>`;
+							}
+							tooltipHtml += "</tbody></table>";
+
+
+							// Show the generated HTML in the tooltip
+							var tooltip = document.getElementById('tooltip');
+							tooltip.innerHTML = tooltipHtml;
+
+							var rect = document.getElementById('MSA').getBoundingClientRect();
 
 							tooltip.style.left = (data.evt.pageX - rect.left - 50) + 'px';  // position the tooltip at the mouse pointer
 							tooltip.style.top = (data.evt.pageY - rect.top + 10) + 'px';
@@ -146,25 +265,75 @@
 							tooltip.classList.add('tooltip-hidden');
 						});
 
+						// m.g.on("column:click", function(data) {
+						// 	// Create text to be shown in the panel
+						// 	var text = 'Column: ' + data.rowPos;
+						// 	console.log(text);
+						// 	console.log(data.evt);
+						// 	// Show the text in the panel
+						// 	var tooltip = document.getElementById('tooltip');
+						// 	tooltip.textContent = text;
+						//
+						// 	var rect = document.getElementById('MSA').getBoundingClientRect();
+						//
+						// 	tooltip.style.left = (data.evt.pageX - rect.left - 50) + 'px';  // position the tooltip at the mouse pointer
+						// 	tooltip.style.top = (data.evt.pageY - rect.top + 10) + 'px';
+						// 	tooltip.classList.remove('tooltip-hidden');
+						// 	tooltip.classList.add('tooltip-showing');
+						// });
+						//
+						// // And don't forget to handle the mouseout event to hide the panel:
+						// m.g.on("column:mouseout", function(data) {
+						// 	var tooltip = document.getElementById('tooltip');
+						// 	tooltip.classList.remove('tooltip-showing');
+						// 	tooltip.classList.add('tooltip-hidden');
+						// });
+
 					}
 
-					var defaultURL = "./fer3.clustal";
+					const urlParams = new URLSearchParams(window.location.search);
+					const species = urlParams.get('species');
+					const gene = urlParams.get('gene');
+
+					const defaultURL = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/alleleome/' + gene +'/MSA.fasta';
 
 					function getURLParameter(name) {
 						return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null;
 					}
 
 					var url = getURLParameter('seq') || defaultURL;
-					m.u.file.importURL(url, renderMSA);
 
+					// Fetch and parse file, then render MSA
+					fetch(url)
+							.then(response => response.text())
+							.then((data) => {
+								// Parse the fasta string
+								var seqs = msa.io.fasta.parse(data);
+
+								// Import parsed sequences
+								m.seqs.reset(seqs);
+
+								// Calculate the alignment width and the length of the sequence
+								var alignmentWidth = m.g.zoomer.get('alignmentWidth');
+								var sequenceLength = m.seqs.getMaxLength(); // assuming all sequences have the same length
+
+								// Set the 'boxRectWidth' based on the calculated values
+								m.g.zoomer.set('boxRectWidth', alignmentWidth / sequenceLength);
+
+								// Render MSA
+								renderMSA();
+
+
+							});
 				</script>
 			</div>
 		</div>
 	</div>
-
-	<div class="col-1">
 	</div>
 </div>
 
 </body>
 </html>
+
+
+

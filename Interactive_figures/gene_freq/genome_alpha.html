@@ -11,7 +11,7 @@
         }
     </style>
     <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/mouse-wheel-zoom.js"></script
+    <script src="https://code.highcharts.com/modules/mouse-wheel-zoom.js"></script>
     <script src="https://code.highcharts.com/modules/series-label.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
@@ -89,7 +89,7 @@
                     },
                     yAxis: {
                         title: {
-                            text: 'Genome counts'
+                            text: 'Number of genomes'
                         },
                         gridLineWidth: 0,
                         crosshair: true
@@ -111,7 +111,7 @@
                         scatter: {
                             tooltip: {
                                 headerFormat: '<b>{point.name}</b><br>',
-                                pointFormat: '\u03B1: {point.x}<br>Genome Count: {point.y}'
+                                pointFormat: '<b>Species</b>: {point.name}<br><b>Number of genomes</b>: {point.y}<br><b>\u03B1:</b> {point.x}'
                             },
                             point: {
                                 events: {

@@ -88,7 +88,7 @@
           <a class="nav-link " href="#">Download</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="#" tabindex="-1" aria-disabled="true">Publications</a>
+          <a class="nav-link " href="./Publications.html" tabindex="-1" aria-disabled="true">Publications</a>
         </li>
       </ul>
     </div>
@@ -170,9 +170,8 @@
 <script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  const sasToken = '?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2023-06-29T16:35:45Z&st=2023-06-29T08:35:45Z&spr=https&sig=97tFqE85sVLfsXgGkme1wCyIFncvrvqJXfngGkLdN4I%3D';
 
-  fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species_list.json' + sasToken)
+  fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species_list.json')
           .then(response => response.json())
           .then(data => {
             const speciesCount = data.Species.length;

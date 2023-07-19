@@ -35,10 +35,6 @@
             text-align: center;
         }
 
-        .table-container {
-            width: 100%;
-            text-align: center;
-        }
 
         .table-container table {
             margin-left: auto;
@@ -60,8 +56,10 @@
         }
 
         .dataTables_wrapper .dataTables_filter {
-            display: none;
+            display: block;
+
         }
+
 
         .dataTables_wrapper thead th {
             text-align: center;
@@ -117,7 +115,7 @@
 
 
 <div class="table_padding overflow-auto">
-    <div style="width:80%;">
+    <div style="width:90%;">
         <div class="card"> <!-- This is the wrapper -->
             <div class="card-body"> <!-- The card-body class adds padding around your content -->
                 <table id="gene_table" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
@@ -140,6 +138,22 @@
             </div>
         </div>
     </div>
+</div>
+
+<br>
+
+    <h2 id = 'MSA_figure' style = 'text-align: center';></h2>
+
+<div class="table_padding overflow-auto">
+    <div style="width:90%;">
+        <div class="card"> <!-- This is the wrapper -->
+            <div class="card-body"> <!-- The card-body class adds padding around your content -->
+                <iframe id = 'MSA' style="width: 100%; height: 100vh;padding-top: 20px"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
 </div>
 
 <!-- Datatable -->
@@ -216,7 +230,10 @@
     });
 
     document.getElementById('gene_table_title').innerHTML= 'Gene: ' + '<b>' +  gene  + '</b>'
+    document.getElementById('MSA_figure').innerHTML= 'Multiple sequence alignment of ' + '<b>' +  gene  + '</b>'
 
+    const MSA = document.getElementById('MSA');
+    MSA.src = '../Interactive_figures/msa/MSA.html?species=' + species + '&' + 'gene=' + gene;
 </script>
 </body>
 </html>
