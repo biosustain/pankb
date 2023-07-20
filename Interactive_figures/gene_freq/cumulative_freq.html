@@ -36,9 +36,8 @@
               const accessory_max_cum = data['accessory_max_cumulative'];
               const core_max_cum = data['core_max_cumulative'];
               const max_cum = data['max_cumulative'];
-
               const trace1 = {
-                x: [0].concat(x),
+                x: x,
                 y: [0].concat(cumulativeFrequency),
                 type: 'scatter',
                 mode: 'lines',
@@ -116,7 +115,8 @@
                     size: 14,
                     family: 'Arial, sans-serif' // Use Arial font family
                   },
-                  range: [0, Math.max(...x) + 1], // Adjust x-axis range
+                  autorange: false,
+                  range: [1, Math.max(...x)],
                   showgrid: false, // Remove x-axis grid lines
                   showline: true, // Show x-axis line
                   zeroline: false, // Remove x-axis zero line
@@ -135,11 +135,12 @@
                     size: 14,
                     family: 'Arial, sans-serif' // Use Arial font family
                   },
-                  range: [0, Math.max(...cumulativeFrequency) + 1000], // Adjust y-axis range
+                  autorange: false,
+                  range: [0, max_cum],
+                  zeroline: false,
                   tickformat: '1s', // Format y-axis labels as '1k'
                   showgrid: false, // Remove y-axis grid lines
                   showline: true, // Show y-axis line
-                  zeroline: false, // Remove y-axis zero line
                   titlefont: {
                     size: 14,
                     family: 'Arial, sans-serif' // Use Arial font family

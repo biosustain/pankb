@@ -33,7 +33,7 @@
                     const avg_acc = data['avg_acc'];
                     const x_pan = data['x_pan'];
                     const avg_pan = data['avg_pan'];
-                    const max_frequency_count = data['max_frequency_count'];
+                    const max_cum = data['max_cumulative'];
                     const alpha = data['alpha'].toFixed(3)
 
                     // Create trace for core genome
@@ -73,7 +73,7 @@
                         autosize: true,
                         margin: {
                             l: 80,  // left margin
-                            r: 10,  // right margin
+                            r: 60,  // right margin
                             b: 40, // bottom margin
                             t: 80, // top margin
                             pad: 0 // padding
@@ -101,7 +101,8 @@
                                 size: 12,
                                 family: 'Arial, sans-serif' // Use Arial font family
                             },
-                            autorange: true,
+                            autorange: false,
+                            range: [0, max_cum],
                             tickformat: '1s', // Format y-axis labels as '1k'
                             showgrid: false,  // Remove y-axis grid lines
                             showline: true,  // Show y-axis line
