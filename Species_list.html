@@ -94,6 +94,7 @@
   <table id="species_list" class="table table-hover" style="width:100%; table-layout: fixed;">
     <thead>
     <tr>
+      <th class="text-center align-middle">Genus</th>
       <th class="text-center align-middle">Species</th>
       <th class="text-center align-middle">Openness</th>
       <th class="text-center align-middle">Gene class distribution</th>
@@ -126,13 +127,14 @@
             // Iterate over each species
             data.Species.forEach((species, index) => {
               const total = data.Gene_class[index][0] + data.Gene_class[index][1] + data.Gene_class[index][2];
-
+              const genus = data.Genus[index]; // Add this line to get the genus information
               const coreWidth = (data.Gene_class[index][0] / total) * 100;
               const accessoryWidth = (data.Gene_class[index][1] / total) * 100;
               const rareWidth = (data.Gene_class[index][2] / total) * 100;
 
               const row = document.createElement('tr');
               row.innerHTML = `
+                      <td class="text-center align-middle">${genus}</td>
                       <td class="text-center align-middle">${species}</td>
                       <td class="text-center align-middle">${data.Openness[index]}</td>
                       <td class="text-center align-middle">
@@ -152,7 +154,7 @@
               tableBody.appendChild(row);
             });
 
-          // Initialize tooltips
+            // Initialize tooltips
             $(function () {
               $('[data-toggle="tooltip"]').tooltip()
             })

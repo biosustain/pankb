@@ -157,6 +157,11 @@
     const genome_id = urlParams.get('genome_id');
     const gene_id = urlParams.get('gene_id');
 
+
+    // const species = 'Lactiplantibacillus_plantarum';
+    // const genome_id = 'GCF_006364975.1';
+    // const gene_id = 'group_6225';
+
     // Load the JSON file
     fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/genome_page/' + genome_id + '/genome_info.json')
         .then(response => response.json())
@@ -208,11 +213,19 @@
                 'dataType': 'json'
             });
 
+            console.log('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/'+ species + '/gene_locustag/' + gene_id + '.json')
+
             var geneData = data; // Convert the data object to an array for DataTables
 
             // Filter the geneData based on the Genome ID
             const matchedEntry = geneData.find(entry => entry.Genome_ID === genome_id);
             geneData = matchedEntry ? [matchedEntry] : [];
+
+            let emptyTableText = 'Loading...';
+
+            if (geneData.length === 0) {
+                emptyTableText = 'Gene ' + '<b>' +  gene_id  + '</b>' + ' doesn\'t exist in genome ' + '<b>' +  genome_id  + '</b>' ;
+            }
 
             let table = $('#gene_info').DataTable({
                 data: geneData,
@@ -248,7 +261,7 @@
                 paging: false, // Remove the page counter
                 searching: false, // Remove the search bar
                 language: {
-                    emptyTable: 'Loading...'
+                    emptyTable: emptyTableText
                 },
                 order: [],
                 bSort: true
@@ -274,6 +287,7 @@
             table.draw(false); // Redraw the DataTable to readjust the layout
         });
     });
+
 
     const Genome_page_COG_distribution = document.getElementById('Genome_page_COG_distribution');
     Genome_page_COG_distribution.src = './barplot.html?species=' + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id) ;

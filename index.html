@@ -169,18 +169,18 @@
 
 <script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
+<!--<script>-->
 
-  fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species_list.json')
-          .then(response => response.json())
-          .then(data => {
-            const speciesCount = data.Species.length;
-            const genomeCount = data.N_of_genome.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-            document.getElementById("speciesCount").textContent = speciesCount + " Species";
-            document.getElementById("genomeCount").textContent = genomeCount + " Genome";
-          })
+<!--  fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species_list.json')-->
+<!--          .then(response => response.json())-->
+<!--          .then(data => {-->
+<!--            const speciesCount = data.Species.length;-->
+<!--            const genomeCount = data.N_of_genome.reduce((accumulator, currentValue) => accumulator + currentValue, 0);-->
+<!--            document.getElementById("speciesCount").textContent = speciesCount + " Species";-->
+<!--            document.getElementById("genomeCount").textContent = genomeCount + " Genome";-->
+<!--          })-->
 
-</script>
+<!--</script>-->
 
 
 </body>

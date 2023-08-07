@@ -41,16 +41,18 @@
 
                 organisms.forEach((organism, index) => {
                     const organismData = data[organism];
+                    console.log(index);
 
                     const points = Object.keys(organismData).map(key => ({x: organismData[key][0], y: organismData[key][1], name: key}));
 
                     const serie = {
                         name: organism,
-                        color: organism === 'Lactobacillus' ? colorList[0] : colorList[index % colorList.length],
+                        color: colorList[index],
                         data: points,
 
                         marker: {
-                            radius: 3,
+                            // symbol: 'circle',
+                            radius: 6,
                             states: {
                                 hover: {
                                     enabled: true,
@@ -95,10 +97,10 @@
                         crosshair: true
                     },
                     legend: {
-                        layout: 'vertical',
-                        align: 'left',
+                        layout: 'horizontal',
+                        align: 'center',
                         verticalAlign: 'top',
-                        x: 80,
+                        x: 0,
                         y: -10,
                         itemStyle: {
                             fontSize: '10px',  // Adjust this value to modify the size
