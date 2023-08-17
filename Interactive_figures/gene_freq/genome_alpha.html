@@ -23,6 +23,12 @@
 <div id="container"></div>
 
 <script>
+    function roundToDecimal(number, decimalPlaces) {
+        var factor = Math.pow(10, decimalPlaces);
+        return Math.round(number * factor) / factor;
+    }
+
+
     document.addEventListener('DOMContentLoaded', function() {
 
         fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species_alpha.json')
@@ -32,9 +38,9 @@
                 const series = [];
 
                 const colorList = [
-                    'rgb(255, 165, 0)', // Orange for Lactobacillus
+                    'rgb(161,0,255)', // Red
                     'rgb(31, 119, 180)', // Blue
-                    'rgb(255, 0, 0)', // Red
+                    'rgb(255, 165, 0)', // Orange for Lactobacillus
                     'rgb(0, 128, 0)', // Green
                     // Add more colors as needed
                 ];
@@ -43,7 +49,7 @@
                     const organismData = data[organism];
                     console.log(index);
 
-                    const points = Object.keys(organismData).map(key => ({x: organismData[key][0], y: organismData[key][1], name: key}));
+                    const points = Object.keys(organismData).map(key => ({x: roundToDecimal(1 - (organismData[key][0]), 3), y: organismData[key][1], name: key}));
 
                     const serie = {
                         name: organism,
@@ -82,7 +88,7 @@
                     },
                     xAxis: {
                         title: {
-                            text: 'Openness (\u03B1)'
+                            text: 'Openness (\u03BB)'
                         },
                         showLastLabel: true,
                         gridLineWidth: 0,
@@ -113,7 +119,7 @@
                         scatter: {
                             tooltip: {
                                 headerFormat: '<b>{point.name}</b><br>',
-                                pointFormat: '<b>Species</b>: {point.name}<br><b>Number of genomes</b>: {point.y}<br><b>\u03B1:</b> {point.x}'
+                                pointFormat: '<b>Species</b>: {point.name}<br><b>Number of genomes</b>: {point.y}<br><b>\u03BB:</b> {point.x}'
                             },
                             point: {
                                 events: {

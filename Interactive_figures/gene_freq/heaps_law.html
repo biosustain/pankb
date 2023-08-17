@@ -18,6 +18,11 @@
     </head>
     <body>
     <script>
+        function roundToDecimal(number, decimalPlaces) {
+            var factor = Math.pow(10, decimalPlaces);
+            return Math.round(number * factor) / factor;
+        }
+
         // Function to load JSON file and create the plot
         function loadJSONAndCreatePlot() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -33,8 +38,8 @@
                     const avg_acc = data['avg_acc'];
                     const x_pan = data['x_pan'];
                     const avg_pan = data['avg_pan'];
-                    const max_cum = data['max_cumulative'];
-                    const alpha = data['alpha'].toFixed(3)
+                    const max_frequency_count = data['max_frequency_count'];
+                    const alpha = roundToDecimal(1 - (data['alpha']), 3)
 
                     // Create trace for core genome
                     var traceCore = {
@@ -101,8 +106,7 @@
                                 size: 12,
                                 family: 'Arial, sans-serif' // Use Arial font family
                             },
-                            autorange: false,
-                            range: [0, max_cum],
+                            autorange: true,
                             tickformat: '1s', // Format y-axis labels as '1k'
                             showgrid: false,  // Remove y-axis grid lines
                             showline: true,  // Show y-axis line
@@ -129,7 +133,7 @@
                                 y: 0.85,
                                 xref: 'paper',
                                 yref: 'paper',
-                                text: '\u03B1 = ' + alpha,
+                                text: '\u03BB = ' + alpha,
                                 showarrow: false,
                                 font: {
                                     size: 14,

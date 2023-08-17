@@ -139,7 +139,6 @@
                     size: 14,
                     family: 'Arial, sans-serif' // Use Arial font family
                   },
-                  autorange: true,
                   tickfont: {
                     size: 12,
                     family: 'Arial, sans-serif' // Use Arial font family
@@ -171,9 +170,8 @@
                 legend: {
                   x: 0.5,  // Position the legend at the center of the plot
                   y: 1,
-                  xanchor: 'center',
-                  yanchor: 'bottom',
                   orientation: 'h',  // Set legend orientation to horizontal
+                  traceorder: 'reversed',  // Change the order of legend items
                   itemclick: false,  // Disable legend item click
                   itemdoubleclick: false,  // Disable legend item double-click
                   itemwidth: 30,  // Adjust legend item width as needed
