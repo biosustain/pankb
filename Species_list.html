@@ -5,36 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Species list</title>
 
-  <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-fixed/">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- Bootstrap 5.3.0 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
 
-  <link rel="stylesheet" href= "https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css">
-  <link rel="stylesheet" href= "https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+  <!-- DataTables Bootstrap 5 CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
 
+  <!-- jQuery -->
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"> </script>
+
+  <!-- DataTables JS -->
   <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"> </script>
   <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"> </script>
 
-  <script>
-    $(document).ready(function () {
-      $('#example').DataTable();
-    });
-  </script>
+  <!-- Bootstrap 5.3.0 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
 
   <!-- Bootstrap core CSS -->
   <link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
-    .bd-placeholder-img {
-      font-size: 1.125rem;
-      text-anchor: middle;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      user-select: none;
-    }
 
     @media (min-width: 768px) {
       .bd-placeholder-img-lg {
@@ -42,24 +33,11 @@
       }
     }
 
-    .link_button{
-      text-align: center;
-      padding: 15px 32px;
-      font-size: 24px;
-    }
-
-    .scrollspy-example {
-      position: relative;
-      height: 900px;
-      margin-top: .6rem;
-      overflow: auto;
-    }
-
     .table_padding{
-      padding-top:50px;
-      padding-bottom:125px;
-      padding-right:100px;
-      padding-left:100px;
+      padding-top:15px;
+      padding-bottom:15px;
+      padding-right:120px;
+      padding-left:120px;
     }
 
     th, td{
@@ -67,9 +45,11 @@
       font-size: 18px;
     }
 
-    .datalink{
-      text-align: center;
+    td {
+      word-wrap: break-word;
+      white-space: normal;
     }
+
   </style>
 
 
@@ -95,13 +75,13 @@
           <a class="nav-link " aria-current="page" href="./About.html">About</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" href="./Species_list.html">Organism</a>
+          <a class="nav-link active" href="./Species_list.html">Organisms</a>
         </li>
         <li class="nav-item">
           <a class="nav-link " href="#">Download</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link " href="#" tabindex="-1" aria-disabled="true">Publications</a>
+          <a class="nav-link" href="./Publications.html" tabindex="-1" aria-disabled="true">Publications</a>
         </li>
       </ul>
     </div>
@@ -115,54 +95,97 @@
 
 <!-- Datatable -->
 
-<div class = "table_padding">
-  <table id="example" class="table table-hover" style="width:100%">
+<div class="table_padding">
+  <table id="species_list" class="table table-hover" style="width:100%; table-layout: fixed;">
     <thead>
     <tr>
+      <th class="text-center align-middle">Family</th>
       <th class="text-center align-middle">Species</th>
       <th class="text-center align-middle">Openness</th>
+      <th class="text-center align-middle">Gene class distribution</th>
       <th class="text-center align-middle">Number of genomes</th>
       <th class="text-center align-middle">Pangenome analyses</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
 
-    <tr>
-      <td class = "text-center align-middle ">Lactiplantibacillus plantarum</td>
-      <td class = "text-center align-middle">Open</td>
-      <td class = "text-center align-middle">611</td>
-      <td class = "text-center align-middle"><a class = 'datalink' href="./Pangenome_analyses_overview.html">Lactiplantibacillus_plantarum</a></td>
-    </tr>
-
-    <!--
-        <tr>
-          <td class = "text-center align-middle">Test</td>
-          <td class = "text-center align-middle">#</td>
-          <td class = "text-center align-middle">#</td>
-          <td class = "text-center align-middle"><a class = 'datalink' href="./Pangenome_analyses_overview.html">Test</a></td>
-        </tr>
-    -->
-
-        </tbody>
-
-      </table>
+<!-- Datatable -->
+<div id="loadingModal" class="modal" tabindex="-1" role="dialog" style="display:none; background-color: rgba(0,0,0,0.75);">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <p>Loading, please wait...</p>
+      </div>
     </div>
-
-    <!-- Datatable -->
+  </div>
+</div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const links = document.getElementsByClassName('datalink');
+  // Load the JSON file
+  // Load the JSON file
+  fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species_list.json')
+          .then(response => response.json())
+          .then(data => {
+            const tableBody = document.getElementById('table-body');
 
-    for (const link of links) {
-      link.addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent the link from navigating immediately
-        const linkText = event.target.textContent;
-        localStorage.setItem('linkText', linkText); // Save the link text in localStorage
-        window.location.href = link.href; // Navigate to the link's destination
-      });
-    }
-  });
+            // Iterate over each species
+            data.Species.forEach((species, index) => {
+              const total = data.Gene_class[index][0] + data.Gene_class[index][1] + data.Gene_class[index][2];
+              const family = data.Family[index]; // Add this line to get the family information
+              const coreWidth = (data.Gene_class[index][0] / total) * 100;
+              const accessoryWidth = (data.Gene_class[index][1] / total) * 100;
+              const rareWidth = (data.Gene_class[index][2] / total) * 100;
+
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                    <td class="text-center align-middle">${family}</td>
+                    <td class="text-center align-middle">${species}</td>
+                    <td class="text-center align-middle">${data.Openness[index]}</td>
+                    <td class="text-center align-middle">
+                    <div style="display: flex; height: 20px; max-width: 80%; margin: auto; border-radius: 10px; overflow: hidden;">
+                        <div style="width: ${coreWidth}%; background-color: rgba(128,0,128,0.8);" data-toggle="tooltip" title="Core: ${data.Gene_class[index][0]}"></div>
+                        <div style="width: ${accessoryWidth}%; background-color: rgba(255,165,0,0.8);" data-toggle="tooltip" title="Accessory: ${data.Gene_class[index][1]}"></div>
+                        <div style="width: ${rareWidth}%; background-color: rgba(0,128,0,0.8);" data-toggle="tooltip" title="Rare: ${data.Gene_class[index][2]}"></div>
+
+                      </div>
+                    </td>
+                    <td class="text-center align-middle">${data.N_of_genome[index]}</td>
+                    <td class="text-center align-middle">
+                      <a id="${data.Pangenome_analyses[index]}" href="#" onclick="handleLinkClick(event, '${data.Pangenome_analyses[index]}')">${data.Pangenome_analyses[index]}</a>
+                    </td>
+
+                  `;
+              tableBody.appendChild(row);
+            });
+
+            // Initialize DataTable with drawCallback
+            $('#species_list').DataTable({
+              drawCallback: function(settings) {
+                // Re-initialize tooltips
+                $('[data-toggle="tooltip"]').tooltip();
+              }
+            });
+
+          })
+          .catch(error => console.error(error));
+
+  function handleLinkClick(e, species) {
+    // Prevent the default link behavior
+    e.preventDefault();
+
+    // Navigate to the new page
+    window.location.href = `./Pangenome_analyses_overview.html?species=${species}`;
+  }
+
+
+
+</script>
+
+
+
+
 </script>
 
 </body>
