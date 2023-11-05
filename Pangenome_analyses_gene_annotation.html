@@ -173,7 +173,7 @@
           <a class="nav-link link_not_activate" aria-current="page" href="./About.html">About</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link link_not_activate" href="./Species_list.html">Organisms</a>
+          <a class="nav-link link_not_activate" href="./Species_list.html">Organism</a>
         </li>
         <li class="nav-item">
           <a class="nav-link link_not_activate" href="#">Download</a>
@@ -201,8 +201,8 @@
             </a>
           </li>
           <li class="mb-1">
-            <a id = 'Gene_annotation' class="btn  align-items-center " role="button">
-              Gene annotation
+            <a id = 'Annotation' class="btn  align-items-center " role="button">
+              Annotation
             </a>
           </li>
           <li class="mb-1 ">
@@ -245,7 +245,7 @@
 
 
     <div class="col-10 center-container">
-      <h2 class="text-center">Annotation table</h2>
+      <h2 class="text-center">Gene annotation table</h2>
       <div class="table_padding">
           <div class="table-responsive">
             <table id="example" class="table table-hover" style="table-layout: fixed;">
@@ -367,7 +367,7 @@
     const Overview = document.getElementById('Overview');
     Overview.href = './Pangenome_analyses_overview.html?species=' + species;
 
-    const Gene_annotation = document.getElementById('Gene_annotation');
+    const Gene_annotation = document.getElementById('Annotation');
     Gene_annotation.href = './Pangenome_analyses_gene_annotation.html?species=' + species;
 
     const Phylogenetic_tree = document.getElementById('Phylogenetic_tree');
@@ -383,7 +383,7 @@
               // Select the species to show in the card
               if (speciesData) {
                 document.getElementById('species').innerHTML = '<b>Species:</b><br>' + speciesData.Species;
-                document.getElementById('numGenome').innerHTML = '<b>Number of genomes:</b><br>' + speciesData.Number_of_genome;
+                document.getElementById('numGenome').innerHTML = '<b>Number of genome:</b><br>' + speciesData.Number_of_genome;
                 document.getElementById('core').innerHTML = '<b>Core:</b><br>' + speciesData.Gene_class[0];
                 document.getElementById('accessory').innerHTML = '<b>Accessory:</b><br>' + speciesData.Gene_class[1];
                 document.getElementById('rare').innerHTML= '<b>Rare:</b><br>' + speciesData.Gene_class[2];

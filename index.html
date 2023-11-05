@@ -40,20 +40,29 @@
     }
 
     .responsive-iframe {
-      position: relative;
-      padding: 0 !important;
-      margin:0 !important;
-      width: 100% !important;
-      height: 45% !important;
+      padding-left: 0;
+      padding-right: 0;
     }
 
+
     .responsive-iframe iframe {
-      position: relative;
-      padding: 0 !important;
-      margin:0 !important;
-      width: 100% !important;
-      height: 100% !important;
+      width: 100%;
+      height: 100%;
+      border: none;
     }
+
+    .responsive-iframe-bar {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+
+    .responsive-iframe-bar iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
 
     .card {
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* This adds a shadow effect */
@@ -97,41 +106,51 @@
 
 <div class = "container-fluid">
 
-  <p class="display-2 center" >
-    Pangenome Knowledge Base
+  <br>
+
+  <p class="display-5 center" >
+    PanKB: pangenome knowledge base for 6 major industrial bacterial families
   </p>
 
   <br>
   <div class="row">
-    <div class="col-3">
-
+    <div class="col-2">
+      <!-- Empty column -->
     </div>
 
-    <div class="col-6">
+    <div class="col-8">
       <div class="card"> <!-- This is the wrapper -->
         <div class="card-body"> <!-- The card-body class adds padding around your content -->
-          <div class="row" style="height:70vh">
-            <div class="responsive-iframe" style="margin-top: 0;">
-              <iframe src='./Interactive_figures/barplot/dimension.html'></iframe>
+
+          <div class="row no-gutters" style="height:50vh">
+
+            <div class="col-4"> <!-- This column is divided into two rows for two iframes -->
+              <div class="row" style="height:50%;"> <!-- First row for the first iframe with 50% height -->
+                <div class="col-12 responsive-iframe" style="height:100%;">
+                  <iframe src='./Interactive_figures/barplot/dimension.html' style="height:100%; width:100%;"></iframe>
+                </div>
+              </div>
+              <div class="row" style="height:50%;"> <!-- Second row for the second iframe with 50% height -->
+                <div class="col-12 responsive-iframe" style="height:100%;">
+                  <iframe src='./Interactive_figures/barplot/organism_genome_number.html' style="height:100%; width:100%;"></iframe>
+                </div>
+              </div>
             </div>
 
-            <div class="col-12">
-              <hr style="width:80%; border: 0.5px solid gray; margin: 20px auto;">
-            </div>
 
-            <div class="responsive-iframe" style="margin-top: 0;">
+            <div class="col-8 responsive-iframe" style="padding-left: 0; padding-right: 0;">
               <iframe src='./Interactive_figures/gene_freq/genome_alpha.html'></iframe>
             </div>
+
           </div>
         </div>
       </div>
     </div>
 
-    <div class="col-3">
-
+    <div class="col-2">
+      <!-- Empty column -->
     </div>
   </div>
-</div>
 
 <br>
 

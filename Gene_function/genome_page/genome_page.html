@@ -171,8 +171,8 @@
             const accessoryWidth = (geneClassDistribution[1] / total) * 100;
             const rareWidth = (geneClassDistribution[2] / total) * 100;
             const number_of_genes = geneClassDistribution.reduce((a, b) => a + b, 0);
-
             const row = document.createElement('tr');
+
             row.innerHTML = `
                 <td class="text-center align-middle">${genome_id}</td>
                 <td class="text-center align-middle">${data[genome_id]['full_name']}</td>
@@ -180,7 +180,7 @@
                 <td class="text-center align-middle">${data[genome_id]['isolation_source']}</td>
                 <td class="text-center align-middle">${data[genome_id]['Country']}</td>
                 <td class="text-center align-middle">${data[genome_id]['geo_loc_name']}</td>
-                <td class="text-center align-middle">${data[genome_id]['gc_content'].toFixed(3)}</td>
+                <td class="text-center align-middle">${(data[genome_id] && typeof data[genome_id]['gc_content'] === 'number') ? data[genome_id]['gc_content'].toFixed(3) : 'null'}</td>                <td class="text-center align-middle">${data[genome_id]['genome_len']}</td>
                 <td class="text-center align-middle">${data[genome_id]['genome_len']}</td>
                 <td class="text-center align-middle">${number_of_genes}</td>
                 <td class="text-center align-middle">

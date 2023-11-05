@@ -16,6 +16,7 @@
 
     <link href="../../assets/dist/css/bootstrap.min.css" rel="stylesheet">
 
+
     <style>
         @media (min-width: 768px) {
             .bd-placeholder-img-lg {
@@ -184,8 +185,7 @@
                 <td class="text-center align-middle">${data[genome_id]['isolation_source']}</td>
                 <td class="text-center align-middle">${data[genome_id]['Country']}</td>
                 <td class="text-center align-middle">${data[genome_id]['geo_loc_name']}</td>
-                <td class="text-center align-middle">${data[genome_id]['gc_content'].toFixed(3)}</td>
-                <td class="text-center align-middle">${data[genome_id]['genome_len']}</td>
+                <td class="text-center align-middle">${(data[genome_id] && typeof data[genome_id]['gc_content'] === 'number') ? data[genome_id]['gc_content'].toFixed(3) : 'null'}</td>                <td class="text-center align-middle">${data[genome_id]['genome_len']}</td>
                 <td class="text-center align-middle">${number_of_genes}</td>
                 <td class="text-center align-middle">
                     <div style="display: flex; height: 20px; max-width: 80%; margin: auto; border-radius: 10px; overflow: hidden;">

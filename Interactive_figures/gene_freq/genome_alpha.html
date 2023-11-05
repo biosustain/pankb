@@ -38,10 +38,12 @@
                 const series = [];
 
                 const colorList = [
-                    'rgb(161,0,255)', // Red
-                    'rgb(31, 119, 180)', // Blue
-                    'rgb(255, 165, 0)', // Orange for Lactobacillus
-                    'rgb(0, 128, 0)', // Green
+                    'rgb(161,0,255)', // purple
+                    'rgb(4,35,245)',  // blue
+                    'rgb(255, 165, 0)', // yellow
+                    'rgb(0, 128, 0)', // green
+                    'rgba(236,4,0)', // red
+
                     // Add more colors as needed
                 ];
 
@@ -75,7 +77,7 @@
                 Highcharts.chart('container', {
                     chart: {
                         type: 'scatter',
-                        zoomType: 'xy',
+                        zoomType: 'x',
                         zooming: {
                             mouseWheel: true
                         }
@@ -99,6 +101,9 @@
                         title: {
                             text: 'Number of genomes'
                         },
+                        type: 'logarithmic',
+                        tickInterval: 1,
+                        tickWidth: 1,
                         gridLineWidth: 0,
                         crosshair: true
                     },
@@ -135,6 +140,31 @@
                         enabled: false
                     }
                 });
+
+                $('#container').on('mousewheel', function(event) {
+                    event.preventDefault(); // Prevent the default zoom behavior
+
+                    var chart = $('#container').highcharts();
+                    var yAxis = chart.yAxis[0];
+
+                    var delta = event.originalEvent.deltaY || event.originalEvent.detail || event.originalEvent.wheelDelta;
+
+                    // Calculate zoom level based on the delta
+                    // Adjust these values to control zoom speed on a logarithmic scale
+                    var zoomFactor = delta > 0 ? 0.5 : 2;
+
+                    var newMin = yAxis.min * zoomFactor;
+                    var newMax = yAxis.max * zoomFactor;
+
+                    // Prevent zooming out beyond max or zooming in beyond min
+                    newMin = Math.max(newMin, yAxis.dataMin);
+                    newMax = Math.min(newMax, yAxis.dataMax);
+
+                    yAxis.setExtremes(newMin, newMax, false);
+
+                    chart.redraw();
+                });
+
             });
     });
 </script>

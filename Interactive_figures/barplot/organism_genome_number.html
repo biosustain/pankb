@@ -18,15 +18,25 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-        fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/pankb_dimension.json')
+        fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/organism_genome_count.json')
             .then(response => response.json())
             .then(data => {
                 const categories = Object.keys(data);
                 const dataValues = Object.values(data);
 
+                const rgbColors = [
+                    [4,35,245], // Purple
+                    [236,4,0], // Orange
+                    [255, 165, 0],   // Green
+                    [161,0,255], // Cyan
+                    [0, 128, 0],     // Black (for empty)
+                ];
+
+                const highchartsColors = rgbColors.map(rgb => `rgb(${rgb.join(',')})`);
+
                 Highcharts.chart('container', {
                     chart: {
-                        type: 'bar'
+                        type: 'column'
                     },
                     title: {
                         text: '' // Empty title
@@ -36,33 +46,37 @@
                         title: {
                             text: '' // Empty x-axis title
                         },
+                        labels: {
+                            rotation: -45,
+                            align: 'right',
 
+                        }
                     },
                     yAxis: {
                         title: {
-                            text: 'Counts' // y-axis title
+                            text: 'Number of genome'
                         },
                         type: 'logarithmic',
-                        tickInterval: 1, // Set custom tick positions
+                        tickInterval: 1,
                         tickWidth: 1,
                         lineWidth: 1,
-                        gridLineWidth: 0, // Remove y-axis grid lines
+                        gridLineWidth: 0
                     },
                     series: [{
                         data: dataValues,
-                        colorByPoint: true, // Different colors for each bar
-                        colors: ['purple', 'orange', 'green', 'cyan'], // Colors for the bars
-                        pointPadding: 0.15, // Adjust space between bars
-                        // groupPadding: 0.2, // Adjust space between bars
-                        borderWidth: 0                }],
+                        colorByPoint: true,
+                        colors: highchartsColors,
+                        pointPadding: 0.15,
+                        borderWidth: 0
+                    }],
                     tooltip: {
-                        pointFormat: 'Count: <b>{point.y}</b>', // Set tooltip text
+                        pointFormat: 'Count: <b>{point.y}</b>',
                         style: {
-                            fontSize: '12px' // Modify tooltip text font size
+                            fontSize: '12px'
                         }
                     },
                     legend: {
-                        enabled: false // Hide the legend
+                        enabled: false
                     },
                     credits: {
                         enabled: false
