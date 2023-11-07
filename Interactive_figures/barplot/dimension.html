@@ -9,7 +9,6 @@
             padding: 0;
             overflow: hidden;
         }
-
     </style>
     <script src="https://code.highcharts.com/highcharts.js"></script>
 </head>
@@ -17,12 +16,18 @@
 <div id="container"></div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-
         fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/pankb_dimension.json')
             .then(response => response.json())
             .then(data => {
                 const categories = Object.keys(data);
-                const dataValues = Object.values(data);
+                const dataValues = Object.values(data).map(value => {
+                    return {
+                        y: value,
+                        color: '#f0f0f0', // Set the bar color to light grey
+                        borderColor: 'black', // Set the border color to black
+                        borderWidth: 1 // Set the border width to make it visible
+                    };
+                });
 
                 Highcharts.chart('container', {
                     chart: {
@@ -36,25 +41,21 @@
                         title: {
                             text: '' // Empty x-axis title
                         },
-
                     },
                     yAxis: {
                         title: {
                             text: 'Counts' // y-axis title
                         },
                         type: 'logarithmic',
-                        tickInterval: 1, // Set custom tick positions
+                        tickInterval: 1,
                         tickWidth: 1,
                         lineWidth: 1,
                         gridLineWidth: 0, // Remove y-axis grid lines
                     },
                     series: [{
                         data: dataValues,
-                        colorByPoint: true, // Different colors for each bar
-                        colors: ['purple', 'orange', 'green', 'cyan'], // Colors for the bars
-                        pointPadding: 0.15, // Adjust space between bars
-                        // groupPadding: 0.2, // Adjust space between bars
-                        borderWidth: 0                }],
+                        pointPadding: 0.15,
+                    }],
                     tooltip: {
                         pointFormat: 'Count: <b>{point.y}</b>', // Set tooltip text
                         style: {

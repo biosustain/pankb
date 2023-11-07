@@ -59,7 +59,7 @@
                         data: points,
 
                         marker: {
-                            // symbol: 'circle',
+                            symbol: 'circle',
                             radius: 6,
                             states: {
                                 hover: {
@@ -73,6 +73,8 @@
 
                     series.push(serie);
                 });
+                const orderedSeriesNames = ['Enterobacteriaceae', 'Lactobacillaceae', 'Bacillaceae', 'Mycobacteriaceae', 'Pseudomonadaceae']; // Specify your desired order
+                const orderedSeries = orderedSeriesNames.map(name => series.find(serie => serie.name === name));
 
                 Highcharts.chart('container', {
                     chart: {
@@ -102,6 +104,7 @@
                             text: 'Number of genomes'
                         },
                         type: 'logarithmic',
+                        lineWidth:1,
                         tickInterval: 1,
                         tickWidth: 1,
                         gridLineWidth: 0,
@@ -114,7 +117,7 @@
                         x: 0,
                         y: -10,
                         itemStyle: {
-                            fontSize: '10px',  // Adjust this value to modify the size
+                            fontSize: '12px',  // Adjust this value to modify the size
                         },
                         floating: true,
                         backgroundColor: Highcharts.defaultOptions.chart.backgroundColor,
@@ -135,7 +138,7 @@
                             }
                         }
                     },
-                    series: series,
+                    series: orderedSeries,
                     credits: {
                         enabled: false
                     }
