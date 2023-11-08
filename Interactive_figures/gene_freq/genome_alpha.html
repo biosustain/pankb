@@ -48,6 +48,8 @@
                 organisms.forEach((organism, index) => {
                     const organismData = data[organism];
                     console.log(index);
+                    console.log(organism);
+                    console.log(colorList[index]);
 
                     const points = Object.keys(organismData).map(key => ({x: roundToDecimal(1 - (organismData[key][0]), 3), y: organismData[key][1], name: key}));
 
