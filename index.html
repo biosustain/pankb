@@ -75,6 +75,7 @@
   <!-- Custom styles for this template -->
   <link href="navbar-top-fixed.css" rel="stylesheet">
 </head>
+
 <body>
 
 
@@ -108,10 +109,14 @@
 
 <div class = "container-fluid">
 
-  <br>
-
   <p class="display-5 center" >
-    PanKB: pangenome knowledge base for 6 major industrial bacterial families
+    <a class="navbar-brand" href="./index.html">
+      <img src="pankb_logo_black.svg" alt="PanKB" height="70" class="d-inline-block align-text-top">
+    </a>
+  </p>
+
+  <p class="display-6 center" style="font-style: italic;  font-size: 30px;">
+    Pangenome Knowledge Base
   </p>
 
   <br>
@@ -124,7 +129,7 @@
       <div class="card"> <!-- This is the wrapper -->
         <div class="card-body"> <!-- The card-body class adds padding around your content -->
 
-          <div class="row no-gutters" style="height:50vh">
+          <div class="row no-gutters" style="height:55vh">
 
             <div class="col-4"> <!-- This column is divided into two rows for two iframes -->
               <div class="row" style="height:50%;"> <!-- First row for the first iframe with 50% height -->
@@ -155,6 +160,7 @@
   </div>
 
 <br>
+<br>
 
 <div class="container-fluid">
   <div class="row">
@@ -162,21 +168,32 @@
       <!-- Leave this empty for the same effect as above -->
     </div>
 
+<!--    <div class="col-6">-->
+<!--      <div class="card">-->
+<!--        <div class="card-body center">-->
+<!--          <main class="container">-->
+<!--            <div class=" p-3 rounded center">-->
+<!--              <h2>-->
+<!--                Click to explore pangenome analyses-->
+<!--              </h2>-->
+<!--              <div>-->
+<!--                <a class="btn btn-lg btn-primary link_button" href="./Species_list.html" >Select a species &raquo;</a>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </main>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+
     <div class="col-6">
-      <div class="card">
-        <div class="card-body center">
           <main class="container">
-            <div class=" p-5 rounded center">
-              <h2>
-                Click to explore pangenome analyses
-              </h2>
-              <br>
+            <div class=" p-3 rounded center">
               <div>
                 <a class="btn btn-lg btn-primary link_button" href="./Species_list.html" >Select a species &raquo;</a>
               </div>
             </div>
           </main>
-        </div>
+
       </div>
     </div>
 
@@ -186,7 +203,7 @@
   </div>
 </div>
 
-
+</div>
 
 <script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
 
