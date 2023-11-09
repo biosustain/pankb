@@ -37,12 +37,14 @@
                 Highcharts.chart('container', {
                     chart: {
                         type: 'bar',
+                        marginRight:0,
+                        paddingLeft:0
                     },
                     title: {
                         text: '' // Empty title
                     },
                     xAxis: {
-                        reversed: true, // Keep the order of categories as is
+                        reversed: true,
                         categories: categories,
                         title: {
                             text: '' // Empty x-axis title
@@ -50,11 +52,11 @@
                         labels: {
                             // rotation: -45,
                             align: 'right',
-
+                            padding:0
                         }
                     },
                     yAxis: {
-                        reversed: true, // Keep the order of categories as is
+                        reversed: true,
                         title: {
                             text: 'Number of genome'
                         },
