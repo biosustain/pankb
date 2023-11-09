@@ -18,7 +18,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-        fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/organism_genome_count.json')
+        fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/organism_gene_count.json')
             .then(response => response.json())
             .then(data => {
                 const categories = Object.keys(data);
@@ -38,28 +38,24 @@
                     chart: {
                         type: 'bar',
                         marginRight:0,
-                        paddingLeft:0
+                        paddingRight:0
                     },
                     title: {
                         text: '' // Empty title
                     },
                     xAxis: {
-                        reversed: true, // Keep the order of categories as is
+                        visible : false,
                         categories: categories,
                         title: {
                             text: '' // Empty x-axis title
                         },
                         labels: {
-                            // rotation: -45,
-                            align: 'right',
-
+                            enabled: false
                         }
                     },
                     yAxis: {
-                        reversed: true, // Keep the order of categories as is
-
                         title: {
-                            text: 'Number of genome'
+                            text: 'Number of gene'
                         },
                         type: 'logarithmic',
                         tickInterval: 1,
