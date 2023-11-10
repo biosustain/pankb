@@ -37,8 +37,6 @@
                 Highcharts.chart('container', {
                     chart: {
                         type: 'bar',
-                        marginRight:0,
-                        paddingLeft:0
                     },
                     title: {
                         text: '' // Empty title
@@ -51,14 +49,13 @@
                         },
                         labels: {
                             // rotation: -45,
-                            align: 'right',
-                            padding:0
+                            align: 'right'
                         }
                     },
                     yAxis: {
                         reversed: true,
                         title: {
-                            text: 'Number of genome'
+                            text: 'Genomes'
                         },
                         type: 'logarithmic',
                         tickInterval: 1,

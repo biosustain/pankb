@@ -101,7 +101,7 @@
                     },
                     yAxis: {
                         title: {
-                            text: 'Number of genomes'
+                            text: 'Genomes'
                         },
                         type: 'logarithmic',
                         lineWidth:1,
@@ -111,11 +111,10 @@
                         crosshair: true
                     },
                     legend: {
-                        layout: 'horizontal',
-                        align: 'center',
+                        layout: 'vertical',
+                        align: 'left',
                         verticalAlign: 'top',
-                        x: 0,
-                        y: -10,
+                        x: 100,
                         itemStyle: {
                             fontSize: '12px',  // Adjust this value to modify the size
                         },
@@ -123,6 +122,35 @@
                         backgroundColor: Highcharts.defaultOptions.chart.backgroundColor,
                         borderWidth: 1
                     },
+                    // responsive: {
+                    //     rules: [{
+                    //         condition: {
+                    //             maxWidth: 500  // Example breakpoint for smaller screens
+                    //         },
+                    //         chartOptions: {
+                    //             legend: {
+                    //                 align: 'center',
+                    //                 verticalAlign: 'top',
+                    //                 x: 0,
+                    //                 y: -10,
+                    //                 layout: 'horizontal'
+                    //             }
+                    //         }
+                    //     }, {
+                    //         condition: {
+                    //             minWidth: 501  // Example breakpoint for larger screens
+                    //         },
+                    //         chartOptions: {
+                    //             legend: {
+                    //                 align: 'center',
+                    //                 verticalAlign: 'top',
+                    //                 x: 0,
+                    //                 y: -10,
+                    //                 layout: 'horizontal'
+                    //             }
+                    //         }
+                    //     }]
+                    // },
                     plotOptions: {
                         scatter: {
                             tooltip: {

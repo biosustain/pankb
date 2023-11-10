@@ -15,17 +15,11 @@
   <link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
-    .bd-placeholder-img {
-      font-size: 1.125rem;
-      text-anchor: middle;
-      -moz-user-select: none;
-      -webkit-user-select: none;
-      user-select: none;
-    }
 
-    @media (min-width: 768px) {
-      .bd-placeholder-img-lg {
-        font-size: 3.5rem;
+    /* Responsive behavior (if needed) */
+    @media (max-width: 768px) {
+      .col-7-5, .col-4-5 {
+        width: 100%;
       }
     }
 
@@ -51,11 +45,6 @@
       border: none;
     }
 
-    .responsive-iframe-bar {
-      padding-left: 0;
-      padding-right: 0;
-    }
-
 
     .responsive-iframe-bar iframe {
       width: 100%;
@@ -68,6 +57,22 @@
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); /* This adds a shadow effect */
       transition: 0.3s; /* This adds a transition effect */
       border-radius: 5px; /* This makes the corners round (5px round corner) */
+    }
+
+    .col-7-5, .col-4-5 {
+      position: relative;
+      width: 100%;
+      padding-right: 0px;
+      padding-left: 0px;
+      float: left;
+    }
+
+    .col-7-5 {
+      width: 62.5%; /* 7.5 * 8.333% */
+    }
+
+    .col-4-5 {
+      width: 37.5%; /* 4.5 * 8.333% */
     }
   </style>
 
@@ -121,33 +126,37 @@
 
   <br>
   <div class="row">
-    <div class="col-2">
+    <div class="col-1">
       <!-- Empty column -->
     </div>
 
-    <div class="col-8">
+    <div class="col-10">
       <div class="card"> <!-- This is the wrapper -->
         <div class="card-body"> <!-- The card-body class adds padding around your content -->
 
           <div class="row no-gutters" style="height:55vh">
 
-            <div class="col-4"> <!-- This column is divided into two rows for two iframes -->
+            <div class="col-4">
+
+              <!-- First bar plot-->
               <div class="row" style="height:50%;"> <!-- First row for the first iframe with 50% height -->
                 <div class="col-12 responsive-iframe" style="height:100%;">
                   <iframe src='./Interactive_figures/barplot/dimension.html' style="height:100%; width:100%;"></iframe>
                 </div>
               </div>
-              <div class="row" style="height:50%;"> <!-- Second row for the second iframe with 50% height -->
 
-                <div class="col-7 responsive-iframe" style="height:100%;">
+              <!-- Second bar plot-->
+              <div class="row" style="height:50%;"> <!-- Second row for the second iframe with 50% height -->
+                <div class="col-7-5 responsive-iframe" style="height:100%;">
                   <iframe src='./Interactive_figures/barplot/organism_genome_number.html' style="height:100%"></iframe>
                 </div>
 
-                <div class="col-5 responsive-iframe" style="height:100%;">
+                <!-- Third bar plot-->
+                <div class="col-4-5 responsive-iframe" style="height:100%;">
                   <iframe src='./Interactive_figures/barplot/organism_gene_number.html' style="height:100%"></iframe>
                 </div>
-
               </div>
+
             </div>
 
 
@@ -160,7 +169,7 @@
       </div>
     </div>
 
-    <div class="col-2">
+    <div class="col-1">
       <!-- Empty column -->
     </div>
   </div>
