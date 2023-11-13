@@ -19933,10 +19933,12 @@
                 document.addEventListener("DOMContentLoaded", (function() {
                         const urlParams = new URLSearchParams(window.location.search);
                         const species = urlParams.get('species');
+                        const gene_class = urlParams.get('gene_class');
+
                         !function() {
                             var t, e = document.querySelector("#chart");
                             if (e.innerHTML = "<br>loading...",
-                                fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + "/heatmap.json.gz").then(response => {
+                                fetch(`https://pankb.blob.core.windows.net/data/PanKB/web_data/species/${species}/heatmap_${gene_class}.json.gz`).then(response => {
                                     if (!response.ok) {
                                         throw new Error("HTTP error " + response.status);
                                     }

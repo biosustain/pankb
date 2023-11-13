@@ -22,12 +22,13 @@
   document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');
+    const gene_class = urlParams.get('gene_class');
 
     var source_info = null;
     $.ajax({
       'async': false,
       'global': false,
-      'url': 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/source_info.json',
+      'url': `https://pankb.blob.core.windows.net/data/PanKB/web_data/species/${species}/source_info_${gene_class}.json`,
       'dataType': "json",
       'success': function (data) {
         source_info = data;
