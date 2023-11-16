@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Highcharts Treemap</title>
+  <style>
+    html, body, #container {
+      height: 97%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/treemap.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+</head>
+<body>
+
+<div id="container"></div>
+
+<script>
+  (async () => {
+    const data = await fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/treemap_data.json')
+            .then(response => response.json());
+
+    // Define colors for each of your top-level categories
+    const categoryColors = {
+      'Animal associated': '#ADD8E6', // Light Blue
+      'Food associated': '#F08080',   // Light Coral
+      'Missing': '#FFD700',           // Gold
+      'Env associated': '#98FB98',    // Pale Green
+      'Others': '#FFB6C1',            // Light Pink
+      'Plant associated': '#FFDEAD'   // Navajo White
+    };
+
+    // Assign colors to top-level categories in your data
+    const coloredData = data.map(item => {
+      if (!item.parent) {
+        item.color = categoryColors[item.name];
+      }
+      return item;
+    });
+
+    Highcharts.chart('container', {
+      series: [{
+        type: 'treemap',
+        layoutAlgorithm: 'squarified',
+        allowDrillToNode: true,
+        animationLimit: 1000,
+        dataLabels: {
+          enabled: false
+        },
+        levels: [{
+          level: 1,
+          dataLabels: {
+            enabled: true,
+            style: {
+              fontSize: '12px'
+            }
+          },
+          borderWidth: 3,
+          levelIsConstant: false
+        }],
+        data: coloredData
+      }],
+      title: {
+        text: ''
+      },
+      tooltip: {
+        pointFormat: '{point.name}: {point.value}'
+      },
+      accessibility: {
+        exposeAsGroupOnly: true
+      },
+      credits: {
+        enabled: false
+      },
+      exporting: {
+        enabled: false  // Disable the exporting feature
+      },
+    });
+  })();
+</script>
+
+</body>
+</html>

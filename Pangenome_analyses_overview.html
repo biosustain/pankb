@@ -362,13 +362,13 @@
               }
             });
 
-    // Remove overlay and show main content after 4 seconds
+    // Remove overlay and show main content after 2 seconds
     setTimeout(function() {
       var overlay = document.getElementById('loading-overlay');
       if(overlay) {
         overlay.parentNode.removeChild(overlay);  // remove the overlay from DOM
       }
-    }, 2000);  // 4000 milliseconds = 4 seconds
+    }, 2000);  // 4000 milliseconds = 2 seconds
 
   });
 
