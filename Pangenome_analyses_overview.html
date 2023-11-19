@@ -385,7 +385,7 @@
     const iframe = document.getElementById('heatmap_all');
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');
-    const cardnewSrc =  './Interactive_figures/hotmap/demo/index.html?species=' + species +'&gene_class=' + gene_class;
+    const newSrc =  './Interactive_figures/hotmap/demo/index.html?species=' + species +'&gene_class=' + gene_class;
     iframe.src = newSrc;
 
     // Update dropdown button text
