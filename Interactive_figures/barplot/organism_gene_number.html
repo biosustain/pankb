@@ -30,6 +30,7 @@
                     [102,205,170],
                     [238,130,238],
                     [100,149,237],
+                    [173, 216, 230]
                 ];
 
                 const highchartsColors = rgbColors.map(rgb => `rgb(${rgb.join(',')})`);
@@ -40,7 +41,12 @@
 
                     },
                     title: {
-                        text: '' // Empty title
+                        text: '',
+                        // style: {
+                        //     fontSize: '16px',
+                        //     align: 'left', // Horizontal alignment
+                        //     verticalAlign: 'top', // Vertical alignment
+                        // }
                     },
 
                     xAxis: {
@@ -48,7 +54,7 @@
                         // visible : false,
                         categories: categories,
                         title: {
-                            text: '' // Empty x-axis title
+                            text: ''
                         },
                         labels: {
                             align: 'center',

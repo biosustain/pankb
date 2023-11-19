@@ -38,11 +38,12 @@
                 const series = [];
 
                 const colorList = [
-                    'rgb(238,130,238)',
-                    'rgb(255,127,80)',
-                    'rgb(102,205,170)',
-                    'rgb(100,149,237)',
-                    'rgba(255,215,0)',
+                    'rgb(238,130,238)', // Mycobacteriaceae
+                    'rgb(173, 216, 230)', // Streptomycetaceae
+                    'rgb(255,127,80)', // Enterobacteriaceae
+                    'rgb(102,205,170)',// Bacillaceae
+                    'rgba(100,149,237)', // Pseudomonadaceae
+                    'rgba(255,215,0)' // Lactobacillaceae
                 ];
 
                 organisms.forEach((organism, index) => {
@@ -73,7 +74,7 @@
 
                     series.push(serie);
                 });
-                const orderedSeriesNames = ['Enterobacteriaceae', 'Lactobacillaceae', 'Bacillaceae', 'Mycobacteriaceae', 'Pseudomonadaceae']; // Specify your desired order
+                const orderedSeriesNames = ['Enterobacteriaceae', 'Lactobacillaceae', 'Bacillaceae', 'Mycobacteriaceae', 'Pseudomonadaceae', 'Streptomycetaceae']; // Specify your desired order
                 const orderedSeries = orderedSeriesNames.map(name => series.find(serie => serie.name === name));
 
                 Highcharts.chart('container', {
@@ -88,7 +89,10 @@
                         enabled: false // Disable the exporting module
                     },
                     title: {
-                        text: ''
+                        text: '',
+                        // style: {
+                        //     fontSize: '16px' // Set your desired font size here
+                        // }
                     },
                     xAxis: {
                         title: {

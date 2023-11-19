@@ -74,6 +74,15 @@
     .col-4-5 {
       width: 37.5%; /* 4.5 * 8.333% */
     }
+
+    .navbar-nav .nav-item .nav-link {
+      margin-left: 25px;  /* Adjust this value for spacing between items */
+      margin-right: 25px; /* Adjust this value for spacing between items */
+      font-size: 20px;    /* Adjust this value for font size */
+    }
+
+
+
   </style>
 
 
@@ -87,14 +96,14 @@
 
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="./index.html" style="margin: 0;">
       <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-      <ul class="navbar-nav me-auto mb-2 mb-md-0">
+    <div class="collapse navbar-collapse justify-content-center" id="navbarCollapse">
+      <ul class="navbar-nav mb-2 mb-md-0">
         <li class="nav-item">
           <a class="nav-link " aria-current="page" href="./About.html">About</a>
         </li>
@@ -109,8 +118,12 @@
         </li>
       </ul>
     </div>
+    <a class="navbar-brand" href="./index.html" style="margin: 0; visibility: hidden; ">
+      <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+    </a>
   </div>
 </nav>
+
 
 <div class = "container-fluid">
 
@@ -145,6 +158,11 @@
 
               <!-- Second bar plot-->
               <div class="row" style="height:50%;"> <!-- Second row for the second iframe with 50% height -->
+
+                <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold;">
+                  Database size per organism
+                </p>
+
                 <div class="col-4-5 responsive-iframe" style="height:100%;">
                   <iframe src='./Interactive_figures/barplot/organism_genome_number.html' style="height:100%"></iframe>
                 </div>
@@ -157,11 +175,22 @@
 
             </div>
 
+
             <div class="col-5 responsive-iframe" style="padding-left: 0; padding-right: 0;">
+
+              <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold;">
+                Pangenomes
+              </p>
+
               <iframe src='./Interactive_figures/gene_freq/genome_alpha.html'></iframe>
             </div>
 
             <div class="col-4 responsive-iframe" style="padding-left: 0; padding-right: 0;">
+
+              <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold;">
+                Strain isolation sources
+              </p>
+
               <iframe src='./Interactive_figures/treemap/treemap.html'></iframe>
             </div>
 
@@ -218,6 +247,7 @@
 </div>
 
 </div>
+
 
 <script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
 

@@ -79,9 +79,45 @@
             border-radius: 5px; /* This makes the corners round (5px round corner) */
         }
 
+        .navbar-nav .nav-item .nav-link {
+            margin-left: 25px;  /* Adjust this value for spacing between items */
+            margin-right: 25px; /* Adjust this value for spacing between items */
+            font-size: 20px;    /* Adjust this value for font size */
+        }
+
     </style>
 </head>
 <body>
+
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="../../index.html" style="margin: 0;">
+            <img src="../../pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-center" id="navbarCollapse">
+            <ul class="navbar-nav mb-2 mb-md-0">
+                <li class="nav-item">
+                    <a class="nav-link " aria-current="page" href="../../About.html">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " href="../../Species_list.html">Organisms</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " href="#">Download</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link " href="../../Publications.html" tabindex="-1" aria-disabled="true">Publications</a>
+                </li>
+            </ul>
+        </div>
+        <a class="navbar-brand" href="../../index.html" style="margin: 0; visibility: hidden; ">
+            <img src="../../pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+        </a>
+    </div>
+</nav>
 
 <br>
 
