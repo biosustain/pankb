@@ -25,23 +25,36 @@
     const data = await fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/treemap_data.json')
             .then(response => response.json());
 
-    // const categoryColors = {
-    //   'Animal associated': '#ADD8E6',
-    //   'Food associated': '#F08080',
-    //   'Missing': '#FFD700',
-    //   'Env associated': '#98FB98',
-    //   'Others': '#FFB6C1',
-    //   'Plant associated': '#FFDEAD'
-    // };
-
     const categoryColors = {
-      'Animal associated': '#FF7F50',
-      'Food associated': '#FFD700',
-      'Missing': '#66CDAA',
-      'Env associated': '#EE82EE',
-      'Others': '#6495ED',
-      'Plant associated': '#ADD8E6'
+      'Animal associated': '#FFFACD',
+      'Food associated': '#FDBCB4',
+      'Missing': '#D3D3D3',
+      'Env associated': '#AFEEEE',
+      'Others': '#CAFFBF',
+      'Plant associated': '#FFDAB9'
     };
+
+
+    const hexColors = [
+      '#FFB6C1', // Light Pink
+      '#ADD8E6', // Light Blue
+      '#98FB98', // Pale Green
+      '#FFDAB9', // Peach Puff
+      '#FFE4B5', // Moccasin
+      '#FFDEAD'  // Navajo White
+    ];
+
+
+
+
+    // const categoryColors = {
+    //   'Animal associated': '#FF7F50',
+    //   'Food associated': '#FFD700',
+    //   'Missing': '#66CDAA',
+    //   'Env associated': '#EE82EE',
+    //   'Others': '#6495ED',
+    //   'Plant associated': '#ADD8E6'
+    // };
 
 
 
