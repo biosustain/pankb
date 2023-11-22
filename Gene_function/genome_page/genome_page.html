@@ -23,9 +23,6 @@
             }
         }
 
-        .h2_center{
-            text-align: center;
-        }
 
         .table_padding{
             padding-top:15px;
@@ -152,6 +149,14 @@
         <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
             <iframe id="Genome_page_COG_distribution" class="w-100 h-100" style="border:0;"></iframe>
         </div>
+
+        <br>
+        <br>
+
+        <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+            <iframe id="antismash" class="w-100 h-100" style="border:0;"></iframe>
+        </div>
+
     </div>
 
     <div class="col-1">
@@ -284,6 +289,9 @@
 
     const Genome_page_COG_distribution = document.getElementById('Genome_page_COG_distribution');
     Genome_page_COG_distribution.src = './barplot.html?species=' + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id) ;
+
+    const antismash = document.getElementById('antismash');
+    antismash.src = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + encodeURIComponent(species) + '/antismash/' + encodeURIComponent(genome_id) + '/index.html';
 
     document.getElementById('genome_page_title').innerHTML= 'Genome(strain): ' + '<b>'  + genome_id + '</b>';
 

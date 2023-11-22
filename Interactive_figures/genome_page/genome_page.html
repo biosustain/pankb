@@ -173,6 +173,13 @@
         <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
             <iframe id="Genome_page_COG_distribution" class="w-100 h-100" style="border:0;"></iframe>
         </div>
+
+        <br>
+        <br>
+
+        <div class="d-flex justify-content-center align-items-center" style="height: 60vh;">
+            <iframe id="antismash" class="w-100 h-100" style="border:0;"></iframe>
+        </div>
     </div>
 
     <div class="col-1">
@@ -186,10 +193,6 @@
     const genome_id = urlParams.get('genome_id');
     const gene_id = urlParams.get('gene_id');
 
-
-    // const species = 'Lactiplantibacillus_plantarum';
-    // const genome_id = 'GCF_006364975.1';
-    // const gene_id = 'group_6225';
 
     // Load the JSON file
     fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/genome_page/' + genome_id + '/genome_info.json')
@@ -320,6 +323,9 @@
 
     const Genome_page_COG_distribution = document.getElementById('Genome_page_COG_distribution');
     Genome_page_COG_distribution.src = './barplot.html?species=' + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id) ;
+
+    const antismash = document.getElementById('antismash');
+    antismash.src = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + encodeURIComponent(species) + '/antismash/' + encodeURIComponent(genome_id) + '/index.html';
 
     document.getElementById('genome_page_title').innerHTML= 'Gene: ' + '<b>' +  gene_id  + '</b>' + ' in genome(strain): ' + '<b>'  + genome_id + '</b>';
 
