@@ -105,6 +105,10 @@
             margin-right: 25px;
             font-size: 18px;
         }
+
+        #gene_page_title {
+            margin-top: 70px; /* Adjust the value based on the height of your navbar */
+        }
     </style>
 </head>
 <body data-bs-spy="scroll" data-bs-target="#navbar-example">
@@ -141,7 +145,7 @@
 
 <br>
 
-<h2 id = 'gene_table_title' style = 'text-align: center';></h2>
+<h2 id = 'gene_page_title' style = 'text-align: center';> Gene Info Page </h2>
 
 
 <div class="table_padding overflow-auto">
@@ -252,8 +256,8 @@
 
     });
 
-    document.getElementById('gene_table_title').innerHTML= 'Gene: ' + '<b>' +  gene  + '</b>'
-    document.getElementById('MSA_figure').innerHTML= 'Multiple sequence alignment of ' + '<b>' +  gene  + '</b>'
+    // document.getElementById('gene_table_title').innerHTML= 'Gene: ' + '<b>' +  gene  + '</b>'
+    document.getElementById('MSA_figure').innerHTML= 'Multiple Sequence Alignment of ' + '<b>' +  gene  + '</b>'
 
     const MSA = document.getElementById('MSA');
     MSA.src = '../Interactive_figures/msa/MSA.html?species=' + species + '&' + 'gene=' + gene;

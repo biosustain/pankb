@@ -119,7 +119,7 @@
 </nav>
 
 <br>
-<h2 id = 'genome_page_title' class = h2_center> </h2>
+<h2 id = 'genome_page_title' class = h2_center>Genome & Gene Info Page</h2>
 
 <div class="row">
     <div class="col-1">
@@ -133,16 +133,16 @@
             <table id="genome_info" class="table table-hover" style="width:100%; table-layout: fixed;">
                 <thead>
                 <tr>
-                    <th class="text-center align-middle">Genome id</th>
+                    <th class="text-center align-middle">Genome ID</th>
                     <th class="text-center align-middle">Species</th>
                     <th class="text-center align-middle">Source</th>
-                    <th class="text-center align-middle">Isolation source</th>
+                    <th class="text-center align-middle">Isolation Source</th>
                     <th class="text-center align-middle">Country</th>
-                    <th class="text-center align-middle">Geological location name</th>
-                    <th class="text-center align-middle">GC content</th>
-                    <th class="text-center align-middle">Genome length</th>
-                    <th class="text-center align-middle">Number of genes</th>
-                    <th class="text-center align-middle">Gene class distribution</th>
+                    <th class="text-center align-middle">Geological Location Name</th>
+                    <th class="text-center align-middle">GC Content</th>
+                    <th class="text-center align-middle">Genome Length</th>
+                    <th class="text-center align-middle">Number of Genes</th>
+                    <th class="text-center align-middle">Gene Class Distribution</th>
                 </tr>
                 </thead>
                 <tbody id="table-body"></tbody>
@@ -154,13 +154,13 @@
             <table id="gene_info" class="table table-hover" style="width:100%; table-layout: fixed;">
                 <thead>
                 <tr>
-                    <th class="text-center align-middle">Gene id</th>
-                    <th class="text-center align-middle">Locus tag</th>
-                    <th class="text-center align-middle">Prokka annotation</th>
-                    <th class="text-center align-middle">Start position</th>
-                    <th class="text-center align-middle">End position</th>
-                    <th class="text-center align-middle">Nucleotide seq</th>
-                    <th class="text-center align-middle">Amino acid seq</th>
+                    <th class="text-center align-middle">Gene ID</th>
+                    <th class="text-center align-middle">Locus Tag</th>
+                    <th class="text-center align-middle">Prokka Annotation</th>
+                    <th class="text-center align-middle">Start Position</th>
+                    <th class="text-center align-middle">End Position</th>
+                    <th class="text-center align-middle">Nucleotide Seq</th>
+                    <th class="text-center align-middle">Amino Acid Seq</th>
                 </tr>
                 </thead>
 
@@ -331,7 +331,8 @@
     const antismash = document.getElementById('antismash');
     antismash.src = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + encodeURIComponent(species) + '/antismash/' + encodeURIComponent(genome_id) + '/index.html';
 
-    document.getElementById('genome_page_title').innerHTML= 'Gene: ' + '<b>' +  gene_id  + '</b>' + ' in genome(strain): ' + '<b>'  + genome_id + '</b>';
+    // document.getElementById('genome_page_title').innerHTML= 'Genome & Gene Info Page' + '<br>' +
+    //     '<b>' +  gene_id  + '</b>' + ' in ' + '<b>'  + genome_id + '</b>';
 
 </script>
 

@@ -31,7 +31,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
 
-        fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species_alpha.json')
+        fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species_genome_gene.json')
             .then(response => response.json())
             .then(data => {
                 const organisms = Object.keys(data);
@@ -48,15 +48,21 @@
 
                 organisms.forEach((organism, index) => {
                     const organismData = data[organism];
-                    console.log(index);
-                    console.log(organism);
-                    console.log(colorList[index]);
 
-                    const points = Object.keys(organismData).map(key => ({x: roundToDecimal(1 - (organismData[key][0]), 3), y: organismData[key][1], name: key}));
+                    const points = Object.keys(organismData).map(key => {
+                        const genomeNumber = organismData[key][0];
+                        const geneNumber = organismData[key][1];
+
+                        // Ensure non-zero, positive values for logarithmic scale
+                        const xValue = Math.max(genomeNumber, 1);
+                        const yValue = Math.max(geneNumber, 1);
+
+                        return {x: xValue, y: yValue, name: key};
+                    });
 
                     const serie = {
                         name: organism,
-                        color: colorList[index],
+                        color: colorList[organisms.indexOf(organism)],
                         data: points,
 
                         marker: {
@@ -96,16 +102,19 @@
                     },
                     xAxis: {
                         title: {
-                            text: 'Openness (\u03BB)'
+                            text: 'Genomes'
                         },
+                        type: 'logarithmic',
                         showLastLabel: true,
+                        lineWidth:1,
+                        tickInterval: 1,
+                        tickWidth: 1,
                         gridLineWidth: 0,
-                        crosshair: true,
-
+                        crosshair: true
                     },
                     yAxis: {
                         title: {
-                            text: 'Genomes'
+                            text: 'Genes'
                         },
                         type: 'logarithmic',
                         lineWidth:1,
@@ -177,28 +186,34 @@
                 });
 
                 $('#container').on('mousewheel', function(event) {
-                    event.preventDefault(); // Prevent the default zoom behavior
+                    event.preventDefault();
 
                     var chart = $('#container').highcharts();
+                    var xAxis = chart.xAxis[0];
                     var yAxis = chart.yAxis[0];
 
                     var delta = event.originalEvent.deltaY || event.originalEvent.detail || event.originalEvent.wheelDelta;
 
-                    // Calculate zoom level based on the delta
-                    // Adjust these values to control zoom speed on a logarithmic scale
+                    // Zoom factor
                     var zoomFactor = delta > 0 ? 0.5 : 2;
 
-                    var newMin = yAxis.min * zoomFactor;
-                    var newMax = yAxis.max * zoomFactor;
+                    // Zoom on both axes
+                    var newXMin = xAxis.min * zoomFactor;
+                    var newXMax = xAxis.max * zoomFactor;
+                    var newYMin = yAxis.min * zoomFactor;
+                    var newYMax = yAxis.max * zoomFactor;
 
-                    // Prevent zooming out beyond max or zooming in beyond min
-                    newMin = Math.max(newMin, yAxis.dataMin);
-                    newMax = Math.min(newMax, yAxis.dataMax);
+                    newXMin = Math.max(newXMin, xAxis.dataMin);
+                    newXMax = Math.min(newXMax, xAxis.dataMax);
+                    newYMin = Math.max(newYMin, yAxis.dataMin);
+                    newYMax = Math.min(newYMax, yAxis.dataMax);
 
-                    yAxis.setExtremes(newMin, newMax, false);
+                    xAxis.setExtremes(newXMin, newXMax, false);
+                    yAxis.setExtremes(newYMin, newYMax, false);
 
                     chart.redraw();
                 });
+
 
             });
     });

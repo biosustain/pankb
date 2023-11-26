@@ -19890,7 +19890,7 @@
                         , o = i.rows
                         , s = i.cols
                         , a = i.matrix
-                        , h = ["Phylogeny group"];
+                        , h = ["Phylogeny Group"];
                     return new r.default({
                         ele: e,
                         rows: o,
@@ -19899,7 +19899,7 @@
                         rowsLabel: "Genomes",
                         colsLabel: "Gene",
                         rowMetaLabels: h,
-                        colMetaLabels: [ "PFAMs", "COG categories", "Description","Pangenome class"],
+                        colMetaLabels: [ "PFAMs", "COG Categories", "Description","Pangenome Class"],
                         hideColMeta: !0,
                         options: {
                             showVersion: '',
@@ -19914,8 +19914,8 @@
                         onHover: function(t) {
                             var e = t.rowMeta;
                             let source = source_info[t.yLabel];
-                            let l = ["Isolation country", "Host", "Species"];
-                            return "<div><b>Pangenome class: </b>".concat(t.colMeta[2], "</div><br>  <div><b>Pangenome group:</b> ").concat(t.xLabel, "<div>    <div><b>COG categories:</b> ").concat(t.colMeta[0], "<div>  <div><b>COG annotation:</b> ").concat(t.colMeta[1], "<div><br>    <div><b>Genome id:</b> ").concat(t.yLabel, "<div>              <div><b>").concat(l[0], ":</b> ").concat(source && "undefined" != source[0] ? source[0] : "N/A", "</div>\n              <div><b>").concat(l[1], ":</b> ").concat(source && "undefined" != source[1] ? source[1] : "N/A", "</div>\n              <div><b>").concat(l[2], ":</b> ").concat(source && "undefined" != source[2] ? source[2] : "N/A", "</div><br>\n              <div><b>Value:</b> ").concat(t.value,"</div><br>")
+                            let l = ["Isolation Country", "Host", "Species"];
+                            return "<div><b>Pangenome Class: </b>".concat(t.colMeta[2], "</div><br>  <div><b>Pangenome Group:</b> ").concat(t.xLabel, "<div>    <div><b>COG Categories:</b> ").concat(t.colMeta[0], "<div>  <div><b>COG Annotation:</b> ").concat(t.colMeta[1], "<div><br>    <div><b>Genome ID:</b> ").concat(t.yLabel, "<div>              <div><b>").concat(l[0], ":</b> ").concat(source && "undefined" != source[0] ? source[0] : "N/A", "</div>\n              <div><b>").concat(l[1], ":</b> ").concat(source && "undefined" != source[1] ? source[1] : "N/A", "</div>\n              <div><b>").concat(l[2], ":</b> ").concat(source && "undefined" != source[2] ? source[2] : "N/A", "</div><br>\n              <div><b>Value:</b> ").concat(t.value,"</div><br>")
                         },
                         onSelection: function(t) {
                             alert("Selected ".concat(t.length, " cell(s)\n\n") + JSON.stringify(t, null, 4).slice(0, 1e4))

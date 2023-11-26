@@ -197,7 +197,7 @@
           </li>
           <li class="mb-1 ">
             <a id = 'Phylogenetic_tree'  class="btn fw-semibold align-items-center" role="button">
-              Phylogenetic tree
+              Phylogenetic Tree
             </a>
           </li>
           <li class="border-top my-3"></li>
@@ -237,7 +237,7 @@
     <div class="col-10 custom-padding">
       <div class="container-fluid">
         <div class="row row-spacing border-container gx-0 gx-md-2">
-          <h2 class="text-center">Heap's law and gene frequency</h2>
+          <h2 class="text-center">Heap's Law and Gene Frequency</h2>
           <div class="col-12 col-md-6">
             <div class="figure-container_above responsive-iframe">
               <iframe style="border:0;" id="Heaps_Law"></iframe>
@@ -260,10 +260,10 @@
         <br>
         <div class="row border-container" style="height: 900px;">
           <div class="col-12" style="height: 800px;">
-            <h2 class="text-center">Presence/absence matrix</h2>
+            <h2 class="text-center">Presence/Absence Matrix</h2>
             <div class="dropdown">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
-                Select Gene Class
+                Select a Gene Class
               </button>
               <ul class="dropdown-menu" aria-labelledby="heatmapDropdown">
                 <li><a class="dropdown-item" href="#" onclick="updateIframeSrc('core', 'Core'); return false;">Core</a></li>
@@ -359,7 +359,7 @@
               // Select the species to show in the card
               if (speciesData) {
                 document.getElementById('species').innerHTML = '<b>Species:</b><br>' + speciesData.Species;
-                document.getElementById('numGenome').innerHTML = '<b>Number of genome:</b><br>' + speciesData.Number_of_genome;
+                document.getElementById('numGenome').innerHTML = '<b>Number of Genome:</b><br>' + speciesData.Number_of_genome;
                 document.getElementById('core').innerHTML = '<b>Core:</b><br>' + speciesData.Gene_class[0];
                 document.getElementById('accessory').innerHTML = '<b>Accessory:</b><br>' + speciesData.Gene_class[1];
                 document.getElementById('rare').innerHTML= '<b>Rare:</b><br>' + speciesData.Gene_class[2];
