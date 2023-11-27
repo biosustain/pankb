@@ -26,7 +26,7 @@
 
         .scrollspy-example {
             position: relative;
-            height: auto; !important;
+            height: auto;
             margin-top: .5rem;
             overflow: auto;
         }
@@ -42,15 +42,13 @@
             top: 100px; /* Adjust if necessary, e.g., below a top navbar */
             left: 0;
             height: 100vh;
-            width: 16.66%;;
+            width: 20%;;
             overflow-y: auto; /* To make sidebar scrollable if content is long */
         }
 
         /*.main-content {*/
         /*    margin-left: 200px; !* Should be at least the width of the sidebar *!*/
         /*}*/
-
-
 
     </style>
 
@@ -97,24 +95,24 @@
 <div class="row">
     <div class="col-2 fixed-sidebar">
         <div id="list-example" class="list-group">
-                <a class="list-group-item list-group-item-action" href="#about_pankb">About PanKB</a>
-            <a class="list-group-item list-group-item-action" href="#how_to_use">How to use PanKB</a>
-            <a class="list-group-item list-group-item-action" href="#Pangenome_Analytics_Dashboards">Pangenome Analytics Dashboards</a>
-            <a class="list-group-item list-group-item-action" href="#overview">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Overview</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 20px' href="#about_pankb">About PanKB</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 20px' href="#how_to_use">How to use PanKB</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 20px' href="#Pangenome_Analytics_Dashboards">Pangenome Analytics Dashboards</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 18px' href="#overview">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Overview</a>
             <a class="list-group-item list-group-item-action" href="#heaps_law_and_gene_frequency">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Heap's Law and Gene Frequency</a>
             <a class="list-group-item list-group-item-action" href="#presence_absence_matrix">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Presence/Absence Matrix</a>
             <a class="list-group-item list-group-item-action" href="#genome_gene_info_page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Genome & Gene Info Page</a>
-            <a class="list-group-item list-group-item-action" href="#genee">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Genes</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 18px' href="#genee">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Genes</a>
             <a class="list-group-item list-group-item-action" href="#gene_annotation_able">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gene Annotation Table</a>
             <a class="list-group-item list-group-item-action" href="#gene_info_page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gene Info Page</a>
-            <a class="list-group-item list-group-item-action" href="#phylogenetic_tree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Phylogenetic Tree</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 18px' href="#phylogenetic_tree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Phylogenetic Tree</a>
         </div>
     </div>
 
     <div class="col-3 vh-100"></div>
 
     <div class="col-8">
-        <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-offset="0" class="scrollspy-example" tabindex="0">
+        <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-offset="0" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
             <h1 id="about_pankb" style = 'text-align: center'>About PanKB</h1>
             <br>
             <p style = 'font-size: 25px'>
@@ -247,7 +245,7 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>2.Scrolling Function:</b> You can scroll up, down, left, and right by holding down the left mouse button and dragging the image.
                 <br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>3.Amino Acid Percentage:</b> Clicking on the position number (found below the logo plot) enables you to view the amino acid percentage for each position.
-
+                <br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>4.Links to Other Pages:</b> You can access the corresponding Genome's Genome Info Page by clicking on the Genome ID along the y-axis. The Genome Info Page is similar to the Genome and Gene Information Page but does not include the gene table (refer to the above section for the link).
                 <br>
                 <br>
@@ -265,9 +263,16 @@
     <div class="col-1 vh-100"></div>
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+        const scrollSpyEl = document.body; // or document.querySelector('.scrollspy-example')
+        const scrollSpy = new bootstrap.ScrollSpy(scrollSpyEl, {
+            target: '#list-example'
+        });
+    });
 
 
-
+</script>
 
 <script src="./assets/dist/js/bootstrap.bundle.min.js"></script>
 

@@ -104,10 +104,10 @@
                         title: {
                             text: 'Genomes'
                         },
-                        type: 'logarithmic',
+                        // type: 'logarithmic',
                         showLastLabel: true,
                         lineWidth:1,
-                        tickInterval: 1,
+                        tickInterval: 500,
                         tickWidth: 1,
                         gridLineWidth: 0,
                         crosshair: true
@@ -135,35 +135,7 @@
                         backgroundColor: Highcharts.defaultOptions.chart.backgroundColor,
                         borderWidth: 1
                     },
-                    // responsive: {
-                    //     rules: [{
-                    //         condition: {
-                    //             maxWidth: 500  // Example breakpoint for smaller screens
-                    //         },
-                    //         chartOptions: {
-                    //             legend: {
-                    //                 align: 'center',
-                    //                 verticalAlign: 'top',
-                    //                 x: 0,
-                    //                 y: -10,
-                    //                 layout: 'horizontal'
-                    //             }
-                    //         }
-                    //     }, {
-                    //         condition: {
-                    //             minWidth: 501  // Example breakpoint for larger screens
-                    //         },
-                    //         chartOptions: {
-                    //             legend: {
-                    //                 align: 'center',
-                    //                 verticalAlign: 'top',
-                    //                 x: 0,
-                    //                 y: -10,
-                    //                 layout: 'horizontal'
-                    //             }
-                    //         }
-                    //     }]
-                    // },
+
                     plotOptions: {
                         scatter: {
                             tooltip: {
@@ -185,35 +157,30 @@
                     }
                 });
 
-                $('#container').on('mousewheel', function(event) {
-                    event.preventDefault();
-
-                    var chart = $('#container').highcharts();
-                    var xAxis = chart.xAxis[0];
-                    var yAxis = chart.yAxis[0];
-
-                    var delta = event.originalEvent.deltaY || event.originalEvent.detail || event.originalEvent.wheelDelta;
-
-                    // Zoom factor
-                    var zoomFactor = delta > 0 ? 0.5 : 2;
-
-                    // Zoom on both axes
-                    var newXMin = xAxis.min * zoomFactor;
-                    var newXMax = xAxis.max * zoomFactor;
-                    var newYMin = yAxis.min * zoomFactor;
-                    var newYMax = yAxis.max * zoomFactor;
-
-                    newXMin = Math.max(newXMin, xAxis.dataMin);
-                    newXMax = Math.min(newXMax, xAxis.dataMax);
-                    newYMin = Math.max(newYMin, yAxis.dataMin);
-                    newYMax = Math.min(newYMax, yAxis.dataMax);
-
-                    xAxis.setExtremes(newXMin, newXMax, false);
-                    yAxis.setExtremes(newYMin, newYMax, false);
-
-                    chart.redraw();
-                });
-
+                //
+                // $('#container').on('mousewheel', function(event) {
+                //     event.preventDefault(); // Prevent the default zoom behavior
+                //
+                //     var chart = $('#container').highcharts();
+                //     var yAxis = chart.yAxis[0];
+                //
+                //     var delta = event.originalEvent.deltaY || event.originalEvent.detail || event.originalEvent.wheelDelta;
+                //
+                //     // Calculate zoom level based on the delta
+                //     // Adjust these values to control zoom speed on a logarithmic scale
+                //     var zoomFactor = delta > 0 ? 0.5 : 2;
+                //
+                //     var newMin = yAxis.min * zoomFactor;
+                //     var newMax = yAxis.max * zoomFactor;
+                //
+                //     // Prevent zooming out beyond max or zooming in beyond min
+                //     newMin = Math.max(newMin, yAxis.dataMin);
+                //     newMax = Math.min(newMax, yAxis.dataMax);
+                //
+                //     yAxis.setExtremes(newMin, newMax, false);
+                //
+                //     chart.redraw();
+                // });
 
             });
     });
