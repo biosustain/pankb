@@ -56,6 +56,9 @@
           level: 1,
           dataLabels: {
             enabled: true,
+            formatter: function () {
+              return this.point.name + ': ' + this.point.value + ' strains';
+            },
             style: {
               fontSize: '12px'
             }
