@@ -95,6 +95,7 @@
             <a class="list-group-item list-group-item-action" href="#gene_annotation_able">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gene Annotation Table</a>
             <a class="list-group-item list-group-item-action" href="#gene_info_page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gene Info Page</a>
             <a class="list-group-item list-group-item-action" style = 'font-size: 18px' href="#phylogenetic_tree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Phylogenetic Tree</a>
+            <a class="list-group-item list-group-item-action" href="#genome_info_page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Genome Info Page</a>
         </div>
     </div>
 
@@ -114,6 +115,13 @@
 
             <p style = 'font-size: 25px'>
                 To begin, choose an organism of interest from the organism list. You can access the organism list page by either clicking the 'Select an organism' button located at the bottom of the landing page or selecting the 'Organism' option in the navbar. Next, you can pick an organism of interest and explore its pangenomic analytics by clicking on the link in the last column labeled 'Pangenome analyses.' This action will direct you to the Pangenome Analysis Dashboards.
+                <br>
+            <div style="text-align: center;">
+                <img src="https://pankb.blob.core.windows.net/data/PanKB/web_data/about_page_gif/pankb_workflow.png" style="width: 80%;">
+            <br>
+                <p id="imageFootprint"  style = 'font-size: 25px' >PanKB workflow</p>
+            </div>
+
                 <br>
                 <br>
                 Alternatively, you can access the overview page of a specific species by clicking on the data point within the 'Pangenomes' figure located in the middle of the landing page.
@@ -188,7 +196,7 @@
             <p  style = 'font-size: 20px'>
                 This page offers more information about the genome and genes from the Presence/Absence Matrix. The page mainly consists of three parts:
                 <br>
-                <b>1. Genome and Gene Tables:</b> These two tables contain basic information about the genome and genes. The genome table includes a link to NCBI, where you can find more information about this genome. The gene table also provides a link to the Gene page (See <a href = '#gene_page'>Gene Page</a>).
+                <b>1. Genome and Gene Tables:</b> These two tables contain basic information about the genome and genes. The genome table includes a link to NCBI, where you can find more information about this genome. The gene table also provides a link to the Gene page (See <a href = '#gene_info_page'>Gene Info Page</a>).
                 <br>
                 <b>2. Gene Annotation Distribution:</b> This is a similar interactive bar plot to the Gene Annotation Distribution on the Overview page. However, this plot focuses on a single genome, whereas the one on the Overview page covers the entire species.
                 <br>
@@ -241,10 +249,17 @@
                 <img src="https://pankb.blob.core.windows.net/data/PanKB/web_data/about_page_gif/Gene_info.gif" style="display: block; margin-left: auto; margin-right: auto; width: 80%;">
 
                 <br>
+            </p>
 
             <h2 id="phylogenetic_tree" style = 'text-align: center'>Phylogenetic Tree</h2>
             <p style = 'font-size: 20px'> The Phylogenetic Tree page displays the phylogenetic traits of a species, and it is constructed using the Mash distance method. The phylogenetic tree in PanKB is generated using Phylotree.js. You can find additional information about its features in <a href = 'https://github.com/veg/phylotree.js/'>phylotree.js</a>. In addition to the features documented in the Phylotree.js documentation, we have also incorporated links to the Genome Info Page. By left-clicking on the genome of interest and selecting 'Search for this strain,' you can navigate to the corresponding Genome Info Page and access more information about that specific genome. </p>
 
+
+            <h3 id="genome_info_page" style = 'text-align: center;' >Genome Info Page</h3>
+            <br>
+            <p  style = 'font-size: 20px'>
+                The Genome Info Page is similar to the <a href = '#genome_gene_info_page'>Genome & Gene Info Page</a>, just without gene table.
+            </p>
 
         </div>
     </div>
