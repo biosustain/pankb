@@ -54,22 +54,35 @@
                         // visible : false,
                         categories: categories,
                         title: {
-                            text: ''
+                            text: '',
+
                         },
                         labels: {
                             align: 'center',
-                            enable:true
+                            enable: true,
+                            style: {
+                                fontSize: '16px'
+                            }
                         },
                     },
                     yAxis: {
                         title: {
-                            text: 'Genes '
+                            text: 'Genes ',
+                            style: {
+                                fontSize: '18px'
+                            }
                         },
                         type: 'logarithmic',
                         tickInterval: 1,
                         tickWidth: 1,
                         lineWidth: 1,
-                        gridLineWidth: 0
+                        gridLineWidth: 1,
+                        labels: {
+                            align: 'center',
+                            style: {
+                                fontSize: '16px'
+                            }
+                        }
                     },
                     series: [{
                         data: dataValues,

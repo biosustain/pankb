@@ -97,14 +97,14 @@
                 margin: {
                   l: 80,  // left margin
                   r: 60,  // right margin
-                  b: 40, // bottom margin
+                  b: 60, // bottom margin
                   t: 80, // top margin
                   pad: 0 // padding
                 },
                 title: {
-                  text: "Cumulative Gene Distribution",
+                  text: "Cumulative gene frequency distribution",
                   titlefont: {
-                    size: 16,
+                    size: 18,
                     family: 'Arial, sans-serif' // Use Arial font family
                   },
                   xref: 'paper',
@@ -113,39 +113,34 @@
                 xaxis: {
                   title: 'Number of Genomes',
                   titlefont: {
-                    size: 14,
+                    size: 18,
                     family: 'Arial, sans-serif' // Use Arial font family
                   },
                   range: [0, Math.max(...x) + 1], // Adjust x-axis range
-                  showgrid: false, // Remove x-axis grid lines
+                  showgrid: true, // Remove x-axis grid lines
                   showline: true, // Show x-axis line
                   zeroline: false, // Remove x-axis zero line
-                  titlefont: {
-                    size: 14,
-                    family: 'Arial, sans-serif' // Use Arial font family
-                  },
+                  tickwidth: 1, // Width of the tick lines (in pixels)
                   tickfont: {
-                    size: 12,
+                    size: 16,
                     family: 'Arial, sans-serif' // Use Arial font family
                   }
                 },
                 yaxis: {
                   title: 'Pangenome Size',
                   titlefont: {
-                    size: 14,
+                    size: 18,
                     family: 'Arial, sans-serif' // Use Arial font family
                   },
                   range: [0, Math.max(...cumulativeFrequency) + 1000], // Adjust y-axis range
                   tickformat: '1s', // Format y-axis labels as '1k'
-                  showgrid: false, // Remove y-axis grid lines
+                  ticks: 'outside',
+                  tickWidth: 1,
+                  showgrid: true, // Remove y-axis grid lines
                   showline: true, // Show y-axis line
                   zeroline: false, // Remove y-axis zero line
-                  titlefont: {
-                    size: 14,
-                    family: 'Arial, sans-serif' // Use Arial font family
-                  },
                   tickfont: {
-                    size: 12,
+                    size: 16,
                     family: 'Arial, sans-serif' // Use Arial font family
                   }
                 },
@@ -157,7 +152,7 @@
                   yanchor: 'bottom',
                   orientation: 'h',  // Set legend orientation to horizontal
                   traceorder: 'reversed',  // Change the order of legend items
-                  itemclick: false,  // Disable legend item click
+                  itemclick: true,  // Disable legend item click
                   itemdoubleclick: false,  // Disable legend item double-click
                   itemwidth: 30,  // Adjust legend item width as needed
                   itemheight: 20,  // Adjust legend item height as needed

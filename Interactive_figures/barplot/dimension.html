@@ -36,7 +36,7 @@
                     title: {
                         text: 'Database Size',
                         style: {
-                            fontSize: '16px' // Set your desired font size here
+                            fontSize: '18px' // Set your desired font size here
                         }
                     },
                     xAxis: {
@@ -44,16 +44,29 @@
                         title: {
                             text: ''
                         },
+                        labels: {
+                            style: {
+                                fontSize: '16px'
+                            }
+                        }
                     },
                     yAxis: {
                         title: {
-                            text: 'Counts' // y-axis title
+                            text: 'Counts',
+                            style: {
+                                fontSize: '16px'
+                            }
                         },
                         type: 'logarithmic',
                         tickInterval: 1,
                         tickWidth: 1,
                         lineWidth: 1,
-                        gridLineWidth: 0, // Remove y-axis grid lines
+                        gridLineWidth: 1,
+                        labels: {
+                            style: {
+                                fontSize: '16px'
+                            }
+                        }
                     },
                     series: [{
                         data: dataValues,
@@ -62,7 +75,7 @@
                     tooltip: {
                         pointFormat: 'Count: <b>{point.y}</b>', // Set tooltip text
                         style: {
-                            fontSize: '12px' // Modify tooltip text font size
+                            fontSize: '12px'
                         }
                     },
                     legend: {

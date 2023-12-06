@@ -79,42 +79,44 @@
                         margin: {
                             l: 80,  // left margin
                             r: 60,  // right margin
-                            b: 40, // bottom margin
+                            b: 60, // bottom margin
                             t: 80, // top margin
                             pad: 0 // padding
                         },
                         xaxis: {
                             title: 'Number of Genomes',
                             titlefont: {
-                                size: 14,
+                                size: 18,
                                 family: 'Arial, sans-serif' // Use Arial font family
                             },
                             tickfont: {
-                                size: 12,
+                                size: 16,
                                 family: 'Arial, sans-serif' // Use Arial font family
                             },
-                            showgrid: false,
+                            showgrid: true,
+                            tickwidth: 1
 
                         },
                         yaxis: {
                             title: 'Pangenome Size',
                             titlefont: {
-                                size: 14,
+                                size: 18,
                                 family: 'Arial, sans-serif' // Use Arial font family
                             },
                             tickfont: {
-                                size: 12,
+                                size: 16,
                                 family: 'Arial, sans-serif' // Use Arial font family
                             },
                             autorange: true,
                             tickformat: '1s', // Format y-axis labels as '1k'
-                            showgrid: false,  // Remove y-axis grid lines
+                            showgrid: true,  // Remove y-axis grid lines
                             showline: true,  // Show y-axis line
+                            tickwidth: 1
                         },
                         title: {
                             text: "Heap's Law",
                             titlefont: {
-                                size: 16,
+                                size: 18,
                                 family: 'Arial, sans-serif' // Use Arial font family
                             },
                             xref: 'paper',

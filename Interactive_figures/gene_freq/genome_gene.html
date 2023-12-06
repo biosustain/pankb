@@ -88,40 +88,55 @@
                         type: 'scatter',
                         zoomType: 'x',
                         zooming: {
-                            mouseWheel: true
+                            mouseWheel: false
                         }
                     },
                     exporting: {
-                        enabled: false // Disable the exporting module
+                        enabled: false
                     },
                     title: {
                         text: '',
-                        // style: {
-                        //     fontSize: '16px' // Set your desired font size here
-                        // }
+                        style: {
+                            fontSize: '18px'
+                        }
                     },
                     xAxis: {
                         title: {
-                            text: 'Genomes'
-                        },
-                        // type: 'logarithmic',
+                            text: 'Genomes',
+                            style: {
+                                fontSize: '18px'
+                            }                        },
+                        type: 'logarithmic',
                         showLastLabel: true,
+                        tickInterval: 1,
                         lineWidth:1,
-                        tickInterval: 500,
                         tickWidth: 1,
-                        gridLineWidth: 0,
-                        crosshair: true
+                        gridLineWidth: 1,
+                        crosshair: true,
+                        labels:  {
+                            style: {
+                                fontSize: '16px'
+                            }
+                        }
                     },
                     yAxis: {
                         title: {
-                            text: 'Genes'
+                            text: 'Genes',
+                            style: {
+                                fontSize: '16px'
+                            }
                         },
                         type: 'logarithmic',
                         lineWidth:1,
                         tickInterval: 1,
                         tickWidth: 1,
-                        gridLineWidth: 0,
-                        crosshair: true
+                        gridLineWidth: 1,
+                        crosshair: true,
+                        labels:  {
+                                style: {
+                                    fontSize: '16px'
+                            }
+                        }
                     },
                     legend: {
                         layout: 'vertical',
@@ -129,7 +144,7 @@
                         verticalAlign: 'top',
                         x: 100,
                         itemStyle: {
-                            fontSize: '12px',  // Adjust this value to modify the size
+                            fontSize: '16px',
                         },
                         floating: true,
                         backgroundColor: Highcharts.defaultOptions.chart.backgroundColor,

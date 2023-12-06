@@ -91,18 +91,18 @@
                 margin: {
                   l: 80,  // left margin
                   r: 60,  // right margin
-                  b: 60, // bottom margin
+                  b: 80, // bottom margin
                   t: 60, // top margin
                   pad: 0 // padding
                 },
                 title: {
                   text: "Gene Annotation Distribution",
                   titlefont: {
-                    size: 16,
+                    size: 18,
                     family: 'Arial, sans-serif' // Use Arial font family
                   },
                   tickfont: {
-                    size: 12,
+                    size: 16,
                     family: 'Arial, sans-serif' // Use Arial font family
                   },
                   xref: 'paper',
@@ -111,7 +111,7 @@
                 xaxis: {
                   title: 'COG Category',
                   titlefont: {
-                    size: 14,
+                    size: 18,
                     family: 'Arial, sans-serif' // Use Arial font family
                   },
                   tickangle: -45,
@@ -120,19 +120,29 @@
                   automargin: true,
                   showgrid: false,
                   tickfont: {
-                    size: 10
+                    size: 14
                   }
                 },
                 yaxis: {
                   title: 'Frequency',
+                  titlefont: {
+                    size: 18,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                  },
                   font: {
                     family: 'Arial, sans-serif',
-                    size: 10,
+                    size: 16,
                     color: '#000000'
+                  },
+                  tickfont: {
+                    size: 16,
+                    family: 'Arial, sans-serif' // Use Arial font family
                   },
                   showline: true,
                   linewidth: 1,
-                  showgrid: false,
+                  showgrid: true,
+                  ticks: 'outside',
+                  tickWidth: 1,
                   type: 'log',
                   dtick: 1,
                   range: [0, Math.ceil(Math.log10(Math.max(...coreData, ...accessoryData, ...rareData)))]
@@ -142,11 +152,9 @@
                   y: 1,
                   font: {
                     family: 'Arial, sans-serif',
-                    size: 12,
+                    size: 18,
                     color: '#000000'
                   },
-                  xanchor: 'center',
-                  yanchor: 'bottom',
                   orientation: 'h',
                   itemclick: 'toggle',
                   itemdoubleclick: false,

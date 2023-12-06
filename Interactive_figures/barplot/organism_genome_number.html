@@ -58,13 +58,22 @@
                     yAxis: {
                         reversed: true,
                         title: {
-                            text: 'Genomes'
+                            text: 'Genomes',
+                            style: {
+                                fontSize: '18px'
+                            }
                         },
                         type: 'logarithmic',
                         tickInterval: 1,
                         tickWidth: 1,
                         lineWidth: 1,
-                        gridLineWidth: 0
+                        gridLineWidth: 1,
+                        labels: {
+                            align: 'center',
+                            style: {
+                                fontSize: '16px'
+                            }
+                        }
                     },
                     series: [{
                         data: dataValues,
