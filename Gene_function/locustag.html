@@ -129,9 +129,9 @@
                 <li class="nav-item">
                     <a class="nav-link " href="../Species_list.html">Organisms</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link " href="#">Download</a>
-                </li>
+<!--                <li class="nav-item">-->
+<!--                    <a class="nav-link " href="#">Download</a>-->
+<!--                </li>-->
                 <li class="nav-item">
                     <a class="nav-link " href="../Publications.html" tabindex="-1" aria-disabled="true">Publications</a>
                 </li>
@@ -187,7 +187,12 @@
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');
-    const gene = urlParams.get('gene');
+    let gene = urlParams.get('gene');
+    if (gene.includes('/')) {
+        gene = gene.replace(/\//g, '_');
+    }
+
+    console.log(gene)
 
     document.addEventListener('DOMContentLoaded', async function() {
         try {

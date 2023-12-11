@@ -28,27 +28,23 @@
         return Math.round(number * factor) / factor;
     }
 
-
     document.addEventListener('DOMContentLoaded', function() {
-
         fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species_genome_gene.json')
             .then(response => response.json())
             .then(data => {
-                const organisms = Object.keys(data);
-                const series = [];
+                const colorList = {
+                    'Enterobacteriaceae': 'rgb(255,127,80)',
+                    'Lactobacillaceae': 'rgba(255,215,0)',
+                    'Bacillaceae': 'rgb(102,205,170)',
+                    'Mycobacteriaceae': 'rgb(238,130,238)',
+                    'Pseudomonadaceae': 'rgba(100,149,237)',
+                    'Streptomycetaceae': 'rgb(173, 216, 230)',
+                    'Burkholderiaceae': 'rgba(59, 159, 192)'
+                };
 
-                const colorList = [
-                    'rgb(238,130,238)', // Mycobacteriaceae
-                    'rgb(173, 216, 230)', // Streptomycetaceae
-                    'rgb(255,127,80)', // Enterobacteriaceae
-                    'rgb(102,205,170)',// Bacillaceae
-                    'rgba(100,149,237)', // Pseudomonadaceae
-                    'rgba(255,215,0)' // Lactobacillaceae
-                ];
-
-                organisms.forEach((organism, index) => {
+                const orderedSeriesNames = ['Enterobacteriaceae', 'Lactobacillaceae', 'Bacillaceae', 'Mycobacteriaceae', 'Pseudomonadaceae', 'Streptomycetaceae', 'Burkholderiaceae'];
+                const series = orderedSeriesNames.map(organism => {
                     const organismData = data[organism];
-
                     const points = Object.keys(organismData).map(key => {
                         const genomeNumber = organismData[key][0];
                         const geneNumber = organismData[key][1];
@@ -60,11 +56,10 @@
                         return {x: xValue, y: yValue, name: key};
                     });
 
-                    const serie = {
+                    return {
                         name: organism,
-                        color: colorList[organisms.indexOf(organism)],
+                        color: colorList[organism],
                         data: points,
-
                         marker: {
                             symbol: 'circle',
                             radius: 6,
@@ -77,11 +72,7 @@
                             }
                         }
                     };
-
-                    series.push(serie);
                 });
-                const orderedSeriesNames = ['Enterobacteriaceae', 'Lactobacillaceae', 'Bacillaceae', 'Mycobacteriaceae', 'Pseudomonadaceae', 'Streptomycetaceae']; // Specify your desired order
-                const orderedSeries = orderedSeriesNames.map(name => series.find(serie => serie.name === name));
 
                 Highcharts.chart('container', {
                     chart: {
@@ -105,15 +96,16 @@
                             text: 'Genomes',
                             style: {
                                 fontSize: '18px'
-                            }                        },
+                            }
+                        },
                         type: 'logarithmic',
                         showLastLabel: true,
                         tickInterval: 1,
-                        lineWidth:1,
+                        lineWidth: 1,
                         tickWidth: 1,
                         gridLineWidth: 1,
                         crosshair: true,
-                        labels:  {
+                        labels: {
                             style: {
                                 fontSize: '16px'
                             }
@@ -127,14 +119,14 @@
                             }
                         },
                         type: 'logarithmic',
-                        lineWidth:1,
+                        lineWidth: 1,
                         tickInterval: 1,
                         tickWidth: 1,
                         gridLineWidth: 1,
                         crosshair: true,
-                        labels:  {
-                                style: {
-                                    fontSize: '16px'
+                        labels: {
+                            style: {
+                                fontSize: '16px'
                             }
                         }
                     },
@@ -166,37 +158,11 @@
                             }
                         }
                     },
-                    series: orderedSeries,
+                    series: series,
                     credits: {
                         enabled: false
                     }
                 });
-
-                //
-                // $('#container').on('mousewheel', function(event) {
-                //     event.preventDefault(); // Prevent the default zoom behavior
-                //
-                //     var chart = $('#container').highcharts();
-                //     var yAxis = chart.yAxis[0];
-                //
-                //     var delta = event.originalEvent.deltaY || event.originalEvent.detail || event.originalEvent.wheelDelta;
-                //
-                //     // Calculate zoom level based on the delta
-                //     // Adjust these values to control zoom speed on a logarithmic scale
-                //     var zoomFactor = delta > 0 ? 0.5 : 2;
-                //
-                //     var newMin = yAxis.min * zoomFactor;
-                //     var newMax = yAxis.max * zoomFactor;
-                //
-                //     // Prevent zooming out beyond max or zooming in beyond min
-                //     newMin = Math.max(newMin, yAxis.dataMin);
-                //     newMax = Math.min(newMax, yAxis.dataMax);
-                //
-                //     yAxis.setExtremes(newMin, newMax, false);
-                //
-                //     chart.redraw();
-                // });
-
             });
     });
 </script>

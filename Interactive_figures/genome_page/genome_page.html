@@ -104,9 +104,9 @@
                 <li class="nav-item">
                     <a class="nav-link " href="../../Species_list.html">Organisms</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link " href="#">Download</a>
-                </li>
+<!--                <li class="nav-item">-->
+<!--                    <a class="nav-link " href="#">Download</a>-->
+<!--                </li>-->
                 <li class="nav-item">
                     <a class="nav-link " href="../../Publications.html" tabindex="-1" aria-disabled="true">Publications</a>
                 </li>
@@ -195,8 +195,10 @@
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');
     const genome_id = urlParams.get('genome_id');
-    const gene_id = urlParams.get('gene_id');
-
+    let gene_id = urlParams.get('gene_id');
+    if (gene_id.includes('/')) {
+        gene_id = gene_id.replace(/\//g, '_');
+    }
 
     // Load the JSON file
     fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/genome_page/' + genome_id + '/genome_info.json')
