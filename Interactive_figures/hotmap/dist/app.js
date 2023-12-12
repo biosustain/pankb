@@ -19914,7 +19914,7 @@
                         onHover: function(t) {
                             var e = t.rowMeta;
                             let source = source_info[t.yLabel];
-                            let l = ["Isolation Country", "Host", "Species"];
+                            let l = ["Isolation Country", "Host", "Species (NCBI)"];
                             return "<div><b>Pangenome Class: </b>".concat(t.colMeta[2], "</div><br>  <div><b>Pangenome Group:</b> ").concat(t.xLabel, "<div>    <div><b>COG Categories:</b> ").concat(t.colMeta[0], "<div>  <div><b>COG Annotation:</b> ").concat(t.colMeta[1], "<div><br>    <div><b>Genome ID:</b> ").concat(t.yLabel, "<div>              <div><b>").concat(l[0], ":</b> ").concat(source && "undefined" != source[0] ? source[0] : "N/A", "</div>\n              <div><b>").concat(l[1], ":</b> ").concat(source && "undefined" != source[1] ? source[1] : "N/A", "</div>\n              <div><b>").concat(l[2], ":</b> ").concat(source && "undefined" != source[2] ? source[2] : "N/A", "</div><br>\n              <div><b>Value:</b> ").concat(t.value,"</div><br>")
                         },
                         onSelection: function(t) {
