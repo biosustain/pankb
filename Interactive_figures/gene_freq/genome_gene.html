@@ -39,10 +39,11 @@
                     'Mycobacteriaceae': 'rgb(238,130,238)',
                     'Pseudomonadaceae': 'rgba(100,149,237)',
                     'Streptomycetaceae': 'rgb(173, 216, 230)',
-                    'Burkholderiaceae': 'rgba(59, 159, 192)'
+                    'Burkholderiaceae': 'rgba(59, 159, 192)',
+                    'Anoxybacillaceae': 'rgba(255, 117, 180)'
                 };
 
-                const orderedSeriesNames = ['Enterobacteriaceae', 'Lactobacillaceae', 'Bacillaceae', 'Mycobacteriaceae', 'Pseudomonadaceae', 'Streptomycetaceae', 'Burkholderiaceae'];
+                const orderedSeriesNames = ['Enterobacteriaceae', 'Lactobacillaceae', 'Bacillaceae', 'Mycobacteriaceae', 'Pseudomonadaceae', 'Streptomycetaceae', 'Burkholderiaceae', 'Anoxybacillaceae'];
                 const series = orderedSeriesNames.map(organism => {
                     const organismData = data[organism];
                     const points = Object.keys(organismData).map(key => {
