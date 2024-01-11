@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stepped Line Chart</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #container {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container"></div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const species = urlParams.get('species');
+
+    function createChart(data) {
+        // Convert JSON data to format suitable for Highcharts
+        const dominantData = data.dominant.map(item => ({
+            x: item.y + 1, // flip the x and y
+            y: item.x,
+        }));
+        const variantData = data.variant.map(item => ({
+            x: item.y + 1, // flip the x and y
+            y: item.x,
+        }));
+
+        Highcharts.chart('container', {
+            chart: {
+                type: 'line',
+                plotBorderWidth: 1,
+                plotBorderColor: '#000000'
+            },
+            title: {
+                text: 'Amino Acid Frequency Distribution'
+            },
+            xAxis: {
+                type: 'logarithmic',
+                title: {
+                    text: 'Amino Acid Frequency'
+                },
+                labels: {
+                    formatter: function() {
+                        // Check if the label is exactly 0.1 and replace it with '0'
+                        if (this.value === 1) {
+                            return '0';
+                        }
+                        return this.value;
+                    }
+                },
+                tickInterval: 1,
+                tickWidth: 1,
+                min: 1 // Set the minimum value for the logarithmic scale
+            },
+            yAxis: {
+                title: {
+                    text: 'Number of Genomes (normalized c = 0 - 1)'
+                },
+                min: 0,
+                tickWidth: 1,
+                gridLineWidth: 0,
+                lineColor: '#000000'
+            },
+            tooltip: {
+                formatter: function() {
+                    // Subtract 1 from displayed y value in tooltip
+                    const displayX = this.x - 1; // flip the x and y
+                    const roundedY = Math.round(this.y * 100) / 100; // flip the x and y
+                    return 'Amino Acid Frequency: ' + displayX+
+                        '<br>(Normalized) Number of Gennome: ' + roundedY;
+                }
+            },
+            series: [{
+                name: 'Dominant',
+                data: dominantData,
+                step: 'right',
+                color: '#25316D',
+            }, {
+                name: 'Variant',
+                data: variantData,
+                step: 'right',
+                color: '#EB1D36',
+            }],
+            credits: {
+                enabled: false
+            }
+        });
+    }
+
+    // Load the JSON data and create the chart
+    fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/alleleome/step_line.json')
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            createChart(data);
+        })
+        .catch(function(error) {
+            console.error('Error fetching the JSON data: ', error);
+        });
+</script>
+
+</body>
+</html>

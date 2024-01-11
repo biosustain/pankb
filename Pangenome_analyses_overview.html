@@ -260,8 +260,8 @@
         <br>
         <br>
         <br>
-        <div class="row border-container" style="height: 900px;">
-          <div class="col-12" style="height: 800px;">
+        <div class="row border-container" style="height: 70vh;">
+          <div class="col-12" style="height: 100%;">
             <h2 class="text-center">Presence/Absence Matrix</h2>
             <div class="dropdown">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -289,21 +289,45 @@
         <br>
         <br>
         <br>
-        <div class="row border-container" style="height: 1050px;">
-          <div class="col-12" style="height: 800px;">
-            <h2 class="text-center">Intra-species analyses(naive) of microbial genetic diversity</h2>
-            <br>
-            <p style="text-align:justify; font-size: 18px;">The below heatmap shows simple intra-species analyses (there might be more complicated analyses coming out later).
-              Genes (column) in the heatmap were selected by the following criteria: for each gene, calculating its frequency in each
-              phylogeny group. If one gene's frequency is > 70% in one phylogeny group but < 30% in all other phylogeny groups, it will be selected.
-              The column (gene) of this heatmap is sorted by the phylogeny group: genes have frequency > 70% in phylogeny group A but < 30% in all others,
-              genes have frequency > 70% in phylogeny group B but < 30% in all others, etc.
-            </p>
+        <br>
+        <div class="row border-container" style="height: 80vh;">
+          <h2 class="text-center">Core Alleleome</h2>
+          <div class="col-1">
+            <!-- Empty column -->
+          </div>
+
+          <div class="col-5" style="height: 70vh;">
             <div class="d-flex justify-content-center align-items-center h-100">
-              <iframe id="heatmap_target" src="Interactive_figures/hotmap/demo/target_gene.html" class="w-100 h-100" style="border:0;"></iframe>
+                  <iframe id="step_histogram" class="w-100 h-100" style="border:0;"></iframe>
             </div>
           </div>
+
+          <div class="col-5" style="height: 70vh;">
+            <div class="d-flex justify-content-center align-items-center h-100">
+              <iframe id="dn_ds" class="w-100 h-100" style="border:0;"></iframe>
+            </div>
+          </div>
+
+          <div class="col-1">
+            <!-- Empty column -->
+          </div>
+
         </div>
+<!--        <div class="row border-container" style="height: 80vh;">-->
+<!--          <div class="col-6" style="height: 80vh;">-->
+<!--            <h2 class="text-center">Intra-species analyses(naive) of microbial genetic diversity</h2>-->
+<!--            <br>-->
+<!--            <p style="text-align:justify; font-size: 18px;">The below heatmap shows simple intra-species analyses (there might be more complicated analyses coming out later).-->
+<!--              Genes (column) in the heatmap were selected by the following criteria: for each gene, calculating its frequency in each-->
+<!--              phylogeny group. If one gene's frequency is > 70% in one phylogeny group but < 30% in all other phylogeny groups, it will be selected.-->
+<!--              The column (gene) of this heatmap is sorted by the phylogeny group: genes have frequency > 70% in phylogeny group A but < 30% in all others,-->
+<!--              genes have frequency > 70% in phylogeny group B but < 30% in all others, etc.-->
+<!--            </p>-->
+<!--            <div class="d-flex justify-content-center align-items-center h-100">-->
+<!--              <iframe id="heatmap_target" src="Interactive_figures/hotmap/demo/target_gene.html" class="w-100 h-100" style="border:0;"></iframe>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
         <br>
         <br>
         <br>
@@ -347,11 +371,17 @@
     Cumulative_Frequency.src = './Interactive_figures/gene_freq/cumulative_freq.html?species=' + species;
 
     const heatmap_all = document.getElementById('heatmap_all');
-    heatmap_all.src =     heatmap_all.src = './Interactive_figures/hotmap/demo/index.html?species=' + species + '&gene_class=core';
+    heatmap_all.src =  heatmap_all.src = './Interactive_figures/hotmap/demo/index.html?species=' + species + '&gene_class=core';
+
+    const step_histogram = document.getElementById('step_histogram');
+    step_histogram.src =  step_histogram.src = './Interactive_figures/alleleome_figures/variant_dominant_frequency.html?species=' + species;
+
+    const dn_ds = document.getElementById('dn_ds');
+    dn_ds.src =  dn_ds.src = './Interactive_figures/alleleome_figures/dn_ds_ratio.html?species=' + species;
 
 
-    const heatmap_target = document.getElementById('heatmap_target');
-    heatmap_target.src = './Interactive_figures/hotmap/demo/target_gene.html?species=' + species;
+    // const heatmap_target = document.getElementById('heatmap_target');
+    // heatmap_target.src = './Interactive_figures/hotmap/demo/target_gene.html?species=' + species;
 
     fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json')
             .then(response => response.json())

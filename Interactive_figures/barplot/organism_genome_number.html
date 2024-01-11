@@ -10,6 +10,9 @@
             overflow: hidden;
         }
 
+        html {
+            font-size: 18px; /* Base font size for larger screens */
+        }
     </style>
     <script src="https://code.highcharts.com/highcharts.js"></script>
 </head>
@@ -62,7 +65,7 @@
                         title: {
                             text: 'Genomes',
                             style: {
-                                fontSize: '18px'
+                                fontSize: '1em'
                             }
                         },
                         type: 'logarithmic',
@@ -73,7 +76,7 @@
                         labels: {
                             align: 'center',
                             style: {
-                                fontSize: '16px'
+                                fontSize: '0.9em'
                             },
                             rotation: 0,
                         },
@@ -88,7 +91,7 @@
                     tooltip: {
                         pointFormat: 'Count: <b>{point.y}</b>',
                         style: {
-                            fontSize: '12px'
+                            fontSize: '1em'
                         }
                     },
                     legend: {

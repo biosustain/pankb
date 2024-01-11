@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Alleleome for TrpF Gene</title>
+  <!-- Include Highcharts -->
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <!-- Include PapaParse for CSV parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+  <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    #container {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+<div id="container" ></div>
+
+<script>
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const species = urlParams.get('species');
+  const gene = urlParams.get('gene');
+
+  function renderChart(data) {
+    Highcharts.chart('container', {
+      chart: {
+        type: 'scatter',
+        zoomType: 'xy',
+        plotBorderWidth: 1,
+        plotBorderColor: '#000000'
+      },
+      title: {
+        text: '',
+        // style: {
+        //   fontSize: '20px'
+        // }
+      },
+      xAxis: {
+        title: {
+          text: 'Amino Acid Position'
+        },
+        gridLineWidth: 0,
+        minPadding: 0.05,
+        maxPadding: 0.05,
+        lineWidth: 1,
+        tickWidth: 1,
+        lineColor: '#000000'
+      },
+      yAxis: {
+        title: {
+          text: 'Number of Genomes'
+        },
+        labels: {
+          offset: 10
+        },
+        gridLineWidth: 0,
+        startOnTick: false,
+        endOnTick: false,
+        min:-10,
+        tickWidth: 1,
+        tickInterval: 50,
+        lineColor: '#000000'
+      },
+      legend: {
+        align: 'center',
+        verticalAlign: 'top',
+        layout: 'horizontal',
+        // x: 50,
+        // y: -20
+      },
+      tooltip: {
+        formatter: function() {
+          return 'Position: ' + this.x + '<br>Number of Genomes: ' + this.y;
+        }
+      },
+      plotOptions: {
+        scatter: {
+          marker: {
+            radius: 8,
+            symbol: 'circle',
+            lineWidth: 1,
+            lineColor: '#666666'
+          }
+        }
+      },
+      series: [{
+        name: 'Variant',
+        data: data.filter(item => item.Sequence_type === 'Variant')
+                .map(item => [parseInt(item.AA_pos), parseInt(item.Genome_count)]),
+        color: '#EB1D36'
+      }, {
+        name: 'Dominant',
+        data: data.filter(item => item.Sequence_type === 'Dominant')
+                .map(item => [parseInt(item.AA_pos), parseInt(item.Genome_count)]),
+        color: '#25316D'
+      }],
+      credits: {
+        enabled: false
+      },
+    });
+  }
+
+  // Parse the CSV data and render the chart
+  Papa.parse('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/alleleome/' + gene + '/' + gene + '_pan_aa_thresh_core_dom_var_pos.csv', {
+    download: true,
+    header: true,
+    complete: function(results) {
+      renderChart(results.data);
+    }
+  });
+</script>
+</body>
+</html>
