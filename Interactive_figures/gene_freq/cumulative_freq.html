@@ -15,6 +15,10 @@
     .legend text {
       opacity: 1 !important;
     }
+
+    html {
+      font-size: 18px;
+    }
   </style>
 </head>
 <body>
@@ -23,6 +27,10 @@
   function loadJSONAndCreatePlot() {
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');
+
+    const template_screen_width = 746;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
 
     fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/gene_freq.json')
             .then(response => response.json())
@@ -59,7 +67,7 @@
                 marker: {
                   color: 'green',
                   symbol: 'square',
-                  size: 12
+                  size: 16 * coefficient
                 },
                 visible: 'legendonly'
               };
@@ -73,7 +81,7 @@
                 marker: {
                   color: 'orange',
                   symbol: 'square',
-                  size: 12
+                  size: 16 * coefficient
                 },
                 visible: 'legendonly'
               };
@@ -87,7 +95,7 @@
                 marker: {
                   color: 'purple',
                   symbol: 'square',
-                  size: 12
+                  size: 16 * coefficient
                 },
                 visible: 'legendonly'
               };
@@ -95,17 +103,18 @@
               const layout = {
                 autosize: true,
                 margin: {
-                  l: 80,  // left margin
-                  r: 60,  // right margin
-                  b: 60, // bottom margin
-                  t: 80, // top margin
+                  l: 80 * coefficient,  // left margin
+                  r: 60 * coefficient,  // right margin
+                  b: 60 * coefficient, // bottom margin
+                  t: 80 * coefficient, // top margin
                   pad: 0 // padding
                 },
                 title: {
                   text: "Cumulative gene frequency distribution",
-                  titlefont: {
-                    size: 18,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                  font: {
+                    family: 'Arial, sans-serif',
+                    size: 20 * coefficient,
+                    color: '#000000'
                   },
                   xref: 'paper',
                   x: 0.5
@@ -113,8 +122,9 @@
                 xaxis: {
                   title: 'Number of Genomes',
                   titlefont: {
-                    size: 18,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
                   },
                   range: [0, Math.max(...x) + 1], // Adjust x-axis range
                   showgrid: true, // Remove x-axis grid lines
@@ -122,14 +132,15 @@
                   zeroline: false, // Remove x-axis zero line
                   tickwidth: 1, // Width of the tick lines (in pixels)
                   tickfont: {
-                    size: 16,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
                   }
                 },
                 yaxis: {
                   title: 'Pangenome Size',
                   titlefont: {
-                    size: 18,
+                    size: 16 * coefficient,
                     family: 'Arial, sans-serif' // Use Arial font family
                   },
                   range: [0, Math.max(...cumulativeFrequency) + 1000], // Adjust y-axis range
@@ -140,7 +151,7 @@
                   showline: true, // Show y-axis line
                   zeroline: false, // Remove y-axis zero line
                   tickfont: {
-                    size: 16,
+                    size: 16 * coefficient,
                     family: 'Arial, sans-serif' // Use Arial font family
                   }
                 },
@@ -154,14 +165,14 @@
                   traceorder: 'reversed',  // Change the order of legend items
                   itemclick: true,  // Disable legend item click
                   itemdoubleclick: false,  // Disable legend item double-click
-                  itemwidth: 30,  // Adjust legend item width as needed
-                  itemheight: 20,  // Adjust legend item height as needed
+                  itemwidth: 30 * coefficient,  // Adjust legend item width as needed
+                  itemheight: 20 * coefficient,  // Adjust legend item height as needed
                   bgcolor: 'rgba(0,0,0,0)',  // Set legend background color to transparent
                   bordercolor: 'rgba(0,0,0,0)',  // Set legend border color to transparent
                   font: {
                     family: 'Arial, sans-serif',
-                    size: 12,
-                    color: 'grey'
+                    size: 16 * coefficient,
+                    color: '#000000'
                   },
                   xref: 'paper',  // Set x-coordinate reference to 'paper'
                   yref: 'paper',  // Set y-coordinate reference to 'paper'
@@ -249,8 +260,20 @@
                             });
                           }
                         });
-                      });
+                      })
+                      .then(function() {
+                window.dispatchEvent(new Event('resize'));
+              });
             });
+
+    window.onresize = function() {
+      const update = {
+        width: document.getElementById('plot').clientWidth,
+        height: document.getElementById('plot').clientHeight,
+      };
+      Plotly.relayout('plot', update);
+    };
+
   }
 
   document.addEventListener('DOMContentLoaded', function() {

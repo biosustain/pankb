@@ -15,11 +15,9 @@
 
   <style>
 
-    /* Responsive behavior (if needed) */
-    @media (max-width: 768px) {
-      .col-7-5, .col-4-5 {
-        width: 100%;
-      }
+    html {
+      font-size: 18px;
+      overflow: hidden;
     }
 
     .center{
@@ -28,8 +26,6 @@
 
     .link_button{
       text-align: center;
-      padding: 15px 32px;
-      font-size: 24px;
     }
 
     .responsive-iframe {
@@ -51,28 +47,39 @@
       border: none;
     }
 
-
-    .col-7-5, .col-4-5 {
-      position: relative;
-      width: 100%;
-      padding-right: 0px;
-      padding-left: 0px;
-      float: left;
-    }
-
     .col-8-5 {
       width: 69%;
+    }
+
+    .col-4-5 {
+      width: 37.5%;
     }
 
     .col-3-5 {
       width: 31%;
     }
 
-    .navbar-nav .nav-item .nav-link {
-      margin-left: 25px;
-      margin-right: 25px;
-      font-size: 18px;
+    .col-0-5{
+      position: relative;
+      width: 4.166%;
     }
+
+    .navbar-nav .nav-item .nav-link {
+        margin-left: 1em;
+        margin-right: 1em;
+        font-size: 1em;
+    }
+
+     .logo-image {
+       height: 7vh;
+     }
+
+    .logo-image_navbar {
+      height: 3vh;
+    }
+
+  </style>
+
 
 
 
@@ -90,7 +97,7 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="./index.html" style="margin: 0;">
-      <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+      <img src="pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -112,7 +119,7 @@
       </ul>
     </div>
     <a class="navbar-brand" href="./index.html" style="margin: 0; visibility: hidden; ">
-      <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+      <img src="pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
     </a>
   </div>
 </nav>
@@ -122,23 +129,23 @@
 
   <p class="display-5 center" style="margin: 0px;">
     <a class="navbar-brand" href="./index.html">
-      <img src="pankb_logo_black.svg" alt="PanKB" height="70" class="d-inline-block align-text-top">
+      <img src="pankb_logo_black.svg" alt="PanKB" class="d-inline-block align-text-top logo-image">
     </a>
   </p>
 
-  <p class="display-6 center" style="font-style: italic;  font-size: 30px;">
+  <p id = "pankb_title" class="display-6 center" style="font-style: italic;">
     Pangenome Knowledge Base
   </p>
 
   <br>
   <div class="row">
-    <div class="col-1">
+    <div class="col-0-5">
       <!-- Empty column -->
     </div>
 
-    <div class="col-10">
+    <div class="col-11">
 
-          <div class="row no-gutters" style="height:55vh">
+          <div class="row no-gutters" style="height:60vh">
 
             <div class="col-3">
 
@@ -152,7 +159,7 @@
               <!-- Second bar plot-->
               <div class="row" style="height:50%;"> <!-- Second row for the second iframe with 50% height -->
 
-                <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold;">
+                <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 1em; font-weight: bold;">
                   Database size per organism
                 </p>
 
@@ -169,18 +176,18 @@
             </div>
 
 
-            <div class="col-5 responsive-iframe" style="padding-left: 0; padding-right: 0;">
+            <div class="col-4-5 responsive-iframe" style="padding-left: 0; padding-right: 0;">
 
-              <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold;">
+              <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 1em; font-weight: bold;">
                 Pangenomes
               </p>
 
               <iframe src='Interactive_figures/gene_freq/genome_gene.html'></iframe>
             </div>
 
-            <div class="col-4 responsive-iframe" style="padding-left: 0; padding-right: 0;">
+            <div class="col-4-5 responsive-iframe" style="padding-left: 0; padding-right: 0;">
 
-              <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: bold;">
+              <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 1em; font-weight: bold;">
                 Annotated strain Isolation Sources
               </p>
 
@@ -190,8 +197,7 @@
           </div>
     </div>
 
-    <div class="col-1">
-      <!-- Empty column -->
+    <div class="col-0-5">
     </div>
   </div>
 
@@ -201,7 +207,6 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-3">
-      <!-- Leave this empty for the same effect as above -->
     </div>
 
 <!--    <div class="col-6">-->
@@ -234,7 +239,6 @@
     </div>
 
     <div class="col-3">
-      <!-- Leave this empty for the same effect as above -->
     </div>
   </div>
 </div>
@@ -255,6 +259,44 @@
 <!--          })-->
 
 <!--</script>-->
+
+<script>
+  function adjustHtmlFontSize(coefficient) {
+    const newFontSize = 18 * coefficient;
+    document.documentElement.style.fontSize = newFontSize + 'px';
+  }
+
+  // Function to adjust title font size
+  function adjustTitleFontSize(coefficient) {
+    const newFontSize = 25 * coefficient;
+    document.getElementById('pankb_title').style.fontSize = newFontSize + 'px';
+  }
+
+  // Function to adjust button styles
+  function adjustButtonStyles(coefficient) {
+    const buttons = document.getElementsByClassName('link_button');
+    for (let i = 0; i < buttons.length; i++) {
+      buttons[i].style.padding = (18 * coefficient) + 'px ' + (18 * coefficient) + 'px';
+      buttons[i].style.fontSize = (20 * coefficient) + 'px';
+    }
+  }
+
+
+  // Function to adjust all styles
+  function adjustStyles() {
+    const template_screen_width = 1920;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
+
+    adjustHtmlFontSize(coefficient);
+    adjustTitleFontSize(coefficient);
+    adjustButtonStyles(coefficient);
+  }
+
+  // Adjust styles on page load and window resize
+  document.addEventListener("DOMContentLoaded", adjustStyles);
+  window.addEventListener("resize", adjustStyles);
+</script>
 
 
 </body>

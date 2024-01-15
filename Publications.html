@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -27,13 +28,19 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0"></script>
 
   <style>
+
+    html {
+      font-size: 18px;
+      overflow: hidden;
+    }
+
     .table_padding {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding-top:50px;
-      padding-bottom:80px;
+      padding-top:0.5em;
+      padding-bottom:4em;
     }
 
     /* Add this to make the DataTable pagination centered */
@@ -53,16 +60,16 @@
     }
 
     tr, th {
-      font-size: 15px;
+      font-size: 1em;
       text-align: center;
       vertical-align: middle;
     }
 
     td {
-      font-size: 15px;
+      font-size: 1em;
       text-align: center !important;
       vertical-align: middle !important;
-      padding: 10px;
+      padding: 0.5em;
       width: 14.2%;
     }
 
@@ -73,7 +80,7 @@
     .dataTables_wrapper thead th {
       text-align: center;
       vertical-align: middle;
-      padding: 20px 5px;
+      padding: 1em 0.3em;
       position: relative;
     }
 
@@ -83,13 +90,13 @@
       left: 50%;
       transform: translateX(-50%);
       width: 80%;
-      margin-bottom: 10px;
+      margin-bottom: 0.5em;
     }
 
     .dataTables_wrapper tbody td {
       text-align: center;
       vertical-align: middle;
-      padding: 10px;
+      padding: 0.5em;
       word-break: break-word;
     }
 
@@ -99,20 +106,24 @@
 
     .dataTables_wrapper .dataTables_filter input {
       width: 100%;
-      max-width: 300px;
+      max-width: 17em;
       margin: 0 auto;
     }
 
     #table-container .dataTables_paginate {
       display: flex;
       justify-content: center;
-      margin-top: 15px !important;
+      margin-top: 1em !important;
     }
 
     .navbar-nav .nav-item .nav-link {
-      margin-left: 25px;
-      margin-right: 25px;
-      font-size: 18px;
+      margin-left: 1em;
+      margin-right: 1em;
+      font-size: 1em;
+    }
+
+    .logo-image_navbar {
+      height: 3vh;
     }
 
   </style>
@@ -131,7 +142,7 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="./index.html" style="margin: 0;">
-      <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+      <img src="pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -144,16 +155,16 @@
         <li class="nav-item">
           <a class="nav-link " href="./Species_list.html">Organisms</a>
         </li>
-<!--        <li class="nav-item">-->
-<!--          <a class="nav-link " href="#">Download</a>-->
-<!--        </li>-->
+        <!--        <li class="nav-item">-->
+        <!--          <a class="nav-link " href="#">Download</a>-->
+        <!--        </li>-->
         <li class="nav-item">
           <a class="nav-link active" href="./Publications.html" tabindex="-1" aria-disabled="true">Publications</a>
         </li>
       </ul>
     </div>
     <a class="navbar-brand" href="./index.html" style="margin: 0; visibility: hidden; ">
-      <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+      <img src="pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
     </a>
   </div>
 </nav>
@@ -194,7 +205,21 @@
       let table = $('#example').DataTable({
         data: data,
         columns: [
-          { data: 'Title' },
+          { data: 'Title',
+            render: function(data, type, row) {
+              if (type === 'display') {
+                // Split the text into words and check if it exceeds 20 words
+                var words = data.split(/\s+/);
+                if (words.length > 10) {
+                  // Join the first 20 words and add an ellipsis
+                  return words.slice(0, 10).join(' ') + '...';
+                }
+                return data;
+              } else {
+                return data;
+              }
+            }
+          },
           { data: 'DOI',
             render: function(data, type, row) {
               if (type === 'display') {
@@ -248,7 +273,26 @@
 
 </script>
 
+<script>
+  function adjustHtmlFontSize(coefficient) {
+    const newFontSize = 18 * coefficient;
+    document.documentElement.style.fontSize = newFontSize + 'px';
+  }
 
+
+  // Function to adjust all styles
+  function adjustStyles() {
+    const template_screen_width = 1920;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
+
+    adjustHtmlFontSize(coefficient);
+  }
+
+  // Adjust styles on page load and window resize
+  document.addEventListener("DOMContentLoaded", adjustStyles);
+  window.addEventListener("resize", adjustStyles);
+</script>
 
 </body>
 </html>

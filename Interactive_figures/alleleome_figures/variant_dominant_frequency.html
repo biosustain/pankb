@@ -18,6 +18,10 @@
             padding: 0;
             overflow: hidden;
         }
+
+        html {
+            font-size: 18px; /* Base font size for larger screens */
+        }
     </style>
 </head>
 <body>
@@ -27,6 +31,10 @@
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');
+
+    const template_screen_width = 602;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
 
     function createChart(data) {
         // Convert JSON data to format suitable for Highcharts
@@ -46,34 +54,71 @@
                 plotBorderColor: '#000000'
             },
             title: {
-                text: 'Amino Acid Frequency Distribution'
+                text: 'Dominant versus Variant Amino Acid Frequency Distribution for Core Genomes',
+                style: {
+                    fontSize: (1.1 * coefficient) + 'em',
+                    color: '#000000'
+                },
+                align: 'center',
+                x: 25 * coefficient,
+
             },
             xAxis: {
                 type: 'logarithmic',
                 title: {
-                    text: 'Amino Acid Frequency'
+                    text: 'Amino Acid Frequency',
+                    style: {
+                        fontSize: coefficient + 'em',
+                        color: '#000000'
+                    }
                 },
                 labels: {
+                    style: {
+                        fontSize: (0.9 * coefficient) + 'em',
+                        color: '#000000'
+                    },
                     formatter: function() {
-                        // Check if the label is exactly 0.1 and replace it with '0'
                         if (this.value === 1) {
                             return '0';
                         }
-                        return this.value;
+                        const power = Math.round(Math.log(this.value) / Math.LN10);
+                        const superscript = String(power).split('').map(digit => '⁰¹²³⁴⁵⁶⁷⁸⁹'[digit]).join('');
+                        return '10' + superscript;
                     }
                 },
                 tickInterval: 1,
                 tickWidth: 1,
-                min: 1 // Set the minimum value for the logarithmic scale
+                min: 1
             },
             yAxis: {
                 title: {
-                    text: 'Number of Genomes (normalized c = 0 - 1)'
+                    text: 'Number of Genomes (normalized c = 0 - 1)',
+                    style: {
+                        fontSize: coefficient + 'em',
+                        color: '#000000'
+                    }
                 },
-                min: 0,
+                labels: {
+                    align: 'center',
+                    enable: true,
+                    style: {
+                        fontSize: (0.9 * coefficient) + 'em',
+                        color: '#000000'
+                    }
+                },
+                startOnTick: false,
+                endOnTick: false,
+                min: -0.05,
                 tickWidth: 1,
+                tickInterval: 0.1,
                 gridLineWidth: 0,
                 lineColor: '#000000'
+            },
+            legend: {
+                align: 'center',
+                verticalAlign: 'top',
+                layout: 'horizontal',
+                x: 25 * coefficient
             },
             tooltip: {
                 formatter: function() {
@@ -88,12 +133,12 @@
                 name: 'Dominant',
                 data: dominantData,
                 step: 'right',
-                color: '#25316D',
+                color: '#EB1D36',
             }, {
                 name: 'Variant',
                 data: variantData,
                 step: 'right',
-                color: '#EB1D36',
+                color: '#25316D',
             }],
             credits: {
                 enabled: false

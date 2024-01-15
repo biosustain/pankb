@@ -19,6 +19,11 @@
 <body>
 <div id="container"></div>
 <script>
+    const template_screen_width = 135;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
+
+
     document.addEventListener('DOMContentLoaded', function() {
 
         fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/organism_genome_count.json')
@@ -65,18 +70,34 @@
                         title: {
                             text: 'Genomes',
                             style: {
-                                fontSize: '1em'
+                                fontSize: (0.9 * coefficient) + 'em'
                             }
                         },
                         type: 'logarithmic',
-                        tickInterval: 1,
+                        tickInterval: 2,
                         tickWidth: 1,
                         lineWidth: 1,
                         gridLineWidth: 1,
+                        min:1,
                         labels: {
                             align: 'center',
                             style: {
-                                fontSize: '0.9em'
+                                fontSize: (0.9 * coefficient) + 'em'
+                            },
+                            formatter: function() {
+                                if (this.value === 1) {
+                                    return '0';
+                                }
+
+                                if (this.value >= 1000000) {
+                                    return (this.value / 1000000) + 'M';
+                                }
+
+                                if (this.value >= 1000) {
+                                    return (this.value / 1000) + 'k';
+                                }
+
+                                return this.value;
                             },
                             rotation: 0,
                         },
@@ -91,7 +112,7 @@
                     tooltip: {
                         pointFormat: 'Count: <b>{point.y}</b>',
                         style: {
-                            fontSize: '1em'
+                            fontSize: (0.9 * coefficient) + 'em'
                         }
                     },
                     legend: {

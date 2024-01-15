@@ -33,6 +33,10 @@
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');
 
+    const template_screen_width = 746;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
+
     fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/gene_freq.json')
             .then(response => response.json())
             .then(data => {
@@ -111,21 +115,23 @@
               const layout = {
                 autosize: true,
                 margin: {
-                  l: 80,  // left margin
-                  r: 60,  // right margin
-                  b: 80, // bottom margin
-                  t: 60, // top margin
+                  l: 80 * coefficient,  // left margin
+                  r: 60 * coefficient,  // right margin
+                  b: 80 * coefficient, // bottom margin
+                  t: 60 * coefficient, // top margin
                   pad: 0 // padding
                 },
                 title: {
                   text: "Gene Frequency",
-                  titlefont: {
-                    size: 18,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                  font: {
+                    family: 'Arial, sans-serif',
+                    size: 20 * coefficient,
+                    color: '#000000'
                   },
                   tickfont: {
-                    size: 16,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
                   },
                   xref: 'paper',
                   x: 0.5,
@@ -136,12 +142,14 @@
                   showgrid: true,  // Remove x-axis grid lines
                   showline: true,  // Show x-axis line
                   titlefont: {
-                    size: 18,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
                   },
                   tickfont: {
-                    size: 16,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
                   },
                   ticks: 'outside',
                   tickWidth: 1,
@@ -149,8 +157,9 @@
                 yaxis: {
                   title: 'Frequency',
                   titlefont: {
-                    size: 18,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
                   },
                   type: 'log',
                   dtick: 1,
@@ -162,26 +171,27 @@
                   ticks: 'outside',
                   tickWidth: 1,
                   tickfont: {
-                    size: 16,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
                   }
                 },
                 showlegend: true,  // Show legend
                 legend: {
-                  x: 0.5,  // Position the legend at the center of the plot
-                  y: 1,
+                  x: 0.5,
+                  y: 1.05,
                   orientation: 'h',  // Set legend orientation to horizontal
                   traceorder: 'reversed',  // Change the order of legend items
                   itemclick: true,  // Disable legend item click
                   itemdoubleclick: false,  // Disable legend item double-click
-                  itemwidth: 30,  // Adjust legend item width as needed
-                  itemheight: 20,  // Adjust legend item height as needed
+                  itemwidth: 30 * coefficient,  // Adjust legend item width as needed
+                  itemheight: 20 * coefficient,  // Adjust legend item height as needed
                   itemorder: 'normal',  // Preserve the order of legend items
                   bgcolor: 'rgba(0,0,0,0)',  // Set legend background color to transparent
                   bordercolor: 'rgba(0,0,0,0)',  // Set legend border color to transparent
                   font: {
                     family: 'Arial, sans-serif',
-                    size: 12,
+                    size: 16 * coefficient,
                     color: 'grey'
                   },
                   xref: 'paper',  // Set x-coordinate reference to 'paper'
@@ -265,6 +275,13 @@
 
               var data = [trace1, trace2, trace3];
               Plotly.newPlot('plot', data, layout, config);
+              window.onresize = function() {
+                const update = {
+                  width: document.getElementById('plot').clientWidth,
+                  height: document.getElementById('plot').clientHeight,
+                };
+                Plotly.relayout('plot', update);
+              };
             });
   }
 

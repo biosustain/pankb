@@ -42,17 +42,19 @@
         }
 
         tr, th {
-            font-size: 15px;
+            font-size: 1em;
             text-align: center;
             vertical-align: middle;
         }
 
         td {
-            font-size: 15px;
+            font-size: 0.9em;
             text-align: center !important;
             vertical-align: middle !important;
-            padding: 10px;
+            padding: 0.45em;
             width: 14.2%;
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
         }
 
         .dataTables_wrapper .dataTables_filter {
@@ -63,7 +65,7 @@
         .dataTables_wrapper thead th {
             text-align: center;
             vertical-align: middle;
-            padding: 5px;
+            padding: 0.3em;
             position: relative;
         }
 
@@ -73,13 +75,13 @@
             left: 50%;
             transform: translateX(-50%);
             width: 80%;
-            margin-bottom: 10px;
+            margin-bottom: 0.45em;
         }
 
         .dataTables_wrapper tbody td {
             text-align: center;
             vertical-align: middle;
-            padding: 10px;
+            padding: 0.45em;
             word-break: break-word;
         }
 
@@ -89,7 +91,7 @@
 
         .dataTables_wrapper .dataTables_filter input {
             width: 100%;
-            max-width: 300px;
+            max-width: 16em;
             margin: 0 auto;
         }
 
@@ -99,14 +101,23 @@
             margin-top: 15px !important;
         }
 
-        .navbar-nav .nav-item .nav-link {
-            margin-left: 25px;
-            margin-right: 25px;
-            font-size: 18px;
+        #gene_page_title {
+            margin-top: 2em;
         }
 
-        #gene_page_title {
-            margin-top: 70px; /* Adjust the value based on the height of your navbar */
+        .navbar-nav .nav-item .nav-link {
+            margin-left: 1em;
+            margin-right: 1em;
+            font-size: 1em;
+        }
+
+
+        .logo-image_navbar {
+            height: 3vh;
+        }
+
+        html {
+            font-size: 18px;
         }
     </style>
 </head>
@@ -115,7 +126,7 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="../index.html" style="margin: 0;">
-            <img src="../pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+            <img src="../pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -137,7 +148,7 @@
             </ul>
         </div>
         <a class="navbar-brand" href="./index.html" style="margin: 0; visibility: hidden; ">
-            <img src="../pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+            <img src="../pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
         </a>
     </div>
 </nav>
@@ -169,7 +180,7 @@
         </div>
     </div>
 
-<h3 id = 'AA_pos_overview_figure' style = 'text-align: center; padding-top: 5vh;'; ></h3>
+<h3 id = 'AA_pos_overview_figure' style = 'text-align: center; padding-top: 5vh; font-size: 1.6em;'; ></h3>
 
 <div class="table_padding overflow-auto">
     <div style="width:70%;">
@@ -181,7 +192,7 @@
 
 <br>
 
-<h3 id = 'MSA_figure' style = 'text-align: center';></h3>
+<h3 id = 'MSA_figure' style = 'text-align: center; font-size: 1.6em;'></h3>
 
 <div class="table_padding overflow-auto">
     <div style="width:90%;">
@@ -196,6 +207,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');
     const gene = urlParams.get('gene');
+    const gene_class = urlParams.get('gene_class');
 
     document.addEventListener('DOMContentLoaded', async function() {
         try {
@@ -262,6 +274,12 @@
             table.draw(false); // Redraw the DataTable to readjust the layout
         });
 
+        if (gene_class !== 'Core') {
+            document.getElementById('AA_pos_overview_figure').style.display = 'none';
+            document.getElementById('AA_pos_overview').style.display = 'none';
+            document.getElementById('MSA_figure').style.display = 'none';
+            document.getElementById('MSA').style.display = 'none';
+        }
     });
 
     // document.getElementById('gene_table_title').innerHTML= 'Gene: ' + '<b>' +  gene  + '</b>'
@@ -274,6 +292,27 @@
 
     const AA_pos_overview = document.getElementById('AA_pos_overview');
     AA_pos_overview.src = '../Interactive_figures/alleleome_figures/gene_AA_pos_overview.html?species=' + species + '&' + 'gene=' + gene;
+</script>
+
+<script>
+    function adjustHtmlFontSize(coefficient) {
+        const newFontSize = 18 * coefficient;
+        document.documentElement.style.fontSize = newFontSize + 'px';
+    }
+
+
+    // Function to adjust all styles
+    function adjustStyles() {
+        const template_screen_width = 1920;
+        const current_window_Width = window.innerWidth;
+        const coefficient = current_window_Width / template_screen_width;
+
+        adjustHtmlFontSize(coefficient);
+    }
+
+    // Adjust styles on page load and window resize
+    document.addEventListener("DOMContentLoaded", adjustStyles);
+    window.addEventListener("resize", adjustStyles);
 </script>
 </body>
 </html>

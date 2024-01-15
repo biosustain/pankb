@@ -16,17 +16,7 @@
 
     <style>
 
-        @media (min-width: 768px) {
-            .bd-placeholder-img-lg {
-                font-size: 3.5rem;
-            }
-        }
-
-
-
-        .navbar-nav .nav-item .nav-link {
-            margin-left: 25px;
-            margin-right: 25px;
+        html {
             font-size: 18px;
         }
 
@@ -39,9 +29,30 @@
             overflow-y: auto; /* To make sidebar scrollable if content is long */
         }
 
-        /*.main-content {*/
-        /*    margin-left: 200px; !* Should be at least the width of the sidebar *!*/
-        /*}*/
+        .navbar-nav .nav-item .nav-link {
+            margin-left: 1em;
+            margin-right: 1em;
+            font-size: 1em;
+        }
+
+        .logo-image_navbar {
+            height: 3vh;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2em; /* Adjust the font-size as needed */
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 1.8em; /* Adjust the font-size as needed */
+        }
+
+        h3 {
+            text-align: center;
+            font-size: 1.6em; /* Adjust the font-size as needed */
+        }
 
     </style>
 
@@ -54,7 +65,7 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="./index.html" style="margin: 0;">
-            <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+            <img src="pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -76,7 +87,7 @@
             </ul>
         </div>
         <a class="navbar-brand" href="./index.html" style="margin: 0; visibility: hidden; ">
-            <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+            <img src="pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
         </a>
     </div>
 </nav>
@@ -84,17 +95,17 @@
 <div class="row">
     <div class="col-2 fixed-sidebar">
         <div id="list-example" class="list-group">
-            <a class="list-group-item list-group-item-action" style = 'font-size: 20px' href="#about_pankb">About PanKB</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 20px' href="#how_to_use">How to use PanKB</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 20px' href="#Pangenome_Analytics_Dashboards">Pangenome Analytics Dashboards</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 18px' href="#overview">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Overview</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#about_pankb">About PanKB</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#how_to_use">How to use PanKB</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#Pangenome_Analytics_Dashboards">Pangenome Analytics Dashboards</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#overview">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Overview</a>
             <a class="list-group-item list-group-item-action" href="#heaps_law_and_gene_frequency">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Heap's Law and Gene Frequency</a>
             <a class="list-group-item list-group-item-action" href="#presence_absence_matrix">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Presence/Absence Matrix</a>
             <a class="list-group-item list-group-item-action" href="#genome_gene_info_page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Genome & Gene Info Page</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 18px' href="#genee">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Genes</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#genee">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Genes</a>
             <a class="list-group-item list-group-item-action" href="#gene_annotation_able">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gene Annotation Table</a>
             <a class="list-group-item list-group-item-action" href="#gene_info_page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gene Info Page</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 18px' href="#phylogenetic_tree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Phylogenetic Tree</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#phylogenetic_tree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Phylogenetic Tree</a>
             <a class="list-group-item list-group-item-action" href="#genome_info_page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Genome Info Page</a>
         </div>
     </div>
@@ -105,7 +116,7 @@
         <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-offset="0" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
             <h1 id="about_pankb" style = 'text-align: center'>About PanKB</h1>
             <br>
-            <p style = 'font-size: 25px'>
+            <p style = 'font-size: 1.3em'>
                 Welcome to PanKB, the Pangenome Knowledge Base. This web-based tool serves as an up-to-date resource for pangenomics research methods and the dissemination of results. The current version of PanKB offers basic pangenome characteristics and advanced pangenome analytics for six major biotech bacteria families.
             </p>
 
@@ -113,13 +124,13 @@
 
             <h1 id="how_to_use" style = 'text-align: center'>How to use PanKB</h1>
 
-            <p style = 'font-size: 25px'>
+            <p style = 'font-size: 1.3em'>
                 To begin, choose an organism of interest from the organism list. You can access the organism list page by either clicking the 'Select an organism' button located at the bottom of the landing page or selecting the 'Organism' option in the navbar. Next, you can pick an organism of interest and explore its pangenomic analytics by clicking on the link in the last column labeled 'Pangenome analyses.' This action will direct you to the Pangenome Analysis Dashboards.
                 <br>
             <div style="text-align: center;">
                 <img src="https://pankb.blob.core.windows.net/data/PanKB/web_data/about_page_gif/pankb_workflow.png" style="width: 80%;">
             <br>
-                <p id="imageFootprint"  style = 'font-size: 25px' >PanKB workflow</p>
+                <p id="imageFootprint"  style = 'font-size: 1.3em' >PanKB workflow</p>
             </div>
 
                 <br>
@@ -137,7 +148,7 @@
 
             <br>
 
-            <p style = 'font-size: 25px'>
+            <p style = 'font-size: 1.3em'>
                 Each dashboard showcases the pangenome analysis results for a organism species. It consists of three parts: Overview, Genes, and Phylogenetic Tree. In the following section, we provide examples of each page element from the <a href = 'https://pankb.org/Pangenome_analyses_overview.html?species=Lactiplantibacillus_plantarum'>Lactiplantibacillus plantarum Pangenome Analytics Dashboards</a>.
                 <br>
                 <br>
@@ -147,13 +158,13 @@
 
             <br>
 
-            <p  style = 'font-size: 20px'> The <b>Overview</b> page contains several interactive figures that depict various pangenome properties of an organism. </p>
+            <p  style = 'font-size: 1em'> The <b>Overview</b> page contains several interactive figures that depict various pangenome properties of an organism. </p>
 
             <h3 id="heaps_law_and_gene_frequency" style = 'text-align: center;' >Heap's Law and Gene Frequency</h3>
 
             <br>
 
-            <p  style = 'font-size: 20px'>
+            <p  style = 'font-size: 1em'>
 
                 The first 4 figures in the <b>Overview</b> page display the four standard calculations related to elementary pangenome properties: Heap's Law, Cumulative Gene Distribution, Gene Annotation Distribution, and Gene Frequency. All of them are interactive figures that offer the following functionalities:
                 <br>
@@ -172,7 +183,7 @@
 
             <h3 id="presence_absence_matrix" style = 'text-align: center;' >Presence/Absence Matrix</h3>
             <br>
-            <p  style = 'font-size: 20px'>
+            <p  style = 'font-size: 1em'>
                 The Presence/Absence Matrix is represented as an interactive heatmap. By default, the heatmap displays the Presence/Absence Matrix only for Core genes. To explore other gene classes such as Accessory, Rare, etc., you can use the <b>'Select a Gene Class'</b> button located in the upper left corner of the figure.
                 <br>
                 <br>
@@ -193,7 +204,7 @@
 
             <h3 id="genome_gene_info_page" style = 'text-align: center;' >Genome & Gene Info Page</h3>
             <br>
-            <p  style = 'font-size: 20px'>
+            <p  style = 'font-size: 1em'>
                 This page offers more information about the genome and genes from the Presence/Absence Matrix. The page mainly consists of three parts:
                 <br>
                 <b>1. Genome and Gene Tables:</b> These two tables contain basic information about the genome and genes. The genome table includes a link to NCBI, where you can find more information about this genome. The gene table also provides a link to the Gene page (See <a href = '#gene_info_page'>Gene Info Page</a>).
@@ -210,11 +221,11 @@
 
             </p>
             <h2 id="genes" style = 'text-align: center'>Genes</h2>
-            <p style = 'font-size: 20px'> <b>Genes</b> page mainly show the annotation of genes. </p>
+            <p style = 'font-size: 1em'> <b>Genes</b> page mainly show the annotation of genes. </p>
 
             <h3 id="gene_annotation_able" style = 'text-align: center;' >Gene Annotation Table</h3>
             <br>
-            <p  style = 'font-size: 20px'>
+            <p  style = 'font-size: 1em'>
                 The Gene Annotation table is an interactive table on the Genes page. It possesses the following features:
                 <br>
                 <b>1.Sorting:</b> You can sort the entire table based on any single column.
@@ -230,7 +241,7 @@
 
             <h3 id="gene_info_page" style = 'text-align: center;' >Gene Info Page</h3>
             <br>
-            <p  style = 'font-size: 20px'>
+            <p  style = 'font-size: 1em'>
                 The Gene page currently comprises two components:
                 <br>
                 <b>1. Gene Information Table:</b> This interactive table contains all Locustags related to this gene, along with their corresponding Genome ID (found in the second column labeled 'Genome ID' which also serves as a link to the respective Genome Info Page), annotation details, and sequence information.
@@ -252,12 +263,12 @@
             </p>
 
             <h2 id="phylogenetic_tree" style = 'text-align: center'>Phylogenetic Tree</h2>
-            <p style = 'font-size: 20px'> The Phylogenetic Tree page displays the phylogenetic traits of a species, and it is constructed using the Mash distance method. The phylogenetic tree in PanKB is generated using Phylotree.js. You can find additional information about its features in <a href = 'https://github.com/veg/phylotree.js/'>phylotree.js</a>. In addition to the features documented in the Phylotree.js documentation, we have also incorporated links to the Genome Info Page. By left-clicking on the genome of interest and selecting 'Search for this strain,' you can navigate to the corresponding Genome Info Page and access more information about that specific genome. </p>
+            <p style = 'font-size: 1em'> The Phylogenetic Tree page displays the phylogenetic traits of a species, and it is constructed using the Mash distance method. The phylogenetic tree in PanKB is generated using Phylotree.js. You can find additional information about its features in <a href = 'https://github.com/veg/phylotree.js/'>phylotree.js</a>. In addition to the features documented in the Phylotree.js documentation, we have also incorporated links to the Genome Info Page. By left-clicking on the genome of interest and selecting 'Search for this strain,' you can navigate to the corresponding Genome Info Page and access more information about that specific genome. </p>
 
 
             <h3 id="genome_info_page" style = 'text-align: center;' >Genome Info Page</h3>
             <br>
-            <p  style = 'font-size: 20px'>
+            <p  style = 'font-size: 1em'>
                 The Genome Info Page is similar to the <a href = '#genome_gene_info_page'>Genome & Gene Info Page</a>, just without gene table.
             </p>
 
@@ -274,8 +285,36 @@
             target: '#list-example'
         });
     });
+</script>
+
+<script>
+    function adjustHtmlFontSize(coefficient) {
+        const newFontSize = 18 * coefficient;
+        document.documentElement.style.fontSize = newFontSize + 'px';
+    }
+
+    // Function to adjust button styles
+    function adjustButtonStyles(coefficient) {
+        const buttons = document.getElementsByClassName('link_button');
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].style.padding = (18 * coefficient) + 'px ' + (18 * coefficient) + 'px';
+            buttons[i].style.fontSize = (20 * coefficient) + 'px';
+        }
+    }
 
 
+    function adjustStyles() {
+        const template_screen_width = 1920;
+        const current_window_Width = window.innerWidth;
+        const coefficient = current_window_Width / template_screen_width;
+
+        adjustHtmlFontSize(coefficient);
+        adjustTitleFontSize(coefficient);
+        adjustButtonStyles(coefficient);
+    }
+
+    document.addEventListener("DOMContentLoaded", adjustStyles);
+    window.addEventListener("resize", adjustStyles);
 </script>
 
 

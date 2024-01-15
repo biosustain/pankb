@@ -17,6 +17,10 @@
 
   <style>
 
+    html {
+      font-size: 18px;
+    }
+
     .row {
       margin-left: 0;
       margin-right: 0;
@@ -99,12 +103,6 @@
       margin-bottom: 0; /* Change this value */
     }
 
-    .link_not_activate{
-      color: grey !important;
-    }
-
-
-
     #loading-overlay {
       position: fixed;
       top: 0;
@@ -121,9 +119,14 @@
 
 
     .navbar-nav .nav-item .nav-link {
-      margin-left: 25px;
-      margin-right: 25px;
-      font-size: 18px;
+      margin-left: 1em;
+      margin-right: 1em;
+      font-size: 1em;
+    }
+
+
+    .logo-image_navbar {
+      height: 3vh;
     }
 
 
@@ -146,7 +149,7 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="./index.html" style="margin: 0;">
-      <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+      <img src="pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -159,16 +162,16 @@
         <li class="nav-item">
           <a class="nav-link " href="./Species_list.html">Organisms</a>
         </li>
-<!--        <li class="nav-item">-->
-<!--          <a class="nav-link " href="#">Download</a>-->
-<!--        </li>-->
+        <!--        <li class="nav-item">-->
+        <!--          <a class="nav-link " href="#">Download</a>-->
+        <!--        </li>-->
         <li class="nav-item">
           <a class="nav-link " href="./Publications.html" tabindex="-1" aria-disabled="true">Publications</a>
         </li>
       </ul>
     </div>
     <a class="navbar-brand" href="./index.html" style="margin: 0; visibility: hidden; ">
-      <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+      <img src="pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
     </a>
   </div>
 </nav>
@@ -220,15 +223,14 @@
           -->
         </ul>
 
-        <!-- Card -->
         <div class="card vh-25" id="speciesCard">
           <div class="card-body text-left">
-            <p id="species"></p>
-            <p id="numGenome"></p>
-            <p id="core"></p>
-            <p id="accessory"></p>
-            <p id="rare"></p>
-            <p id="openness"></p>
+            <p style = 'font-size: 0.9em' id="species"></p>
+            <p style = 'font-size: 0.9em' id="numGenome"></p>
+            <p style = 'font-size: 0.9em 'id="core"></p>
+            <p style = 'font-size: 0.9em' id="accessory"></p>
+            <p style = 'font-size: 0.9em' id="rare"></p>
+            <p style = 'font-size: 0.9em' id="openness"></p>
           </div>
         </div>
 
@@ -239,7 +241,7 @@
     <div class="col-10 custom-padding">
       <div class="container-fluid">
         <div class="row row-spacing border-container gx-0 gx-md-2">
-          <h2 class="text-center">Heap's Law and Gene Frequency</h2>
+          <h2 class="text-center" style="font-size: 1.6em;">Heap's Law and Gene Frequency</h2>
           <div class="col-12 col-md-6">
             <div class="figure-container_above responsive-iframe">
               <iframe style="border:0;" id="Heaps_Law"></iframe>
@@ -260,9 +262,9 @@
         <br>
         <br>
         <br>
-        <div class="row border-container" style="height: 70vh;">
+        <div class="row border-container" style="height: 80vh;">
           <div class="col-12" style="height: 100%;">
-            <h2 class="text-center">Presence/Absence Matrix</h2>
+            <h2 class="text-center" style="font-size: 1.6em;">Presence/Absence Matrix</h2>
             <div class="dropdown">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
                 Select a Gene Class
@@ -291,7 +293,7 @@
         <br>
         <br>
         <div class="row border-container" style="height: 80vh;">
-          <h2 class="text-center">Core Alleleome</h2>
+          <h2 class="text-center" style="font-size: 1.6em;">Core Alleleome</h2>
           <div class="col-1">
             <!-- Empty column -->
           </div>
@@ -362,7 +364,7 @@
     Heaps_Law.src = './Interactive_figures/gene_freq/heaps_law.html?species=' + species;
 
     const Barplot = document.getElementById('Barplot');
-    Barplot.src = './Interactive_figures/barplot/barplot.html?species=' + species;
+    Barplot.src = './Interactive_figures/barplot/gene_annotation_barplot.html?species=' + species;
 
     const Gene_frequency = document.getElementById('Gene_frequency');
     Gene_frequency.src = './Interactive_figures/gene_freq/gene_freq.html?species=' + species;
@@ -378,7 +380,6 @@
 
     const dn_ds = document.getElementById('dn_ds');
     dn_ds.src =  dn_ds.src = './Interactive_figures/alleleome_figures/dn_ds_ratio.html?species=' + species;
-
 
     // const heatmap_target = document.getElementById('heatmap_target');
     // heatmap_target.src = './Interactive_figures/hotmap/demo/target_gene.html?species=' + species;
@@ -404,7 +405,7 @@
       if(overlay) {
         overlay.parentNode.removeChild(overlay);  // remove the overlay from DOM
       }
-    }, 2000);  // 4000 milliseconds = 2 seconds
+    }, 5000);  // 4000 milliseconds = 2 seconds
 
   });
 
@@ -420,9 +421,30 @@
     dropdownButton.textContent = gene_class_text;
   }
 
-
-
 </script>
+
+<script>
+  // Function to adjust HTML font size
+  function adjustHtmlFontSize(coefficient) {
+    const newFontSize = 18 * coefficient;
+    document.documentElement.style.fontSize = newFontSize + 'px';
+  }
+
+
+  // Function to adjust all styles
+  function adjustStyles() {
+    const template_screen_width = 1920;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
+
+    adjustHtmlFontSize(coefficient);
+  }
+
+  // Adjust styles on page load and window resize
+  document.addEventListener("DOMContentLoaded", adjustStyles);
+  window.addEventListener("resize", adjustStyles);
+</script>
+
 
 
 

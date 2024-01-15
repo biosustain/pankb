@@ -31,17 +31,6 @@
             }
         }
 
-        /*.col-2 {*/
-        /*    flex: 0 0 12.5% !important;*/
-        /*    max-width: 12.5% !important;*/
-        /*    padding:0;*/
-        /*}*/
-
-        /*.col-10 {*/
-        /*    flex: 0 0 87.5% !important;*/
-        /*    max-width: 87.5% !important;*/
-
-        /*}*/
 
         .navbar_fixed {
             position: fixed;
@@ -69,9 +58,14 @@
         }
 
         .navbar-nav .nav-item .nav-link {
-            margin-left: 25px;
-            margin-right: 25px;
-            font-size: 18px;
+            margin-left: 1em;
+            margin-right: 1em;
+            font-size: 1em;
+        }
+
+
+        .logo-image_navbar {
+            height: 3vh;
         }
     </style>
 
@@ -88,7 +82,7 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="./index.html" style="margin: 0;">
-            <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+            <img src="pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -110,7 +104,7 @@
             </ul>
         </div>
         <a class="navbar-brand" href="./index.html" style="margin: 0; visibility: hidden; ">
-            <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+            <img src="pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
         </a>
     </div>
 </nav>
@@ -218,6 +212,28 @@
             });
 
     });
+</script>
+
+<script>
+    // Function to adjust HTML font size
+    function adjustHtmlFontSize(coefficient) {
+        const newFontSize = 18 * coefficient;
+        document.documentElement.style.fontSize = newFontSize + 'px';
+    }
+
+
+    // Function to adjust all styles
+    function adjustStyles() {
+        const template_screen_width = 1920;
+        const current_window_Width = window.innerWidth;
+        const coefficient = current_window_Width / template_screen_width;
+
+        adjustHtmlFontSize(coefficient);
+    }
+
+    // Adjust styles on page load and window resize
+    document.addEventListener("DOMContentLoaded", adjustStyles);
+    window.addEventListener("resize", adjustStyles);
 </script>
 
 </body>

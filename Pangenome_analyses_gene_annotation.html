@@ -23,9 +23,11 @@
       width: 100%;
       margin: 0;
       padding: 0;
-      /*overflow: hidden;*/
     }
 
+    html {
+      font-size: 18px;
+    }
 
     .center-container {
       display: flex;
@@ -68,20 +70,20 @@
       align-content: center;
       overflow-x: hidden !important;
       overflow-y: auto !important;
-      max-height: 80vh;  /* adjust based on your needs */
-      padding-left: 50px;  /* adjust as needed */
-      padding-right: 20px;
+      max-height: 100vh;
+      padding-left: 2.8em;
+      padding-right: 1.1em;
     }
 
     tr,
     th {
-      font-size: 15px;
+      font-size: 1em;
       text-align: center;
       vertical-align: middle;
     }
 
     td {
-      font-size: 15px;
+      font-size: 0.9em;
       text-align: center !important;
       align-content: center;
       width: 12.5% !important;
@@ -92,7 +94,7 @@
     }
 
     tbody td {
-      padding: 1rem !important;  /* adjust as needed */
+      padding: 1.1em !important;  /* adjust as needed */
     }
 
     .dataTables_wrapper .dataTables_filter {
@@ -101,16 +103,16 @@
     }
 
     thead th {
-      height: 60px;
+      height: 5em;
       position: relative;
       text-align: center;
       vertical-align: top !important;
-      padding-right: 8px !important;
+      padding-right: 0.4em !important;
     }
 
     thead th input {
       position: absolute;
-      bottom: 10px;
+      bottom: 0.55em;
       width: 50%;
       left: 50%;
       transform: translateX(-50%);
@@ -133,11 +135,15 @@
     }
 
 
-
     .navbar-nav .nav-item .nav-link {
-      margin-left: 25px;
-      margin-right: 25px;
-      font-size: 18px;
+      margin-left: 1em;
+      margin-right: 1em;
+      font-size: 1em;
+    }
+
+
+    .logo-image_navbar {
+      height: 3vh;
     }
 
 
@@ -159,7 +165,7 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="./index.html" style="margin: 0;">
-      <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+      <img src="pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -181,7 +187,7 @@
       </ul>
     </div>
     <a class="navbar-brand" href="./index.html" style="margin: 0; visibility: hidden; ">
-      <img src="pankb_logo.svg" alt="PanKB" height="30" class="d-inline-block align-text-top">
+      <img src="pankb_logo.svg" alt="PanKB" class="d-inline-block align-text-top logo-image_navbar">
     </a>
   </div>
 </nav>
@@ -229,15 +235,15 @@
           -->
         </ul>
 
-        <!-- Card -->
-        <div class="card" id="speciesCard">
+
+        <div class="card vh-25" id="speciesCard">
           <div class="card-body text-left">
-            <p id="species"></p>
-            <p id="numGenome"></p>
-            <p id="core"></p>
-            <p id="accessory"></p>
-            <p id="rare"></p>
-            <p id="openness"></p>
+            <p style = 'font-size: 0.9em' id="species"></p>
+            <p style = 'font-size: 0.9em' id="numGenome"></p>
+            <p style = 'font-size: 0.9em 'id="core"></p>
+            <p style = 'font-size: 0.9em' id="accessory"></p>
+            <p style = 'font-size: 0.9em' id="rare"></p>
+            <p style = 'font-size: 0.9em' id="openness"></p>
           </div>
         </div>
 
@@ -246,7 +252,7 @@
 
 
     <div class="col-10 center-container">
-      <h2 class="text-center">Gene Annotation Table</h2>
+      <h2 class="text-center" style="font-size: 1.6em;">Gene Annotation Table</h2>
       <div class="table_padding">
           <div class="table-responsive">
             <table id="example" class="table table-hover" style="table-layout: fixed;">
@@ -283,7 +289,8 @@
               dataType: 'json'
             });
 
-            var Gene = data;
+            const Gene = data;
+            console.log(Gene);
 
             let table = $('#example').DataTable({
               destroy: true,
@@ -292,7 +299,7 @@
                 {
                   data: '0',
                   render: function (data, type, row) {
-                    return '<a href="./Gene_function/locustag.html?species=' + species + '&gene=' + encodeURIComponent(data) + '" target="_blank">' + data + '</a>';
+                    return '<a href="./Gene_function/locustag.html?species=' + species + '&gene=' + encodeURIComponent(data) + '&gene_class=' + encodeURIComponent(row[7]) + '" target="_blank">' + data + '</a>';
                   }
                 },
                 {data: '7'},
@@ -391,6 +398,28 @@
               }
             });
   });
+</script>
+
+<script>
+  // Function to adjust HTML font size
+  function adjustHtmlFontSize(coefficient) {
+    const newFontSize = 18 * coefficient;
+    document.documentElement.style.fontSize = newFontSize + 'px';
+  }
+
+
+  // Function to adjust all styles
+  function adjustStyles() {
+    const template_screen_width = 1920;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
+
+    adjustHtmlFontSize(coefficient);
+  }
+
+  // Adjust styles on page load and window resize
+  document.addEventListener("DOMContentLoaded", adjustStyles);
+  window.addEventListener("resize", adjustStyles);
 </script>
 
 </body>

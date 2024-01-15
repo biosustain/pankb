@@ -10,6 +10,11 @@
       padding: 0;
       overflow: hidden;
     }
+
+    html {
+      font-size: 18px;
+    }
+
   </style>
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <script src="https://code.highcharts.com/modules/treemap.js"></script>
@@ -21,6 +26,11 @@
 <div id="container"></div>
 
 <script>
+  const template_screen_width = 655;
+  const current_window_Width = window.innerWidth;
+  const coefficient = current_window_Width / template_screen_width;
+
+
   (async () => {
     const data = await fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/treemap_data.json')
             .then(response => response.json());
@@ -60,7 +70,7 @@
               return this.point.name + ': ' + this.point.value + ' strains';
             },
             style: {
-              fontSize: '16px'
+              fontSize: (0.8 * coefficient) + 'em'
             }
           },
           borderWidth: 3,

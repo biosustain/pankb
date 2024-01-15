@@ -9,12 +9,22 @@
             padding: 0;
             overflow: hidden;
         }
+
+        html {
+            font-size: 18px; /* Base font size for larger screens */
+        }
     </style>
     <script src="https://code.highcharts.com/highcharts.js"></script>
 </head>
 <body>
 <div id="container"></div>
 <script>
+
+    const template_screen_width = 437;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
+
+
     document.addEventListener('DOMContentLoaded', function() {
         fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/pankb_dimension.json')
             .then(response => response.json())
@@ -36,7 +46,7 @@
                     title: {
                         text: 'Database Size',
                         style: {
-                            fontSize: '16px' // Set your desired font size here
+                            fontSize: (0.9 * coefficient) + 'em' // Set your desired font size here
                         }
                     },
                     xAxis: {
@@ -46,7 +56,7 @@
                         },
                         labels: {
                             style: {
-                                fontSize: '16px'
+                                fontSize: (0.9 * coefficient) + 'em'
                             }
                         }
                     },
@@ -54,17 +64,17 @@
                         title: {
                             text: 'Counts',
                             style: {
-                                fontSize: '16px'
+                                fontSize: (0.9 * coefficient) + 'em'
                             }
                         },
                         type: 'logarithmic',
-                        tickInterval: 1,
+                        tickInterval: 2,
                         tickWidth: 1,
                         lineWidth: 1,
                         gridLineWidth: 1,
                         labels: {
                             style: {
-                                fontSize: '16px'
+                                fontSize: (0.9 * coefficient) + 'em'
                             }
                         }
                     },
@@ -75,7 +85,7 @@
                     tooltip: {
                         pointFormat: 'Count: <b>{point.y}</b>', // Set tooltip text
                         style: {
-                            fontSize: '12px'
+                            fontSize: (0.8 * coefficient) + 'em'
                         }
                     },
                     legend: {

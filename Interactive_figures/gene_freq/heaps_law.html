@@ -14,19 +14,28 @@
                 padding: 0;
                 overflow: hidden;
             }
+
+            html {
+                font-size: 18px;
+            }
         </style>
     </head>
     <body>
     <script>
+
         function roundToDecimal(number, decimalPlaces) {
             var factor = Math.pow(10, decimalPlaces);
             return Math.round(number * factor) / factor;
         }
 
-        // Function to load JSON file and create the plot
+
         function loadJSONAndCreatePlot() {
             const urlParams = new URLSearchParams(window.location.search);
             const species = urlParams.get('species');
+
+            const template_screen_width = 746;
+            const current_window_Width = window.innerWidth;
+            const coefficient = current_window_Width / template_screen_width;
 
             fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/gene_freq.json')
                 .then(response => response.json())
@@ -77,47 +86,51 @@
                         height: document.getElementById('plot').clientHeight,
                         autosize: true,
                         margin: {
-                            l: 80,  // left margin
-                            r: 60,  // right margin
-                            b: 60, // bottom margin
-                            t: 80, // top margin
+                            l: 80 * coefficient, // left margin
+                            r: 60 * coefficient, // right margin
+                            b: 60 * coefficient, // bottom margin
+                            t: 80 * coefficient, // top margin
                             pad: 0 // padding
                         },
                         xaxis: {
                             title: 'Number of Genomes',
                             titlefont: {
-                                size: 18,
-                                family: 'Arial, sans-serif' // Use Arial font family
+                                size: 16 * coefficient,
+                                family: 'Arial, sans-serif',
+                                color: '#000000'
                             },
                             tickfont: {
-                                size: 16,
-                                family: 'Arial, sans-serif' // Use Arial font family
+                                size: 16 * coefficient,
+                                family: 'Arial, sans-serif',
+                                color: '#000000'
                             },
                             showgrid: true,
                             tickwidth: 1
-
                         },
                         yaxis: {
                             title: 'Pangenome Size',
                             titlefont: {
-                                size: 18,
-                                family: 'Arial, sans-serif' // Use Arial font family
+                                size: 16 * coefficient,
+                                family: 'Arial, sans-serif',
+                                color: '#000000'
                             },
                             tickfont: {
-                                size: 16,
-                                family: 'Arial, sans-serif' // Use Arial font family
+                                size: 16 * coefficient,
+                                family: 'Arial, sans-serif',
+                                color: '#000000'
                             },
                             autorange: true,
                             tickformat: '1s', // Format y-axis labels as '1k'
-                            showgrid: true,  // Remove y-axis grid lines
-                            showline: true,  // Show y-axis line
+                            showgrid: true,
+                            showline: true,
                             tickwidth: 1
                         },
                         title: {
                             text: "Heap's Law",
-                            titlefont: {
-                                size: 18,
-                                family: 'Arial, sans-serif' // Use Arial font family
+                            font: {
+                                family: 'Arial, sans-serif',
+                                size: 20 * coefficient,
+                                color: '#000000'
                             },
                             xref: 'paper',
                             x: 0.5
@@ -127,7 +140,12 @@
                             xanchor: 'center',
                             y: 1,
                             yanchor: 'bottom',
-                            orientation: 'h'  // Set this to make the legend horizontal
+                            orientation: 'h',
+                            font: {
+                                family: 'Arial, sans-serif',
+                                size: 16 * coefficient,
+                                color: '#000000'
+                            },
                         },
                         annotations: [
                             {
@@ -138,7 +156,7 @@
                                 text: '\u03BB = ' + alpha,
                                 showarrow: false,
                                 font: {
-                                    size: 14,
+                                    size: 16 * coefficient,
                                     color: 'black'
                                 }
                             }

@@ -21,6 +21,11 @@
       padding: 0;
       overflow: hidden;
     }
+
+    html {
+      font-size: 18px; /* Base font size for larger screens */
+    }
+
   </style>
 </head>
 <body>
@@ -30,6 +35,11 @@
   const urlParams = new URLSearchParams(window.location.search);
   const species = urlParams.get('species');
   const species_name = (urlParams.get('species') || 'Unknown Species').replace(/_/g, ' ');
+
+  const template_screen_width = 602;
+  const current_window_Width = window.innerWidth;
+  const coefficient = current_window_Width / template_screen_width;
+
   function processData(rawData) {
     const dataGreaterThanOne = [];
     const dataEqualToOne = [];
@@ -60,14 +70,30 @@
         plotBorderColor: '#000000'
       },
       title: {
-        text: 'dN/dS Ratios for ' + species_name,
-        align: 'center'
-
+        text: 'dN/dS Ratios for ' + species_name + ' Core Genomes',
+        align: 'center',
+        style: {
+          fontSize: (1.1 * coefficient) + 'em',
+          color: '#000000'
+        },
+        x: 38 * coefficient
       },
       xAxis: {
         type: 'logarithmic',
         title: {
-          text: 'Number of synonymous codons per core gene'
+          text: 'Number of synonymous codons per core gene',
+          style: {
+            fontSize: coefficient + 'em',
+            color: '#000000'
+          }
+        },
+        labels: {
+          align: 'center',
+          enable: true,
+          style: {
+            fontSize: (0.9 * coefficient) + 'em',
+            color: '#000000'
+          }
         },
           gridLineWidth: 0,
           tickWidth: 1,
@@ -77,12 +103,30 @@
       yAxis: {
         type: 'logarithmic',
         title: {
-          text: 'Number of non-synonymous codons per core gene'
+          text: 'Number of non-synonymous codons per core gene',
+          style: {
+            fontSize: coefficient + 'em',
+            color: '#000000'
+          }
+        },
+        labels: {
+          align: 'center',
+          enable: true,
+          style: {
+            fontSize: (0.9 * coefficient) + 'em',
+            color: '#000000'
+          }
         },
         gridLineWidth: 0,
         tickWidth: 1,
         tickInterval: 1,
         lineColor: '#000000'
+      },
+      legend: {
+        align: 'center',
+        verticalAlign: 'top',
+        layout: 'horizontal',
+        x: 38 * coefficient
       },
       series: [{
         name: 'dN/dS > 1',
@@ -96,14 +140,16 @@
         data: dataEqualToOne,
         color: 'red',
         marker: {
-          symbol: 'circle'
+          symbol: 'circle',
+          radius: 4 * coefficient
         }
       }, {
         name: 'dN/dS < 1',
         data: dataLessThanOne,
         color: '#9BABB8',
         marker: {
-          symbol: 'circle'
+          symbol: 'circle',
+          radius: 4 * coefficient
         }
       }],
       credits: {

@@ -25,6 +25,10 @@
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');
 
+    const template_screen_width = 746;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
+
     let jsondata;
     fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/COG_distribution.json')
             .then(function (response) {
@@ -54,7 +58,7 @@
                 marker: {
                   color: 'purple',
                   opacity: 0.8,
-                  size: 12
+                  size: 16 * coefficient
                 }
               };
 
@@ -68,7 +72,7 @@
                 marker: {
                   color: 'orange',
                   opacity: 0.8,
-                  size: 12
+                  size: 16 * coefficient
                 }
               };
 
@@ -82,7 +86,7 @@
                 marker: {
                   color: 'green',
                   opacity: 0.8,
-                  size: 12
+                  size: 16 * coefficient
                 }
               };
 
@@ -92,21 +96,23 @@
                 barmode: 'column',
                 autosize: true,
                 margin: {
-                  l: 80,  // left margin
-                  r: 60,  // right margin
-                  b: 80, // bottom margin
-                  t: 60, // top margin
+                  l: 80 * coefficient,  // left margin
+                  r: 60 * coefficient,  // right margin
+                  b: 80 * coefficient, // bottom margin
+                  t: 60 * coefficient, // top margin
                   pad: 0 // padding
                 },
                 title: {
                   text: "Gene Annotation Distribution",
-                  titlefont: {
-                    size: 18,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                  font: {
+                    family: 'Arial, sans-serif',
+                    size: 20 * coefficient,
+                    color: '#000000'
                   },
                   tickfont: {
-                    size: 16,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
                   },
                   xref: 'paper',
                   x: 0.5,
@@ -114,8 +120,9 @@
                 xaxis: {
                   title: 'COG Category',
                   titlefont: {
-                    size: 18,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
                   },
                   tickangle: -45,
                   showline: true,
@@ -123,23 +130,26 @@
                   automargin: true,
                   showgrid: false,
                   tickfont: {
-                    size: 14
+                    size: 14 * coefficient,
+                    color: '#000000'
                   }
                 },
                 yaxis: {
                   title: 'Frequency',
                   titlefont: {
-                    size: 18,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
                   },
                   font: {
                     family: 'Arial, sans-serif',
-                    size: 16,
+                    size: 16 * coefficient,
                     color: '#000000'
                   },
                   tickfont: {
-                    size: 16,
-                    family: 'Arial, sans-serif' // Use Arial font family
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
                   },
                   showline: true,
                   linewidth: 1,
@@ -155,14 +165,14 @@
                   y: 1,
                   font: {
                     family: 'Arial, sans-serif',
-                    size: 12,
-                    color: '#000000'
+                    size: 16 * coefficient,
+                    color: 'black'
                   },
                   orientation: 'h',
                   itemclick: 'toggle',
                   itemdoubleclick: false,
-                  itemwidth: 30,
-                  itemheight: 20,
+                  itemwidth: 30 * coefficient,
+                  itemheight: 20 * coefficient,
                   itemorder: 'normal',
                   bgcolor: 'rgba(0,0,0,0)',
                   bordercolor: 'rgba(0,0,0,0)',
@@ -201,9 +211,19 @@
                     }
                   };
                 });
+              }).then(function () {
+                window.dispatchEvent(new Event('resize'));
               });
             });
   }
+
+  window.onresize = function() {
+    const update = {
+      width: document.getElementById('plot').clientWidth,
+      height: document.getElementById('plot').clientHeight,
+    };
+    Plotly.relayout('plot', update);
+  };
 
   document.addEventListener('DOMContentLoaded', function() {
     loadJSONAndCreatePlot();

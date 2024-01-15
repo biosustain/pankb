@@ -22,6 +22,10 @@
       padding: 0;
       overflow: hidden;
     }
+
+    html {
+      font-size: 18px; /* Base font size for larger screens */
+    }
   </style>
 </head>
 <body>
@@ -33,6 +37,11 @@
   const species = urlParams.get('species');
   const gene = urlParams.get('gene');
 
+  const template_screen_width = 1334;
+  const current_window_Width = window.innerWidth;
+  const coefficient = current_window_Width / template_screen_width;
+  console.log('window width: ' + current_window_Width);
+
   function renderChart(data) {
     Highcharts.chart('container', {
       chart: {
@@ -43,13 +52,24 @@
       },
       title: {
         text: '',
-        // style: {
-        //   fontSize: '20px'
-        // }
+        style: {
+          fontSize: (1.1 * coefficient) + 'em',
+          color: '#000000'
+        },
       },
       xAxis: {
         title: {
-          text: 'Amino Acid Position'
+          text: 'Amino Acid Position',
+          style: {
+            fontSize: coefficient + 'em',
+            color: '#000000'
+          }
+        },
+        labels: {
+          style: {
+            fontSize: (0.9 * coefficient) + 'em',
+            color: '#000000'
+          }
         },
         gridLineWidth: 0,
         minPadding: 0.05,
@@ -60,10 +80,18 @@
       },
       yAxis: {
         title: {
-          text: 'Number of Genomes'
+          text: 'Number of Genomes',
+          style: {
+            fontSize: coefficient + 'em',
+            color: '#000000'
+          }
         },
         labels: {
-          offset: 10
+          offset: 10,
+          style: {
+            fontSize: (0.9 * coefficient) + 'em',
+            color: '#000000'
+          }
         },
         gridLineWidth: 0,
         startOnTick: false,
