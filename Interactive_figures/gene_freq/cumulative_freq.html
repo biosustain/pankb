@@ -100,6 +100,36 @@
                 visible: 'legendonly'
               };
 
+              const hoverPointsX15 = Array(Math.ceil(max_cum / 1000)).fill(x15).map((x, i) => ({ x, y: i * 1000 }));
+              const traceX15Hover = {
+                x: hoverPointsX15.map(p => p.x),
+                y: hoverPointsX15.map(p => p.y),
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                  size: 1,
+                  color: 'rgba(0, 0, 0, 0)' // Make the marker invisible
+                },
+                hoverinfo: 'text',
+                text: hoverPointsX15.map(p => `Number of Genome: ${p.x}`), // Customize your hover text
+                showlegend: false
+              };
+
+              const hoverPointsX99 = Array(Math.ceil(max_cum / 1000)).fill(x99).map((x, i) => ({ x, y: i * 1000 }));
+              const traceX99Hover = {
+                x: hoverPointsX99.map(p => p.x),
+                y: hoverPointsX99.map(p => p.y),
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                  size: 1,
+                  color: 'rgba(0, 0, 0, 0)' // Make the marker invisible
+                },
+                hoverinfo: 'text',
+                text: hoverPointsX99.map(p => `Number of Genome: ${p.x}`), // Customize your hover text
+                showlegend: false
+              };
+
               const layout = {
                 autosize: true,
                 margin: {
@@ -246,7 +276,9 @@
               const config = {
                 displayModeBar: false,  // Enable the display of the mode bar
               }
-              var data = [trace1, trace2, trace3, trace4];
+
+              var data = [trace1, trace2, trace3, trace4, traceX15Hover, traceX99Hover];
+
               Plotly.newPlot('plot', data, layout, config)
                       .then(function(gd) {
                         gd.on('plotly_relayout', function(eventData) {
@@ -262,8 +294,8 @@
                         });
                       })
                       .then(function() {
-                window.dispatchEvent(new Event('resize'));
-              });
+                        window.dispatchEvent(new Event('resize'));
+                      });
             });
 
     window.onresize = function() {

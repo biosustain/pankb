@@ -112,6 +112,41 @@
                 opacity: 0.3
               };
 
+              const numHoverPoints = 50;
+              const logMinY = Math.log(1);
+              const logMaxY = Math.log(max_frequency_count);
+              const logRange = logMaxY - logMinY;
+              const yHoverValues = Array.from({ length: numHoverPoints }, (_, i) => Math.exp(logMinY + i * (logRange / (numHoverPoints - 1))));
+              console.log(yHoverValues)
+
+              const traceX15Hover = {
+                x: Array(numHoverPoints).fill(x15),
+                y: yHoverValues,
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                  size: 5,
+                  color: 'rgba(0, 0, 0, 0)' // Invisible
+                },
+                hoverinfo: 'text',
+                text: Array(numHoverPoints).fill(`Number of Genome: ${x15}`),
+                showlegend: false
+              };
+
+              const traceX99Hover = {
+                x: Array(numHoverPoints).fill(x99),
+                y: yHoverValues,
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                  size: 5,
+                  color: 'rgba(0, 0, 0, 0)' // Invisible
+                },
+                hoverinfo: 'text',
+                text: Array(numHoverPoints).fill(`Number of Genome: ${x99}`),
+                showlegend: false
+              };
+
               const layout = {
                 autosize: true,
                 margin: {
@@ -139,8 +174,8 @@
                 xaxis: {
                   title: 'Number of Genomes',
                   x: 0.5,
-                  showgrid: true,  // Remove x-axis grid lines
-                  showline: true,  // Show x-axis line
+                  showgrid: true,
+                  showline: true,
                   titlefont: {
                     size: 16 * coefficient,
                     family: 'Arial, sans-serif',
@@ -153,6 +188,7 @@
                   },
                   ticks: 'outside',
                   tickWidth: 1,
+                  range: [Math.min(...frequency), Math.max(...frequency)]
                 },
                 yaxis: {
                   title: 'Frequency',
@@ -273,7 +309,7 @@
                 displayModeBar: false,  // Enable the display of the mode bar
               }
 
-              var data = [trace1, trace2, trace3];
+              var data = [trace1, trace2, trace3, traceX15Hover, traceX99Hover];
               Plotly.newPlot('plot', data, layout, config);
               window.onresize = function() {
                 const update = {

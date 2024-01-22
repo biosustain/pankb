@@ -388,7 +388,6 @@
             .then(response => response.json())
             .then(speciesData => {
 
-              // Select the species to show in the card
               if (speciesData) {
                 document.getElementById('species').innerHTML = '<b>Species:</b><br>' + speciesData.Species;
                 document.getElementById('numGenome').innerHTML = '<b>Number of Genome:</b><br>' + speciesData.Number_of_genome;
@@ -396,20 +395,22 @@
                 document.getElementById('accessory').innerHTML = '<b>Accessory:</b><br>' + speciesData.Gene_class[1];
                 document.getElementById('rare').innerHTML= '<b>Rare:</b><br>' + speciesData.Gene_class[2];
                 document.getElementById('openness').innerHTML = '<b>Openness:</b><br>' + speciesData.Openness;
+
+                // Determine the timeout duration based on the number of genomes
+                const timeoutDuration = speciesData.Number_of_genome > 1000 ? 5000 : 3000;
+
+                setTimeout(function() {
+                  const overlay = document.getElementById('loading-overlay');
+                  if (overlay) {
+                    overlay.parentNode.removeChild(overlay);
+                  }
+                }, timeoutDuration);
+                console.log('timeoutDuration: ', timeoutDuration);
               }
             });
+    });
 
-    // Remove overlay and show main content after 2 seconds
-    setTimeout(function() {
-      var overlay = document.getElementById('loading-overlay');
-      if(overlay) {
-        overlay.parentNode.removeChild(overlay);  // remove the overlay from DOM
-      }
-    }, 5000);  // 4000 milliseconds = 2 seconds
-
-  });
-
-  function updateIframeSrc(gene_class, gene_class_text) {
+    function updateIframeSrc(gene_class, gene_class_text) {
     const iframe = document.getElementById('heatmap_all');
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');

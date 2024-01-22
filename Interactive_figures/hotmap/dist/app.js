@@ -19947,7 +19947,6 @@
                                     .then(buffer => {
                                         var decompressedData = pako.inflate(new Uint8Array(buffer), { to: 'string' });
                                         var r = JSON.parse(decompressedData);
-                                        console.log("data provided to heatmap:", r),
                                             s ? fetch("data/test-tree.nwk").then((function(i) {
                                                     i.text().then((function(i) {
                                                             t = a({
