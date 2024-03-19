@@ -1,0 +1,266 @@
+{% load static %}
+
+<html>
+<head>
+    <meta charSet="UTF-8">
+    <meta name="description" content="MSA plot"/>
+    <!-- include MSA js + css -->
+    <script src=" {% static 'msa/js/msa_readable.js' %} "></script>
+    <!--
+    MSA (the project is now unmaintained, the developers switched to the React-based version)
+    http://msa.biojs.net
+    https://github.com/wilzbach/msa/tree/master
+    The problem with the current standalone version:
+    https://github.com/wilzbach/msa/issues/257
+    -->
+    <style>
+        body {
+            overflow-x: hidden; /* Block horizontal overflow */
+        }
+        #tooltip {
+            position: absolute;
+            padding: 10px;
+            background: red;
+            border-radius: 5px;
+            width: 350px; /* Adjust the width here */
+            height: 550px; /* Adjust the height here */
+            opacity: 0.85;
+            transition: visibility 0s, opacity 0.5s linear;
+            z-index: 9999; /* New line */
+
+        }
+        .tooltip-hidden {
+            visibility: hidden;
+            opacity: 0;
+        }
+    </style>
+    <div id="tooltip" class="tooltip-hidden" style="position: absolute; padding: 10px;; background: lightpink; border-radius: 5px;">
+        Frequency information will go here.
+    </div>
+</head>
+
+<body>
+<!--A simple website with left and right bars-->
+<div class="row">
+    <div class="col-12">
+        <div>
+            <div style="width: 100%; display: inline-block">
+                <div id="menuDiv"></div>
+                <div id="MSA" style="position: relative;">Loading ...</div>
+                <script>
+                    let opts = {};
+                    opts.el = document.getElementById("MSA");
+                    opts.vis = {
+                        conserv: false,
+                        overviewbox: true,
+                        seqlogo: true,
+                        leftHeader: false,
+                        labelId: false,
+                        gapHeader: false,
+                    };
+                    opts.conf = {
+                        dropImport: false,
+                        registerMouseClicks: true, // make sure to register mouse clicks
+                        registerMouseHover: true
+                    };
+                    opts.zoomer = {
+                        autoResize: true,
+                        columnWidth: 30,
+                        labelPadding: 100,
+                        overviewboxHeight: 200,
+                        boxRectWidth: 0.1,
+                        alignmentHeight: 600,
+                        labelNameLength: 120,
+                        markerFontsize: "10px",
+                        markerStepSize: 2,
+                        overviewboxPaddingTop: 30,
+                        stepSize: 1,
+                        markerHeight: 30,
+                    };
+
+                    // init msa
+                    let m = new msa.msa(opts);
+
+                    function renderMSA() {
+                        // call render at the end to display the whole MSA
+                        m.render();
+
+                        // Add a click listener on rows
+                        // Create a variable to hold the panel and the current sequence ID outside the event
+                        let panel = null;
+                        let currentSeqId = null;
+
+                        let sequenceName;
+
+                        m.g.on("row:click", function(data) {
+                            // Get the sequence object
+                            const sequence = m.seqs.at(data.seqId);
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const species = urlParams.get('species');
+
+                            // Get the name of the sequence
+                            sequenceName = sequence.get('name');
+
+                            // If clicking on the same row, hide the panel and return
+                            if (currentSeqId === data.seqId) {
+                                panel.style.display = 'none';
+                                currentSeqId = null;
+                                return;
+                            }
+
+                            // Otherwise, store the current sequence ID
+                            currentSeqId = data.seqId;
+
+                            // If the panel doesn't exist, create it
+                            if (!panel) {
+                                panel = createPanel(species, sequenceName);
+                            }
+
+                            // Update the panel position and make it visible
+                            panel.style.left = data.evt.pageX + 'px'; // position the panel at the mouse pointer
+                            panel.style.top = data.evt.pageY + 'px';
+                            panel.style.display = 'block';
+                        });
+
+                        function createPanel(species, genome_id) {
+                            let panel = document.createElement('div');
+                            panel.style.position = "absolute";
+                            panel.style.background = "#fff";
+                            panel.style.padding = "10px";
+                            panel.style.border = "1px solid #000";
+                            panel.style.zIndex = 1000; // put the panel in front
+                            // Add card classes
+                            panel.classList.add("card");
+
+                            // Option 1: Jump to new page
+                            let jumpBtn = document.createElement('button');
+                            jumpBtn.setAttribute("type", "button");
+                            jumpBtn.classList.add("btn", "btn-primary", "btn-sm", "mb-1"); // Add margin bottom class
+                            jumpBtn.innerHTML = "Info of " + sequenceName;
+                            jumpBtn.onclick = function() {
+                                // Define a unique URL for each sequence
+                                let url = "{% url 'genome_info' %}?species=" + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id)
+
+                                // Open a new page
+                                window.open(url, '_blank');
+
+                                // Hide panel
+                                panel.style.display = 'none';
+                                currentSeqId = null;
+                            };
+                            panel.appendChild(jumpBtn);
+
+                            // Add an empty line (line break)
+                            panel.appendChild(document.createElement('br'));
+
+                            // Option 2: Copy row label text
+                            let copyBtn = document.createElement('button');
+                            copyBtn.setAttribute("type", "button");
+                            copyBtn.classList.add("btn", "btn-primary", "btn-sm");
+                            copyBtn.innerHTML = "Copy genome id";
+                            copyBtn.onclick = function() {
+                                // Copy sequenceName to clipboard
+                                navigator.clipboard.writeText(sequenceName).then(function() {
+                                    console.log('Copying to clipboard was successful!');
+                                }, function(err) {
+                                    console.error('Could not copy text: ', err);
+                                });
+
+                                // Hide panel
+                                panel.style.display = 'none';
+                                currentSeqId = null;
+                            };
+                            panel.appendChild(copyBtn);
+                            // Append the panel to body
+                            document.body.appendChild(panel);
+
+                            return panel;
+                        }
+
+                        m.g.on("column:click", async function(data) {
+                            // Obtain JSON data rendered in the respective view: ----
+                            const jsonData = {{ msaData|safe }};
+
+                            const Amino_Acid = {
+                                'A': 'Alanine&nbsp;[A]',
+                                'R': 'Arginine&nbsp;[R]',
+                                'N': 'Asparagine&nbsp;[N]',
+                                'D': 'Aspartic&nbsp;Acid&nbsp;[D]',
+                                'C': 'Cysteine&nbsp;[C]',
+                                'Q': 'Glutamine&nbsp;[Q]',
+                                'E': 'Glutamic&nbsp;Acid&nbsp;[E]',
+                                'G': 'Glycine&nbsp;[G]',
+                                'H': 'Histidine&nbsp;[H]',
+                                'I': 'Isoleucine&nbsp;[I]',
+                                'L': 'Leucine&nbsp;[L]',
+                                'K': 'Lysine&nbsp;[K]',
+                                'M': 'Methionine&nbsp;[M]',
+                                'F': 'Phenylalanine&nbsp;[F]',
+                                'P': 'Proline&nbsp;[P]',
+                                'S': 'Serine&nbsp;[S]',
+                                'T': 'Threonine&nbsp;[T]',
+                                'W': 'Tryptophan&nbsp;[W]',
+                                'Y': 'Tyrosine&nbsp;[Y]',
+                                'V': 'Valine&nbsp;[V]',
+                                '-': '-'
+                            };
+
+                            // Get the data for the column that was clicked
+                            const columnData = jsonData[(data.rowPos + 1).toString()];
+
+                            // Generate the HTML string for the tooltip
+                            let tooltipHtml = "<div style='text-align:center;'><strong>Position " + (data.rowPos + 1) + "</strong></div><br><table style='width: 100%; table-layout: fixed;'>";
+                            tooltipHtml += `<thead><tr><th style='width: 33%; text-align: center;'>Residue</th><th style='width: 33%; text-align: center;'>Count</th><th style='width: 33%; text-align: center;'>Frequency</th></tr></thead><tbody>`;
+                            for (const [aminoAcid, values] of Object.entries(columnData)) {
+                                tooltipHtml += `<tr><td style= 'text-align: center;'>${Amino_Acid[aminoAcid]}</td><td style= 'text-align: center;'>${values[0]}</td><td style= 'text-align: center;'>${values[1]}%</td></tr>`;
+                            }
+                            tooltipHtml += "</tbody></table>";
+
+                            // Show the generated HTML in the tooltip
+                            var tooltip = document.getElementById('tooltip');
+                            tooltip.innerHTML = tooltipHtml;
+
+                            var rect = document.getElementById('MSA').getBoundingClientRect();
+
+                            tooltip.style.left = (data.evt.pageX - rect.left - 50) + 'px';  // position the tooltip at the mouse pointer
+                            tooltip.style.top = (data.evt.pageY - rect.top + 10) + 'px';
+                            tooltip.classList.remove('tooltip-hidden');
+                            tooltip.classList.add('tooltip-showing');
+                        });
+
+                        // And don't forget to handle the mouseout event to hide the panel:
+                        m.g.on("column:mouseout", function(data) {
+                            var tooltip = document.getElementById('tooltip');
+                            tooltip.classList.remove('tooltip-showing');
+                            tooltip.classList.add('tooltip-hidden');
+                        });
+                    }
+
+                    // Obtain the MSA data rendered by the respective view: ----
+                    const data = {{ msaData|safe }};
+
+                    // Parse the fasta string
+                    const seqs = msa.io.fasta.parse(data);
+
+                    // Import parsed sequences
+                    m.seqs.reset(seqs);
+
+                    // Calculate the alignment width and the length of the sequence
+                    let alignmentWidth = m.g.zoomer.get('alignmentWidth');
+                    let sequenceLength = m.seqs.getMaxLength(); // assuming all sequences have the same length
+
+                    // Set the 'boxRectWidth' based on the calculated values
+                    m.g.zoomer.set('boxRectWidth', alignmentWidth / sequenceLength);
+
+                    // Render MSA
+                    renderMSA();
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+
+

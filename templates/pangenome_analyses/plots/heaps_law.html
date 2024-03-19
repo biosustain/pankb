@@ -1,0 +1,195 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        html, body, #plot {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        html {
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+<script src=" {% static './js/plotly/plotly.min.js' %} "></script>
+<!-- DIV block with id must be placed before the script will make a reference to the object with the respective id -->
+<div id="plot"></div>
+<script>
+    function roundToDecimal(number, decimalPlaces) {
+        var factor = Math.pow(10, decimalPlaces);
+        return Math.round(number * factor) / factor;
+    }
+
+    const template_screen_width = 746;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
+
+    // Data
+    var data = {{ dataset|safe }}
+    const x_core = data['x_core'];
+    const avg_core = data['avg_core'];
+    const x_acc = data['x_acc'];
+    const avg_acc = data['avg_acc'];
+    const x_pan = data['x_pan'];
+    const avg_pan = data['avg_pan'];
+    const max_frequency_count = data['max_frequency_count'];
+    const alpha = roundToDecimal(1 - (data['alpha']), 3)
+
+    // Create trace for core genome
+    var traceCore = {
+        x: x_core,
+        y: avg_core,
+        fill: 'tozeroy',
+        fillcolor: 'rgba(128, 0, 128, 0.8)',
+        line: { color: 'rgba(128, 0, 128, 0.8)'},
+        name: 'Core'
+    };
+
+    // Create trace for accessory genome
+    var traceAcc = {
+        x: x_acc,
+        y: avg_acc,
+        fill: 'tozeroy',
+        fillcolor: 'rgba(255, 165, 0, 0.2)',
+        line: { color: 'rgba(255, 165, 0, 0.8)' },
+        name: 'Accessory'
+    };
+
+    // Create trace for pangenome
+    var tracePan = {
+        x: x_pan,
+        y: avg_pan,
+        fill: 'tozeroy',
+        fillcolor: 'rgba(0, 128, 0, 0.05)',
+        line: { color: 'rgba(0, 128, 0, 0.8)'},
+        name: 'Rare'
+    };
+
+    // Layout
+    var layout = {
+        width: document.getElementById('plot').clientWidth,
+        height: document.getElementById('plot').clientHeight,
+        autosize: true,
+        margin: {
+            l: 80 * coefficient, // left margin
+            r: 60 * coefficient, // right margin
+            b: 60 * coefficient, // bottom margin
+            t: 80 * coefficient, // top margin
+            pad: 0 // padding
+        },
+        xaxis: {
+            title: 'Number of Genomes',
+            titlefont: {
+                size: 16 * coefficient,
+                family: 'Arial, sans-serif',
+                color: '#000000'
+            },
+            tickfont: {
+                size: 16 * coefficient,
+                family: 'Arial, sans-serif',
+                color: '#000000'
+            },
+            showgrid: true,
+            tickwidth: 1
+        },
+        yaxis: {
+            title: 'Pangenome Size',
+            titlefont: {
+                size: 16 * coefficient,
+                family: 'Arial, sans-serif',
+                color: '#000000'
+            },
+            tickfont: {
+                size: 16 * coefficient,
+                family: 'Arial, sans-serif',
+                color: '#000000'
+            },
+            autorange: true,
+            tickformat: '1s', // Format y-axis labels as '1k'
+            showgrid: true,
+            showline: true,
+            tickwidth: 1
+        },
+        title: {
+            text: "Heap's Law",
+            font: {
+                family: 'Arial, sans-serif',
+                size: 20 * coefficient,
+                color: '#000000'
+            },
+            xref: 'paper',
+            x: 0.5
+        },
+        legend: {
+            x: 0.5,
+            xanchor: 'center',
+            y: 1,
+            yanchor: 'bottom',
+            orientation: 'h',
+            font: {
+                family: 'Arial, sans-serif',
+                size: 16 * coefficient,
+                color: '#000000'
+            },
+        },
+        annotations: [
+            {
+                x: 0.058,
+                y: 0.85,
+                xref: 'paper',
+                yref: 'paper',
+                text: '\u03BB = ' + alpha,
+                showarrow: false,
+                font: {
+                    size: 16 * coefficient,
+                    color: 'black'
+                }
+            }
+        ],
+    };
+    const config = {
+        displayModeBar: false,  // Enable the display of the mode bar
+    }
+
+    // Create data array
+    var data = [traceCore, traceAcc, tracePan];
+
+    // Plot the graph
+    Plotly.newPlot('plot', data, layout, config).then(function() {
+        window.dispatchEvent(new Event('resize'));
+    });
+
+    // Handle window resize event
+    window.onresize = function() {
+        const update = {
+            width: document.getElementById('plot').clientWidth,
+            height: document.getElementById('plot').clientHeight,
+        };
+        Plotly.relayout('plot', update);
+
+        // Function to resize plot
+        function resizePlot() {
+            const update = {
+                width: document.getElementById('plot').clientWidth,
+                height: document.getElementById('plot').clientHeight,
+            };
+            Plotly.relayout('plot', update);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadJSONAndCreatePlot();
+
+    });
+</script>
+</body>
+</html>

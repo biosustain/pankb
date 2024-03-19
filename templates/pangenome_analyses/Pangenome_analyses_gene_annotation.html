@@ -1,0 +1,196 @@
+{% extends "pangenome_analyses/Pangenome_analyses.html" %}
+
+{% block custom_style %}
+    <style>
+        html, body {
+            height: 100vh;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .center-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .table_padding {
+            width: 100%;  /* adjust this value according to your needs */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .table-responsive {
+            width: 85%;  /* make sure it fills its container */
+            align-content: center;
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            max-height: 100vh;
+            padding-left: 2.8em;
+            padding-right: 1.1em;
+        }
+        tr,
+        th {
+            font-size: 1em;
+            text-align: center;
+            vertical-align: middle;
+        }
+        td {
+            font-size: 0.9em;
+            text-align: center !important;
+            align-content: center;
+            width: 12.5% !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 0;
+        }
+        tbody td {
+            padding: 1.1em !important;  /* adjust as needed */
+        }
+        .dataTables_wrapper .dataTables_filter {
+            display: none;
+
+        }
+        thead th {
+            height: 5em;
+            position: relative;
+            text-align: center;
+            vertical-align: top !important;
+            padding-right: 0.4em !important;
+        }
+        thead th input {
+            position: absolute;
+            bottom: 0.55em;
+            width: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 0px;
+        }
+        .dataTables_wrapper tbody td {
+            text-align: center;
+            vertical-align: middle;
+
+        }
+        .expanded-row td {
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        table {
+            table-layout: auto;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <!-- Include the top navigation panel, which is the same for every page -->
+    {% include "navigation.html" with about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" %}
+    <!-- ######### -->
+
+    <div class = "container-fluid">
+        <div class="row">
+            <!-- Include the info panel on the left (it is shared between several apps) -->
+            {% include 'pangenome_analyses/info_panel.html' %}
+            <!-- ######### -->
+            <div class="col-10 center-container">
+                <h2 class="text-center" style="font-size: 1.6em;">Gene Annotation Table</h2>
+                <div class="table_padding">
+                    <div class="table-responsive">
+                        <table id="example" class="table table-hover" style="table-layout: fixed;">
+                            <thead>
+                            <tr>
+                                <th class="text-center">Gene</th>
+                                <th class="text-center">Class</th>
+                                <th class="text-center">COG Category</th>
+                                <th class="text-center">COG Name</th>
+                                <th class="text-center">Description</th>
+                                <th class="text-center">Annotation</th>
+                                <th class="text-center">PFAMs</th>
+                                <th class="text-center">Frequency</th>
+                            </tr>
+                            </thead>
+                            <tbody class="text-center align-middle" id="tbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+                <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+                <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+                <script>
+                    $(document).ready(async function () {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const species = urlParams.get('species');
+
+                        data = {{ dataset|safe }}
+
+                        const Gene = data;
+                        console.log(Gene);
+
+                        let table = $('#example').DataTable({
+                            destroy: true,
+                            data: Gene,
+                            columns: [
+                                {
+                                    data: '0',
+                                    render: function (data, type, row) {
+                                        return '<a href=" {% url 'gene_info' %}?species=' + species + '&gene=' + encodeURIComponent(data) + '&gene_class=' + encodeURIComponent(row[7]) + '" target="_blank">' + data + '</a>';
+                                    }
+                                },
+                                {data: '7'},
+                                {data: '1'},
+                                {data: '2'},
+                                {data: '3'},
+                                {data: '4'},
+                                {data: '5'},
+                                {data: '6'}
+                            ],
+                            language: {
+                                loadingRecords: 'Loading...',
+                                zeroRecords: 'Result not found.'
+                            },
+
+                            initComplete: function () {
+                                var api = this.api();
+
+                                // Existing column search code
+                                $(this.api().table().header()).find('th').each(function (index, th) {
+                                    var columnHeader = $(th);
+                                    var columnIndex = index;
+
+                                    var searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 60%; display: block; justify-content: center;" />')
+                                        .on('keyup change clear', function () {
+                                            api.column(columnIndex).search(this.value).draw();
+                                        })
+                                        .on('click', function(e) {  // Prevent event bubbling on click
+                                            e.stopPropagation();
+                                        });
+
+                                    $(searchInput).appendTo(columnHeader);
+                                });
+                            }
+                        });
+
+                        // Expand row on click
+                        $('#example tbody').on('click', 'td', function () {
+                            var cellText = $(this).text().trim();
+                            var rowIndex = $(this).closest('tr').index();
+                            var row = table.row(rowIndex);
+                            if (row.child.isShown()) {
+                                row.child.hide();
+                                $(this).closest('tr').removeClass('expanded-row');
+                            } else {
+                                var expandedRowContent = '<td colspan="8" style="white-space: normal; word-wrap: break-word;">' + cellText + '</td>';
+                                row.child(expandedRowContent).show();
+                                $(this).closest('tr').addClass('expanded-row');
+                            }
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+{% endblock %}

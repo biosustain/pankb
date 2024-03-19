@@ -1,0 +1,71 @@
+{% load static %}
+
+<!--    <div class="col-1">-->
+<!--    </div>-->
+<div class="col-2">
+    <div class="flex-shrink-0 p-3 bg-light navbar_fixed">
+        <a id = 'Pangenome_analyses' class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom justify-content-center">
+            <span class="text-center fs-5 fw-semibold">Pangenome Analysis Dashboards</span>
+        </a>
+
+        <ul class="list-unstyled ps-0">
+            <li class="mb-1">
+                <a id = 'Overview' class="btn fw-semibold align-items-center " role="button">
+                    Overview
+                </a>
+            </li>
+            <li class="mb-1">
+                <a id = 'Annotation' class="btn fw-semibold align-items-center " role="button">
+                    Genes
+                </a>
+            </li>
+            <li class="mb-1 ">
+                <a id = 'Phylogenetic_tree'  class="btn fw-semibold align-items-center" role="button">
+                    Phylogenetic Tree
+                </a>
+            </li>
+            <li class="border-top my-3"></li>
+        </ul>
+
+        <div class="card vh-25" id="speciesCard">
+            <div class="card-body text-left">
+                <p style = 'font-size: 0.9em' id="species"></p>
+                <p style = 'font-size: 0.9em' id="numGenome"></p>
+                <p style = 'font-size: 0.9em ' id="core"></p>
+                <p style = 'font-size: 0.9em' id="accessory"></p>
+                <p style = 'font-size: 0.9em' id="rare"></p>
+                <p style = 'font-size: 0.9em' id="openness"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const species = urlParams.get('species');
+
+        const Pangenome_analyses = document.getElementById('Pangenome_analyses');
+        Pangenome_analyses.href = "{% url 'pangenome_analyses_overview' %}?species=" + species;
+
+        const Overview = document.getElementById('Overview');
+        Overview.href = "{% url 'pangenome_analyses_overview' %}?species=" + species;
+
+        const Gene_annotation = document.getElementById('Annotation');
+        Gene_annotation.href = "{% url 'pangenome_analyses_gene_annotation' %}?species=" + species;
+
+        const Phylogenetic_tree = document.getElementById('Phylogenetic_tree');
+        Phylogenetic_tree.href = "{% url 'pangenome_analyses_phylogenetic_tree' %}?species=" + species;
+
+        speciesData = {{ speciesData | safe }}
+
+        if (speciesData) {
+            document.getElementById('species').innerHTML = '<b>Species:</b><br>' + speciesData.Species;
+            document.getElementById('numGenome').innerHTML = '<b>Number of Genomes:</b><br>' + speciesData.Number_of_genome;
+            document.getElementById('core').innerHTML = '<b>Core:</b><br>' + speciesData.Gene_class[0];
+            document.getElementById('accessory').innerHTML = '<b>Accessory:</b><br>' + speciesData.Gene_class[1];
+            document.getElementById('rare').innerHTML= '<b>Rare:</b><br>' + speciesData.Gene_class[2];
+            document.getElementById('openness').innerHTML = '<b>Openness:</b><br>' + speciesData.Openness;
+        }
+    })
+</script>

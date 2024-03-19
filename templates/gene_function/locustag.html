@@ -1,0 +1,199 @@
+{% extends "gene_function/gene_function.html" %}
+
+{% block title %}<title>Gene Info</title>{% endblock %}
+{% block custom_style %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href= "https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href= "https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .table_padding {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 1vh;
+        }
+        /* Add this to make the DataTable pagination centered */
+        .dataTables_wrapper .dataTables_paginate {
+            float: none;
+            text-align: center;
+        }
+        .table-container table {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        tr, th {
+            font-size: 1em;
+            text-align: center;
+            vertical-align: middle;
+        }
+        td {
+            font-size: 0.9em;
+            text-align: center !important;
+            vertical-align: middle !important;
+            padding: 0.45em;
+            width: 14.2%;
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+        }
+        .dataTables_wrapper .dataTables_filter {
+            display: block;
+        }
+        .dataTables_wrapper thead th {
+            text-align: center;
+            vertical-align: middle;
+            padding: 0.3em;
+            position: relative;
+        }
+        .dataTables_wrapper thead th input {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            margin-bottom: 0.45em;
+        }
+        .dataTables_wrapper tbody td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 0.45em;
+            word-break: break-word;
+        }
+        .dataTables_wrapper .dataTables_filter {
+            text-align: center;
+        }
+        .dataTables_wrapper .dataTables_filter input {
+            width: 100%;
+            max-width: 16em;
+            margin: 0 auto;
+        }
+        #table-container .dataTables_paginate {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px !important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2 style = 'text-align: center; font-size: 1.6em;'> Gene Info Page </h2>
+    <div class="table_padding overflow-auto">
+        <div style="width:90%;">
+            <table id="gene_table" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
+                <thead>
+                <tr>
+                    <th class="text-center align-middle">Locus Tag</th>
+                    <th class="text-center align-middle">Genome ID</th>
+                    <th class="text-center align-middle">Prokka Annotation</th>
+                    <th class="text-center align-middle">Start Position</th>
+                    <th class="text-center align-middle">End Position</th>
+                    <th class="text-center align-middle">Nucleotide Seq</th>
+                    <th class="text-center align-middle">Amino Acid Seq</th>
+                </tr>
+                </thead>
+                <tbody class="text-center align-middle" id="tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <h3 id = 'AA_pos_overview_figure' style = 'text-align: center; padding-top: 5vh; font-size: 1.6em;'; ></h3>
+    <div class="table_padding overflow-auto">
+        <div style="width:70%;">
+            <iframe id = 'AA_pos_overview' style="width: 100%; height: 60vh; padding-top: 0px"></iframe>
+        </div>
+    </div>
+    </div>
+    <br>
+    <h3 id = 'MSA_figure' style = 'text-align: center; font-size: 1.6em;'></h3>
+    <div class="table_padding overflow-auto">
+        <div style="width:90%;">
+            <iframe id = 'MSA' style="width: 100%; height: 100vh; padding-top: 1vh"></iframe>
+        </div>
+    </div>
+    </div>
+
+    <!-- Datatable -->
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const species = urlParams.get('species');
+        const gene = urlParams.get('gene');
+        const gene_class = urlParams.get('gene_class');
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                let geneData = {{ dataset | safe }}; // Convert the data object to an array for DataTables
+
+                let table = $('#gene_table').DataTable({
+                    data: geneData,
+                    columns: [
+                        { data: 'Locus_Tag' },
+                        {
+                            data: 'Genome_ID',
+                            render: function(data, type, row) {
+                                return '<a href=" {% url 'genome_info' %}?species=' + encodeURIComponent(species) + '&genome_id=' + encodeURIComponent(data) + '" target="_blank">' + data + '</a>';
+                            }
+                        },
+                        { data: 'Prokka_Annotation' },
+                        { data: 'Start_Position' },
+                        { data: 'End_Position' },
+                        { data: 'Nucleotide_Seq' },
+                        { data: 'Amino_Acid_Seq' }
+                    ],
+                    columnDefs: [
+                        {
+                            targets: [2, 5, 6], // Apply the function to the inference, translation, and product columns
+                            render: function(data, type, row) {
+                                if (type === 'display' && data.length > 30) {
+                                    return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 30) + '...</span>';
+                                } else {
+                                    return data;
+                                }
+                            }
+                        }
+                    ],
+                    language: {
+                        emptyTable: 'Loading...'
+                    },
+                    order: [],
+                    bSort: true,
+                    searching: true
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+
+            $('body').on('click', '.truncated', function() {
+                let fullText = $(this).attr('data-fulltext');
+                let truncatedText = $(this).text();
+                let cell = $(this).closest('td');
+
+                if (fullText !== truncatedText) { // check if fullText is not equal to truncatedText
+                    $(this).text(fullText);
+                    cell.addClass('expanded');
+                } else {
+                    $(this).text(fullText.substr(0, 20) + '...');
+                    cell.removeClass('expanded');
+                }
+
+                table.draw(false); // Redraw the DataTable to readjust the layout
+            });
+
+            if (gene_class !== 'Core') {
+                document.getElementById('AA_pos_overview_figure').style.display = 'none';
+                document.getElementById('AA_pos_overview').style.display = 'none';
+                document.getElementById('MSA_figure').style.display = 'none';
+                document.getElementById('MSA').style.display = 'none';
+            }
+        });
+
+        document.getElementById('MSA_figure').innerHTML= 'Multiple Sequence Alignment of ' + '<b>' +  gene  + '</b>'
+        const MSA = document.getElementById('MSA');
+        MSA.src = "{% url 'msa' %}?species=" + species + '&' + 'gene=' + gene;
+
+        document.getElementById('AA_pos_overview_figure').innerHTML= 'Dominant and Variant Amino Acid Position Overview of ' + '<b>' +  gene  + '</b>'
+        const AA_pos_overview = document.getElementById('AA_pos_overview');
+        AA_pos_overview.src = "{% url 'aa_pos_overview' %}?species=" + species + '&' + 'gene=' + gene;
+    </script>
+{% endblock %}

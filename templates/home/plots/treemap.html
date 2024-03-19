@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Highcharts Treemap</title>
+    <style>
+        html, body, #container {
+            height: 98%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        html {
+            font-size: 18px;
+        }
+
+    </style>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/treemap.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+</head>
+<body>
+
+<div id="container"></div>
+
+<script>
+    const template_screen_width = 655;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
+
+    const data = {{ dataset|safe }}
+
+    const categoryColors = {
+        'Animal associated': '#FFFACD',
+        'Food associated': '#FDBCB4',
+        'Missing': '#D3D3D3',
+        'Env associated': '#AFEEEE',
+        'Others': '#CAFFBF',
+        'Plant associated': '#FFDAB9'
+    };
+
+    // Assign colors to top-level categories in your data
+    const coloredData = data.map(item => {
+        if (!item.parent) {
+            item.color = categoryColors[item.name];
+        }
+        return item;
+    });
+
+    Highcharts.chart('container', {
+        series: [{
+            name: 'Isolation Source',
+            type: 'treemap',
+            layoutAlgorithm: 'squarified',
+            allowDrillToNode: true,
+            animationLimit: 1000,
+            dataLabels: {
+                enabled: false
+            },
+            levels: [{
+                level: 1,
+                dataLabels: {
+                    enabled: true,
+                    formatter: function () {
+                        return this.point.name + ': ' + this.point.value + ' strains';
+                    },
+                    style: {
+                        fontSize: (0.8 * coefficient) + 'em'
+                    }
+                },
+                borderWidth: 3,
+                levelIsConstant: false
+            }],
+            data: coloredData
+        }],
+        title: {
+            text: '',
+            // style: {
+            //   fontSize: '16px' // Set your desired font size here
+            // }
+        },
+        tooltip: {
+            pointFormat: '{point.name}: {point.value}'
+        },
+        accessibility: {
+            exposeAsGroupOnly: true
+        },
+        credits: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false  // Disable the exporting feature
+        },
+    });
+</script>
+</body>
+</html>

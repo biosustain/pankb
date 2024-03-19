@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        html {
+            font-size: 18px; /* Base font size for larger screens */
+        }
+
+        html, body, #container {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+    </style>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+<div id="container"></div>
+<script>
+    const template_screen_width = 302;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
+
+    document.addEventListener('DOMContentLoaded', function() {
+                const data = {{ dataset|safe }}
+                const categories = Object.keys(data);
+                const dataValues = Object.values(data);
+
+                const rgbColors = [
+                    [255,127,80],
+                    [255,215,0],
+                    [102,205,170],
+                    [238,130,238],
+                    [100,149,237],
+                    [173, 216, 230],
+                    [255, 117, 180],
+                    [59, 159, 192]
+                ];
+
+                const highchartsColors = rgbColors.map(rgb => `rgb(${rgb.join(',')})`);
+
+                Highcharts.chart('container', {
+                    chart: {
+                        type: 'bar',
+                    },
+                    title: {
+                        text: '',
+                        // style: {
+                        //     fontSize: '16px',
+                        //     align: 'left', // Horizontal alignment
+                        //     verticalAlign: 'top', // Vertical alignment
+                        // }
+                    },
+
+                    xAxis: {
+                        reversed: true, // Keep the order of categories as is
+                        // visible : false,
+                        categories: categories,
+                        title: {
+                            text: '',
+                        },
+                        labels: {
+                            align: 'center',
+                            enable: true,
+                            style: {
+                                fontSize: (0.9 * coefficient) + 'em'
+                            }
+                        },
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Genes ',
+                            style: {
+                                fontSize: (0.9 * coefficient) + 'em'
+                            }
+                        },
+                        type: 'logarithmic',
+                        tickInterval: 3,
+                        tickWidth: 1,
+                        lineWidth: 1,
+                        min:1,
+                        gridLineWidth: 1,
+                        labels: {
+                            align: 'center',
+                            style: {
+                                fontSize: (0.9 * coefficient) + 'em'
+                            },
+                            formatter: function() {
+                                if (this.value === 1) {
+                                    return '0';
+                                }
+
+                                if (this.value >= 1000000) {
+                                    return (this.value / 1000000) + 'M';
+                                }
+
+                                if (this.value >= 1000) {
+                                    return (this.value / 1000) + 'k';
+                                }
+
+                                return this.value;
+                            },
+
+                            rotation: 0,
+                        }
+                    },
+                    series: [{
+                        data: dataValues,
+                        colorByPoint: true,
+                        colors: highchartsColors,
+                        pointPadding: 0.15,
+                        borderWidth: 0
+                    }],
+                    tooltip: {
+                        pointFormat: 'Count: <b>{point.y}</b>',
+                        style: {
+                            fontSize: (0.9 * coefficient) + 'em'
+                        }
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    credits: {
+                        enabled: false
+                    }
+                });
+    });
+</script>
+</body>
+</html>

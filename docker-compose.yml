@@ -1,0 +1,30 @@
+version: '3.7'
+
+
+services:
+  django_gunicorn:
+    container_name: pankb-web
+    build:
+      context: .
+    volumes:
+      - ./static:/static
+    environment:
+      DEBUG: False
+    env_file:
+        - .env
+    ports:
+      - "8000:8000"
+    restart: always
+
+
+  nginx:
+    container_name: pankb-nginx
+    build: ./nginx
+    #image: pankb_web-nginx
+    volumes:
+      - ./static:/static
+    ports:
+      - "80:80"
+    depends_on:
+      - django_gunicorn
+    restart: always

@@ -1,0 +1,227 @@
+{% extends "pangenome_analyses/Pangenome_analyses.html" %}
+
+{% block custom_style %}
+    <style>
+        .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .custom-padding {
+            padding-left: 30px;
+            padding-right: 20px;
+        }
+        .figure-container_above,
+        .figure-container_below {
+            height: 42.5vh; /* This is 50% of the viewport height */
+            padding-bottom: 0%;
+            margin-bottom: 0;
+            margin-top: 0;
+        }
+        .figure-container_above iframe,
+        .figure-container_below iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .border-container {
+            border: 0px solid rgba(0, 0, 0, 0.09);
+            /* Add other styles as needed */
+        }
+        .services-section img {
+            margin: auto;
+            display: block;
+        }
+        .responsive-iframe {
+            position: relative;
+            width: 100%;
+            padding-bottom: 0;
+        }
+        .responsive-iframe iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 10%;
+            right: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .row-spacing {
+            margin-bottom: 2rem;
+        }
+        /* Remove spacing from Bootstrap columns */
+        .col-12.col-md-6 > *:not(:last-child) {
+            margin-bottom: 0; /* Change this value */
+        }
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 1);  /* or any other color */
+            z-index: 9999;  /* or any large number to ensure overlay is on top */
+            display: flex;
+            justify-content: center;
+            align-items: center; /* center the text */
+            opacity: 1;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="loading-overlay">
+        <p>Loading, please wait...</p>
+    </div>
+    <!-- Include the top navigation panel, which is the same for every page -->
+    {% include "navigation.html" with about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" %}
+    <!-- ######### -->
+    <div class="vh-100">
+        <div class="row">
+            <!-- Include the info panel on the left (it is shared between several apps) -->
+            {% include 'pangenome_analyses/info_panel.html' %}
+            <!-- ######### -->
+            <div class="col-10 custom-padding">
+                <div class="container-fluid">
+                    <div class="row row-spacing border-container gx-0 gx-md-2">
+                        <h2 class="text-center" style="font-size: 1.6em;">Heap's Law and Gene Frequency</h2>
+                        <div class="col-12 col-md-6">
+                            <div class="figure-container_above responsive-iframe">
+                                <iframe style="border:0;" id="Heaps_Law"></iframe>
+                            </div>
+                            <div class="figure-container_below responsive-iframe">
+                                <iframe id = 'Barplot' name="Barplot" style="border:0;"></iframe>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="figure-container_above responsive-iframe">
+                                <iframe style="border:0;" id="Cumulative_Frequency"></iframe>
+                            </div>
+                            <div class="figure-container_below responsive-iframe">
+                                <iframe style="border:0;" id="Gene_frequency"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <div class="row border-container" style="height: 80vh;">
+                        <div class="col-12" style="height: 100%;">
+                            <h2 class="text-center" style="font-size: 1.6em;">Presence/Absence Matrix</h2>
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Select a Gene Class
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="heatmapDropdown">
+                                    <li><a class="dropdown-item" href="#" onclick="updateIframeSrc('core', 'Core'); return false;">Core</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="updateIframeSrc('accessory', 'Accessory'); return false;">Accessory</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="updateIframeSrc('1_15', 'Rare: Occurs 1% - 15% of strains'); return false;">Rare: Occurs 1% - 15% of strains</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="updateIframeSrc('above_1', 'Rare: Occurs < 1% of strains, but > 2 strains'); return false;">Rare: Occurs < 1% of strains, but > 2 strains</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="updateIframeSrc('only_1', 'Rare: Unique genes'); return false;">Rare: Unique genes</a></li>
+                                </ul>
+                            </div>
+
+                            <br>
+
+                            <div class="d-flex justify-content-center align-items-center h-100" >
+                                <iframe id="heatmap_all" class="w-100 h-100" style="border:0;"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <div class="row border-container" style="height: 80vh;">
+                        <h2 class="text-center" style="font-size: 1.6em;">Core Alleleome</h2>
+                        <div class="col-1">
+                            <!-- Empty column -->
+                        </div>
+
+                        <div class="col-5" style="height: 70vh;">
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                <iframe id="step_histogram" class="w-100 h-100" style="border:0;"></iframe>
+                            </div>
+                        </div>
+
+                        <div class="col-5" style="height: 70vh;">
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                <iframe id="dn_ds" class="w-100 h-100" style="border:0;"></iframe>
+                            </div>
+                        </div>
+
+                        <div class="col-1">
+                            <!-- Empty column -->
+                        </div>
+
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const species = urlParams.get('species');
+
+            // set src for different elements
+            const Heaps_Law = document.getElementById('Heaps_Law');
+            Heaps_Law.src = "{% url 'heaps_law' %}?species=" + species;
+
+            const Barplot = document.getElementById('Barplot');
+            Barplot.src = "{% url 'gene_annotation_distribution' %}?species=" + species;
+
+            const Gene_frequency = document.getElementById('Gene_frequency');
+            Gene_frequency.src = "{% url 'gene_freq' %}?species=" + species;
+
+            const Cumulative_Frequency = document.getElementById('Cumulative_Frequency');
+            Cumulative_Frequency.src = "{% url 'cumulative_freq' %}?species=" + species;
+
+            const heatmap_all = document.getElementById('heatmap_all');
+            //heatmap_all.src = './Interactive_figures/hotmap/demo/index.html?species=' + species + '&gene_class=core';
+            heatmap_all.src = "{% url 'hotmap' %}?species=" + species + "&gene_class=core"
+
+            const step_histogram = document.getElementById('step_histogram');
+            step_histogram.src = "{% url 'variant_dominant_freq' %}?species=" + species;
+
+            const dn_ds = document.getElementById('dn_ds');
+            dn_ds.src = "{% url 'ds_dn_ratio' %}?species=" + species;
+
+            // Species Data from the info panel
+            speciesData = {{ speciesData | safe }}
+
+            if (speciesData) {
+                // Determine the timeout duration based on the number of genomes
+                const timeoutDuration = speciesData.Number_of_genome > 1000 ? 5000 : 3000;
+
+                setTimeout(function() {
+                    const overlay = document.getElementById('loading-overlay');
+                    if (overlay) {
+                        overlay.parentNode.removeChild(overlay);
+                    }
+                }, timeoutDuration);
+                console.log('timeoutDuration: ', timeoutDuration);
+            }
+        });
+
+        function updateIframeSrc(gene_class, gene_class_text) {
+            const iframe = document.getElementById('heatmap_all');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const species = urlParams.get('species');
+            iframe.src = './Interactive_figures/hotmap/demo/index.html?species=' + species +'&gene_class=' + gene_class;
+
+            // Update dropdown button text
+            const dropdownButton = document.getElementById('dropdownButton');
+            dropdownButton.textContent = gene_class_text;
+        }
+        </script>
+{% endblock %}

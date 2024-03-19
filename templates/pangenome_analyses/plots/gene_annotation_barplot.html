@@ -1,0 +1,225 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stacked Column Chart</title>
+    <!--  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
+    <style>
+        html, body, #plot {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        html {
+            font-size: 18px; /* Base font size for larger screens */
+        }
+    </style>
+</head>
+
+<body>
+<div id="plot"></div>
+<script src=" {% static './js/plotly/plotly.min.js' %} "></script>
+<script>
+    function loadJSONAndCreatePlot() {
+        const template_screen_width = 746;
+        const current_window_Width = window.innerWidth;
+        const coefficient = current_window_Width / template_screen_width;
+
+        var jsondata = {{ dataset|safe }};
+        const categories = jsondata.categories;
+        const shortCategories = categories.map(function (category) {
+            if (category.length > 3) {
+                return category.substring(0, 3);
+            }
+            return category;
+        });
+        const coreData = jsondata.Core;
+        const accessoryData = jsondata.Accessory;
+        const rareData = jsondata.Rare;
+
+        const traceCore = {
+            x: shortCategories,
+            y: coreData,
+            customdata: categories,
+            name: 'Core',
+            type: 'bar',
+            hovertemplate: '%{customdata}: %{y}',
+            marker: {
+                color: 'purple',
+                opacity: 0.8,
+                size: 16 * coefficient
+            }
+        };
+
+        const traceAccessory = {
+            x: shortCategories,
+            y: accessoryData,
+            customdata: categories,
+            name: 'Accessory',
+            type: 'bar',
+            hovertemplate: '%{customdata}: %{y}',
+            marker: {
+                color: 'orange',
+                opacity: 0.8,
+                size: 16 * coefficient
+            }
+        };
+
+        const traceRare = {
+            x: shortCategories,
+            y: rareData,
+            customdata: categories,
+            name: 'Rare',
+            type: 'bar',
+            hovertemplate: '%{customdata}: %{y}',
+            marker: {
+                color: 'green',
+                opacity: 0.8,
+                size: 16 * coefficient
+            }
+        };
+
+        const data = [traceCore, traceAccessory, traceRare];
+
+        const layout = {
+            barmode: 'column',
+            autosize: true,
+            margin: {
+                l: 80 * coefficient,  // left margin
+                r: 60 * coefficient,  // right margin
+                b: 80 * coefficient, // bottom margin
+                t: 60 * coefficient, // top margin
+                pad: 0 // padding
+            },
+            title: {
+                text: "Gene Annotation Distribution",
+                font: {
+                    family: 'Arial, sans-serif',
+                    size: 20 * coefficient,
+                    color: '#000000'
+                },
+                tickfont: {
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
+                },
+                xref: 'paper',
+                x: 0.5,
+            },
+            xaxis: {
+                title: 'COG Category',
+                titlefont: {
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
+                },
+                tickangle: -45,
+                showline: true,
+                linewidth: 1,
+                automargin: true,
+                showgrid: false,
+                tickfont: {
+                    size: 14 * coefficient,
+                    color: '#000000'
+                }
+            },
+            yaxis: {
+                title: 'Frequency',
+                titlefont: {
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
+                },
+                font: {
+                    family: 'Arial, sans-serif',
+                    size: 16 * coefficient,
+                    color: '#000000'
+                },
+                tickfont: {
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
+                },
+                showline: true,
+                linewidth: 1,
+                showgrid: true,
+                ticks: 'outside',
+                tickWidth: 1,
+                type: 'log',
+                dtick: 1,
+                range: [0, Math.ceil(Math.log10(Math.max(...coreData, ...accessoryData, ...rareData)))]
+            },
+            legend: {
+                x: 0.5,
+                y: 1,
+                font: {
+                    family: 'Arial, sans-serif',
+                    size: 16 * coefficient,
+                    color: 'black'
+                },
+                orientation: 'h',
+                itemclick: 'toggle',
+                itemdoubleclick: false,
+                itemwidth: 30 * coefficient,
+                itemheight: 20 * coefficient,
+                itemorder: 'normal',
+                bgcolor: 'rgba(0,0,0,0)',
+                bordercolor: 'rgba(0,0,0,0)',
+                xref: 'paper',
+                yref: 'paper',
+                xanchor: 'center',
+                yanchor: 'middle',
+            },
+            hovermode: 'closest'
+        };
+
+        const config = {
+            displayModeBar: false,
+        };
+
+        Plotly.newPlot('plot', data, layout, config).then(function () {
+            const xTicks = document.querySelectorAll('.xaxislayer-above g.xtick');
+            xTicks.forEach(function (tick, index) {
+                tick.onmouseover = function (event) {
+                    let xhover = document.getElementById('xhover');
+                    if (xhover) {
+                        xhover.parentNode.removeChild(xhover);
+                    }
+                    xhover = document.createElement('div');
+                    xhover.setAttribute('id', 'xhover');
+                    xhover.classList.add('xhover');
+                    xhover.style.left = event.clientX + 'px';
+                    xhover.style.top = event.clientY + 'px';
+                    xhover.innerText = categories[index];
+                    document.body.appendChild(xhover);
+                };
+                tick.onmouseout = function () {
+                    let xhover = document.getElementById('xhover');
+                    if (xhover) {
+                        xhover.parentNode.removeChild(xhover);
+                    }
+                };
+            });
+        }).then(function () {
+            window.dispatchEvent(new Event('resize'));
+        });
+    }
+
+    window.onresize = function() {
+        const update = {
+            width: document.getElementById('plot').clientWidth,
+            height: document.getElementById('plot').clientHeight,
+        };
+        Plotly.relayout('plot', update);
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadJSONAndCreatePlot();
+    });
+</script>
+</body>
+</html>

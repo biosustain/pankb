@@ -1,0 +1,52 @@
+{% extends "pangenome_analyses/Pangenome_analyses.html" %}
+
+{% block custom_style %}
+    <style>
+        html, body {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: auto;
+        }
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+        .iframe_center {
+            height: 100vh;
+            width: 100%;
+            border: none;
+            padding-left: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <!-- Include the top navigation panel, which is the same for every page -->
+    {% include "navigation.html" with about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" %}
+    <!-- ######### -->
+
+    <div class = "container-fluid">
+        <div class="row">
+            <!-- Include the info panel on the left (it is shared between several apps) -->
+            {% include 'pangenome_analyses/info_panel.html' %}
+            <!-- ######### -->
+            <div class="col-10">
+                <div class = "d-flex align-items-center justify-content-center">
+                    <iframe id='Phylotree' class = 'iframe_center' height= '100%'></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const species = urlParams.get('species');
+
+            // Set the src for the iframe containing
+            const Phylotree = document.getElementById('Phylotree');
+            Phylotree.src = "{% url 'phylotree_plot' %}?species=" + species;
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        html, body, #container {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        html {
+            font-size: 18px; /* Base font size for larger screens */
+        }
+    </style>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+<div id="container"></div>
+<script>
+
+    const template_screen_width = 437;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const data = {{ dataset|safe }}
+        const categories = Object.keys(data);
+        const dataValues = Object.values(data).map(value => {
+            return {
+                y: value,
+                color: '#f0f0f0', // Set the bar color to light grey
+                borderColor: 'black', // Set the border color to black
+                borderWidth: 1 // Set the border width to make it visible
+            };
+        });
+                Highcharts.chart('container', {
+
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: 'Database Size',
+                        style: {
+                            fontSize: (0.9 * coefficient) + 'em' // Set your desired font size here
+                        }
+                    },
+                    xAxis: {
+                        categories: categories,
+                        title: {
+                            text: ''
+                        },
+                        labels: {
+                            style: {
+                                fontSize: (0.9 * coefficient) + 'em'
+                            }
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Counts',
+                            style: {
+                                fontSize: (0.9 * coefficient) + 'em'
+                            }
+                        },
+                        type: 'logarithmic',
+                        tickInterval: 2,
+                        tickWidth: 1,
+                        lineWidth: 1,
+                        gridLineWidth: 1,
+                        labels: {
+                            style: {
+                                fontSize: (0.9 * coefficient) + 'em'
+                            }
+                        }
+                    },
+                    series: [{
+                        data: dataValues,
+                        pointPadding: 0.15,
+                    }],
+                    tooltip: {
+                        pointFormat: 'Count: <b>{point.y}</b>', // Set tooltip text
+                        style: {
+                            fontSize: (0.8 * coefficient) + 'em'
+                        }
+                    },
+                    legend: {
+                        enabled: false // Hide the legend
+                    },
+                    credits: {
+                        enabled: false
+                    }
+                });
+
+    });
+</script>
+</body>
+</html>

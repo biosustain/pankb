@@ -1,0 +1,323 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
+    <style>
+        html, body, #plot {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .legend text {
+            opacity: 0.6 !important;
+        }
+
+        /* Legend styles */
+        .legend {
+            opacity: 1 !important;  /* Set the opacity of the legend */
+        }
+
+    </style>
+</head>
+<body>
+<div id="plot"></div>
+<script src=" {% static './js/plotly/plotly.min.js' %} "></script>
+<script>
+    // Function to load JSON file and create the plot
+    function loadJSONAndCreatePlot() {
+        const template_screen_width = 746;
+        const current_window_Width = window.innerWidth;
+        const coefficient = current_window_Width / template_screen_width;
+
+        var data = {{ dataset|safe }};
+        const frequency = data['frequency'];
+        const x15 = data['x15'];
+        const x99 = data['x99'];
+        const rare_max_freq = data['rare_max_freq'];
+        const accessory_max_freq = data['accessory_max_freq'];
+        const core_max_freq = data['core_max_freq'];
+        const max_frequency_count = data['max_frequency_count'];
+
+        const trace1 = {
+            x: frequency.filter(value => value <= x15),
+            type: 'histogram',
+            name: 'Rare',
+            histfunc: 'count',
+            autobinx: false,
+            xbins: {
+                start: Math.min(...frequency),
+                end: x15,
+                size: 1
+            },
+            marker: {
+                color: 'green',
+                line: {
+                    color:  'black',
+                    width: 1
+                }
+            },
+            opacity: 0.3
+        };
+
+        const trace2 = {
+            x: frequency.filter(value => value > x15 && value <= x99),
+            type: 'histogram',
+            name: 'Accessory',
+            histfunc: 'count',
+            autobinx: false,
+            xbins: {
+                start: x15,
+                end: x99,
+                size: 1
+            },
+            marker: {
+                color: 'orange',
+                line: {
+                    color:  'black',
+                    width: 1
+                }
+            },
+            opacity: 0.3
+        };
+
+        const trace3 = {
+            x: frequency.filter(value => value > x99),
+            type: 'histogram',
+            name: 'Core',
+            histfunc: 'count',
+            autobinx: false,
+            xbins: {
+                start: x99,
+                end: Math.max(...frequency),
+                size: 1
+            },
+            marker: {
+                color: 'purple',
+                line: {
+                    color:  'black',
+                    width: 1
+                }
+            },
+            opacity: 0.3
+        };
+
+        const numHoverPoints = 50;
+        const logMinY = Math.log(1);
+        const logMaxY = Math.log(max_frequency_count);
+        const logRange = logMaxY - logMinY;
+        const yHoverValues = Array.from({ length: numHoverPoints }, (_, i) => Math.exp(logMinY + i * (logRange / (numHoverPoints - 1))));
+        console.log(yHoverValues)
+
+        const traceX15Hover = {
+            x: Array(numHoverPoints).fill(x15),
+            y: yHoverValues,
+            mode: 'markers',
+            type: 'scatter',
+            marker: {
+                size: 5,
+                color: 'rgba(0, 0, 0, 0)' // Invisible
+            },
+            hoverinfo: 'text',
+            text: Array(numHoverPoints).fill(`Number of Genome: ${x15}`),
+            showlegend: false
+        };
+
+        const traceX99Hover = {
+            x: Array(numHoverPoints).fill(x99),
+            y: yHoverValues,
+            mode: 'markers',
+            type: 'scatter',
+            marker: {
+                size: 5,
+                color: 'rgba(0, 0, 0, 0)' // Invisible
+            },
+            hoverinfo: 'text',
+            text: Array(numHoverPoints).fill(`Number of Genome: ${x99}`),
+            showlegend: false
+        };
+
+        const layout = {
+            autosize: true,
+            margin: {
+                l: 80 * coefficient,  // left margin
+                r: 60 * coefficient,  // right margin
+                b: 80 * coefficient, // bottom margin
+                t: 60 * coefficient, // top margin
+                pad: 0 // padding
+            },
+            title: {
+                text: "Gene Frequency",
+                font: {
+                    family: 'Arial, sans-serif',
+                    size: 20 * coefficient,
+                    color: '#000000'
+                },
+                tickfont: {
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
+                },
+                xref: 'paper',
+                x: 0.5,
+            },
+            xaxis: {
+                title: 'Number of Genomes',
+                x: 0.5,
+                showgrid: true,
+                showline: true,
+                titlefont: {
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
+                },
+                tickfont: {
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
+                },
+                ticks: 'outside',
+                tickWidth: 1,
+                range: [Math.min(...frequency), Math.max(...frequency)]
+            },
+            yaxis: {
+                title: 'Frequency',
+                titlefont: {
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
+                },
+                type: 'log',
+                dtick: 1,
+                autorange: true,
+                showgrid: true,  // Remove y-axis grid lines
+                showline: true,  // Show y-axis line
+                range: [0, max_frequency_count * 1.1],
+                linewidth: 1,
+                ticks: 'outside',
+                tickWidth: 1,
+                tickfont: {
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
+                }
+            },
+            showlegend: true,  // Show legend
+            legend: {
+                x: 0.5,
+                y: 1.05,
+                orientation: 'h',  // Set legend orientation to horizontal
+                traceorder: 'reversed',  // Change the order of legend items
+                itemclick: true,  // Disable legend item click
+                itemdoubleclick: false,  // Disable legend item double-click
+                itemwidth: 30 * coefficient,  // Adjust legend item width as needed
+                itemheight: 20 * coefficient,  // Adjust legend item height as needed
+                itemorder: 'normal',  // Preserve the order of legend items
+                bgcolor: 'rgba(0,0,0,0)',  // Set legend background color to transparent
+                bordercolor: 'rgba(0,0,0,0)',  // Set legend border color to transparent
+                font: {
+                    family: 'Arial, sans-serif',
+                    size: 16 * coefficient,
+                    color: 'grey'
+                },
+                xref: 'paper',  // Set x-coordinate reference to 'paper'
+                yref: 'paper',  // Set y-coordinate reference to 'paper'
+                xanchor: 'center',  // Center the legend horizontally
+                yanchor: 'middle',  // Center the legend vertically
+            },
+            shapes: [
+                {
+                    type: 'line',
+                    x0: x15,
+                    y0: 0,
+                    x1: x15,
+                    y1: max_frequency_count,
+                    yref: 'y',
+                    line: {
+                        color: 'black',
+                        width: 2,
+                        dash: 'dot'
+                    }
+                },
+
+                {
+                    type: 'line',
+                    x0: x99,
+                    y0: 0,
+                    x1: x99,
+                    y1: max_frequency_count,
+                    yref: 'y',
+                    line: {
+                        color: 'black',
+                        width: 2,
+                        dash: 'dot'
+                    }
+                },
+                {
+                    type: 'rect',
+                    x0: Math.min(...frequency),
+                    y0: 0,
+                    x1: x15,
+                    y1: rare_max_freq,
+                    yref: 'y',
+                    fillcolor: 'green',
+                    opacity: 0.3,
+                    line: {
+                        width: 0
+                    }
+                },
+                {
+                    type: 'rect',
+                    x0: x15,
+                    y0: 0,
+                    x1: x99,
+                    y1: accessory_max_freq,
+                    yref: 'y',
+                    fillcolor: 'orange',
+                    opacity: 0.3,
+                    line: {
+                        width: 0
+                    }
+                },
+                {
+                    type: 'rect',
+                    x0: x99,
+                    y0: 0,
+                    x1: Math.max(...frequency),
+                    y1: core_max_freq,
+                    yref: 'y',
+                    fillcolor: 'purple',
+                    opacity: 0.3,
+                    line: {
+                        width: 0
+                    }
+                }
+            ],
+        };
+
+        const config = {
+            displayModeBar: false,  // Enable the display of the mode bar
+        }
+
+        var data = [trace1, trace2, trace3, traceX15Hover, traceX99Hover];
+        Plotly.newPlot('plot', data, layout, config);
+        window.onresize = function() {
+            const update = {
+                width: document.getElementById('plot').clientWidth,
+                height: document.getElementById('plot').clientHeight,
+            };
+            Plotly.relayout('plot', update);
+        };
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadJSONAndCreatePlot();
+    });
+</script>
+</body>
+</html>

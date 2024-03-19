@@ -1,0 +1,316 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        html, body, #plot {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .legend text {
+            opacity: 1 !important;
+        }
+
+        html {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+<div id="plot"></div>
+<script src=" {% static './js/plotly/plotly.min.js' %} "></script>
+<script>
+    // Function to load JSON file and create the plot
+    function loadJSONAndCreatePlot() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const species = urlParams.get('species');
+
+        const template_screen_width = 746;
+        const current_window_Width = window.innerWidth;
+        const coefficient = current_window_Width / template_screen_width;
+
+        var data = {{ dataset|safe }}
+        // Data
+        const x = data['data'];
+        const cumulativeFrequency = data['cumulative_frequency'];
+        const x15 = data['x15'];
+        const x99 = data['x99'];
+        const rare_max_cum = data['rare_max_cumulative'];
+        const accessory_max_cum = data['accessory_max_cumulative'];
+        const core_max_cum = data['core_max_cumulative'];
+        const max_cum = data['max_cumulative'];
+
+        const trace1 = {
+            x: [0].concat(x),
+            y: [0].concat(cumulativeFrequency),
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Pangenome size',
+            line: {
+                color: 'blue',
+                width: 2
+            },
+            showlegend: false // Remove from legend
+        };
+
+        const trace2 = {
+            x: [x15],
+            y: [rare_max_cum],
+            type: 'scatter',
+            mode: 'markers',
+            name: 'Rare',
+            marker: {
+                color: 'green',
+                symbol: 'square',
+                size: 16 * coefficient
+            },
+            visible: 'legendonly'
+        };
+
+        const trace3 = {
+            x: [x15],
+            y: [accessory_max_cum],
+            type: 'scatter',
+            mode: 'markers',
+            name: 'Accessory',
+            marker: {
+                color: 'orange',
+                symbol: 'square',
+                size: 16 * coefficient
+            },
+            visible: 'legendonly'
+        };
+
+        const trace4 = {
+            x: [x15],
+            y: [core_max_cum],
+            type: 'scatter',
+            mode: 'markers',
+            name: 'Core',
+            marker: {
+                color: 'purple',
+                symbol: 'square',
+                size: 16 * coefficient
+            },
+            visible: 'legendonly'
+        };
+
+        const hoverPointsX15 = Array(Math.ceil(max_cum / 1000)).fill(x15).map((x, i) => ({ x, y: i * 1000 }));
+        const traceX15Hover = {
+            x: hoverPointsX15.map(p => p.x),
+            y: hoverPointsX15.map(p => p.y),
+            mode: 'markers',
+            type: 'scatter',
+            marker: {
+                size: 1,
+                color: 'rgba(0, 0, 0, 0)' // Make the marker invisible
+            },
+            hoverinfo: 'text',
+            text: hoverPointsX15.map(p => `Number of Genome: ${p.x}`), // Customize your hover text
+            showlegend: false
+        };
+
+        const hoverPointsX99 = Array(Math.ceil(max_cum / 1000)).fill(x99).map((x, i) => ({ x, y: i * 1000 }));
+        const traceX99Hover = {
+            x: hoverPointsX99.map(p => p.x),
+            y: hoverPointsX99.map(p => p.y),
+            mode: 'markers',
+            type: 'scatter',
+            marker: {
+                size: 1,
+                color: 'rgba(0, 0, 0, 0)' // Make the marker invisible
+            },
+            hoverinfo: 'text',
+            text: hoverPointsX99.map(p => `Number of Genome: ${p.x}`), // Customize your hover text
+            showlegend: false
+        };
+
+        const layout = {
+            autosize: true,
+            margin: {
+                l: 80 * coefficient,  // left margin
+                r: 60 * coefficient,  // right margin
+                b: 60 * coefficient, // bottom margin
+                t: 80 * coefficient, // top margin
+                pad: 0 // padding
+            },
+            title: {
+                text: "Cumulative Gene Frequency Distribution",
+                font: {
+                    family: 'Arial, sans-serif',
+                    size: 20 * coefficient,
+                    color: '#000000'
+                },
+                xref: 'paper',
+                x: 0.5
+            },
+            xaxis: {
+                title: 'Number of Genomes',
+                titlefont: {
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
+                },
+                range: [0, Math.max(...x) + 1], // Adjust x-axis range
+                showgrid: true, // Remove x-axis grid lines
+                showline: true, // Show x-axis line
+                zeroline: false, // Remove x-axis zero line
+                tickwidth: 1, // Width of the tick lines (in pixels)
+                tickfont: {
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif',
+                    color: '#000000'
+                }
+            },
+            yaxis: {
+                title: 'Pangenome Size',
+                titlefont: {
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                },
+                range: [0, Math.max(...cumulativeFrequency) + 1000], // Adjust y-axis range
+                tickformat: '1s', // Format y-axis labels as '1k'
+                ticks: 'outside',
+                tickWidth: 1,
+                showgrid: true, // Remove y-axis grid lines
+                showline: true, // Show y-axis line
+                zeroline: false, // Remove y-axis zero line
+                tickfont: {
+                    size: 16 * coefficient,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                }
+            },
+            showlegend: true,
+            legend: {
+                x: 0.5,  // Position the legend at the center of the plot
+                y: 1,
+                xanchor: 'center',
+                yanchor: 'bottom',
+                orientation: 'h',  // Set legend orientation to horizontal
+                traceorder: 'reversed',  // Change the order of legend items
+                itemclick: true,  // Disable legend item click
+                itemdoubleclick: false,  // Disable legend item double-click
+                itemwidth: 30 * coefficient,  // Adjust legend item width as needed
+                itemheight: 20 * coefficient,  // Adjust legend item height as needed
+                bgcolor: 'rgba(0,0,0,0)',  // Set legend background color to transparent
+                bordercolor: 'rgba(0,0,0,0)',  // Set legend border color to transparent
+                font: {
+                    family: 'Arial, sans-serif',
+                    size: 16 * coefficient,
+                    color: '#000000'
+                },
+                xref: 'paper',  // Set x-coordinate reference to 'paper'
+                yref: 'paper',  // Set y-coordinate reference to 'paper'
+            },
+            shapes: [
+                {
+                    type: 'line',
+                    x0: x15,
+                    y0: 0,
+                    x1: x15,
+                    y1: max_cum,
+                    yref: 'y',
+                    line: {
+                        color: 'black',
+                        width: 2,
+                        dash: 'dot'
+                    }
+                },
+                {
+                    type: 'line',
+                    x0: x99,
+                    y0: 0,
+                    x1: x99,
+                    y1: max_cum,
+                    yref: 'y',
+                    line: {
+                        color: 'black',
+                        width: 2,
+                        dash: 'dot'
+                    }
+                },
+                {
+                    type: 'rect',
+                    x0: 0,
+                    y0: 0,
+                    x1: x15,
+                    y1: rare_max_cum,
+                    fillcolor: 'green',
+                    opacity: 0.3,
+                    line: {
+                        width: 0
+                    }
+                },
+                {
+                    type: 'rect',
+                    x0: x15,
+                    y0: rare_max_cum,
+                    x1: x99,
+                    y1: accessory_max_cum,
+                    fillcolor: 'orange',
+                    opacity: 0.3,
+                    line: {
+                        width: 0
+                    }
+                },
+                {
+                    type: 'rect',
+                    x0: x99,
+                    y0: accessory_max_cum,
+                    x1: Math.max(...x),
+                    y1: core_max_cum,
+                    fillcolor: 'purple',
+                    opacity: 0.3,
+                    line: {
+                        width: 0
+                    }
+                }
+            ]
+        };
+
+        const config = {
+            displayModeBar: false,  // Enable the display of the mode bar
+        }
+
+        var data = [trace1, trace2, trace3, trace4, traceX15Hover, traceX99Hover];
+
+        Plotly.newPlot('plot', data, layout, config)
+            .then(function(gd) {
+                gd.on('plotly_relayout', function(eventData) {
+                    const legendItemClicked = Object.keys(eventData)[0].startsWith('hiddenlabels');
+                    if (legendItemClicked) {
+                        const svgTextItems = document.querySelectorAll('.legend text');
+                        svgTextItems.forEach(function(item) {
+                            if (item.style.opacity !== '1') {
+                                item.style.opacity = '1';
+                            }
+                        });
+                    }
+                });
+            })
+            .then(function() {
+                window.dispatchEvent(new Event('resize'));
+            });
+
+        window.onresize = function() {
+            const update = {
+                width: document.getElementById('plot').clientWidth,
+                height: document.getElementById('plot').clientHeight,
+            };
+            Plotly.relayout('plot', update);
+        };
+
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadJSONAndCreatePlot();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stacked Column Chart</title>
+    <style>
+        html, body, #plot {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+    <script src=" {% static './js/plotly/plotly.min.js' %} "></script>
+</head>
+
+<body>
+<div id="plot"></div>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const species = urlParams.get('species');
+    const genome_id = urlParams.get('genome_id');
+
+    function loadJSONAndCreatePlot() {
+        const jsondata = {{ dataset|safe }};
+        const categories = jsondata.categories;
+        const shortCategories = categories.map(function (category) {
+            if (category.length > 3) {
+                return category.substring(0, 3);
+            }
+            return category;
+        });
+        const coreData = jsondata.Core;
+        const accessoryData = jsondata.Accessory;
+        const rareData = jsondata.Rare;
+
+        const traceCore = {
+            x: shortCategories,
+            y: coreData,
+            customdata: categories,
+            name: 'Core',
+            type: 'bar',
+            hovertemplate: '%{customdata}: %{y}',
+            marker: {
+                color: 'purple',
+                opacity: 0.8,
+                size: 12
+            }
+        };
+
+        const traceAccessory = {
+            x: shortCategories,
+            y: accessoryData,
+            customdata: categories,
+            name: 'Accessory',
+            type: 'bar',
+            hovertemplate: '%{customdata}: %{y}',
+            marker: {
+                color: 'orange',
+                opacity: 0.8,
+                size: 12
+            }
+        };
+
+        const traceRare = {
+            x: shortCategories,
+            y: rareData,
+            customdata: categories,
+            name: 'Rare',
+            type: 'bar',
+            hovertemplate: '%{customdata}: %{y}',
+            marker: {
+                color: 'green',
+                opacity: 0.8,
+                size: 12
+            }
+        };
+
+        const data = [traceCore, traceAccessory, traceRare];
+
+        const layout = {
+            barmode: 'column',
+            autosize: true,
+            margin: {
+                l: 80,  // left margin
+                r: 10,  // right margin
+                b: 60, // bottom margin
+                t: 60, // top margin
+                pad: 0 // padding
+            },
+            title: {
+                text: "Gene Annotation Distribution of " + genome_id,
+                titlefont: {
+                    size: 16,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                },
+                tickfont: {
+                    size: 12,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                },
+                xref: 'paper',
+                x: 0.5,
+            },
+            xaxis: {
+                title: 'COG Category',
+                titlefont: {
+                    size: 14,
+                    family: 'Arial, sans-serif' // Use Arial font family
+                },
+                tickangle: -45,
+                showline: true,
+                linewidth: 1,
+                automargin: true,
+                showgrid: false,
+                tickfont: {
+                    size: 10
+                }
+            },
+            yaxis: {
+                title: 'Frequency',
+                font: {
+                    family: 'Arial, sans-serif',
+                    size: 10,
+                    color: '#000000'
+                },
+                showline: true,
+                linewidth: 1,
+                showgrid: false,
+                type: 'log',
+                dtick: 1,
+                range: [0, Math.ceil(Math.log10(Math.max(...coreData, ...accessoryData, ...rareData)))]
+            },
+            legend: {
+                x: 0.5,
+                y: 1,
+                font: {
+                    family: 'Arial, sans-serif',
+                    size: 12,
+                    color: '#000000'
+                },
+                xanchor: 'center',
+                yanchor: 'bottom',
+                orientation: 'h',
+                itemclick: 'toggle',
+                itemdoubleclick: false,
+                itemwidth: 30,
+                itemheight: 20,
+                itemorder: 'normal',
+                bgcolor: 'rgba(0,0,0,0)',
+                bordercolor: 'rgba(0,0,0,0)',
+                xref: 'paper',
+                yref: 'paper',
+                xanchor: 'center',
+                yanchor: 'middle',
+            },
+            hovermode: 'closest'
+        };
+
+        const config = {
+            displayModeBar: false,
+        };
+
+        Plotly.newPlot('plot', data, layout, config).then(function () {
+            const xTicks = document.querySelectorAll('.xaxislayer-above g.xtick');
+            xTicks.forEach(function (tick, index) {
+                tick.onmouseover = function (event) {
+                    let xhover = document.getElementById('xhover');
+                    if (xhover) {
+                        xhover.parentNode.removeChild(xhover);
+                    }
+                    xhover = document.createElement('div');
+                    xhover.setAttribute('id', 'xhover');
+                    xhover.classList.add('xhover');
+                    xhover.style.left = event.clientX + 'px';
+                    xhover.style.top = event.clientY + 'px';
+                    xhover.innerText = categories[index];
+                    document.body.appendChild(xhover);
+                };
+                tick.onmouseout = function () {
+                    let xhover = document.getElementById('xhover');
+                    if (xhover) {
+                        xhover.parentNode.removeChild(xhover);
+                    }
+                };
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadJSONAndCreatePlot();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        html, body, #container {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        html {
+            font-size: 18px;
+        }
+    </style>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/mouse-wheel-zoom.js"></script>
+    <script src="https://code.highcharts.com/modules/series-label.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>
+</head>
+
+<body>
+<div id="container"></div>
+<script>
+    const template_screen_width = 655;
+    const current_window_Width = window.innerWidth;
+    const coefficient = current_window_Width / template_screen_width;
+    console.log('window width = ' + current_window_Width);
+    function roundToDecimal(number, decimalPlaces) {
+        var factor = Math.pow(10, decimalPlaces);
+        return Math.round(number * factor) / factor;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const data = {{ dataset|safe }}
+        const colorList = {
+            'Enterobacteriaceae': 'rgb(255,127,80)',
+            'Lactobacillaceae': 'rgba(255,215,0)',
+            'Bacillaceae': 'rgb(102,205,170)',
+            'Mycobacteriaceae': 'rgb(238,130,238)',
+            'Pseudomonadaceae': 'rgba(100,149,237)',
+            'Streptomycetaceae': 'rgb(173, 216, 230)',
+            'Burkholderiaceae': 'rgba(59, 159, 192)',
+            'Anoxybacillaceae': 'rgba(255, 117, 180)'
+        };
+
+        const orderedSeriesNames = ['Enterobacteriaceae', 'Lactobacillaceae', 'Bacillaceae', 'Mycobacteriaceae', 'Pseudomonadaceae', 'Streptomycetaceae', 'Burkholderiaceae', 'Anoxybacillaceae'];
+        const series = orderedSeriesNames.map(organism => {
+            const organismData = data[organism];
+            const points = Object.keys(organismData).map(key => {
+                const genomeNumber = organismData[key][0];
+                const geneNumber = organismData[key][1];
+
+                // Ensure non-zero, positive values for logarithmic scale
+                const xValue = Math.max(genomeNumber, 1);
+                const yValue = Math.max(geneNumber, 1);
+
+                return {x: xValue, y: yValue, name: key};
+            });
+
+            return {
+                name: organism,
+                color: colorList[organism],
+                data: points,
+                marker: {
+                    symbol: 'circle',
+                    radius: 6,
+                    states: {
+                        hover: {
+                            enabled: true,
+                            lineColor: 'rgb(100,100,100)',
+                            radiusPlus: 2
+                        }
+                    }
+                }
+            };
+        });
+
+        Highcharts.chart('container', {
+            chart: {
+                type: 'scatter',
+                zoomType: 'x',
+                zooming: {
+                    mouseWheel: false
+                }
+            },
+            exporting: {
+                enabled: false
+            },
+            title: {
+                text: '',
+                style: {
+                    fontSize: (0.9 * coefficient) + 'em'
+                }
+            },
+            xAxis: {
+                title: {
+                    text: 'Genomes',
+                    style: {
+                        fontSize: (0.9 * coefficient) + 'em'
+                    }
+                },
+                type: 'logarithmic',
+                showLastLabel: true,
+                tickInterval: 1,
+                lineWidth: 1,
+                tickWidth: 1,
+                gridLineWidth: 1,
+                crosshair: true,
+                labels: {
+                    style: {
+                        fontSize: (0.9 * coefficient) + 'em',
+                    }
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Genes',
+                    style: {
+                        fontSize: (0.8 * coefficient) + 'em',
+                    }
+                },
+                type: 'logarithmic',
+                lineWidth: 1,
+                tickInterval: 1,
+                tickWidth: 1,
+                gridLineWidth: 1,
+                crosshair: true,
+                labels: {
+                    style: {
+                        fontSize: (0.8 * coefficient) + 'em',
+                    }
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'left',
+                verticalAlign: 'top',
+                x: 80 * coefficient,
+                itemStyle: {
+                    fontSize: (0.7 * coefficient) + 'em',
+                },
+                floating: true,
+                backgroundColor: Highcharts.defaultOptions.chart.backgroundColor,
+                borderWidth: 1
+            },
+
+            plotOptions: {
+                scatter: {
+                    tooltip: {
+                        headerFormat: '<b>{point.name}</b><br>',
+                        pointFormat: '<b>Species</b>: {point.name}<br><b>Number of genomes</b>: {point.x}<br><b>Number of genes:</b> {point.y}'
+                    },
+                    point: {
+                        events: {
+                            click: function () {
+                                window.open(`../../Pangenome_analyses_overview.html?species=${encodeURIComponent(this.options.name)}`, '_blank');
+                            }
+                        }
+                    }
+                }
+            },
+            series: series,
+            credits: {
+                enabled: false
+            }
+        });
+    });
+</script>
+</body>
+</html>
