@@ -82,3 +82,4 @@ CONTAINER ID   IMAGE                            COMMAND                  CREATED
 d262e9064c87   django_project-nginx             "/docker-entrypoint.…"   8 seconds ago    Up 7 seconds   0.0.0.0:80->80/tcp, :::80->80/tcp           pankb-nginx
 927a8c3c63e1   django_project-django_gunicorn   "sh /entrypoint.sh"      18 seconds ago   Up 7 seconds   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp   pankb-web
 ```
+In case you do Python remote server development via SSH (e.g., using PyCharm IDE), you should use the remote Python interpreter from the `django_unicorn` Docker Compose. 
