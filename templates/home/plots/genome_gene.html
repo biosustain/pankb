@@ -159,7 +159,7 @@
                     point: {
                         events: {
                             click: function () {
-                                window.open(`../../Pangenome_analyses_overview.html?species=${encodeURIComponent(this.options.name)}`, '_blank');
+				window.open("{% url 'pangenome_analyses_overview' %}" + `?species=${encodeURIComponent(this.options.name)}`, '_blank');
                             }
                         }
                     }
