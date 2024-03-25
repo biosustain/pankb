@@ -75,7 +75,7 @@ Build the containers with Docker Compose:
 ```
 docker compose up -d --build
 ```
-The web-application must now be available in your browser on http://127.0.0.1 or http://<your-public-ip-address> (it will use the standard 80 port). The command `docker ps` should show two docker containers running:
+The web-application must now be available in your browser on http://127.0.0.1 (local development) or http://(type-your-public-ip-address-here) (remote server development). If you use a virtual machine, your IP address will be the public address of your virtual machine. It will use the standard 80 port. The command `docker ps` should show two docker containers running:
 ```
 >>> docker ps
 CONTAINER ID   IMAGE                            COMMAND                  CREATED          STATUS         PORTS                                       NAMES
