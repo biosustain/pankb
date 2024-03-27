@@ -37,7 +37,14 @@ Now Docker should be installed. The respective daemon is running and will start 
 ```
 sudo systemctl status docker
 ```
-
+Finally, change docker.sock to new permissions:
+```
+sudo chmod 666 /var/run/docker.sock
+```
+and restart the docker daemon:
+```
+sudo systemctl restart docker
+```
 ### Set up an ability to execute the `docker` command without `sudo`
 By default, the `docker` command can only be run by <b>root</b> (if you type `sudo` afront of it) or by a user included into the <b>docker</b> group (this is a group that Docker creates during the installation). If you want to avoid typing `sudo` every time you run the `docker` command, add yourself to the <b>docker</b> group:
 ```
@@ -62,13 +69,15 @@ sudo apt install git
 ### Set up the repository and build the containers
 Create /pankb_web directory and change to it:
 ```
-mkdir /pankb_web
-sudo chown $USER /pankb_web
-cd /pankb_web 
+sudo mkdir /projects
+cd /projects
+sudo mkdir pankb_web
+sudo chown -R $USER pankb_web
+cd pankb_web 
 ```
-Clone the PanKB git repo into the subdirectory /django_project and change to it:
+Clone the PanKB git repo (the <i>develop</i> branch) into the subdirectory /django_project and change to it:
 ```
-git clone https://github.com/biosustain/pankb.git django_project
+git clone --branch develop https://github.com/biosustain/pankb.git django_project
 cd django_project
 ```
 Build the containers with Docker Compose:
