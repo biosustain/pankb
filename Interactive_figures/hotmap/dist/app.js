@@ -19925,7 +19925,8 @@
                             const species = urlParams.get('species');
                             const genome_id = t.rowName;
                             const gene_id = t.colName;
-                            const url = '../../genome_page/genome_page.html?species=' + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id) + '&' +'gene_id=' + encodeURIComponent(gene_id);
+                            const gene_class = t.xMeta[2];
+                            const url = '../../genome_page/genome_page.html?species=' + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id) + '&' +'gene_id=' + encodeURIComponent(gene_id) + '&' +'gene_class=' + encodeURIComponent(gene_class) ;
                             window.open(url, '_blank');
                         },
                     })

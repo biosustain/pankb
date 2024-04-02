@@ -37,29 +37,6 @@
     });
   });
 
-  /*
-   document.addEventListener('DOMContentLoaded', function() {
-     const urlParams = new URLSearchParams(window.location.search);
-     const species = urlParams.get('species');
-
-     fetch("https://pankb.blob.core.windows.net/data/PanKB/Interactive_figures/data/" + species + "/locustag.json.gz")
-             .then(response => {
-               if (!response.ok) {
-                 throw new Error("HTTP error " + response.status);
-               }
-               return response.arrayBuffer();
-             })
-             .then(buffer => {
-               var decompressedData = pako.inflate(new Uint8Array(buffer), { to: 'string' });
-               var locustag = JSON.parse(decompressedData);
-               window.locustag = locustag; // Store locustag globally
-             })
-             .catch(function(error) {
-               console.log('Fetch error:', error);
-             });
-   });
- */
-
 
 
 </script>

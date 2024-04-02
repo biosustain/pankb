@@ -12,7 +12,7 @@
 	<style>
 
 		body {
-			overflow-x: hidden; /* Block horizontal overflow */
+			/*overflow-x: hidden;*/
 		}
 
 		#tooltip {
@@ -60,7 +60,7 @@
 					//msa = require("msa");
 					//msa = window.msa;
 
-					var opts = {};
+					const opts = {};
 
 					opts.el = document.getElementById("MSA");
 					opts.vis = {
@@ -95,7 +95,7 @@
 					};
 
 					// init msa
-					var m = new msa(opts);
+					const m = new msa(opts);
 
 
 
@@ -113,7 +113,7 @@
 
 
 						m.g.on("row:click", function(data) {
-							// Get the sequence object
+
 							const sequence = m.seqs.at(data.seqId);
 							const urlParams = new URLSearchParams(window.location.search);
 							const species = urlParams.get('species');
@@ -128,13 +128,13 @@
 								return;
 							}
 
-							// Otherwise, store the current sequence ID
+							if (panel) {
+								panel.remove();
+							}
+
 							currentSeqId = data.seqId;
 
-							// If the panel doesn't exist, create it
-							if (!panel) {
-								panel = createPanel(species, sequenceName);
-							}
+							panel = createPanel(species, sequenceName);
 
 							// Update the panel position and make it visible
 							panel.style.left = data.evt.pageX + 'px'; // position the panel at the mouse pointer
@@ -143,7 +143,7 @@
 						});
 
 						function createPanel(species, genome_id) {
-							var panel = document.createElement('div');
+							const panel = document.createElement('div');
 
 
 							panel.style.position = "absolute";
@@ -156,13 +156,12 @@
 							panel.classList.add("card");
 
 							// Option 1: Jump to new page
-							var jumpBtn = document.createElement('button');
+							const jumpBtn = document.createElement('button');
 							jumpBtn.setAttribute("type", "button");
 							jumpBtn.classList.add("btn", "btn-primary", "btn-sm", "mb-1"); // Add margin bottom class
 							jumpBtn.innerHTML = "Info of " + sequenceName;
 							jumpBtn.onclick = function() {
-								// Define a unique URL for each sequence
-								var url = '../../Gene_function/genome_page/genome_page.html?species=' + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id)
+								const url = '../../Gene_function/genome_page/genome_page.html?species=' + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id)
 
 								// Open a new page
 								window.open(url, '_blank');
@@ -173,11 +172,10 @@
 							};
 							panel.appendChild(jumpBtn);
 
-							// Add an empty line (line break)
 							panel.appendChild(document.createElement('br'));
 
 							// Option 2: Copy row label text
-							var copyBtn = document.createElement('button');
+							const copyBtn = document.createElement('button');
 							copyBtn.setAttribute("type", "button");
 							copyBtn.classList.add("btn", "btn-primary", "btn-sm");
 							copyBtn.innerHTML = "Copy genome id";
@@ -195,7 +193,7 @@
 							};
 							panel.appendChild(copyBtn);
 
-							// Append the panel to body
+							// Append the NEW panel to the body
 							document.body.appendChild(panel);
 
 							return panel;
@@ -246,47 +244,28 @@
 
 
 							// Show the generated HTML in the tooltip
-							var tooltip = document.getElementById('tooltip');
+							const tooltip = document.getElementById('tooltip');
 							tooltip.innerHTML = tooltipHtml;
 
-							var rect = document.getElementById('MSA').getBoundingClientRect();
+							const rect = document.getElementById('MSA').getBoundingClientRect();
 
-							tooltip.style.left = (data.evt.pageX - rect.left - 50) + 'px';  // position the tooltip at the mouse pointer
-							tooltip.style.top = (data.evt.pageY - rect.top + 10) + 'px';
+							tooltip.style.left = (data.evt.pageX - rect.left - 100) + 'px';  // position the tooltip at the mouse pointer
+							tooltip.style.top = (data.evt.pageY - rect.top + 20) + 'px';
 							tooltip.classList.remove('tooltip-hidden');
 							tooltip.classList.add('tooltip-showing');
+							document.addEventListener('click', hideTooltip);
+
 						});
 
-						// And don't forget to handle the mouseout event to hide the panel:
-						m.g.on("column:mouseout", function(data) {
-							var tooltip = document.getElementById('tooltip');
-							tooltip.classList.remove('tooltip-showing');
-							tooltip.classList.add('tooltip-hidden');
-						});
+						function hideTooltip(event) {
+							const tooltip = document.getElementById('tooltip');
+							if (!tooltip.contains(event.target)) {
+								tooltip.classList.add('tooltip-hidden');
+								document.removeEventListener('click', hideTooltip); // Remove listener after hiding
+							}
+						}
 
-						// m.g.on("column:click", function(data) {
-						// 	// Create text to be shown in the panel
-						// 	var text = 'Column: ' + data.rowPos;
-						// 	console.log(text);
-						// 	console.log(data.evt);
-						// 	// Show the text in the panel
-						// 	var tooltip = document.getElementById('tooltip');
-						// 	tooltip.textContent = text;
-						//
-						// 	var rect = document.getElementById('MSA').getBoundingClientRect();
-						//
-						// 	tooltip.style.left = (data.evt.pageX - rect.left - 50) + 'px';  // position the tooltip at the mouse pointer
-						// 	tooltip.style.top = (data.evt.pageY - rect.top + 10) + 'px';
-						// 	tooltip.classList.remove('tooltip-hidden');
-						// 	tooltip.classList.add('tooltip-showing');
-						// });
-						//
-						// // And don't forget to handle the mouseout event to hide the panel:
-						// m.g.on("column:mouseout", function(data) {
-						// 	var tooltip = document.getElementById('tooltip');
-						// 	tooltip.classList.remove('tooltip-showing');
-						// 	tooltip.classList.add('tooltip-hidden');
-						// });
+
 
 					}
 
@@ -300,21 +279,21 @@
 						return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null;
 					}
 
-					var url = getURLParameter('seq') || defaultURL;
+					const url = getURLParameter('seq') || defaultURL;
 
 					// Fetch and parse file, then render MSA
 					fetch(url)
 							.then(response => response.text())
 							.then((data) => {
 								// Parse the fasta string
-								var seqs = msa.io.fasta.parse(data);
+								const seqs = msa.io.fasta.parse(data);
 
 								// Import parsed sequences
 								m.seqs.reset(seqs);
 
 								// Calculate the alignment width and the length of the sequence
-								var alignmentWidth = m.g.zoomer.get('alignmentWidth');
-								var sequenceLength = m.seqs.getMaxLength(); // assuming all sequences have the same length
+								const alignmentWidth = m.g.zoomer.get('alignmentWidth');
+								const sequenceLength = m.seqs.getMaxLength(); // assuming all sequences have the same length
 
 								// Set the 'boxRectWidth' based on the calculated values
 								m.g.zoomer.set('boxRectWidth', alignmentWidth / sequenceLength);

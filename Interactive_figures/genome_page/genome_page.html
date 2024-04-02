@@ -157,6 +157,7 @@
                 <thead>
                 <tr>
                     <th class="text-center align-middle">Gene ID</th>
+                    <th class="text-center align-middle">Gene Class</th>
                     <th class="text-center align-middle">Locus Tag</th>
                     <th class="text-center align-middle">Prokka Annotation</th>
                     <th class="text-center align-middle">Start Position</th>
@@ -197,6 +198,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');
     const genome_id = urlParams.get('genome_id');
+    const gene_class = urlParams.get('gene_class');
     let gene_id = urlParams.get('gene_id');
     if (gene_id.includes('/')) {
         gene_id = gene_id.replace(/\//g, '_');
@@ -273,9 +275,14 @@
                     {
                         data: null,
                         render: function(data, type, row) {
-                            // Render the gene_id value here
-                            return '<a href="../../Gene_function/locustag.html?species=' + species + '&gene=' + encodeURIComponent(gene_id) + '" target="_blank">' + gene_id + '</a>';
+                            return '<a href="../../Gene_function/locustag.html?species=' + species + '&gene=' + encodeURIComponent(gene_id) + '&gene_class=' + encodeURIComponent(gene_class) +'" target="_blank">' + gene_id + '</a>';
                         }
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return gene_class;
+                        },
                     },
                     { data: 'Locus_Tag' },
                     { data: 'Prokka_Annotation' },
@@ -286,7 +293,7 @@
                 ],
                 columnDefs: [
                     {
-                        targets: [5, 6], // Apply the function to the inference, translation, and product columns
+                        targets: [6, 7], // Apply the function to the inference, translation, and product columns
                         render: function(data, type, row) {
                             if (type === 'display' && data.length > 20) {
                                 return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 20) + '...</span>';
