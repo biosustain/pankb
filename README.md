@@ -80,7 +80,7 @@ Clone the PanKB git repo (the <i>develop</i> branch) into the subdirectory /djan
 git clone --branch develop https://github.com/biosustain/pankb.git django_project
 cd django_project
 ```
-Create the .env.dev file under the /projects/pankb_web/django_project/ folder in the following format (do not forget to choose your own SECRET_KEY, SUPER_USER_PASSWORD, SUPER_USER_EMAIL and optionally other fields):
+Create a file with the name ".env" under the /projects/pankb_web/django_project/ folder in the following format (do not forget to choose your own SECRET_KEY, SUPER_USER_PASSWORD, SUPER_USER_EMAIL and optionally other fields):
 ```
 ## Do not put this file under version control!
 
