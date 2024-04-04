@@ -1,5 +1,5 @@
 # PanKB
-The dynamic Python-based version of the website. The Django framework is used as the back-end. Currently, it has not yet been connected to any databases (Microsoft Azure Blob Storage is used as the data lake).
+<b>The dynamic Python-based version of the website. The Django framework is used as the back-end. Currently, it has been connected to databases, but only Django generated tables are in the DBs. The Microsoft Azure Blob Storage is still used as the data lake. The work under this branch is focused on the data model and ETLs.</b>
 
 ## Development configuration on Ubuntu servers
 Tested on Linux Ubuntu 20.04 (may need tweaks for other systems).
