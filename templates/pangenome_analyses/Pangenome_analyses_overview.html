@@ -186,7 +186,6 @@
             Cumulative_Frequency.src = "{% url 'cumulative_freq' %}?species=" + species;
 
             const heatmap_all = document.getElementById('heatmap_all');
-            //heatmap_all.src = './Interactive_figures/hotmap/demo/index.html?species=' + species + '&gene_class=core';
             heatmap_all.src = "{% url 'hotmap' %}?species=" + species + "&gene_class=core"
 
             const step_histogram = document.getElementById('step_histogram');
@@ -217,7 +216,7 @@
 
             const urlParams = new URLSearchParams(window.location.search);
             const species = urlParams.get('species');
-            iframe.src = './Interactive_figures/hotmap/demo/index.html?species=' + species +'&gene_class=' + gene_class;
+            iframe.src = "{% url 'hotmap' %}?species=" + species + "&gene_class=" + gene_class;
 
             // Update dropdown button text
             const dropdownButton = document.getElementById('dropdownButton');
