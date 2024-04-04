@@ -80,6 +80,18 @@ Clone the PanKB git repo (the <i>develop</i> branch) into the subdirectory /djan
 git clone --branch develop https://github.com/biosustain/pankb.git django_project
 cd django_project
 ```
+Create the .env.dev file under the /projects/pankb_web/django_project/ folder in the following format (do not forget to choose your own SECRET_KEY, SUPER_USER_PASSWORD, SUPER_USER_EMAIL and optionally other fields):
+```
+## Do not put this file under version control!
+
+## Django: The secret key
+SECRET_KEY='<any string you choose>'
+
+## Django: Super-User Credentials
+SUPER_USER_NAME = 'admin'
+SUPER_USER_PASSWORD = '<any password you choose>'
+SUPER_USER_EMAIL = '<your email>'
+```
 Build the containers with Docker Compose:
 ```
 docker compose up -d --build
