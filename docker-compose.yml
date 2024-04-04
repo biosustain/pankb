@@ -10,7 +10,7 @@ services:
     environment:
       DEBUG: False
     env_file:
-      - .env.dev
+      - .env
     ports:
       - "8000:8000"
     depends_on:
@@ -37,7 +37,7 @@ services:
       - ./mongodb/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
       - ../docker_volumes/mongodb:/data/db
     env_file:
-      - .env.dev
+      - .env
     ports:
       - "27017:27017"
 
@@ -48,6 +48,6 @@ services:
     volumes:
       - ../docker_volumes/postgres:/var/lib/postgresql/data
     env_file:
-      - .env.dev
+      - .env
     ports:
       - "5432:5432"

@@ -81,7 +81,7 @@ Clone the PanKB git repo (the <i>develop</i> branch) into the subdirectory /djan
 git clone --branch develop https://github.com/biosustain/pankb.git django_project
 cd django_project
 ```
-Create the .env.dev file under the /projects/pankb_web/django_project/ folder in the following format (do not forget to choose your own SECRET_KEY, SUPER_USER_PASSWORD, SUPER_USER_EMAIL, MONGO_INITDB_ROOT_PASSWORD, MONGODB_PASSWORD, POSTGRES_PASSWORD and optionally other fields):
+Create a file with the name ".env" under the /projects/pankb_web/django_project/ folder in the following format (do not forget to choose your own SECRET_KEY, SUPER_USER_PASSWORD, SUPER_USER_EMAIL, MONGO_INITDB_ROOT_PASSWORD, MONGODB_PASSWORD, POSTGRES_PASSWORD and optionally other fields):
 ```
 ## Do not put this file under version control!
 
@@ -123,4 +123,4 @@ CONTAINER ID   IMAGE                            COMMAND                  CREATED
 b3197b7ed6cb   mongo:7.0-rc                     "docker-entrypoint.s…"   About an hour ago   Up About an hour   0.0.0.0:27017->27017/tcp, :::27017->27017/tcp   pankb-mongodb
 eb78ba6978c0   postgres:14-alpine               "docker-entrypoint.s…"   About an hour ago   Up About an hour   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       pankb-postgresdb
 ```
-In case you do Python remote server development via SSH (e.g., using PyCharm IDE), you should use the remote Python interpreter from the django_unicorn Docker Compose. 
+In case you do Python remote server development via SSH (e.g., using PyCharm IDE), you should use the remote Python interpreter from the django_unicorn Docker Compose.
