@@ -79,6 +79,7 @@
                 <thead>
                 <tr>
                     <th class="text-center align-middle">Gene ID</th>
+                    <th class="text-center align-middle">Gene Class</th>
                     <th class="text-center align-middle">Locus Tag</th>
                     <th class="text-center align-middle">Prokka Annotation</th>
                     <th class="text-center align-middle">Start Position</th>
@@ -103,6 +104,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');
     const genome_id = urlParams.get('genome_id');
+    const gene_class = urlParams.get('gene_class');
     let gene_id = urlParams.get('gene_id');
     if (gene_id.includes('/')) {
         gene_id = gene_id.replace(/\//g, '_');
@@ -156,10 +158,8 @@
 
     // Gene Info Table Rendering: ----
     try {
-        const data = {{ dataGene | safe }};
-
         // Convert the data object to an array for DataTables
-        let geneData = data;
+        let geneData = {{ dataGene | safe }};
         // Filter the geneData based on the Genome ID
         const matchedEntry = geneData.find(entry => entry.Genome_ID === genome_id);
         geneData = matchedEntry ? [matchedEntry] : [];
@@ -177,8 +177,14 @@
                     data: null,
                     render: function(data, type, row) {
                         // Render the link to the respective gene info here
-                        return '<a href = "' + "{% url 'gene_info' %}" + '?species=' + species + '&gene=' + encodeURIComponent(gene_id) + '" target="_blank">' + gene_id + '</a>';
+                        return '<a href = "' + "{% url 'gene_info' %}" + '?species=' + species + '&gene=' + encodeURIComponent(gene_id) + '&gene_class=' + encodeURIComponent(gene_class) + '" target="_blank">' + gene_id + '</a>';
                     }
+                },
+                {
+                    data: null,
+                    render: function(data, type, row) {
+                        return gene_class;
+                    },
                 },
                 { data: 'Locus_Tag' },
                 { data: 'Prokka_Annotation' },
@@ -189,7 +195,7 @@
             ],
             columnDefs: [
                 {
-                    targets: [5, 6], // Apply the function to the inference, translation, and product columns
+                    targets: [6, 7], // Apply the function to the 6th and 7th columns
                     render: function(data, type, row) {
                         if (type === 'display' && data.length > 20) {
                             return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 20) + '...</span>';
