@@ -80,29 +80,29 @@
     const tableBody = document.getElementById('table-body');
 
     // Iterate over each species
-    data.Species.forEach((species, index) => {
-        const total = data.Gene_class[index][0] + data.Gene_class[index][1] + data.Gene_class[index][2];
-        const family = data.Family[index]; // Add this line to get the family information
-        const coreWidth = (data.Gene_class[index][0] / total) * 100;
-        const accessoryWidth = (data.Gene_class[index][1] / total) * 100;
-        const rareWidth = (data.Gene_class[index][2] / total) * 100;
+    data.species.forEach((species, index) => {
+        const total = data.gene_class_distribution[index][0] + data.gene_class_distribution[index][1] + data.gene_class_distribution[index][2];
+        const family = data.family[index]; // Add this line to get the family information
+        const coreWidth = (data.gene_class_distribution[index][0] / total) * 100;
+        const accessoryWidth = (data.gene_class_distribution[index][1] / total) * 100;
+        const rareWidth = (data.gene_class_distribution[index][2] / total) * 100;
 
         const row = document.createElement('tr');
         row.innerHTML = `
                     <td class="text-center align-middle">${family}</td>
                     <td class="text-center align-middle">${species}</td>
-                    <td class="text-center align-middle">${data.Openness[index]}</td>
+                    <td class="text-center align-middle">${data.openness[index]}</td>
                     <td class="text-center align-middle">
                     <div style="display: flex; height: 1.2em; max-width: 80%; margin: auto; border-radius: 0.6em; overflow: hidden;">
-                        <div style="width: ${coreWidth}%; background-color: rgba(128,0,128,0.8);" data-toggle="tooltip" title="Core: ${data.Gene_class[index][0]}"></div>
-                        <div style="width: ${accessoryWidth}%; background-color: rgba(255,165,0,0.8);" data-toggle="tooltip" title="Accessory: ${data.Gene_class[index][1]}"></div>
-                        <div style="width: ${rareWidth}%; background-color: rgba(0,128,0,0.8);" data-toggle="tooltip" title="Rare: ${data.Gene_class[index][2]}"></div>
+                        <div style="width: ${coreWidth}%; background-color: rgba(128,0,128,0.8);" data-toggle="tooltip" title="Core: ${data.gene_class_distribution[index][0]}"></div>
+                        <div style="width: ${accessoryWidth}%; background-color: rgba(255,165,0,0.8);" data-toggle="tooltip" title="Accessory: ${data.gene_class_distribution[index][1]}"></div>
+                        <div style="width: ${rareWidth}%; background-color: rgba(0,128,0,0.8);" data-toggle="tooltip" title="Rare: ${data.gene_class_distribution[index][2]}"></div>
 
                       </div>
                     </td>
-                    <td class="text-center align-middle">${data.N_of_genome[index]}</td>
+                    <td class="text-center align-middle">${data.genomes_num[index]}</td>
                     <td class="text-center align-middle">
-                      <a id="${data.Pangenome_analyses[index]}" href="#" onclick="handleLinkClick(event, '${data.Pangenome_analyses[index]}')">${data.Pangenome_analyses[index]}</a>
+                      <a id="${data.pangenome_analyses[index]}" href="#" onclick="handleLinkClick(event, '${data.pangenome_analyses[index]}')">${data.pangenome_analyses[index]}</a>
                     </td>
 
                   `;
