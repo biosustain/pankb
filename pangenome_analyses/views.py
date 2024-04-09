@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
+from .models import GeneAnnotations
 import json, requests, io, gzip
 import pandas as pd
+import numpy as np
 
 
 ################### Overview Page Templates ###################################
@@ -142,14 +144,24 @@ def gene_annotation(request):
   r1 = requests.get(url1)
   json_obj1 = r1.json()
 
-  url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/All.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  r2 = requests.get(url2)
-  json_obj2 = r2.json()
+  # Set the filter() function parameters: ----
+  filter_params = {}
+  filter_params['pangenome_analyses'] = species
+  gene_annotations = GeneAnnotations.objects.filter(**filter_params).values()
+
+  # Transform the QuerySet with gene annotations into a pandas df: ----
+  gene_annotations_pd = pd.DataFrame(list(gene_annotations), index=None)
+  # Remove the column with ids: ----
+  del  gene_annotations_pd["_id"]
+  # Transform the dataframe with gene annotations into a list of lists (imposed by the front-end js):
+  ga_list_of_lists = gene_annotations_pd.values.tolist()
+  # Transform the list of lists into
+  gene_annotations_json = json.dumps(ga_list_of_lists, default=str)
 
   # Compose a context for the template rendering
   context = {
     'speciesData': json.dumps(json_obj1),
-    'dataset': json.dumps(json_obj2)
+    'dataset': gene_annotations_json
   }
   return HttpResponse(template.render(context, request))
 
