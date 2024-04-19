@@ -24,6 +24,7 @@ from publications import views as publications_views
 from organisms import views as organisms_views
 from pangenome_analyses import views as pangenome_analyses_views
 from gene_function import views as gene_function_views
+from search import views as search_views
 
 import json, requests
 
@@ -65,6 +66,7 @@ urlpatterns = [
     path('msa/', gene_function_views.msa, name='msa'),
     path('gene_function/genome_info/', gene_function_views.genome_info, name='genome_info'),
     path('genome_barplot/', gene_function_views.genome_barplot, name='genome_barplot'),
-    path('gene_function/genome_gene_info/', gene_function_views.genome_gene_info, name='genome_gene_info')
+    path('gene_function/genome_gene_info/', gene_function_views.genome_gene_info, name='genome_gene_info'),
+    path("search/", search_views.search_results, name="search_results")
     #path('admin/', admin.site.urls)   # make the amdin panel inaccessible via its utl (the admin admin is preserved for the potential future needs)
 ]

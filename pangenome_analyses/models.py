@@ -16,3 +16,6 @@ class GeneAnnotations(models.Model):
    class Meta:
        managed = True  # tells Django to manage the table’s creation, modification, and deletion
        db_table = 'gene_annotations'
+       indexes = [
+           models.Index(fields=['gene', 'annotation']) # create a compound index on the fields to facilitate the filter() operations
+       ]

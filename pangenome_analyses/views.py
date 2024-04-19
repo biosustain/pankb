@@ -153,9 +153,9 @@ def gene_annotation(request):
   gene_annotations_pd = pd.DataFrame(list(gene_annotations), index=None)
   # Remove the column with ids: ----
   del  gene_annotations_pd["_id"]
-  # Transform the dataframe with gene annotations into a list of lists (imposed by the front-end js):
+  # Transform the dataframe with gene annotations into a list of lists (imposed by the front-end JS):
   ga_list_of_lists = gene_annotations_pd.values.tolist()
-  # Transform the list of lists into
+  # Transform the list of lists into a JSON object: ----
   gene_annotations_json = json.dumps(ga_list_of_lists, default=str)
 
   # Compose a context for the template rendering

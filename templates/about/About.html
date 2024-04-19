@@ -18,10 +18,10 @@
         }
         .fixed-sidebar {
             position: fixed;
-            top: 100px; /* Adjust if necessary, e.g., below a top navbar */
+            top: 10.0rem; /* Adjust if necessary, e.g., below a top navbar */
             left: 0;
             height: 100vh;
-            width: 23%;;
+            width: 23%;
             overflow-y: auto; /* To make sidebar scrollable if content is long */
         }
         h1 {
@@ -43,6 +43,10 @@
 
 <!-- Include the top navigation panel, which is the same for every page -->
 {% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link active" organisms_link_style="nav-link" publications_link_style="nav-link" %}
+<!-- ######### -->
+
+<!-- Include the search bar under the top navigation panel: -->
+{%  include "search/search_bar.html" with search_bar_style="navbar-non-landing" %}
 <!-- ######### -->
 
 <div class="row">

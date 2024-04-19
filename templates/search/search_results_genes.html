@@ -1,0 +1,142 @@
+{% load static %}
+
+<style>
+    .table-responsive {
+        width: 100%;  /* make sure it fills its container */
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        display: flex;
+    }
+
+    td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .expanded-row td {
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    thead th input {
+        width: 80%;
+    }
+
+    .table {
+        table-layout: fixed;
+    }
+
+    .dataTables_filter {
+        display: none;    /* Remove the "Search" filter above the table */
+    }
+
+    .dataTables_paginate {
+        padding-right: 5px;
+    }
+</style>
+
+<!-- Datatable: Genes found -->
+<div class="table_padding" style="width:100%;">
+    Genes
+    <div class="table-responsive">
+        <table id="genes_list" class="table table-hover">
+            <thead>
+            <tr>
+                <th class="text-left">Gene Name</th>
+                <th class="text-left">Species</th>
+                <th class="text-left">Class</th>
+                <th class="text-left">Frequency</th>
+                <th class="text-left">COG Category</th>
+                <th class="text-left">COG Name</th>
+                <th class="text-left">Annotation</th>
+                <th class="text-left">Description</th>
+                <th class="text-left">PFAMs</th>
+            </tr>
+            </thead>
+            <tbody class="text-left align-middle" id="tbody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(async function () {
+
+        data = {{ genes_results | safe }}
+        const Gene = data;
+
+        let table = $('#genes_list').DataTable({
+            responsive: true,
+            lengthChange: false,
+            paging: true,
+            destroy: true,
+            order: [],   // preserve the original order (needed to order by relevance)
+            data: Gene,
+            columns: [
+                {
+                    data: '0',
+                    render: function (data, type, row) {
+                        return '<a href=" {% url 'gene_info' %}?species=' + encodeURIComponent(row[8]) + '&gene=' + encodeURIComponent(data) + '&gene_class=' + encodeURIComponent(row[7]) + '" target="_blank">' + data + '</a>';
+                    }
+                },
+                {
+                    data: '8',
+                    render: function (data, type, row) {
+                        return '<a href=" {% url 'pangenome_analyses_overview' %}?species=' + encodeURIComponent(row[8]) + '" target="_blank">' + data + '</a>';
+                    }
+                },
+                {data: '7'},
+                {data: '6'},
+                {data: '1'},
+                {data: '2'},
+                {data: '4'},
+                {data: '3'},
+                {data: '5'}
+            ],
+            language: {
+                loadingRecords: 'Loading...',
+                zeroRecords: 'No data available in table'
+            },
+
+            drawCallback: function (settings) {
+                // Get the query string from the the URL parameter: ----
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                const q = urlParams.get('q')
+                // Highlight text found by the search and optinally expand some rows if the text is found in the "Annotation" column
+                // after the table "Genes" is re-drawn (e.g., after the page is changed)
+                highlightText(q);
+            },
+
+            initComplete: function () {
+                var api = this.api();
+                // Existing column search code
+                $(this.api().table().header()).find('th').each(function (index, th) {
+                    var columnHeader = $(th);
+                    var columnIndex = index;
+                    var searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 60%; display: block; justify-content: center;" />')
+                        .on('keyup change clear', function () {
+                            api.column(columnIndex).search(this.value).draw();
+                        })
+                        .on('click', function(e) {  // Prevent event bubbling on click
+                            e.stopPropagation();
+                        });
+                    $(searchInput).appendTo(columnHeader);
+                });
+            }
+        });
+
+        // Expand or collapse a table row on click: ----
+        $('#genes_list tbody').on('click', 'td', function () {
+            let row = $(this).closest('tr')
+            row.toggleClass('expanded-row');
+        });
+
+    });
+
+</script>

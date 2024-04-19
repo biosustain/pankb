@@ -1,0 +1,26 @@
+<!-- The Search Bar Template -->
+<! -- Based on the navbar css class from bootstrap -->
+
+{% load static %}
+
+<style>
+    .navbar-non-landing {
+        background-color:#41424c;
+        margin-top:-2.0rem;
+        padding-top:2.0rem;
+        margin-bottom:0.5rem;
+    }
+</style>
+
+<!-- The panel containing the search form is implemented as a variation of the Bootstrap's navigation bar  -->
+<nav class="navbar navbar-expand-md navbar-dark {{ search_bar_style }}">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#searchForm" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-center" id="searchForm">
+            <!-- Include the search form itself -->
+            {%  include "search/search_form.html" %}
+        </div>
+    </div>
+</nav>

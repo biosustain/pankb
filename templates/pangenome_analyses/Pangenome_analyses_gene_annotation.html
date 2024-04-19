@@ -44,14 +44,13 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 0;
+
         }
         tbody td {
             padding: 1.1em !important;  /* adjust as needed */
         }
         .dataTables_wrapper .dataTables_filter {
             display: none;
-
         }
         thead th {
             height: 5em;
@@ -71,7 +70,6 @@
         .dataTables_wrapper tbody td {
             text-align: center;
             vertical-align: middle;
-
         }
         .expanded-row td {
             white-space: normal;
@@ -86,6 +84,10 @@
 {% block content %}
     <!-- Include the top navigation panel, which is the same for every page -->
     {% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" %}
+    <!-- ######### -->
+
+    <!-- Include the search bar under the top navigation panel: -->
+    {%  include "search/search_bar.html" with search_bar_style="navbar-non-landing" %}
     <!-- ######### -->
 
     <div class = "container-fluid">

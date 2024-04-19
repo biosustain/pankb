@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'publications',
     'organisms',
     'pangenome_analyses',
-    'gene_function'
+    'gene_function',
+    'search'
 ]
 
 MIDDLEWARE = [

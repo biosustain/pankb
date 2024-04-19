@@ -77,6 +77,11 @@
     <!-- Include the top navigation panel, which is the same for every page -->
     {% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" %}
     <!-- ######### -->
+
+    <!-- Include the search bar under the top navigation panel: -->
+    {%  include "search/search_bar.html" with search_bar_style="navbar-non-landing" %}
+    <!-- ######### -->
+
     <div class="vh-100">
         <div class="row">
             <!-- Include the info panel on the left (it is shared between several apps) -->

@@ -1,0 +1,57 @@
+{% load static %}
+
+<!-- Datatable: Families found -->
+<div class="table_padding">
+    Families
+    <table id="families_list" class="table table-hover" style=" width:15%; table-layout: fixed;">
+        <thead>
+        <tr>
+            <th class="text-left align-left">Family Name</th>
+        </tr>
+        </thead>
+        <tbody id="table-body-families"></tbody>
+    </table>
+</div>
+
+<script>
+    var template_screen_width = 1920;
+    var current_window_Width = window.innerWidth;
+    var coefficient = current_window_Width / template_screen_width;
+    var data = {{ families_results | safe }}
+    var tableBody = document.getElementById('table-body-families');
+
+    // Iterate over each species in case the search results are not empty: ----
+    if (!isEmpty(data)) {
+        data.family.forEach((family, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                    <td class="text-left align-left"><a id="${data.family[index]}" href="#" onclick="handleLinkClickFamily(event, '${data.family[index]}')">${data.family[index]}</a></td>
+                    `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    $(document).ready(function () {
+        // Initialize DataTable with drawCallback after the document is loaded
+        $('#families_list').DataTable({
+            searching: false,
+            lengthChange: false,
+            bPaginate: false,
+            paging: false,
+            bInfo: false,
+            order: [],     // preserve the original order (needed to order by relevance)
+            drawCallback: function(settings) {
+                $('[data-toggle="tooltip"]').tooltip();
+                adjustStyles();
+            }
+        });
+    });
+
+    function handleLinkClickFamily(e, family) {
+        // Prevent the default link behavior
+        e.preventDefault();
+        // Navigate to the new page
+        window.location.href = "{% url 'organisms' %}" + `?family=${family}`
+    }
+
+</script>

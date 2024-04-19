@@ -1,0 +1,201 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Search results</title>
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-fixed/">
+    <!-- DataTables Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <!-- jQuery -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"> </script>
+    <!-- DataTables JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"> </script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"> </script>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <style>
+        html {
+            font-size: 18px;
+        }
+
+        .table_padding{
+            padding-top: 0px;
+            padding-bottom: 0px;
+            padding-right: 120px;
+            padding-left: 120px;
+        }
+
+        tr, th{
+            height: 50px;
+            font-size: 1.0em;
+            vertical-align: middle;
+        }
+
+        td {
+            height: 50px;
+            word-wrap: break-word;
+            white-space: normal;
+            font-size: 1.0em;
+        }
+    </style>
+</head>
+
+<body data-bs-spy="scroll" data-bs-target="#navbar-example">
+<!-- Include the top navigation panel, which is the same for every page -->
+{% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" %}
+<!-- ######### -->
+
+<!-- Include the search bar under the top navigation panel: -->
+{%  include "search/search_bar.html" with search_bar_style="navbar-non-landing" %}
+<!-- ######### -->
+
+<div class="table_padding">Showing all search results for <b>{{ request.GET.q }}</b></div>
+<br>
+
+<script>
+    // Function checking if a JS object is empty: ----
+    function isEmpty(obj) {
+        for (const prop in obj) {
+            if (Object.hasOwn(obj, prop)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Function that highlights text found by the search in the table cells for the "Families" and "Species" search results tables
+    // and optionally expands a row in the "Genes" table if the text found is in the "Annotation" column: ----
+    // !!!
+    //////// The index of the "Annotation" column has to be modified if we add columns to the left side of the "Annotation" column ////////
+    // !!!
+    function highlightText(searchTerm) {
+        // Get all elements containing text
+        const elements = document.querySelectorAll('td');
+        // Loop through each element
+        elements.forEach((element) => {
+            const text = element.innerText;
+            const regex = new RegExp(`(${searchTerm})`, "gi");
+            // Check if the element's text contains the search term
+            if (text.match(regex)) {
+                // Split the text into parts (matched and unmatched)
+                const parts = text.split(regex);
+                // Create a new HTML structure with the matched term highlighted
+                const highlightedText = parts
+                    .map((part) =>
+                        part.match(regex)
+                            ? `<span style="background-color: yellow;">${part}</span>`
+                            : part
+                    )
+                    .join("");
+                // Replace the original text with the highlighted version
+                element.innerHTML = highlightedText;
+
+                // Expand
+                if (element.cellIndex == 6) {
+                    let row = element.closest('tr')
+                    row.classList.add('expanded-row');
+                }
+            }
+        });
+    }
+
+</script>
+
+<!-- Include search results for families: -->
+{%  include "search/search_results_families.html" %}
+<!-- ######### -->
+<br>
+<!-- Include search results for species: -->
+{%  include "search/search_results_species.html" %}
+<!-- ######### -->
+<br>
+<!-- Include search results for genes: -->
+{%  include "search/search_results_genes.html" %}
+<!-- ######### -->
+
+<script>
+
+    // Get the global query string paramater for the higlight func: ----
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const q = urlParams.get('q')
+
+    // Highlight text found by the search in the tables: ----
+    highlightText(q);
+
+    function adjustTableFontSize2(coefficient) {
+        const tableHeadersAndData = document.querySelectorAll('#families_list th, #families_list td, #species_list th, #species_list td');
+        tableHeadersAndData.forEach(element => {
+            element.style.fontSize = (18 * coefficient) + 'px';
+        });
+    }
+
+    function adjustHtmlFontSize(coefficient) {
+        const newFontSize = 18 * coefficient;
+        document.documentElement.style.fontSize = newFontSize + 'px';
+    }
+
+    function adjustTablePadding(coefficient) {
+        const tablePaddingElements = document.querySelectorAll('.table_padding');
+        tablePaddingElements.forEach(element => {
+            element.style.paddingTop = 0 * coefficient + 'px';
+            element.style.paddingBottom = 0 * coefficient + 'px';
+            element.style.paddingRight = 120 * coefficient + 'px';
+            element.style.paddingLeft = 120 * coefficient + 'px';
+        });
+    }
+
+    function adjustTableFontSize(coefficient) {
+        const tableHeadersAndData = document.querySelectorAll('table');
+        tableHeadersAndData.forEach(element => {
+            element.style.fontSize = 18 * coefficient + 'px';
+            element.style.height = 40 * coefficient + 'px';
+        });
+    }
+
+    function adjustDataTablesInterface(coefficient) {
+        // Adjust the font size for 'Showing 1 to 10 of 51 entries'
+        const infoElements = document.querySelectorAll('.dataTables_info');
+        infoElements.forEach(element => {
+            element.style.fontSize = (18 * coefficient) + 'px'; // Adjust base font size as needed
+        });
+
+        // Adjust the font size for pagination controls
+        const paginateElements = document.querySelectorAll('.dataTables_paginate');
+        paginateElements.forEach(element => {
+            element.style.fontSize = (14 * coefficient) + 'px'; // Adjust base font size as needed
+        });
+    }
+
+    function adjustStyles() {
+        let template_screen_width = 1920;
+        let current_window_Width = window.innerWidth;
+        let coefficient = current_window_Width / template_screen_width;
+
+        adjustHtmlFontSize(coefficient);
+        adjustTablePadding(coefficient);
+        adjustTableFontSize(coefficient);
+        adjustTableFontSize2(coefficient);
+        adjustDataTablesInterface(coefficient);
+    }
+
+    // Adjust styles on page load and window resize
+    document.addEventListener("DOMContentLoaded", adjustStyles);
+    window.addEventListener("resize", adjustStyles);
+
+    /* A hacky way to solve a problem with incorrectly working pagination: */
+    /* by adjusting the columns when the pagination buttons are clicked */
+    $('.dataTables_paginate .paginate_button').click(function() {
+        // Call the function with the search term you want to highlight
+        highlightText(q);
+        $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+    });
+</script>
+
+<br><br> <!-- Include two empty lines to create some spase after the pagination bar -->
+</body>
+</html>

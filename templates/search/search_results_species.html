@@ -1,0 +1,57 @@
+{% load static %}
+
+<!-- Datatable: Species found -->
+<div class="table_padding" style="width: 50%">
+    Species
+    <table id="species_list" class="table table-hover" style="table-layout: fixed;">
+        <thead>
+        <tr>
+            <th class="text-left align-left" >Species Name</th>
+            <th class="text-left align-left" style="width:30%;">Family Name</th>
+        </tr>
+        </thead>
+        <tbody id="table-body-species"></tbody>
+    </table>
+</div>
+
+<script>
+    var template_screen_width = 1920;
+    var current_window_Width = window.innerWidth;
+    var coefficient = current_window_Width / template_screen_width;
+    var data = {{ species_results | safe }}
+    var tableBody = document.getElementById('table-body-species');
+
+    // Iterate over each species in case the search results are not empty: ----
+    if (!isEmpty(data)) {
+        data.species.forEach((species, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                    <td class="text-left align-left"><a id="${data.species[index]}" href="#" onclick="handleLinkClickSpecies(event, '${data.pangenome_analyses[index]}')">${data.species[index]}</a></td>
+                    <td class="text-left align-left">${data.family[index]}</td>
+                    `;
+            tableBody.appendChild(row);
+        });
+    };
+
+    $(document).ready(function () {
+        // Initialize DataTable with drawCallback after the document is loaded
+        $('#species_list').DataTable({
+            searching: false,
+            lengthChange: false,
+            bPaginate: true,
+            order: [],    // preserve the original order (needed to order by relevance)
+            drawCallback: function(settings) {
+                $('[data-toggle="tooltip"]').tooltip();
+                adjustStyles();
+            }
+        });
+    });
+
+    function handleLinkClickSpecies(e, species) {
+        // Prevent the default link behavior
+        e.preventDefault();
+        // Navigate to the new page
+        window.location.href = "{% url 'pangenome_analyses_overview' %}" + `?species=${species}`
+    }
+
+</script>

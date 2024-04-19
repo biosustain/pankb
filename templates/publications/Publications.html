@@ -102,6 +102,10 @@
 {% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link active" %}
 <!-- ######### -->
 
+<!-- Include the search bar under the top navigation panel: -->
+{%  include "search/search_bar.html" with search_bar_style="navbar-non-landing" %}
+<!-- ######### -->
+
 <div class="table_padding overflow-auto">
     <div style="width:80%;">
         <table id="example" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
