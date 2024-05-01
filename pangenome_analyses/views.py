@@ -4,7 +4,6 @@ from django.template import loader
 from .models import GeneAnnotations
 import json, requests, io, gzip
 import pandas as pd
-import numpy as np
 
 
 ################### Overview Page Templates ###################################
