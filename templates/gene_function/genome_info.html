@@ -48,18 +48,18 @@
 {% endblock %}
 
 {% block content %}
-    <h2 style = 'text-align: center; font-size: 1.6em;' >Genome Info Page</h2>
+    <h2 style = 'text-align: center; font-size: 1.6em;' >Genome Info</h2>
     <div class="row">
         <div class="col-1">
         </div>
         <div class="col-10">
-            <br><br>
+            <br>
             <div class="table_padding">
                 <table id="genome_info" class="table table-hover" style="width:100%; table-layout: fixed;">
                     <thead>
                     <tr>
                         <th class="text-center align-middle">Genome ID</th>
-                        <th class="text-center align-middle">Species (NCBI)</th>
+                        <th class="text-center align-middle">Strain (NCBI)</th>
                         <th class="text-center align-middle">Source</th>
                         <th class="text-center align-middle">Isolation Source</th>
                         <th class="text-center align-middle">Country</th>
@@ -103,7 +103,7 @@
 
             row.innerHTML = `
                 <td class="text-center align-middle">${genome_id}
-                {% if antismash_url != '' %}<br><a href='{{antismash_url|safe}}' target="_blank"><img src="https://antismash.secondarymetabolites.org/images/antismash_logo.svg" alt="antiSMASH - Identified Secondary Metabolite Regions" style="height: 1.7em;"></a>{% endif %}
+                {% if antismash_url != '' %}&nbsp;<a href='{{antismash_url|safe}}' target="_blank"><img src="https://antismash.secondarymetabolites.org/images/antismash_logo.svg" alt="antiSMASH - Identified Secondary Metabolite Regions" style="height: 1.7em;"></a>{% endif %}
                 </td>
                 <td class="text-center align-middle">${data[genome_id]['strain']}</td>
                 <td class="text-center align-middle"><a href="https://www.ncbi.nlm.nih.gov/datasets/genome/${genome_id}" target="_blank">NCBI</a></td>
@@ -128,7 +128,13 @@
                 $('[data-toggle="tooltip"]').tooltip()
             })
             // Initialize DataTable
-            $('#species_list').DataTable();
+            $('#genome_info').DataTable({
+                searching: false,
+                lengthChange: false,
+                bPaginate: false,
+                paging: false,
+                bInfo: false,
+            });
         }
         catch(error) {
             console.error(error)
