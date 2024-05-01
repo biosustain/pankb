@@ -78,7 +78,7 @@
 {% endblock %}
 
 {% block content %}
-    <h2 style = 'text-align: center; font-size: 1.6em;'> Gene Info Page </h2>
+    <h2 style = 'text-align: center; font-size: 1.6em;'>Gene Info Page </h2>
     <div class="table_padding overflow-auto">
         <div style="width:90%;">
             <table id="gene_table" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
@@ -91,6 +91,7 @@
                     <th class="text-center align-middle">End Position</th>
                     <th class="text-center align-middle">Nucleotide Seq</th>
                     <th class="text-center align-middle">Amino Acid Seq</th>
+                    <th class="text-center align-middle">Pathways</th>
                 </tr>
                 </thead>
                 <tbody class="text-center align-middle" id="tbody">
@@ -128,22 +129,24 @@
                 let table = $('#gene_table').DataTable({
                     data: geneData,
                     columns: [
-                        { data: 'Locus_Tag' },
+                        { data: 'locus_tag' },
                         {
-                            data: 'Genome_ID',
+                            data: 'genome_id',
                             render: function(data, type, row) {
                                 return '<a href=" {% url 'genome_info' %}?species=' + encodeURIComponent(species) + '&genome_id=' + encodeURIComponent(data) + '" target="_blank">' + data + '</a>';
                             }
                         },
-                        { data: 'Prokka_Annotation' },
-                        { data: 'Start_Position' },
-                        { data: 'End_Position' },
-                        { data: 'Nucleotide_Seq' },
-                        { data: 'Amino_Acid_Seq' }
+                        { data: 'prokka_annotation' },
+                        { data: 'start_position' },
+                        { data: 'end_position' },
+                        { data: 'nucleotide_seq' },
+                        { data: 'aminoacid_seq' },
+                        { data: 'pathways' }
+
                     ],
                     columnDefs: [
                         {
-                            targets: [2, 5, 6], // Apply the function to the inference, translation, and product columns
+                            targets: [2, 5, 6], // Apply the function to the "Prokka Annotation", "Nucleotide Seq" and "Amino Acid Seq" columns
                             render: function(data, type, row) {
                                 if (type === 'display' && data.length > 30) {
                                     return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 30) + '...</span>';

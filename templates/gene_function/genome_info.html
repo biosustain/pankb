@@ -68,8 +68,6 @@
                         <th class="text-center align-middle">Genome Length</th>
                         <th class="text-center align-middle">Number of Genes</th>
                         <th class="text-center align-middle">Gene Class Distribution</th>
-                        <!-- Load the Secondary Metabolite Regions column only if the antiSMASH link exists for the given genome -->
-                        {% if antismash_url != '' %} <th class="text-center align-middle">Secondary Metabolite Regions</th>{% endif %}
                     </tr>
                     </thead>
                     <tbody id="table-body"></tbody>
@@ -95,7 +93,7 @@
             const data = {{ dataGenome|safe }}
 
             const tableBody = document.getElementById('table-body');
-            const geneClassDistribution = data[genome_id]['Gene_class_distribution'];
+            const geneClassDistribution = data[genome_id]['gene_class_distribution'];
             const total = geneClassDistribution[0] + geneClassDistribution[1] + geneClassDistribution[2];
             const coreWidth = (geneClassDistribution[0] / total) * 100;
             const accessoryWidth = (geneClassDistribution[1] / total) * 100;
@@ -104,11 +102,13 @@
             const row = document.createElement('tr');
 
             row.innerHTML = `
-                <td class="text-center align-middle">${genome_id}</td>
-                <td class="text-center align-middle">${data[genome_id]['full_name']}</td>
+                <td class="text-center align-middle">${genome_id}
+                {% if antismash_url != '' %}<br><a href='{{antismash_url|safe}}' target="_blank"><img src="https://antismash.secondarymetabolites.org/images/antismash_logo.svg" alt="antiSMASH - Identified Secondary Metabolite Regions" style="height: 1.7em;"></a>{% endif %}
+                </td>
+                <td class="text-center align-middle">${data[genome_id]['strain']}</td>
                 <td class="text-center align-middle"><a href="https://www.ncbi.nlm.nih.gov/datasets/genome/${genome_id}" target="_blank">NCBI</a></td>
                 <td class="text-center align-middle">${data[genome_id]['isolation_source']}</td>
-                <td class="text-center align-middle">${data[genome_id]['Country']}</td>
+                <td class="text-center align-middle">${data[genome_id]['country']}</td>
                 <td class="text-center align-middle">${data[genome_id]['geo_loc_name']}</td>
                 <td class="text-center align-middle">${(data[genome_id] && typeof data[genome_id]['gc_content'] === 'number') ? data[genome_id]['gc_content'].toFixed(3) : 'null'}</td>
                 <td class="text-center align-middle">${data[genome_id]['genome_len']}</td>
@@ -120,7 +120,6 @@
                         <div style="width: ${rareWidth}%; background-color: rgba(0,128,0,0.8);" data-toggle="tooltip" title="Rare: ${geneClassDistribution[2]}"></div>
                     </div>
                 </td>
-                {% if antismash_url != '' %}<td class="text-center align-middle"><a href='{{antismash_url|safe}}' target="_blank">antiSMASH</a></td>{% endif %}
             `;
             tableBody.appendChild(row);
 

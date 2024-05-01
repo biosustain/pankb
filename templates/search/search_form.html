@@ -10,7 +10,7 @@
 
     /* Style the search field */
     form.search input[type=text] {
-        width: 60ch;     /* 1ch is approximately equal to the width of 1 character */
+        width: 72ch;     /* 1ch is approximately equal to the width of 1 character */
         border: 1px solid grey;
         border-radius: 0;
         display: inline-block;
@@ -73,7 +73,11 @@
     <label for="q">
         <span style="color:#a9a6a7;">Examples: </span>
         <span style="color:#57a0d3"><i>
-        <a class="search" href="{% url 'search_results' %}?q=Limosilactobacillus+reuteri">Limosilactobacillus reuteri</a>, <a class="search" href="{% url 'search_results' %}?q=adhE">adhE</a>, <a class="search" href="{% url 'search_results' %}?q=mannosylglycerate hydrolase">mannosylglycerate hydrolase</a>
+            <a class="search" href="{% url 'search_results' %}?q=Limosilactobacillus+reuteri">Limosilactobacillus reuteri</a>,
+            <a class="search" href="{% url 'search_results' %}?q=Rhamnolipid">Rhamnolipid</a>,
+            <a class="search" href="{% url 'search_results' %}?q=adhE">adhE</a>,
+            <a class="search" href="{% url 'search_results' %}?q=mannosylglycerate hydrolase">mannosylglycerate hydrolase</a>,
+            <a class="search" href="{% url 'search_results' %}?q=lacto">lacto</a>
         </i></span>
     </label>
 </form>
