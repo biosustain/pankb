@@ -1,0 +1,146 @@
+{% load static %}
+
+<style>
+    .table-responsive {
+        width: 100%;  /* make sure it fills its container */
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        display: flex;
+    }
+
+    td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .expanded-row td {
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    thead th input {
+        width: 80%;
+    }
+
+    .table {
+        table-layout: fixed;
+    }
+
+    .dataTables_filter {
+        display: none;    /* Remove the "Search" filter above the table */
+    }
+
+    .dataTables_paginate {
+        padding-right: 5px;
+    }
+</style>
+
+<!-- Datatable: Pathways found -->
+<div class="table_padding" style="width:100%;">
+    <h5>Pathways</h5>
+    <div class="table-responsive">
+        <table id="pathways_list" class="table table-hover">
+            <thead>
+            <tr>
+                <th class="text-left">Pathway ID</th>
+                <th class="text-left">Name</th>
+                <th class="text-left">Species</th>
+                <th class="text-left">Strain (NCBI)</th>
+                <th class="text-left">Gene Name(s)</th>
+                <th class="text-left">Product(s)</th>
+            </tr>
+            </thead>
+            <tbody class="text-left align-middle" id="tbody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(async function () {
+
+        data = {{ pathways_results | safe }}
+        const Pathways = data;
+
+        let table = $('#pathways_list').DataTable({
+            responsive: true,
+            lengthChange: false,
+            paging: true,
+            destroy: true,
+            order: [],   // preserve the original order (needed to order by relevance)
+            data: Pathways,
+            columns: [
+                {
+                    data: '0',
+                    render: function (data, type, row) {
+                        return '<a href="{% url 'pathway_info' %}?pathway_id=' + data + '" target="_blank">' + data + '</a>';
+                    }
+                },
+                {
+                    data: '1',
+                    render: function (data, type, row) {
+                        return '<span id=pathway_name>' + data + '</span>';
+                    }
+                },
+                {
+                    data: '2',
+                    render: function (data, type, row) {
+                        return '<a href=" {% url 'pangenome_analyses_overview' %}?species=' + encodeURIComponent(data) + '" target="_blank">' + row[3] + '</a>';
+                    }
+                },
+                {data: '4'},
+                {data: '5'},
+                {
+                    data: '6',
+                    render: function (data, type, row) {
+                        return '<span id=pathway_products>' + data + '</span>';
+                    }
+                }
+            ],
+            language: {
+                loadingRecords: 'Loading...',
+                zeroRecords: 'No data available in table'
+            },
+
+            drawCallback: function (settings) {
+                // Get the query string from the the URL parameter: ----
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                const q = urlParams.get('q')
+                // Highlight text found by the search and optinally expand some rows if the text is found in the "Annotation" column
+                // after the table is re-drawn (e.g., after the page is changed)
+                highlightText(q);
+            },
+
+            initComplete: function () {
+                var api = this.api();
+                // Existing column search code
+                $(this.api().table().header()).find('th').each(function (index, th) {
+                    var columnHeader = $(th);
+                    var columnIndex = index;
+                    var searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 60%; display: block; justify-content: center;" />')
+                        .on('keyup change clear', function () {
+                            api.column(columnIndex).search(this.value).draw();
+                        })
+                        .on('click', function(e) {  // Prevent event bubbling on click
+                            e.stopPropagation();
+                        });
+                    $(searchInput).appendTo(columnHeader);
+                });
+            }
+        });
+
+        // Expand or collapse a table row on click: ----
+        $('#pathways_list tbody').on('click', 'td', function () {
+            let row = $(this).closest('tr')
+            row.toggleClass('expanded-row');
+        });
+
+    });
+
+</script>

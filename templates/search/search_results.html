@@ -55,7 +55,6 @@
 
 <div class="table_padding">Showing all search results for <b>{{ request.GET.q }}</b></div>
 <br>
-
 <script>
     // Function checking if a JS object is empty: ----
     function isEmpty(obj) {
@@ -68,22 +67,19 @@
     }
 
     // Function that highlights text found by the search in the table cells for the "Families" and "Species" search results tables
-    // and optionally expands a row in the "Genes" table if the text found is in the "Annotation" column: ----
-    // !!!
-    //////// The index of the "Annotation" column has to be modified if we add columns to the left side of the "Annotation" column ////////
-    // !!!
+    // and optionally expands a row in the "Genes" table if the text found is in the "Protein" column: ----
     function highlightText(searchTerm) {
-        // Get all elements containing text
-        const elements = document.querySelectorAll('#families_list a, #species_list a, #genes_list a, #annotation');
-        // Loop through each element
+        // Get all elements potentially containing text: ----
+        const elements = document.querySelectorAll('#families_list a, #species_list a, #genes_list a, #protein, #pathways_list a, #pathway_name, #pathway_products');
+        // Loop through each of the elements: ----
         elements.forEach((element) => {
             const text = element.innerText;
             const regex = new RegExp(`(${searchTerm})`, "gi");
-            // Check if the element's text contains the search term
+            // Check if the element's text contains the search term: ----
             if (text.match(regex)) {
-                // Split the text into parts (matched and unmatched)
+                // Split the text into parts (matched and unmatched): ----
                 const parts = text.split(regex);
-                // Create a new HTML structure with the matched term highlighted
+                // Create a new HTML structure with the matched term highlighted: ----
                 const highlightedText = parts
                     .map((part) =>
                         part.match(regex)
@@ -91,18 +87,24 @@
                             : part
                     )
                     .join("");
-                // Replace the original text with the highlighted version
+                // Replace the original text with the highlighted version: ----
                 element.innerHTML = highlightedText;
-
-                // Expand
-                if (element.cellIndex == 6) {
-                    let row = element.closest('tr')
-                    row.classList.add('expanded-row');
-                }
+            }
+        })
+        // A hacky, but always working method to expand the rows in cases the query substring was found:
+        // - in the "Name" column of the Pathways search results table;
+        // - in the "Protein" column of the Genes search results table.
+        const elements_to_expand = document.querySelectorAll('#protein, #pathway_name, #pathway_products');
+        // Now we have to iterate over some elements of interest again: ----
+        elements_to_expand.forEach((element) => {
+            const text = element.innerText;
+            const regex = new RegExp(`(${searchTerm})`, "gi");
+            if (text.match(regex)) {  // expand only if the match was found: ----
+                let row = element.closest('tr');
+                row.classList.add('expanded-row');
             }
         });
     }
-
 </script>
 
 <!-- Include search results for families: -->
@@ -111,6 +113,10 @@
 <br>
 <!-- Include search results for species: -->
 {%  include "search/search_results_species.html" %}
+<!-- ######### -->
+<br>
+<!-- Include search results for pathways: -->
+{%  include "search/search_results_pathways.html" %}
 <!-- ######### -->
 <br>
 <!-- Include search results for genes: -->
