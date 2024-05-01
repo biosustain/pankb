@@ -38,7 +38,7 @@
 
 <!-- Datatable: Genes found -->
 <div class="table_padding" style="width:100%;">
-    Genes
+    <h5>Genes</h5>
     <div class="table-responsive">
         <table id="genes_list" class="table table-hover">
             <thead>
@@ -49,7 +49,7 @@
                 <th class="text-left">Frequency</th>
                 <th class="text-left">COG Category</th>
                 <th class="text-left">COG Name</th>
-                <th class="text-left">Annotation</th>
+                <th class="text-left">Protein</th>
                 <th class="text-left">Description</th>
                 <th class="text-left">PFAMs</th>
             </tr>
@@ -85,7 +85,7 @@
                     }
                 },
                 {
-                    data: '8',
+                    data: '9',
                     render: function (data, type, row) {
                         return '<a href=" {% url 'pangenome_analyses_overview' %}?species=' + encodeURIComponent(row[8]) + '" target="_blank">' + data + '</a>';
                     }
@@ -94,11 +94,10 @@
                 {data: '6'},
                 {data: '1'},
                 {data: '2'},
-                //{data: '4'},
                 {
                     data: '4',
                     render: function (data, type, row) {
-                        return '<span id = annotation>' + data + '</span>';
+                        return '<span id=protein>' + data + '</span>';
                     }
                 },
                 {data: '3'},
@@ -115,7 +114,7 @@
                 const urlParams = new URLSearchParams(queryString);
                 const q = urlParams.get('q')
                 // Highlight text found by the search and optinally expand some rows if the text is found in the "Annotation" column
-                // after the table "Genes" is re-drawn (e.g., after the page is changed)
+                // after the table is re-drawn (e.g., after the page is changed)
                 highlightText(q);
             },
 
