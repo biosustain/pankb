@@ -1,0 +1,122 @@
+{% extends "gene_function/gene_function.html" %}
+
+{% block title %}<title>Pathway Info</title>{% endblock %}
+{% block custom_style %}
+    <style>
+        .table_padding{
+            padding-top: 0px;
+            padding-bottom: 0px;
+            padding-right: 1em;
+            padding-left: 1em;
+        }
+        th, td{
+            height: 2.8em;
+            font-size: 0.9em;
+            padding-left: 1em !important;
+            padding-right: 1em !important;
+        }
+        .dataTables_wrapper thead th {
+            text-align: center;
+            vertical-align: middle;
+            padding: 1em;
+            position: relative;
+        }
+        .dataTables_wrapper thead th input {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            margin-bottom: 0.45em;
+        }
+        .dataTables_wrapper tbody td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 0.45em;
+            word-break: break-word;
+        }
+        .responsive-iframe iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 10%;
+            right: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2 style = 'text-align: center; font-size: 1.6em;' >Pathway Info Page</h2>
+    <div class="row">
+        <div class="col-1">
+        </div>
+        <div class="col-10">
+            <br>
+            <div class="table_padding">
+                <table id="pathway_info" class="table table-hover" style="width:100%; table-layout: fixed;">
+                    <thead>
+                    <tr>
+                        <th class="text-center align-middle">Pathway ID</th>
+                        <th class="text-center align-middle">Source</th>
+                        <th class="text-center align-middle">Name</th>
+                        <th class="text-center align-middle">Species</th>
+                        <th class="text-center align-middle">Strain (NCBI)</th>
+                        <th class="text-center align-middle">Genome ID</th>
+                        <th class="text-center align-middle">Gene Name(s)</th>
+                        <th class="text-center align-middle">Product(s)</th>
+                    </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-1">
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const pathway_id = urlParams.get('pathway_id');
+
+        try {
+            // Obtain data rendered in the respective view
+            const data = {{ dataPathway|safe }}
+            const species = data[pathway_id]['pangenome_analyses']
+            const genome_id = data[pathway_id]['genome_id']
+
+            const tableBody = document.getElementById('table-body');
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td class="text-center align-middle">${pathway_id}</td>
+                <td class="text-center align-middle"><a href="https://www.kegg.jp/entry/${pathway_id}" target="_blank">KEGG</a></td>
+                <td class="text-center align-middle">${data[pathway_id]['pathway_name']}</td>
+                <td class="text-center align-middle"><a href="{% url 'pangenome_analyses_overview' %}?species=${species}" target="_blank">${data[pathway_id]['species']}</a></td>
+                <td class="text-center align-middle">${data[pathway_id]['strain']}</td>
+                <td class="text-center align-middle"><a href="{% url 'genome_info' %}?species=${species}&genome_id=${genome_id}" target="_blank">${genome_id}</a></td>
+                <td class="text-center align-middle">${data[pathway_id]['genes']}</td>
+                <td class="text-center align-middle">${data[pathway_id]['products']}</td>
+            `;
+            tableBody.appendChild(row);
+
+            // Initialize tooltips
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+            // Initialize DataTable
+            $('#pathway_info').DataTable({
+                searching: false,
+                lengthChange: false,
+                bPaginate: false,
+                paging: false,
+                bInfo: false,
+            });
+        }
+        catch(error) {
+            console.error(error)
+        }
+    </script>
+
+{% endblock %}

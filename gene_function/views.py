@@ -3,22 +3,56 @@ from django.http import HttpResponse
 from django.template import loader
 import json, requests, io
 import pandas as pd
+from .models import GeneInfo, GenomeInfo, PathwayInfo
+from pangenome_analyses.models import GeneAnnotations
+
 
 
 ################### Gene Info Page Templates ###################################
 
 # Template renderer for the Gene Info Page
 def gene_info(request):
-  template = loader.get_template('gene_function/locustag.html')
+  template = loader.get_template('gene_function/gene_info.html')
   species = request.GET['species']
   gene = request.GET['gene']
 
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/gene_locustag/' + gene + '.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  r = requests.get(url)
-  json_obj = r.json()
-  # Compose a context for the template rendering
+  # Set the filter() function parameters: ----
+  filter_params = {}
+  filter_params['pangenome_analyses'] = species
+  filter_params['gene'] = gene
+  # Obtain the gene info: ----
+  gene_info = GeneInfo.objects.filter(**filter_params).values()
+  # In the Microsoft Azure Blob Storage, we actually store python objects that are dictionaries with the records orientation:
+  # [{"key_1": value_1, "key_2": value_2,..., "key_n": value_n}, ..., {} ]
+  # Transform the data to the dataframe first and remove a columns with ids (not needed in the output): ----
+  gene_info_pd = pd.DataFrame(list(gene_info), index=None)
+  del gene_info_pd['_id']
+
+  # Iterate over genomes to retrieve info about pathways: ----
+  for genome_id in gene_info_pd['genome_id']:
+    # Set the filter() function parameters: ----
+    filter_params = {}
+    filter_params['pangenome_analyses'] = species
+    filter_params['gene'] = gene
+    filter_params['genome_id'] = genome_id
+    # Obtain info about associated pathways if any: ----
+    pathway_info = PathwayInfo.objects.filter(**filter_params).values()
+    pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
+    if len(pathway_info_pd) > 0:
+      # The line below is a hacky way to wrap list items into links.
+      # The HTML must be rendered by Django the templates: ----
+      gene_info_pd.loc[gene_info_pd.genome_id == genome_id, 'pathways'] = (
+        ", ".join(list("<a href='/gene_function/pathway_info/?pathway_id=" + pathway_info_pd["pathway_id"] + "' target='_blank'>" + pathway_info_pd["pathway_name"] + "</a>")))
+    else:
+      gene_info_pd.loc[gene_info_pd.genome_id == genome_id, 'pathways'] = "-"
+
+  # Transform the df to a list of dictionaries: ----
+  gene_info_dict = gene_info_pd.to_dict(orient = "records")
+  gene_info_json = json.dumps(gene_info_dict, default = str)  # json dumps replaces the single quotes with the double ones
+
+  # Compose a context for the template rendering: ----
   context = {
-    'dataset': json.dumps(json_obj)
+    'dataset': gene_info_json
   }
   return HttpResponse(template.render(context, request))
 
@@ -38,7 +72,7 @@ def aa_pos_overview(request):
   dataset_df2 = pd.read_csv(io.StringIO(r2.content.decode('utf-8')))
   dataset_dict2 = dataset_df2.to_dict(orient='records')
 
-  # Compose a context for the template rendering
+  # Compose a context for the template rendering: ----
   context = {
     'speciesData': json.dumps(json_obj1),
     'dataset': json.dumps(dataset_dict2)
@@ -59,7 +93,7 @@ def msa(request):
   url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/alleleome/' + gene +'/MSA.fasta'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r2 = requests.get(url2)
 
-  # Compose a context for the template rendering
+  # Compose a context for the template rendering: ----
   context = {
     'jsonData': json.dumps(json_obj1),
     'msaData': json.dumps(r2.text)
@@ -69,26 +103,35 @@ def msa(request):
 
 
 ################### Genome Info Page Templates ###################################
-
 # Template renderer for the Genome Info Page
 def genome_info(request):
-  template = loader.get_template('gene_function/genome_page.html')
+  template = loader.get_template('gene_function/genome_info.html')
   species = request.GET['species']
   genome_id = request.GET['genome_id']
 
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/genome_page/' + genome_id + '/genome_info.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  r = requests.get(url)
-  json_obj = r.json()
+  # Set the filter() function parameters: ----
+  filter_params = {}
+  filter_params['pangenome_analyses'] = species
+  filter_params['genome_id'] = genome_id
+  # Obtain the genome info: ----
+  genome_info = GenomeInfo.objects.filter(**filter_params).values()
+  # In the Microsoft Azure Blob Storage, we actually store python objects that are nested dictionaries:
+  # {"genome_id": {"key_1": value_1, "key_2": value_2, ..., "key_n": value_n}}
+  # Transform the data to the dataframe first and remove a columns with ids (not needed in the output): ----
+  genome_info_pd = pd.DataFrame(list(genome_info), index=None)
+  del genome_info_pd['_id']
 
-  # Check if antiSMASH url exists for the given genome: ----
-  antismash_url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/antismash/' + genome_id + '/index.html'
-  if requests.head(antismash_url).status_code == 404:
-    antismash_url = ''
+  # Transform the df to a dict of dicts: ----
+  genome_info_dict = genome_info_pd.to_dict(orient="index")
+  # Substitute the index with our own (genome_id): ----
+  dict_vals = {k:v for d in genome_info_dict.values() for k,v in  d.items()}
+  genome_info_dict = {genome_id: dict_vals}
+  genome_info_json = json.dumps(genome_info_dict, default = str)  # json dumps replaces the single quotes with the double ones
 
-  # Compose a context for the template rendering
+  # Compose a context for the template rendering: ----
   context = {
-    'dataGenome': json.dumps(json_obj),
-    'antismash_url': antismash_url
+    'dataGenome': genome_info_json,
+    'antismash_url':  genome_info_dict[genome_id]["antismash_url"]
   }
   return HttpResponse(template.render(context, request))
 
@@ -101,7 +144,7 @@ def genome_barplot(request):
   url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/genome_page/' + genome_id + '/COG_distribution.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
   json_obj = r.json()
-  # Compose a context for the template rendering
+  # Compose a context for the template rendering: ----
   context = {
     'dataset': json.dumps(json_obj)
   }
@@ -110,31 +153,123 @@ def genome_barplot(request):
 
 
 ################### Genome & Gene Info Page Templates ###################################
+
 # Template renderer for the Genome Info Page
 def genome_gene_info(request):
   template = loader.get_template('gene_function/genome_gene_info.html')
   species = request.GET['species']
   genome_id = request.GET['genome_id']
-  gene_id = request.GET['gene_id']
+  gene = request.GET['gene_id']
 
-  url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/genome_page/' + genome_id + '/genome_info.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  r1 = requests.get(url1)
-  json_obj1 = r1.json()
+  # Set the filter() function parameters: ----
+  filter_params = {}
+  filter_params['pangenome_analyses'] = species
+  filter_params['genome_id'] = genome_id
+  # Obtain the gene info: ----
+  genome_info = GenomeInfo.objects.filter(**filter_params).values()
+  # In the Microsoft Azure Blob Storage, we actually store python objects that are nested dictionaries:
+  # {"genome_id": {"key_1": value_1, "key_2": value_2, ..., "key_n": value_n}}
+  # Transform the data to the dataframe first and remove a columns with ids (not needed in the output): ----
+  genome_info_pd = pd.DataFrame(list(genome_info), index=None)
+  del genome_info_pd['_id']
 
-  url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/gene_locustag/' + gene_id + '.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  r2 = requests.get(url2)
-  json_obj2 = r2.json()
+  # Transform the df to a dict of dicts: ----
+  genome_info_dict = genome_info_pd.to_dict(orient="index")
+  # Substitute the index with our own (genome_id): ----
+  dict_vals = {k:v for d in genome_info_dict.values() for k,v in  d.items()}
+  genome_info_dict = {genome_id: dict_vals}
+  genome_info_json = json.dumps(genome_info_dict, default = str)  # json dumps replaces the single quotes with the double ones
 
-  # Check if antiSMASH url exists for the given genome: ----
-  antismash_url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/antismash/' + genome_id + '/index.html'
-  if requests.head(antismash_url).status_code == 404:
-    antismash_url = ''
+  ## Gene Info Table: ##
+  # Set the filter() function parameters: ----
+  filter_params = {}
+  filter_params['pangenome_analyses'] = species
+  filter_params['gene'] = gene
+  # Obtain the gene info: ----
+  gene_info = GeneInfo.objects.filter(**filter_params).values()
+  # In the Microsoft Azure Blob Storage, we actually store python objects that are dictionaries with the records orientation:
+  # [{"key_1": value_1, "key_2": value_2,..., "key_n": value_n}, ..., {} ]
+  # Transform the data to the dataframe first and remove a columns with ids (not needed in the output): ----
+  gene_info_pd = pd.DataFrame(list(gene_info), index=None)
+  del gene_info_pd['_id']
 
-  # Compose a context for the template rendering
+  # Iterate over genomes to retrieve info about pathways: ----
+  # Set the filter() function parameters: ----
+  filter_params = {}
+  filter_params['pangenome_analyses'] = species
+  filter_params['gene'] = gene
+  filter_params['genome_id'] = genome_id
+  # Obtain info about associated pathways if any: ----
+  pathway_info = PathwayInfo.objects.filter(**filter_params).values()
+  pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
+  if len(pathway_info_pd) > 0:
+    # The line below is a hacky way to wrap list items into links.
+    # The HTML must be rendered by Django the templates: ----
+    gene_info_pd.loc[gene_info_pd.genome_id == genome_id, 'pathways'] = (
+      ", ".join(list("<a href='/gene_function/pathway_info/?pathway_id=" + pathway_info_pd["pathway_id"] + "' target='_blank'>" + pathway_info_pd["pathway_name"] + "</a>")))
+  else:
+    gene_info_pd.loc[gene_info_pd.genome_id == genome_id, 'pathways'] = "-"
+
+  # Transform the df to a list of dictionaries: ----
+  gene_info_dict = gene_info_pd.to_dict(orient = "records")
+  gene_info_json = json.dumps(gene_info_dict, default = str)  # json dumps replaces the single quotes with the double ones
+
+  # Compose a context for the template rendering: ----
   context = {
-    'dataGenome': json.dumps(json_obj1),
-    'dataGene': json.dumps(json_obj2),
-    'antismash_url': antismash_url
+    'dataGenome': genome_info_json,
+    'dataGene': gene_info_json,
+    'antismash_url': genome_info_dict[genome_id]["antismash_url"]
+  }
+  return HttpResponse(template.render(context, request))
+
+
+################### Pathway Info Page Templates ###################################
+def pathway_info(request):
+  template = loader.get_template('gene_function/pathway_info.html')
+  pathway_id = request.GET['pathway_id']
+
+  pathway_info = PathwayInfo.objects.filter(pathway_id=pathway_id).values()
+  # Transform the data to the dataframe first and remove a columns with ids (as it is not needed in the output): ----
+  pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
+  del pathway_info_pd['_id']
+
+  # Iterate over genomes to retrieve info about pathways: ----
+  genome_id = pathway_info_pd['genome_id'][0]
+  species = pathway_info_pd['pangenome_analyses'][0]
+  # Set the filter() function parameters: ----
+  filter_params = {}
+  filter_params['genome_id'] = genome_id
+  filter_params['pathway_id'] = pathway_id
+  # Obtain info about the pathway genes: ----
+  genes_info = PathwayInfo.objects.filter(**filter_params).values('gene').distinct()
+  genes_info_pd = pd.DataFrame(list(genes_info), index=None)
+
+  # Get the classes from the gene annotations collection (needed for the AA position overview and MSA plots to be rendered after click on the gene links): ----
+  genes_annotations = GeneAnnotations.objects.filter(gene__in = list(genes_info_pd['gene'])).values()
+  genes_annotations_pd = pd.DataFrame(list(genes_annotations), index=None)
+
+  genes_info_pd['pangenomic_class'] = genes_annotations_pd['pangenomic_class']
+  genes_info_pd['product'] = genes_annotations_pd['protein']
+
+  # Sort by gene name for the sake of representability: ----
+  genes_info_pd.sort_values(by=['gene'], inplace=True)
+
+  # The line below is a hacky way to wrap list items into links.
+  # The HTML must be rendered by Django the templates: ----
+  pathway_info_pd.loc[pathway_info_pd.genome_id == genome_id, 'genes'] = (
+      ", ".join(list("<a href='/gene_function/gene_info/?species=" + species + "&gene=" + genes_info_pd["gene"] + "&gene_class=" + genes_info_pd["pangenomic_class"] + "' target='_blank'>" + genes_info_pd["gene"] + "</a>")))
+  pathway_info_pd.loc[pathway_info_pd.genome_id == genome_id, 'products'] = (", ".join(list(genes_info_pd["product"].str.lower())))
+
+  # Transform the pathway df to a dict of dicts like {"pathway_id": {"key_1": value_1, "key_2": value_2, ..., "key_n": value_n}}: ----
+  pathway_info_dict = pathway_info_pd.to_dict(orient="index")
+  # Substitute the index with our own (genome_id): ----
+  dict_vals = {k:v for d in pathway_info_dict.values() for k,v in  d.items()}
+  pathway_info_dict = {pathway_id: dict_vals}
+  pathway_info_json = json.dumps(pathway_info_dict, default = str)  # json dumps replaces the single quotes with the double ones
+
+  # Compose a context for the template rendering: ----
+  context = {
+    'dataPathway': pathway_info_json
   }
   return HttpResponse(template.render(context, request))
 

@@ -78,15 +78,15 @@
 {% endblock %}
 
 {% block content %}
-    <h2 style = 'text-align: center; font-size: 1.6em;'>Gene Info Page </h2>
+    <h2 style = 'text-align: center; font-size: 1.6em;'>Gene <i>{{request.GET.gene}}</i> Info</h2>
     <div class="table_padding overflow-auto">
         <div style="width:90%;">
-            <table id="gene_table" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
+            <table id="gene_info" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
                 <thead>
                 <tr>
                     <th class="text-center align-middle">Locus Tag</th>
                     <th class="text-center align-middle">Genome ID</th>
-                    <th class="text-center align-middle">Prokka Annotation</th>
+                    <th class="text-center align-middle">Protein</th>
                     <th class="text-center align-middle">Start Position</th>
                     <th class="text-center align-middle">End Position</th>
                     <th class="text-center align-middle">Nucleotide Seq</th>
@@ -126,17 +126,17 @@
             try {
                 let geneData = {{ dataset | safe }}; // Convert the data object to an array for DataTables
 
-                let table = $('#gene_table').DataTable({
+                let table = $('#gene_info').DataTable({
                     data: geneData,
                     columns: [
                         { data: 'locus_tag' },
                         {
                             data: 'genome_id',
                             render: function(data, type, row) {
-                                return '<a href=" {% url 'genome_info' %}?species=' + encodeURIComponent(species) + '&genome_id=' + encodeURIComponent(data) + '" target="_blank">' + data + '</a>';
+                                return '<a href="{% url 'genome_info' %}?species=' + encodeURIComponent(species) + '&genome_id=' + encodeURIComponent(data) + '" target="_blank">' + data + '</a>';
                             }
                         },
-                        { data: 'prokka_annotation' },
+                        { data: 'protein' },
                         { data: 'start_position' },
                         { data: 'end_position' },
                         { data: 'nucleotide_seq' },

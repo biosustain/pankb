@@ -67,6 +67,7 @@ urlpatterns = [
     path('gene_function/genome_info/', gene_function_views.genome_info, name='genome_info'),
     path('genome_barplot/', gene_function_views.genome_barplot, name='genome_barplot'),
     path('gene_function/genome_gene_info/', gene_function_views.genome_gene_info, name='genome_gene_info'),
+    path('gene_function/pathway_info/', gene_function_views.pathway_info, name='pathway_info'),
     path("search/", search_views.search_results, name="search_results")
     #path('admin/', admin.site.urls)   # make the amdin panel inaccessible via its utl (the admin admin is preserved for the potential future needs)
 ]
