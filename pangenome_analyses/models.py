@@ -11,14 +11,17 @@ class GeneAnnotations(models.Model):
    pfams = models.CharField(max_length=100)
    frequency = models.IntegerField()
    pangenomic_class = models.CharField(max_length=9)      # Core, Accessory (9 symbols) or Rare
-   pangenome_analyses = models.CharField(max_length=40)
+   pangenome_analysis = models.CharField(max_length=40)
    species = models.CharField(max_length=40)
 
    class Meta:
        managed = True  # tells Django to manage the table’s creation, modification, and deletion
-       db_table = 'gene_annotations'
+       db_table = 'pankb_gene_annotations'
        indexes = [
            models.Index(fields=['gene']),
            models.Index(fields=['protein']),
-           models.Index(fields=['species'])
+           models.Index(fields=['pangenome_analysis']),
+           models.Index(fields=['gene', 'protein'])
        ]
+
+
