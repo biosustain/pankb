@@ -1,5 +1,8 @@
-services:
+networks:
+  pankb-net:
+    name: pankb-net
 
+services:
   django_gunicorn:
     container_name: pankb-web
     build:
@@ -7,16 +10,12 @@ services:
     restart: always
     volumes:
       - ./static:/static
-    environment:
-      DEBUG: False
     env_file:
       - .env
     ports:
       - "8000:8000"
-    depends_on:
-      - mongodb
-      - postgresdb
-
+    networks:
+      - pankb-net
   nginx:
     container_name: pankb-nginx
     build: ./nginx
@@ -25,29 +24,5 @@ services:
       - ./static:/static
     ports:
       - "80:80"
-    depends_on:
-      - django_gunicorn
-
-  mongodb:
-    container_name: pankb-mongodb
-    image: mongo:7.0-rc
-    restart: always
-    command: [ '--auth', '--wiredTigerCacheSizeGB=1' ]
-    volumes:
-      - ./mongodb/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
-      - ../docker_volumes/mongodb:/data/db
-    env_file:
-      - .env
-    ports:
-      - "27017:27017"
-
-  postgresdb:
-    container_name: pankb-postgresdb
-    image: postgres:14-alpine
-    restart: always
-    volumes:
-      - ../docker_volumes/postgres:/var/lib/postgresql/data
-    env_file:
-      - .env
-    ports:
-      - "5432:5432"
+    networks:
+      - pankb-net
