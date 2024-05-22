@@ -18,7 +18,7 @@ def gene_info(request):
 
   # Set the filter() function parameters: ----
   filter_params = {}
-  filter_params['pangenome_analyses'] = species
+  filter_params['pangenome_analysis'] = species
   filter_params['gene'] = gene
   # Obtain the gene info: ----
   gene_info = GeneInfo.objects.filter(**filter_params).values()
@@ -32,11 +32,11 @@ def gene_info(request):
   for genome_id in gene_info_pd['genome_id']:
     # Set the filter() function parameters: ----
     filter_params = {}
-    filter_params['pangenome_analyses'] = species
+    filter_params['pangenome_analysis'] = species
     filter_params['gene'] = gene
     filter_params['genome_id'] = genome_id
     # Obtain info about associated pathways if any: ----
-    pathway_info = PathwayInfo.objects.filter(**filter_params).values()
+    pathway_info = PathwayInfo.objects.filter(**filter_params).order_by('pathway_name').values('pathway_id', 'pathway_name')
     pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
     if len(pathway_info_pd) > 0:
       # The line below is a hacky way to wrap list items into links.
@@ -111,7 +111,7 @@ def genome_info(request):
 
   # Set the filter() function parameters: ----
   filter_params = {}
-  filter_params['pangenome_analyses'] = species
+  filter_params['pangenome_analysis'] = species
   filter_params['genome_id'] = genome_id
   # Obtain the genome info: ----
   genome_info = GenomeInfo.objects.filter(**filter_params).values()
@@ -163,7 +163,7 @@ def genome_gene_info(request):
 
   # Set the filter() function parameters: ----
   filter_params = {}
-  filter_params['pangenome_analyses'] = species
+  filter_params['pangenome_analysis'] = species
   filter_params['genome_id'] = genome_id
   # Obtain the gene info: ----
   genome_info = GenomeInfo.objects.filter(**filter_params).values()
@@ -183,7 +183,7 @@ def genome_gene_info(request):
   ## Gene Info Table: ##
   # Set the filter() function parameters: ----
   filter_params = {}
-  filter_params['pangenome_analyses'] = species
+  filter_params['pangenome_analysis'] = species
   filter_params['gene'] = gene
   # Obtain the gene info: ----
   gene_info = GeneInfo.objects.filter(**filter_params).values()
@@ -196,11 +196,11 @@ def genome_gene_info(request):
   # Iterate over genomes to retrieve info about pathways: ----
   # Set the filter() function parameters: ----
   filter_params = {}
-  filter_params['pangenome_analyses'] = species
+  filter_params['pangenome_analysis'] = species
   filter_params['gene'] = gene
   filter_params['genome_id'] = genome_id
   # Obtain info about associated pathways if any: ----
-  pathway_info = PathwayInfo.objects.filter(**filter_params).values()
+  pathway_info = PathwayInfo.objects.filter(**filter_params).order_by('pathway_name').values('pathway_id', 'pathway_name')
   pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
   if len(pathway_info_pd) > 0:
     # The line below is a hacky way to wrap list items into links.
@@ -225,6 +225,7 @@ def genome_gene_info(request):
 
 ################### Pathway Info Page Templates ###################################
 def pathway_info(request):
+
   template = loader.get_template('gene_function/pathway_info.html')
   pathway_id = request.GET['pathway_id']
 
@@ -233,45 +234,35 @@ def pathway_info(request):
   pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
   del pathway_info_pd['_id']
 
-  # Iterate over genomes to retrieve info about pathways: ----
+  # Do not have to iterate over genomes to retrieve info about pathways.
+  # (one pathways id = one strain): ----
   genome_id = pathway_info_pd['genome_id'][0]
-  species = pathway_info_pd['pangenome_analyses'][0]
+  species = pathway_info_pd['pangenome_analysis'][0]
+
   # Set the filter() function parameters: ----
   filter_params = {}
   filter_params['genome_id'] = genome_id
   filter_params['pathway_id'] = pathway_id
   # Obtain info about the pathway genes: ----
-  genes_info = PathwayInfo.objects.filter(**filter_params).values('gene').distinct()
+  genes_info = PathwayInfo.objects.filter(**filter_params).order_by('gene').values('gene', 'product', 'pangenomic_class')
   genes_info_pd = pd.DataFrame(list(genes_info), index=None)
-
-  # Get the classes from the gene annotations collection (needed for the AA position overview and MSA plots to be rendered after click on the gene links): ----
-  genes_annotations = GeneAnnotations.objects.filter(gene__in = list(genes_info_pd['gene'])).values()
-  genes_annotations_pd = pd.DataFrame(list(genes_annotations), index=None)
-
-  genes_info_pd['pangenomic_class'] = genes_annotations_pd['pangenomic_class']
-  genes_info_pd['product'] = genes_annotations_pd['protein']
-
-  # Sort by gene name for the sake of representability: ----
-  genes_info_pd.sort_values(by=['gene'], inplace=True)
 
   # The line below is a hacky way to wrap list items into links.
   # The HTML must be rendered by Django the templates: ----
-  pathway_info_pd.loc[pathway_info_pd.genome_id == genome_id, 'genes'] = (
-      ", ".join(list("<a href='/gene_function/gene_info/?species=" + species + "&gene=" + genes_info_pd["gene"] + "&gene_class=" + genes_info_pd["pangenomic_class"] + "' target='_blank'>" + genes_info_pd["gene"] + "</a>")))
-  pathway_info_pd.loc[pathway_info_pd.genome_id == genome_id, 'products'] = (", ".join(list(genes_info_pd["product"].str.lower())))
+  pathway_info_pd.loc[pathway_info_pd.genome_id == genome_id, 'genes'] = (", ".join(list("<a href='/gene_function/gene_info/?species=" + species + "&gene=" + genes_info_pd["gene"] + "&gene_class=" + genes_info_pd["pangenomic_class"] + "' target='_blank'>" + genes_info_pd["gene"] + "</a>")))
+  # The pathway products are just proteins obtained from the KEGG DB and coded by the genes included into the pathway: ----
+  pathway_info_pd.loc[pathway_info_pd.genome_id == genome_id, 'products'] = (", ".join(list(genes_info_pd["product"])))
 
   # Transform the pathway df to a dict of dicts like {"pathway_id": {"key_1": value_1, "key_2": value_2, ..., "key_n": value_n}}: ----
   pathway_info_dict = pathway_info_pd.to_dict(orient="index")
+
   # Substitute the index with our own (genome_id): ----
-  dict_vals = {k:v for d in pathway_info_dict.values() for k,v in  d.items()}
+  dict_vals = {k:v for d in pathway_info_dict.values() for k,v in d.items()}
   pathway_info_dict = {pathway_id: dict_vals}
-  pathway_info_json = json.dumps(pathway_info_dict, default = str)  # json dumps replaces the single quotes with the double ones
+  pathway_info_json = json.dumps(pathway_info_dict, default=str)  # json dumps replaces the single quotes with the double ones
 
   # Compose a context for the template rendering: ----
   context = {
     'dataPathway': pathway_info_json
   }
   return HttpResponse(template.render(context, request))
-
-
-
