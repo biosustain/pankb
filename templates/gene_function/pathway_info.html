@@ -16,7 +16,7 @@
             padding-right: 1em !important;
         }
         .dataTables_wrapper thead th {
-            text-align: center;
+            text-align: left;
             vertical-align: middle;
             padding: 1em;
             position: relative;
@@ -30,8 +30,7 @@
             margin-bottom: 0.45em;
         }
         .dataTables_wrapper tbody td {
-            text-align: center;
-            vertical-align: middle;
+            text-align: left;
             padding: 0.45em;
             word-break: break-word;
         }
@@ -58,14 +57,14 @@
                 <table id="pathway_info" class="table table-hover" style="width:100%; table-layout: fixed;">
                     <thead>
                     <tr>
-                        <th class="text-center align-middle">Pathway ID</th>
-                        <th class="text-center align-middle">Source</th>
-                        <th class="text-center align-middle">Name</th>
-                        <th class="text-center align-middle">Species</th>
-                        <th class="text-center align-middle">Strain (NCBI)</th>
-                        <th class="text-center align-middle">Genome ID</th>
-                        <th class="text-center align-middle">Gene Name(s)</th>
-                        <th class="text-center align-middle">Product(s)</th>
+                        <th>Pathway ID</th>
+                        <th>Source</th>
+                        <th>Name</th>
+                        <th>Species</th>
+                        <th>Strain (NCBI)</th>
+                        <th>Genome ID</th>
+                        <th>Gene Name(s)</th>
+                        <th>Product(s)</th>
                     </tr>
                     </thead>
                     <tbody id="table-body"></tbody>
@@ -83,21 +82,21 @@
         try {
             // Obtain data rendered in the respective view
             const data = {{ dataPathway|safe }}
-            const species = data[pathway_id]['pangenome_analyses']
+            const species = data[pathway_id]['pangenome_analysis']
             const genome_id = data[pathway_id]['genome_id']
 
             const tableBody = document.getElementById('table-body');
             const row = document.createElement('tr');
 
             row.innerHTML = `
-                <td class="text-center align-middle">${pathway_id}</td>
-                <td class="text-center align-middle"><a href="https://www.kegg.jp/entry/${pathway_id}" target="_blank">KEGG</a></td>
-                <td class="text-center align-middle">${data[pathway_id]['pathway_name']}</td>
-                <td class="text-center align-middle"><a href="{% url 'pangenome_analyses_overview' %}?species=${species}" target="_blank">${data[pathway_id]['species']}</a></td>
-                <td class="text-center align-middle">${data[pathway_id]['strain']}</td>
-                <td class="text-center align-middle"><a href="{% url 'genome_info' %}?species=${species}&genome_id=${genome_id}" target="_blank">${genome_id}</a></td>
-                <td class="text-center align-middle">${data[pathway_id]['genes']}</td>
-                <td class="text-center align-middle">${data[pathway_id]['products']}</td>
+                <td>${pathway_id}</td>
+                <td><a href="https://www.kegg.jp/entry/${pathway_id}" target="_blank">KEGG</a></td>
+                <td>${data[pathway_id]['pathway_name']}</td>
+                <td><a href="{% url 'pangenome_analyses_overview' %}?species=${species}" target="_blank">${data[pathway_id]['species']}</a></td>
+                <td>${data[pathway_id]['strain']}</td>
+                <td><a href="{% url 'genome_info' %}?species=${species}&genome_id=${genome_id}" target="_blank">${genome_id}</a></td>
+                <td>${data[pathway_id]['genes']}</td>
+                <td>${data[pathway_id]['products']}</td>
             `;
             tableBody.appendChild(row);
 

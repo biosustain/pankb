@@ -55,12 +55,12 @@
     <table id="species_list" class="table table-hover" style=" width:100%; table-layout: fixed;">
         <thead>
         <tr>
-            <th class="text-center align-middle">Family</th>
-            <th class="text-center align-middle">Species</th>
-            <th class="text-center align-middle">Openness</th>
-            <th class="text-center align-middle">Gene Class Distribution</th>
-            <th class="text-center align-middle">Number of Genomes</th>
-            <th class="text-center align-middle">Pangenome Analyses</th>
+            <th>Family</th>
+            <th>Species</th>
+            <th>Openness</th>
+            <th>Gene Class Distribution</th>
+            <th>Number of Genomes</th>
+            <th>Pangenome Analyses</th>
         </tr>
         </thead>
         <tbody id="table-body"></tbody>
@@ -93,19 +93,19 @@
 
         const row = document.createElement('tr');
         row.innerHTML = `
-                    <td class="text-center align-middle">${family}</td>
-                    <td class="text-center align-middle">${species}</td>
-                    <td class="text-center align-middle">${data.openness[index]}</td>
-                    <td class="text-center align-middle">
-                    <div style="display: flex; height: 1.2em; max-width: 80%; margin: auto; border-radius: 0.6em; overflow: hidden;">
+                    <td>${family}</td>
+                    <td>${species}</td>
+                    <td>${data.openness[index]}</td>
+                    <td>
+                    <div style="display: flex; height: 1.2em; max-width: 80%; margin: 0; border-radius: 0.6em; overflow: hidden;">
                         <div style="width: ${coreWidth}%; background-color: rgba(128,0,128,0.8);" data-toggle="tooltip" title="Core: ${data.gene_class_distribution[index][0]}"></div>
                         <div style="width: ${accessoryWidth}%; background-color: rgba(255,165,0,0.8);" data-toggle="tooltip" title="Accessory: ${data.gene_class_distribution[index][1]}"></div>
                         <div style="width: ${rareWidth}%; background-color: rgba(0,128,0,0.8);" data-toggle="tooltip" title="Rare: ${data.gene_class_distribution[index][2]}"></div>
                       </div>
                     </td>
-                    <td class="text-center align-middle">${data.genomes_num[index]}</td>
-                    <td class="text-center align-middle">
-                      <a id="${data.pangenome_analyses[index]}" href="#" onclick="handleLinkClick(event, '${data.pangenome_analyses[index]}')">${data.pangenome_analyses[index]}</a>
+                    <td>${data.genomes_num[index]}</td>
+                    <td>
+                      <a id="${data.pangenome_analysis[index]}" href="#" onclick="handleLinkClick(event, '${data.pangenome_analysis[index]}')">${data.pangenome_analysis[index]}</a>
                     </td>
                   `;
         tableBody.appendChild(row);

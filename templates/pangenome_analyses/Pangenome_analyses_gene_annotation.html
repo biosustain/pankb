@@ -23,28 +23,24 @@
         }
         .table-responsive {
             width: 85%;  /* make sure it fills its container */
-            align-content: center;
             overflow-x: hidden !important;
             overflow-y: auto !important;
             max-height: 100vh;
             padding-left: 2.8em;
             padding-right: 1.1em;
         }
-        tr,
-        th {
+        tr, th {
             font-size: 1em;
             text-align: center;
             vertical-align: middle;
         }
         td {
             font-size: 0.9em;
-            text-align: center !important;
-            align-content: center;
+            text-align: center;
             width: 12.5% !important;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-
         }
         tbody td {
             padding: 1.1em !important;  /* adjust as needed */
@@ -56,7 +52,7 @@
             height: 5em;
             position: relative;
             text-align: center;
-            vertical-align: top !important;
+            vertical-align: top;
             padding-right: 0.4em !important;
         }
         thead th input {
@@ -69,7 +65,7 @@
         }
         .dataTables_wrapper tbody td {
             text-align: center;
-            vertical-align: middle;
+            vertical-align: top;
         }
         .expanded-row td {
             white-space: normal;
@@ -112,7 +108,7 @@
                                 <th class="text-center">Frequency</th>
                             </tr>
                             </thead>
-                            <tbody class="text-center align-middle" id="tbody">
+                            <tbody id="tbody">
                             </tbody>
                         </table>
                     </div>
@@ -163,7 +159,7 @@
                                     var columnHeader = $(th);
                                     var columnIndex = index;
 
-                                    var searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 60%; display: block; justify-content: center;" />')
+                                    var searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 60%; display: block;" />')
                                         .on('keyup change clear', function () {
                                             api.column(columnIndex).search(this.value).draw();
                                         })

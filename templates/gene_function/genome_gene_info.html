@@ -1,4 +1,4 @@
-pro{% extends "gene_function/gene_function.html"%}
+{% extends "gene_function/gene_function.html"%}
 
 {% block title %}<title>Genome & Gene Info</title>{% endblock %}
 {% block custom_style %}
@@ -16,8 +16,8 @@ pro{% extends "gene_function/gene_function.html"%}
             padding-right: 1em !important;
         }
         .dataTables_wrapper thead th {
-            text-align: center;
-            vertical-align: middle;
+            text-align: left;
+            vertical-align: top;
             padding: 1em;
             position: relative;
         }
@@ -30,8 +30,8 @@ pro{% extends "gene_function/gene_function.html"%}
             margin-bottom: 0.45em;
         }
         .dataTables_wrapper tbody td {
-            text-align: center;
-            vertical-align: middle;
+            text-align: left;
+            vertical-align: top;
             padding: 0.45em;
             word-break: break-word;
         }
@@ -57,16 +57,16 @@ pro{% extends "gene_function/gene_function.html"%}
                 <table id="genome_info" class="table table-hover" style="width:100%; table-layout: fixed;">
                     <thead>
                     <tr>
-                        <th class="text-center align-middle">Genome ID</th>
-                        <th class="text-center align-middle">Strain (NCBI)</th>
-                        <th class="text-center align-middle">Source</th>
-                        <th class="text-center align-middle">Isolation Source</th>
-                        <th class="text-center align-middle">Country</th>
-                        <th class="text-center align-middle">Geological Location Name</th>
-                        <th class="text-center align-middle">GC Content</th>
-                        <th class="text-center align-middle">Genome Length</th>
-                        <th class="text-center align-middle">Number of Genes</th>
-                        <th class="text-center align-middle">Gene Class Distribution</th>
+                        <th>Genome ID</th>
+                        <th>Strain (NCBI)</th>
+                        <th>Source</th>
+                        <th>Isolation Source</th>
+                        <th>Country</th>
+                        <th>Geological Location Name</th>
+                        <th>GC Content</th>
+                        <th>Genome Length</th>
+                        <th>Number of Genes</th>
+                        <th>Gene Class Distribution</th>
                     </tr>
                     </thead>
                     <tbody id="table-body"></tbody>
@@ -77,18 +77,18 @@ pro{% extends "gene_function/gene_function.html"%}
                 <table id="gene_info" class="table table-hover" style="width:100%; table-layout: fixed;">
                     <thead>
                     <tr>
-                        <th class="text-center align-middle">Gene ID</th>
-                        <th class="text-center align-middle">Gene Class</th>
-                        <th class="text-center align-middle">Locus Tag</th>
-                        <th class="text-center align-middle">Protein</th>
-                        <th class="text-center align-middle">Start Position</th>
-                        <th class="text-center align-middle">End Position</th>
-                        <th class="text-center align-middle">Nucleotide Seq</th>
-                        <th class="text-center align-middle">Amino Acid Seq</th>
-                        <th class="text-center align-middle">Pathways</th>
+                        <th>Gene ID</th>
+                        <th>Gene Class</th>
+                        <th>Locus Tag</th>
+                        <th>Protein</th>
+                        <th>Start Position</th>
+                        <th>End Position</th>
+                        <th>Nucleotide Seq</th>
+                        <th>Amino Acid Seq</th>
+                        <th>Pathways</th>
                     </tr>
                     </thead>
-                    <tbody class="text-center align-middle" id="tbody">
+                    <tbody id="tbody">
                     </tbody>
                 </table>
             </div>
@@ -125,19 +125,19 @@ pro{% extends "gene_function/gene_function.html"%}
             const row = document.createElement('tr');
 
             row.innerHTML = `
-                <td class="text-center align-middle">${genome_id}
+                <td>${genome_id}
                 {% if antismash_url != '' %}&nbsp;<a href='{{antismash_url|safe}}' target="_blank"><img src="https://antismash.secondarymetabolites.org/images/antismash_logo.svg" alt="antiSMASH - Identified Secondary Metabolite Regions" style="height: 1.7em;"></a>{% endif %}
                 </td>
-                <td class="text-center align-middle">${data[genome_id]['strain']}</td>
-                <td class="text-center align-middle"><a href="https://www.ncbi.nlm.nih.gov/datasets/genome/${genome_id}" target="_blank">NCBI</a></td>
-                <td class="text-center align-middle">${data[genome_id]['isolation_source']}</td>
-                <td class="text-center align-middle">${data[genome_id]['country']}</td>
-                <td class="text-center align-middle">${data[genome_id]['geo_loc_name']}</td>
-                <td class="text-center align-middle">${(data[genome_id] && typeof data[genome_id]['gc_content'] === 'number') ? data[genome_id]['gc_content'].toFixed(3) : 'null'}</td>
-                <td class="text-center align-middle">${data[genome_id]['genome_len']}</td>
-                <td class="text-center align-middle">${number_of_genes}</td>
-                <td class="text-center align-middle">
-                    <div style="display: flex; height: 20px; max-width: 80%; margin: auto; border-radius: 10px; overflow: hidden;">
+                <td>${data[genome_id]['strain']}</td>
+                <td><a href="https://www.ncbi.nlm.nih.gov/datasets/genome/${genome_id}" target="_blank">NCBI</a></td>
+                <td>${data[genome_id]['isolation_source']}</td>
+                <td>${data[genome_id]['country']}</td>
+                <td>${data[genome_id]['geo_loc_name']}</td>
+                <td>${(data[genome_id] && typeof data[genome_id]['gc_content'] === 'number') ? data[genome_id]['gc_content'].toFixed(3) : 'null'}</td>
+                <td>${data[genome_id]['genome_len']}</td>
+                <td>${number_of_genes}</td>
+                <td>
+                    <div style="display: flex; height: 20px; max-width: 80%; margin: 0; border-radius: 10px; overflow: hidden;">
                         <div style="width: ${coreWidth}%; background-color: rgba(128,0,128,0.8);" data-toggle="tooltip" title="Core: ${geneClassDistribution[0]}"></div>
                         <div style="width: ${accessoryWidth}%; background-color: rgba(255,165,0,0.8);" data-toggle="tooltip" title="Accessory: ${geneClassDistribution[1]}"></div>
                         <div style="width: ${rareWidth}%; background-color: rgba(0,128,0,0.8);" data-toggle="tooltip" title="Rare: ${geneClassDistribution[2]}"></div>

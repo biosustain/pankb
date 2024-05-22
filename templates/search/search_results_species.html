@@ -26,7 +26,7 @@
         data.species.forEach((species, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                    <td class="text-left align-left"><a id="${data.species[index]}" href="#" onclick="handleLinkClickSpecies(event, '${data.pangenome_analyses[index]}')">${data.species[index]}</a></td>
+                    <td class="text-left align-left"><a id="${data.species[index]}" href="#" onclick="handleLinkClickSpecies(event, '${data.pangenome_analysis[index]}')">${data.species[index]}</a></td>
                     <td class="text-left align-left">${data.family[index]}</td>
                     `;
             tableBody.appendChild(row);
