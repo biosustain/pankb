@@ -33,7 +33,7 @@ def search_results(request):
             del families_pd["ratio"]
 
         # Get the filtered species from the DB: ----
-        species = Organisms.objects.filter(Q(species__icontains = q)).values('species', 'family', 'pangenome_analyses').distinct()
+        species = Organisms.objects.filter(Q(species__icontains = q)).values('species', 'family', 'pangenome_analysis').distinct()
         species_pd = pd.DataFrame(list(species), index=None)
         if not species_pd.empty:
             species_pd["ratio"] = species_pd.apply(lambda row: algorithims.levenshtein(row["species"], q), axis=1)
@@ -43,30 +43,25 @@ def search_results(request):
             del species_pd["ratio"]
 
         # Get the filtered pathways from the DB: ----
-        pathways = PathwayInfo.objects.filter(Q(pathway_id__icontains = q) | Q(pathway_name__icontains = q) | Q(product__icontains = q)).values('pathway_id', 'pathway_name', 'strain', 'species', 'pangenome_analyses', 'genome_id').distinct()
+        pathways = PathwayInfo.objects.filter(Q(pathway_id__icontains = q) | Q(pathway_name__icontains = q) | Q(product__icontains = q)).order_by('strain', 'gene').values()
         pathways_pd = pd.DataFrame(list(pathways), index=None)
-        for index, row in pathways_pd.iterrows():
-            pangenome_analysis = row['pangenome_analyses']
-            genome_id = row['genome_id']
-            # Set the filter() function parameters: ----
-            filter_params = {}
-            filter_params['pathway_id'] = row['pathway_id']
-            filter_params['genome_id'] = genome_id
-            # Obtain info about the pathway genes: ----
-            genes_info = PathwayInfo.objects.filter(**filter_params).values('gene').distinct()
-            genes_info_pd = pd.DataFrame(list(genes_info), index=None)
-            # Get the classes from the gene annotations collection (needed for the AA position overview and MSA plots to be rendered after click on the gene links): ----
-            genes_annotations = GeneAnnotations.objects.filter(gene__in=list(genes_info_pd['gene'])).values()
-            genes_annotations_pd = pd.DataFrame(list(genes_annotations), index=None)
-            genes_info_pd['pangenomic_class'] = genes_annotations_pd['pangenomic_class']
-            genes_info_pd['product'] = genes_annotations_pd['protein']
-            # Sort by gene name for the sake of representability: ----
-            genes_info_pd.sort_values(by=['gene'], inplace=True)
-            # The line below is a hacky way to wrap list items into links.
-            # The HTML must be rendered by Django the templates: ----
-            pathways_pd.loc[index, 'genes'] = (", ".join(list("<a href='/gene_function/gene_info/?species=" + pangenome_analysis  + "&gene=" + genes_info_pd["gene"] + "&gene_class=" + genes_info_pd["pangenomic_class"] + "' target='_blank'>" + genes_info_pd["gene"] + "</a>")))
-            # The pathway products are just proteins coded by the genes included into the pathway: ----
-            pathways_pd.loc[index, 'products'] = (", ".join(list(genes_info_pd["product"].str.lower())))
+
+        pathways_pd["gene"] = "<a href='/gene_function/gene_info/?species=" + pathways_pd['pangenome_analysis'] + "&gene=" + pathways_pd["gene"] + "&gene_class=" + pathways_pd["pangenomic_class"] + "' target='_blank'>" + pathways_pd["gene"] + "</a>"
+
+        # Obtain one df and group it by genes creating a list out of them: ---
+        pathways_pd1 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["gene"].apply(lambda x: ", ".join(x))
+        # Obtain one df and group it by gene products creating a list out of them: ---
+        pathways_pd2 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["product"].apply(lambda x: ", ".join(x))
+
+        # Rename the columns accordingly and remove the old ones: ----
+        pathways_pd1["genes"] = pathways_pd1["gene"]
+        del pathways_pd1["gene"]
+        pathways_pd2["products"] =  pathways_pd2["product"]
+        del pathways_pd2["product"]
+
+        # Merge genes and products together: ----
+        pathways_pd = pathways_pd1.merge(pathways_pd2, how='inner', on=["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"])
+
         if not pathways_pd.empty:
             pathways_pd["ratio_pathway_id"] = pathways_pd.apply(lambda row: algorithims.levenshtein(row["pathway_id"], q), axis=1)
             pathways_pd["ratio_pathway_name"] = pathways_pd.apply(lambda row: algorithims.levenshtein(row['pathway_name'], q), axis=1)
@@ -77,7 +72,9 @@ def search_results(request):
             del pathways_pd["ratio_pathway_id"]
             del pathways_pd["ratio_pathway_name"]
             del pathways_pd["ratio_product"]
-            pathways_pd = pathways_pd[["pathway_id", "pathway_name", "pangenome_analyses", "species", "strain", "genes", "products"]]
+
+            # Filter out unnecessary columns: ----
+            pathways_pd = pathways_pd[["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain", "genes", "products"]]
 
         # Get the filtered genes from the DB: ----
         genes = GeneAnnotations.objects.filter(Q(gene__icontains = q) | Q(protein__icontains = q)).values()
