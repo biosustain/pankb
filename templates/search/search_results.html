@@ -92,9 +92,10 @@
             }
         })
         // A hacky, but always working method to expand the rows in cases the query substring was found:
-        // - in the "Name" column of the Pathways search results table;
         // - in the "Protein" column of the Genes search results table.
-        const elements_to_expand = document.querySelectorAll('#protein, #pathway_name, #pathway_products');
+        // Note: It is not a good idea to expand the "Product(s)" column of the Pathways search results table,
+        // because it can be too long and take a lot of space on the page in the expanded state.
+        const elements_to_expand = document.querySelectorAll('#protein');
         // Now we have to iterate over some elements of interest again: ----
         elements_to_expand.forEach((element) => {
             const text = element.innerText;
