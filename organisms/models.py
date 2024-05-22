@@ -8,8 +8,8 @@ class Organisms(models.Model):
    openness = models.CharField(max_length=6)   # ('Open' or 'Closed'), used CharField here instead of boolean to facilitate the parsing
    gene_class_distribution = models.CharField(max_length=20)
    genomes_num = models.IntegerField()
-   pangenome_analyses = models.CharField(max_length=40)
+   pangenome_analysis = models.CharField(max_length=40)
 
    class Meta:
        managed = True  # tells Django not to manage the table’s creation, modification, and deletion
-       db_table = 'organisms'
+       db_table = 'pankb_organisms'
