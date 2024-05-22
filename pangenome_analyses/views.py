@@ -145,7 +145,7 @@ def gene_annotation(request):
 
   # Set the filter() function parameters: ----
   filter_params = {}
-  filter_params['pangenome_analyses'] = species
+  filter_params['pangenome_analysis'] = species
   gene_annotations = GeneAnnotations.objects.filter(**filter_params).values()
 
   # Transform the QuerySet with gene annotations into a pandas df: ----
