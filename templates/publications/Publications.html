@@ -48,13 +48,9 @@
         }
         tr, th {
             font-size: 1em;
-            text-align: center;
-            vertical-align: middle;
         }
         td {
             font-size: 1em;
-            text-align: center !important;
-            vertical-align: middle !important;
             padding: 0.5em;
             width: 14.2%;
         }
@@ -76,8 +72,6 @@
             margin-bottom: 0.5em;
         }
         .dataTables_wrapper tbody td {
-            text-align: center;
-            vertical-align: middle;
             padding: 0.5em;
             word-break: break-word;
         }
@@ -108,15 +102,15 @@
 
 <div class="table_padding overflow-auto">
     <div style="width:80%;">
-        <table id="example" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
+        <table id="publications_list" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
             <thead>
             <tr>
-                <th class="text-center align-middle">Title</th>
-                <th class="text-center align-middle">DOI</th>
-                <th class="text-center align-middle">Family / Species</th>
+                <th>Title</th>
+                <th>DOI</th>
+                <th>Family / Species</th>
             </tr>
             </thead>
-            <tbody class="text-center align-middle" id="tbody">
+            <tbody id="tbody">
             </tbody>
         </table>
     </div>
@@ -124,36 +118,23 @@
 
 <!-- Datatable -->
 <script>
-    document.addEventListener('DOMContentLoaded', async function() {
-        try {
+    $(document).ready(async function () {
             // Obtain the data rendered in the view: ----
             data = {{ dataset | safe }}
 
-            let table = $('#example').DataTable({
+            let table = $('#publications_list').DataTable({
                 data: data,
                 columns: [
                     { data: 'Title',
                         render: function(data, type, row) {
-                            if (type === 'display') {
-                                // Split the text into words and check if it exceeds 20 words
-                                var words = data.split(/\s+/);
-                                if (words.length > 10) {
-                                    // Join the first 20 words and add an ellipsis
-                                    return words.slice(0, 10).join(' ') + '...';
-                                }
-                                return data;
-                            } else {
-                                return data;
-                            }
+                            return data;
                         }
                     },
                     { data: 'DOI',
                         render: function(data, type, row) {
                             if (type === 'display') {
                                 return '<a href="' + data + '" target="_blank">' + data + '</a>';
-                            } else {
-                                return data;
-                            }
+                            } else return data;
                         }
                     },
                     { data: 'Scope' }
@@ -162,11 +143,7 @@
                     {
                         targets: [0, 1, 2],
                         render: function(data, type, row) {
-                            if (type === 'display' && data && data.length > 150) {
-                                return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 150) + '...</span>';
-                            } else {
-                                return data;
-                            }
+                            return data;
                         }
                     }
                 ],
@@ -177,26 +154,8 @@
                 bSort: true,
                 searching: true
             });
-        } catch (error) {
-            console.error('Error:', error);
-        }
-
-        $('body').on('click', '.truncated', function() {
-            var fullText = $(this).attr('data-fulltext');
-            var truncatedText = $(this).text();
-            var cell = $(this).closest('td');
-
-            if (fullText !== truncatedText) {
-                $(this).text(fullText);
-                cell.addClass('expanded');
-            } else {
-                $(this).text(fullText.substr(0, 150) + '...');
-                cell.removeClass('expanded');
-            }
-
-            table.draw(false);
-        });
     });
+
 
     function adjustHtmlFontSize(coefficient) {
         const newFontSize = 18 * coefficient;
