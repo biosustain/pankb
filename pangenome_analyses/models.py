@@ -6,7 +6,7 @@ class GeneAnnotations(models.Model):
    gene = models.CharField(max_length=15)
    cog_category = models.CharField(max_length=1)
    cog_name = models.CharField(max_length=100)
-   description = models.CharField(max_length=255)
+   description = models.TextField()
    protein = models.CharField(max_length=150)
    pfams = models.CharField(max_length=100)
    frequency = models.IntegerField()
@@ -18,8 +18,6 @@ class GeneAnnotations(models.Model):
        managed = True  # tells Django to manage the table’s creation, modification, and deletion
        db_table = 'pankb_gene_annotations'
        indexes = [
-           models.Index(fields=['gene']),
-           models.Index(fields=['protein']),
            models.Index(fields=['pangenome_analysis']),
            models.Index(fields=['gene', 'protein'])
        ]

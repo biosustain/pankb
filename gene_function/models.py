@@ -18,8 +18,9 @@ class GeneInfo(models.Model):
         db_table = 'pankb_gene_info'
         indexes = [
             models.Index(fields=['gene']),
-            models.Index(fields=['protein']),
-            models.Index(fields=['pangenome_analysis'])
+            models.Index(fields=['genome_id']),
+            models.Index(fields=['pangenome_analysis']),
+            models.Index(fields=['pangenome_analysis', 'gene'])
         ]
 
 # Model for the Genome Info table content
@@ -41,7 +42,9 @@ class GenomeInfo(models.Model):
        db_table = 'pankb_genome_info'
        indexes = [
            models.Index(fields=['genome_id']),
-           models.Index(fields=['pangenome_analysis'])
+           models.Index(fields=['pangenome_analysis']),
+           models.Index(fields=['pangenome_analysis', 'genome_id']),
+           models.Index(fields=['strain'])
        ]
 
 
@@ -61,7 +64,5 @@ class PathwayInfo(models.Model):
        db_table = 'pankb_pathway_info'
        indexes = [
            models.Index(fields=['pathway_id']),
-           models.Index(fields=['pathway_name']),
-           models.Index(fields=['product']),
            models.Index(fields=['pathway_id', 'pathway_name', 'product'])
        ]
