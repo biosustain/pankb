@@ -46,23 +46,31 @@ def search_results(request):
         pathways = PathwayInfo.objects.filter(Q(pathway_id__icontains = q) | Q(pathway_name__icontains = q) | Q(product__icontains = q)).order_by('strain', 'gene').values()
         pathways_pd = pd.DataFrame(list(pathways), index=None)
 
-        pathways_pd["gene"] = "<a href='/gene_function/gene_info/?species=" + pathways_pd['pangenome_analysis'] + "&gene=" + pathways_pd["gene"] + "&gene_class=" + pathways_pd["pangenomic_class"] + "' target='_blank'>" + pathways_pd["gene"] + "</a>"
-
-        # Obtain one df and group it by genes creating a list out of them: ---
-        pathways_pd1 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["gene"].apply(lambda x: ", ".join(x))
-        # Obtain one df and group it by gene products creating a list out of them: ---
-        pathways_pd2 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["product"].apply(lambda x: ", ".join(x))
-
-        # Rename the columns accordingly and remove the old ones: ----
-        pathways_pd1["genes"] = pathways_pd1["gene"]
-        del pathways_pd1["gene"]
-        pathways_pd2["products"] =  pathways_pd2["product"]
-        del pathways_pd2["product"]
-
-        # Merge genes and products together: ----
-        pathways_pd = pathways_pd1.merge(pathways_pd2, how='inner', on=["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"])
-
         if not pathways_pd.empty:
+            pathways_pd["gene"] = "<a href='/gene_function/gene_info/?species=" + pathways_pd[
+                "pangenome_analysis"] + "&gene=" + pathways_pd["gene"] + "&gene_class=" + pathways_pd[
+                                      "pangenomic_class"] + "' target='_blank'>" + pathways_pd["gene"] + "</a>"
+
+            # Obtain one df and group it by genes creating a list out of them: ---
+            pathways_pd1 = \
+            pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"],
+                                as_index=False)["gene"].apply(lambda x: ", ".join(x))
+            # Obtain one df and group it by gene products creating a list out of them: ---
+            pathways_pd2 = \
+            pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"],
+                                as_index=False)["product"].apply(lambda x: ", ".join(x))
+
+            # Rename the columns accordingly and remove the old ones: ----
+            pathways_pd1["genes"] = pathways_pd1["gene"]
+            del pathways_pd1["gene"]
+            pathways_pd2["products"] = pathways_pd2["product"]
+            del pathways_pd2["product"]
+
+            # Merge genes and products together: ----
+            pathways_pd = pathways_pd1.merge(pathways_pd2, how='inner',
+                                             on=["pathway_id", "pathway_name", "pangenome_analysis", "species",
+                                                 "strain"])
+
             pathways_pd["ratio_pathway_id"] = pathways_pd.apply(lambda row: algorithims.levenshtein(row["pathway_id"], q), axis=1)
             pathways_pd["ratio_pathway_name"] = pathways_pd.apply(lambda row: algorithims.levenshtein(row['pathway_name'], q), axis=1)
             pathways_pd["ratio_product"] = pathways_pd.apply(lambda row: algorithims.levenshtein(row['products'], q), axis=1)
