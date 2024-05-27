@@ -20,7 +20,8 @@ class GeneInfo(models.Model):
             models.Index(fields=['gene']),
             models.Index(fields=['genome_id']),
             models.Index(fields=['pangenome_analysis']),
-            models.Index(fields=['pangenome_analysis', 'gene'])
+            models.Index(fields=['pangenome_analysis', 'gene']),
+            models.Index(fields=['pangenome_analysis', 'genome_id'])
         ]
 
 # Model for the Genome Info table content
