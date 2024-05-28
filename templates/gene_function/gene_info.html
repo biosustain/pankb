@@ -33,9 +33,17 @@
             font-size: 0.9em;
             padding: 0.45em;
             width: 14.2%;
+            height: 50px;
             padding-top: 0px !important;
             padding-bottom: 0px !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+        .expanded-row td {
+            white-space: normal;
+            word-wrap: break-word;
+    }
         .dataTables_wrapper .dataTables_filter {
             display: block;
         }
@@ -140,19 +148,6 @@
                         { data: 'nucleotide_seq' },
                         { data: 'aminoacid_seq' },
                         { data: 'pathways' }
-
-                    ],
-                    columnDefs: [
-                        {
-                            targets: [2, 5, 6], // Apply the function to the "Prokka Annotation", "Nucleotide Seq" and "Amino Acid Seq" columns
-                            render: function(data, type, row) {
-                                if (type === 'display' && data.length > 30) {
-                                    return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 30) + '...</span>';
-                                } else {
-                                    return data;
-                                }
-                            }
-                        }
                     ],
                     language: {
                         emptyTable: 'Loading...'
@@ -165,20 +160,10 @@
                 console.error('Error:', error);
             }
 
-            $('body').on('click', '.truncated', function() {
-                let fullText = $(this).attr('data-fulltext');
-                let truncatedText = $(this).text();
-                let cell = $(this).closest('td');
-
-                if (fullText !== truncatedText) { // check if fullText is not equal to truncatedText
-                    $(this).text(fullText);
-                    cell.addClass('expanded');
-                } else {
-                    $(this).text(fullText.substr(0, 20) + '...');
-                    cell.removeClass('expanded');
-                }
-
-                table.draw(false); // Redraw the DataTable to readjust the layout
+            // Expand or collapse a table row on click: ----
+            $('#gene_info tbody').on('click', 'td', function () {
+                let row = $(this).closest('tr')
+                row.toggleClass('expanded-row');
             });
 
             if (gene_class !== 'Core') {
