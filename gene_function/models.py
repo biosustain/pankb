@@ -17,9 +17,6 @@ class GeneInfo(models.Model):
         managed = True  # tells Django to manage the table’s creation, modification, and deletion
         db_table = 'pankb_gene_info'
         indexes = [
-            models.Index(fields=['gene']),
-            models.Index(fields=['genome_id']),
-            models.Index(fields=['pangenome_analysis']),
             models.Index(fields=['pangenome_analysis', 'gene']),
             models.Index(fields=['pangenome_analysis', 'genome_id'])
         ]
@@ -42,10 +39,8 @@ class GenomeInfo(models.Model):
        managed = True  # tells Django to manage the table’s creation, modification, and deletion
        db_table = 'pankb_genome_info'
        indexes = [
-           models.Index(fields=['genome_id']),
-           models.Index(fields=['pangenome_analysis']),
            models.Index(fields=['pangenome_analysis', 'genome_id']),
-           models.Index(fields=['strain'])
+           models.Index(fields=['pangenome_analysis', 'strain'])
        ]
 
 
@@ -64,6 +59,8 @@ class PathwayInfo(models.Model):
        managed = True  # tells Django to manage the table’s creation, modification, and deletion
        db_table = 'pankb_pathway_info'
        indexes = [
-           models.Index(fields=['pathway_id']),
-           models.Index(fields=['pathway_id', 'pathway_name', 'product'])
+           models.Index(fields=['pathway_id', 'pathway_name', 'product']),
+           models.Index(fields=['pangenome_analysis', 'gene', 'genome_id']),
+           models.Index(fields=['genome_id', 'pathway_id']),
+           models.Index(fields=['pathway_id', 'strain'])
        ]
