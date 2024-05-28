@@ -43,7 +43,7 @@ def search_results(request):
             del species_pd["ratio"]
 
         # Get the filtered pathways from the DB: ----
-        pathways = PathwayInfo.objects.filter(Q(pathway_id__icontains=q) | Q(pathway_name__icontains=q) | Q(product__icontains=q)).order_by('strain', 'gene').values()
+        pathways = PathwayInfo.objects.filter(Q(pathway_id__icontains=q) | Q(pathway_name__icontains=q) | Q(product__icontains=q)).values("pathway_id", "pathway_name", "pangenome_analysis", "species", "strain", "gene", "product", "pangenomic_class").order_by('gene').distinct()
         pathways_pd = pd.DataFrame(list(pathways), index=None)
 
         if not pathways_pd.empty:
@@ -52,9 +52,9 @@ def search_results(request):
                                       "pangenomic_class"] + "' target='_blank'>" + pathways_pd["gene"] + "</a>"
 
             # Obtain one df and group it by genes creating a distinct (important, each pathway is strain specific, but each strain can correspond to several genomes) list out of them: ---
-            pathways_pd1 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["gene"].apply(lambda x: ', '.join(set(x)))
+            pathways_pd1 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["gene"].apply(lambda x: ', '.join(x))
             # Obtain one df and group it by gene products creating a distinct (important, each pathway is strain specific, but each strain can correspond to several genomes)  list out of them: ---
-            pathways_pd2 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["product"].apply(lambda x: ', '.join(set(x)))
+            pathways_pd2 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["product"].apply(lambda x: ', '.join(x))
 
             # Rename the columns accordingly and remove the old ones: ----
             pathways_pd1["genes"] = pathways_pd1["gene"]
