@@ -4,7 +4,7 @@ from django.template import loader
 from django.db.models import Q
 from organisms.models import Organisms
 from pangenome_analyses.models import GeneAnnotations
-from gene_function.models import GeneInfo, GenomeInfo, PathwayInfo
+from gene_function.models import PathwayInfo
 import json
 import pandas as pd
 import re
@@ -43,7 +43,7 @@ def search_results(request):
             del species_pd["ratio"]
 
         # Get the filtered pathways from the DB: ----
-        pathways = PathwayInfo.objects.filter(Q(pathway_id__icontains = q) | Q(pathway_name__icontains = q) | Q(product__icontains = q)).order_by('strain', 'gene').values()
+        pathways = PathwayInfo.objects.filter(Q(pathway_id__icontains=q) | Q(pathway_name__icontains=q) | Q(product__icontains=q)).order_by('strain', 'gene').values()
         pathways_pd = pd.DataFrame(list(pathways), index=None)
 
         if not pathways_pd.empty:
@@ -51,14 +51,10 @@ def search_results(request):
                 "pangenome_analysis"] + "&gene=" + pathways_pd["gene"] + "&gene_class=" + pathways_pd[
                                       "pangenomic_class"] + "' target='_blank'>" + pathways_pd["gene"] + "</a>"
 
-            # Obtain one df and group it by genes creating a list out of them: ---
-            pathways_pd1 = \
-            pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"],
-                                as_index=False)["gene"].apply(lambda x: ", ".join(x))
-            # Obtain one df and group it by gene products creating a list out of them: ---
-            pathways_pd2 = \
-            pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"],
-                                as_index=False)["product"].apply(lambda x: ", ".join(x))
+            # Obtain one df and group it by genes creating a distinct (important, each pathway is strain specific, but each strain can correspond to several genomes) list out of them: ---
+            pathways_pd1 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["gene"].apply(lambda x: ', '.join(set(x)))
+            # Obtain one df and group it by gene products creating a distinct (important, each pathway is strain specific, but each strain can correspond to several genomes)  list out of them: ---
+            pathways_pd2 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["product"].apply(lambda x: ', '.join(set(x)))
 
             # Rename the columns accordingly and remove the old ones: ----
             pathways_pd1["genes"] = pathways_pd1["gene"]

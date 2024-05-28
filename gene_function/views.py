@@ -36,13 +36,13 @@ def gene_info(request):
     filter_params['gene'] = gene
     filter_params['genome_id'] = genome_id
     # Obtain info about associated pathways if any: ----
-    pathway_info = PathwayInfo.objects.filter(**filter_params).order_by('pathway_name').values('pathway_id', 'pathway_name')
+    pathway_info = PathwayInfo.objects.filter(**filter_params).order_by('pathway_name').values('pathway_id', 'pathway_name', 'strain')
     pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
     if len(pathway_info_pd) > 0:
       # The line below is a hacky way to wrap list items into links.
       # The HTML must be rendered by Django the templates: ----
       gene_info_pd.loc[gene_info_pd.genome_id == genome_id, 'pathways'] = (
-        ", ".join(list("<a href='/gene_function/pathway_info/?pathway_id=" + pathway_info_pd["pathway_id"] + "' target='_blank'>" + pathway_info_pd["pathway_name"] + "</a>")))
+        ", ".join(list("<a href='/gene_function/pathway_info/?pathway_id=" + pathway_info_pd["pathway_id"] + "&strain=" + pathway_info_pd["strain"] + "' target='_blank'>" + pathway_info_pd["pathway_name"] + "</a>")))
     else:
       gene_info_pd.loc[gene_info_pd.genome_id == genome_id, 'pathways'] = "-"
 
@@ -200,7 +200,7 @@ def genome_gene_info(request):
   filter_params['gene'] = gene
   filter_params['genome_id'] = genome_id
   # Obtain info about associated pathways if any: ----
-  pathway_info = PathwayInfo.objects.filter(**filter_params).order_by('pathway_name').values('pathway_id', 'pathway_name')
+  pathway_info = PathwayInfo.objects.filter(**filter_params).values('pathway_id', 'pathway_name')
   pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
   if len(pathway_info_pd) > 0:
     # The line below is a hacky way to wrap list items into links.
@@ -228,35 +228,32 @@ def pathway_info(request):
 
   template = loader.get_template('gene_function/pathway_info.html')
   pathway_id = request.GET['pathway_id']
+  strain = request.GET['strain']
 
-  pathway_info = PathwayInfo.objects.filter(pathway_id=pathway_id).values()
+  pathway_info = PathwayInfo.objects.filter(pathway_id=pathway_id, strain=strain).values()
   # Transform the data to the dataframe first and remove a columns with ids (as it is not needed in the output): ----
   pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
   del pathway_info_pd['_id']
-
-  # Do not have to iterate over genomes to retrieve info about pathways.
-  # (one pathways id = one strain): ----
-  genome_id = pathway_info_pd['genome_id'][0]
   species = pathway_info_pd['pangenome_analysis'][0]
 
   # Set the filter() function parameters: ----
   filter_params = {}
-  filter_params['genome_id'] = genome_id
   filter_params['pathway_id'] = pathway_id
+  filter_params['strain'] = strain
   # Obtain info about the pathway genes: ----
-  genes_info = PathwayInfo.objects.filter(**filter_params).order_by('gene').values('gene', 'product', 'pangenomic_class')
+  genes_info = PathwayInfo.objects.filter(**filter_params).order_by('gene').values('gene', 'product', 'pangenomic_class').distinct()
   genes_info_pd = pd.DataFrame(list(genes_info), index=None)
 
   # The line below is a hacky way to wrap list items into links.
   # The HTML must be rendered by Django the templates: ----
-  pathway_info_pd.loc[pathway_info_pd.genome_id == genome_id, 'genes'] = (", ".join(list("<a href='/gene_function/gene_info/?species=" + species + "&gene=" + genes_info_pd["gene"] + "&gene_class=" + genes_info_pd["pangenomic_class"] + "' target='_blank'>" + genes_info_pd["gene"] + "</a>")))
+  pathway_info_pd.loc[pathway_info_pd.strain == strain, 'genes'] = (", ".join(list("<a href='/gene_function/gene_info/?species=" + species + "&gene=" + genes_info_pd["gene"] + "&gene_class=" + genes_info_pd["pangenomic_class"] + "' target='_blank'>" + genes_info_pd["gene"] + "</a>")))
   # The pathway products are just proteins obtained from the KEGG DB and coded by the genes included into the pathway: ----
-  pathway_info_pd.loc[pathway_info_pd.genome_id == genome_id, 'products'] = (", ".join(list(genes_info_pd["product"])))
+  pathway_info_pd.loc[pathway_info_pd.strain == strain, 'products'] = (", ".join(list(genes_info_pd["product"])))
 
   # Transform the pathway df to a dict of dicts like {"pathway_id": {"key_1": value_1, "key_2": value_2, ..., "key_n": value_n}}: ----
   pathway_info_dict = pathway_info_pd.to_dict(orient="index")
 
-  # Substitute the index with our own (genome_id): ----
+  # Substitute the index with our own: ----
   dict_vals = {k:v for d in pathway_info_dict.values() for k,v in d.items()}
   pathway_info_dict = {pathway_id: dict_vals}
   pathway_info_json = json.dumps(pathway_info_dict, default=str)  # json dumps replaces the single quotes with the double ones

@@ -79,7 +79,7 @@
                 {
                     data: '0',
                     render: function (data, type, row) {
-                        return '<a href="{% url 'pathway_info' %}?pathway_id=' + data + '" target="_blank">' + data + '</a>';
+                        return '<a href="{% url 'pathway_info' %}?pathway_id=' + data + '&strain=' + encodeURIComponent(row[4]) + '" target="_blank">' + data + '</a>';
                     }
                 },
                 {
@@ -91,7 +91,7 @@
                 {
                     data: '2',
                     render: function (data, type, row) {
-                        return '<a href=" {% url 'pangenome_analyses_overview' %}?species=' + encodeURIComponent(data) + '" target="_blank">' + row[3] + '</a>';
+                        return '<a href="{% url 'pangenome_analyses_overview' %}?species=' + encodeURIComponent(data) + '" target="_blank">' + row[3] + '</a>';
                     }
                 },
                 {data: '4'},

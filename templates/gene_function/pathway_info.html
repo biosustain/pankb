@@ -62,7 +62,6 @@
                         <th>Name</th>
                         <th>Species</th>
                         <th>Strain (NCBI)</th>
-                        <th>Genome ID</th>
                         <th>Gene Name(s)</th>
                         <th>Product(s)</th>
                     </tr>
@@ -83,7 +82,6 @@
             // Obtain data rendered in the respective view
             const data = {{ dataPathway|safe }}
             const species = data[pathway_id]['pangenome_analysis']
-            const genome_id = data[pathway_id]['genome_id']
 
             const tableBody = document.getElementById('table-body');
             const row = document.createElement('tr');
@@ -94,7 +92,6 @@
                 <td>${data[pathway_id]['pathway_name']}</td>
                 <td><a href="{% url 'pangenome_analyses_overview' %}?species=${species}" target="_blank">${data[pathway_id]['species']}</a></td>
                 <td>${data[pathway_id]['strain']}</td>
-                <td><a href="{% url 'genome_info' %}?species=${species}&genome_id=${genome_id}" target="_blank">${genome_id}</a></td>
                 <td>${data[pathway_id]['genes']}</td>
                 <td>${data[pathway_id]['products']}</td>
             `;
