@@ -42,7 +42,7 @@
 <body data-bs-spy="scroll" data-bs-target="#list-example" data-bs-offset="0">
 
 <!-- Include the top navigation panel, which is the same for every page -->
-{% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link active" organisms_link_style="nav-link" publications_link_style="nav-link" %}
+{% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link active" organisms_link_style="nav-link" publications_link_style="nav-link" ai_assistant_link_style="nav-link" %}
 <!-- ######### -->
 
 <!-- Include the search bar under the top navigation panel: -->
@@ -209,6 +209,12 @@
     function adjustHtmlFontSize(coefficient) {
         const newFontSize = 18 * coefficient;
         document.documentElement.style.fontSize = newFontSize + 'px';
+    }
+
+    // Function to adjust title font size
+    function adjustTitleFontSize(coefficient) {
+        const newFontSize = 25 * coefficient;
+        document.getElementById('pankb_title').style.fontSize = newFontSize + 'px';
     }
 
     // Function to adjust button styles

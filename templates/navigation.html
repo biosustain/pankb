@@ -38,16 +38,19 @@
         <div class="collapse navbar-collapse justify-content-center" id="navbarCollapse">
             <ul class="navbar-nav mb-2 mb-md-0">
                 <li class="nav-item">
-                    <a class="{{ home_link_style }}" href=" {% url 'home' %} " aria-current="page">Home</a>
+                    <a class="{{ home_link_style }}" aria-current="page" href=" {% url 'home' %} ">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="{{ about_link_style }}" aria-current="page" href=" {% url 'about' %} ">About</a>
+                    <a class="{{ about_link_style }}" href=" {% url 'about' %} ">About</a>
                 </li>
                 <li class="nav-item">
                     <a class="{{ organisms_link_style }}" href=" {% url 'organisms' %} ">Organisms</a>
                 </li>
                 <li class="nav-item">
-                    <a class="{{ publications_link_style }}" href=" {% url 'publications' %} " tabindex="-1" aria-disabled="true">Publications</a>
+                    <a class="{{ publications_link_style }}" href=" {% url 'publications' %} ">Publications</a>
+                </li>
+                <li class="nav-item">
+                    <a class="{{ ai_assistant_link_style }}" href=" {% url 'ai_assistant' %} " tabindex="-1" aria-disabled="true">AI Assistant</a>
                 </li>
             </ul>
         </div>
