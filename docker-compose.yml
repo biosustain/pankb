@@ -7,9 +7,13 @@ services:
     container_name: pankb-web
     build:
       context: .
-    restart: always
+    restart: always       # for the container to be up and running again even after the VM is brought down
     volumes:
       - ./static:/static
+      # map a folder where the current web project is located to the /app folder inside the container
+      # (this way the changes inside and outside the docker container will be synchronized
+      - # without the necessity to re-build the container): ----
+      - ./:/app:rw
     env_file:
       - .env
     ports:
@@ -19,7 +23,7 @@ services:
   nginx:
     container_name: pankb-nginx
     build: ./nginx
-    restart: always
+    restart: always       # for the container to be up and running again even after the VM is brought down
     volumes:
       - ./static:/static
     ports:
