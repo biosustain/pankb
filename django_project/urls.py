@@ -25,28 +25,28 @@ from organisms import views as organisms_views
 from pangenome_analyses import views as pangenome_analyses_views
 from gene_function import views as gene_function_views
 from search import views as search_views
-
+from ai_assistant import views as ai_assistant_views
 import json, requests
 
 
 urlpatterns = [
-    path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type="text/plain")),
+    path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
     path('', home_views.home, name='home'),
-    path('plots/dimension.html', TemplateView.as_view(template_name="home/plots/dimension.html",
+    path('plots/dimension.html', TemplateView.as_view(template_name='home/plots/dimension.html',
                                                       extra_context={'dataset': json.dumps(requests.get('https://pankb.blob.core.windows.net/data/PanKB/web_data/pankb_dimension.json').json())}),
-         name="dimension"),
-    path('plots/organism_genome_number.html', TemplateView.as_view(template_name="home/plots/organism_genome_number.html",
+         name='dimension'),
+    path('plots/organism_genome_number.html', TemplateView.as_view(template_name='home/plots/organism_genome_number.html',
                                                                    extra_context={'dataset': json.dumps(requests.get('https://pankb.blob.core.windows.net/data/PanKB/web_data/organism_genome_count.json').json())}),
-         name="organism_genome_number"),
-    path('plots/organism_gene_number.html', TemplateView.as_view(template_name="home/plots/organism_gene_number.html",
+         name='organism_genome_number'),
+    path('plots/organism_gene_number.html', TemplateView.as_view(template_name='home/plots/organism_gene_number.html',
                                                                  extra_context={'dataset': json.dumps(requests.get('https://pankb.blob.core.windows.net/data/PanKB/web_data/organism_gene_count.json').json())}),
-         name="organism_gene_number"),
-    path('plots/genome_gene.html', TemplateView.as_view(template_name="home/plots/genome_gene.html",
+         name='organism_gene_number'),
+    path('plots/genome_gene.html', TemplateView.as_view(template_name='home/plots/genome_gene.html',
                                                         extra_context={'dataset': json.dumps(requests.get('https://pankb.blob.core.windows.net/data/PanKB/web_data/species_genome_gene.json').json())}),
-         name="genome_gene"),
-    path('plots/treemap.html', TemplateView.as_view(template_name="home/plots/treemap.html",
+         name='genome_gene'),
+    path('plots/treemap.html', TemplateView.as_view(template_name='home/plots/treemap.html',
                                                     extra_context={'dataset': json.dumps(requests.get('https://pankb.blob.core.windows.net/data/PanKB/web_data/treemap_data.json').json())}),
-         name="treemap"),
+         name='treemap'),
     path('about/', about_views.about, name='about'),
     path('publications/', publications_views.publications, name='publications'),
     path('organisms/', organisms_views.organisms, name='organisms'),
@@ -68,6 +68,7 @@ urlpatterns = [
     path('genome_barplot/', gene_function_views.genome_barplot, name='genome_barplot'),
     path('gene_function/genome_gene_info/', gene_function_views.genome_gene_info, name='genome_gene_info'),
     path('gene_function/pathway_info/', gene_function_views.pathway_info, name='pathway_info'),
-    path("search/", search_views.search_results, name="search_results")
+    path('search/', search_views.search_results, name='search_results'),
+    path('ai_assistant/', ai_assistant_views.ai_assistant, name='ai_assistant')
     #path('admin/', admin.site.urls)   # make the amdin panel inaccessible via its utl (the admin admin is preserved for the potential future needs)
 ]

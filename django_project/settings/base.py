@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'organisms',
     'pangenome_analyses',
     'gene_function',
-    'search'
+    'search',
+    'ai_assistant'
 ]
 
 MIDDLEWARE = [
