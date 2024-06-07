@@ -50,6 +50,7 @@ urlpatterns = [
     path('about/', about_views.about, name='about'),
     path('publications/', publications_views.publications, name='publications'),
     path('organisms/', organisms_views.organisms, name='organisms'),
+    path('download_organisms_table_csv/', organisms_views.download_organisms_table_csv, name='download_organisms_table_csv'),
     path('pangenome_analyses/overview/', pangenome_analyses_views.overview, name='pangenome_analyses_overview'),
     path('heaps_law/', pangenome_analyses_views.heaps_law, name='heaps_law'),
     path('cumulative_freq/', pangenome_analyses_views.cumulative_freq, name='cumulative_freq'),

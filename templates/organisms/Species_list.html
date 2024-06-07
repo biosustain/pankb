@@ -52,6 +52,14 @@
 
 <!-- Datatable -->
 <div class="table_padding">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end" style="padding-bottom: 10px;">
+        <form action="{% url 'download_organisms_table_csv' %}" method="GET">
+            <input type="hidden" name="family" value="{{ request.GET.family }}" />
+            <!-- The button styles from Bootstrap:
+            https://getbootstrap.com/docs/5.3/components/buttons/ -->
+            <button class="btn btn-primary" type="submit">Download CSV</button>
+        </form>
+    </div>
     <table id="species_list" class="table table-hover" style=" width:100%; table-layout: fixed;">
         <thead>
         <tr>
