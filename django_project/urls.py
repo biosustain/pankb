@@ -56,6 +56,7 @@ urlpatterns = [
     path('gene_annotation_distribution/', pangenome_analyses_views.gene_annotation_distribution, name='gene_annotation_distribution'),
     path('gene_freq/', pangenome_analyses_views.gene_freq, name='gene_freq'),
     path('hotmap/', pangenome_analyses_views.hotmap, name='hotmap'),
+    path('download_matrix_csv/', pangenome_analyses_views.download_matrix_csv, name='download_matrix_csv'),
     path('variant_dominant_freq/', pangenome_analyses_views.variant_dominant_freq, name='variant_dominant_freq'),
     path('ds_dn_ratio/', pangenome_analyses_views.ds_dn_ratio, name='ds_dn_ratio'),
     path('pangenome_analyses/gene_annotation/', pangenome_analyses_views.gene_annotation, name='pangenome_analyses_gene_annotation'),

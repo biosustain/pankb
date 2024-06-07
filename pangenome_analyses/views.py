@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import StreamingHttpResponse
 from django.template import loader
 from .models import GeneAnnotations
-import json, requests, io, gzip
+import json, requests, io, gzip, csv
 import pandas as pd
 
 
@@ -99,6 +100,63 @@ def hotmap(request):
     'heatmapData': json.dumps(str2)
   }
   return HttpResponse(template.render(context, request))
+
+
+# Source: https://docs.djangoproject.com/en/5.0/howto/outputting-csv/
+class Echo:
+  """ An object that implements just the write method of the file-like
+  interface.
+  """
+  def write(self, value):
+    """ Write the value by returning it, instead of storing in a buffer. """
+    return value
+
+
+# A view that streams potentially large presence/absence matrices
+def download_matrix_csv(request):
+  species = request.GET['species']
+  gene_class = request.GET['gene_class']
+
+  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/heatmap_' + gene_class + '.json.gz'    # the url of the respective json.gz file stored on the Microsoft Azure Blob Storage
+  r = requests.get(url)
+
+  # Decompress the gzipped content and transform it to a dictionary string
+  matrix_dict_str = str(gzip.decompress(r.content), 'utf-8')
+
+  # Convert the dictionary string to a dictionary: ----
+  matrix_dict = json.loads(matrix_dict_str)
+
+  # Obtain a dictionary with the genomes info: ----
+  genomes_info = matrix_dict["rows"]
+  # Obtain a list with the genome ids: ----
+  genome_names = [""] + [d["name"] for d in genomes_info]
+
+  # Obtain a dictionary with the genes info: ----
+  genes_info = matrix_dict["cols"]
+  # Obtain the gene names: ----
+  gene_names = [[d["name"] for d in genes_info]]
+
+  # Obtain the presence/absence matrix: ----
+  matrix = matrix_dict["matrix"]
+  rows = gene_names + matrix
+  rows = list(zip(genome_names, rows))
+
+  # Format the resulting list iof lists
+  # (the rows = the concatenated genome_id lists and matrix rows as lists of integers transformed to lists of strings): ----
+  res = []
+  for row in rows:
+    res.append([row[0]] + list(map(str, row[1])))
+  rows = res
+
+  pseudo_buffer = Echo()
+  writer = csv.writer(pseudo_buffer)
+
+  # User the StreamingHttpResponse instead of HttpResponse to serve potentially large csv files
+  # to avoid a load balancer dropping the connection (otherwise we can get the connection timeout): ----
+  response = StreamingHttpResponse((writer.writerow(row) for row in rows), content_type="text/csv")
+  downloaded_file_name = "Matrix__" + species + "_" + gene_class + ".csv"
+  response['Content-Disposition'] = f"attachment; filename=" + downloaded_file_name
+  return response
 
 
 # Template renderer for the first alleleome plot
