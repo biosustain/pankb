@@ -223,6 +223,31 @@ def gene_annotation(request):
   return HttpResponse(template.render(context, request))
 
 
+# A view that serves the Organisms table content in the .csv format
+def download_gene_annotation_table_csv(request):
+  species = request.GET.get('species')
+  downloaded_file_name = "Gene_annotations__" + species + ".csv"
+
+  # Adjust filter parameters based on the GET paramater value: ----
+  filter_params = {}
+  filter_params['pangenome_analysis'] = species
+  # Get the filtered or full table with gene_annotations as a list of dictionaries: ----
+  gene_annotations = GeneAnnotations.objects.filter(**filter_params).values('gene', 'pangenomic_class', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency').order_by('gene')
+
+  # Transform a list of dictionaries into a list of lists: ----
+  rows = list(map(lambda x: list(x.values()), gene_annotations))
+  # Add the column names: ----
+  rows.insert(0, list(gene_annotations[0].keys()))
+
+  pseudo_buffer = Echo()
+  writer = csv.writer(pseudo_buffer)
+
+  # User the StreamingHttpResponse instead of HttpResponse to serve potentially large csv files
+  # to avoid a load balancer dropping the connection (otherwise we can get the connection timeout): ----
+  response = StreamingHttpResponse((writer.writerow(row) for row in rows), content_type="text/csv")
+  response['Content-Disposition'] = f"attachment; filename=" + downloaded_file_name
+  return response
+
 
 ################### Phylogenetic Tree Page Templates ###################################
 
