@@ -66,9 +66,8 @@
             <th>Family</th>
             <th>Species</th>
             <th>Openness</th>
-            <th>Gene Class Distribution</th>
             <th>Number of Genomes</th>
-            <th>Pangenome Analyses</th>
+            <th>Gene Class Distribution</th>
         </tr>
         </thead>
         <tbody id="table-body"></tbody>
@@ -101,19 +100,18 @@
 
         const row = document.createElement('tr');
         row.innerHTML = `
-                    <td class="align-middle">${family}</td>
-                    <td class="align-middle">${species}</td>
+                    <td class="align-middle"><a href="{% url 'organisms' %}?family=${family}" target="_blank">${family}</a></td>
+                    <td class="align-middle">
+                      <a href="{% url 'pangenome_analyses_overview' %}?species=${data.pangenome_analysis[index]}" alt="testeststst">${species}</a>
+                    </td>
                     <td class="align-middle">${data.openness[index]}</td>
+                    <td class="align-middle">${data.genomes_num[index]}</td>
                     <td class="align-middle">
                     <div style="display: flex; height: 1.2em; max-width: 80%; margin: 0; border-radius: 0.6em; overflow: hidden;">
                         <div style="width: ${coreWidth}%; background-color: rgba(128,0,128,0.8);" data-toggle="tooltip" title="Core: ${data.gene_class_distribution[index][0]}"></div>
                         <div style="width: ${accessoryWidth}%; background-color: rgba(255,165,0,0.8);" data-toggle="tooltip" title="Accessory: ${data.gene_class_distribution[index][1]}"></div>
                         <div style="width: ${rareWidth}%; background-color: rgba(0,128,0,0.8);" data-toggle="tooltip" title="Rare: ${data.gene_class_distribution[index][2]}"></div>
                       </div>
-                    </td>
-                    <td class="align-middle">${data.genomes_num[index]}</td>
-                    <td class="align-middle">
-                      <a id="${data.pangenome_analysis[index]}" href="#" onclick="handleLinkClick(event, '${data.pangenome_analysis[index]}')">${data.pangenome_analysis[index]}</a>
                     </td>
                   `;
         tableBody.appendChild(row);
@@ -129,13 +127,6 @@
             }
         });
     });
-
-    function handleLinkClick(e, species) {
-        // Prevent the default link behavior
-        e.preventDefault();
-        // Navigate to the new page
-        window.location.href = "{% url 'pangenome_analyses_overview' %}" + `?species=${species}`
-    }
 
     function adjustTableFontSize2(coefficient) {
         const tableHeadersAndData = document.querySelectorAll('#species_list th, #species_list td');
