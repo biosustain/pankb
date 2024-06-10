@@ -67,6 +67,7 @@ urlpatterns = [
     path('pangenome_analyses/phylogenetic_tree/', pangenome_analyses_views.phylogenetic_tree, name='pangenome_analyses_phylogenetic_tree'),
     path('phylotree_plot/', pangenome_analyses_views.phylotree_plot, name='phylotree_plot'),
     path('gene_function/gene_info/', gene_function_views.gene_info, name='gene_info'),
+    path('gene_function/gene_info/download_gene_info_table_csv', gene_function_views.download_gene_info_table_csv, name='download_gene_info_table_csv'),
     path('aa_pos_overview/', gene_function_views.aa_pos_overview, name='aa_pos_overview'),
     path('msa/', gene_function_views.msa, name='msa'),
     path('gene_function/genome_info/', gene_function_views.genome_info, name='genome_info'),

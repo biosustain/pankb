@@ -1,14 +1,15 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
-import json, requests, io
+import json, requests, io, csv
 import pandas as pd
+import numpy as np
 from .models import GeneInfo, GenomeInfo, PathwayInfo
 from django.db.models import Q
 
 
 
-################### Gene Info Page Templates ###################################
+################################## Gene Info Page Templates ###################################
 
 # Template renderer for the Gene Info Page
 def gene_info(request):
@@ -30,24 +31,31 @@ def gene_info(request):
 
   # Obtain the list of all genomes containing the given gene: ----
   genome_ids_list = list(set(gene_info_pd["genome_id"]))
-  # Obrtain the pathways associated with the given gene and genomes containing it: ----
+  # Obtain the pathways associated with the given gene and genomes containing it: ----
   pathway_info = PathwayInfo.objects.filter(Q(pangenome_analysis = species) & Q(gene = gene) & Q(genome_id__in = genome_ids_list)).values('pathway_id', 'pathway_name', 'strain', 'genome_id').order_by('pathway_name')
   pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
   if not pathway_info_pd.empty:
     # Wrap the pathway names with tags: ----
     pathway_info_pd["pathway_name"] = "<a href='/gene_function/pathway_info/?pathway_id=" + pathway_info_pd["pathway_id"] + "&strain=" + pathway_info_pd["strain"] + "' target='_blank'>" + pathway_info_pd["pathway_name"] + "</a>"
     pathway_info_pd = pathway_info_pd.groupby(["genome_id", "strain"], as_index=False)["pathway_name"].apply(lambda x: ', '.join(x))
-  # Rename the column accordingly remove the old one: ----
+    # Rename the column accordingly remove the old one: ----
     pathway_info_pd["pathways"] = pathway_info_pd["pathway_name"]
     del pathway_info_pd["pathway_name"]
     # Merge the gene and associated pathways info: ----
     gene_info_pd = gene_info_pd.merge(pathway_info_pd, how='left', on=["genome_id"])
     # Fill NaNs that appear after the merge: ----
-    gene_info_pd["pathways"] = gene_info_pd["pathways"].fillna(value=" - ")
+    gene_info_pd["pathways"] = gene_info_pd["pathways"].fillna(value="-")
   else:
-    gene_info_pd["pathways"] = " - "
-    
+    gene_info_pd["pathways"] = "-"
+
+  # Leave only the columns of interest in the output: ----
   gene_info_pd = gene_info_pd[["locus_tag", "genome_id", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq", "pathways"]]
+
+  # Transform positions of the gene in the genome from float (as the start and end position are stored in the MongoDB) to int: ----
+  gene_info_pd["start_position"] = gene_info_pd["start_position"].astype(np.int64)
+  gene_info_pd["end_position"] = gene_info_pd["end_position"].astype(np.int64)
+  # ... and sort by the positions: ----
+  gene_info_pd = gene_info_pd.sort_values(by=['start_position', 'end_position'])
 
   # Transform the df to a list of dictionaries: ----
   gene_info_dict = gene_info_pd.to_dict(orient = "records")
@@ -58,6 +66,67 @@ def gene_info(request):
     'dataset': gene_info_json
   }
   return HttpResponse(template.render(context, request))
+
+
+
+# A view that serves the Gene Info table content in the .csv format
+def download_gene_info_table_csv(request):
+  species = request.GET.get('species')
+  gene = request.GET.get('gene')
+  downloaded_file_name = "Gene_Info__" + species + "__" + gene + ".csv"
+
+  # Set the filter() function parameters: ----
+  filter_params = {}
+  filter_params['pangenome_analysis'] = species
+  filter_params['gene'] = gene
+  # Obtain the gene info: ----
+  gene_info = GeneInfo.objects.filter(**filter_params).values()
+  # Transform the data to the dataframe first and remove a columns with ids (not needed in the output): ----
+  gene_info_pd = pd.DataFrame(list(gene_info), index=None)
+  del gene_info_pd['_id']
+
+  # Obtain the list of all genomes containing the given gene: ----
+  genome_ids_list = list(set(gene_info_pd["genome_id"]))
+  # Obtain the pathways associated with the given gene and genomes containing it: ----
+  pathway_info = PathwayInfo.objects.filter(
+    Q(pangenome_analysis=species) & Q(gene=gene) & Q(genome_id__in=genome_ids_list)).values('pathway_id',
+                                                                                            'pathway_name', 'strain',
+                                                                                            'genome_id').order_by('pathway_name')
+  pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
+  if not pathway_info_pd.empty:
+    # Wrap the pathway names with tags: ----
+    pathway_info_pd = pathway_info_pd.groupby(["genome_id", "strain"], as_index=False)["pathway_name"].apply(lambda x: ', '.join(x))
+    # Rename the column accordingly remove the old one: ----
+    pathway_info_pd["pathways"] = pathway_info_pd["pathway_name"]
+    del pathway_info_pd["pathway_name"]
+    # Merge the gene and associated pathways info: ----
+    gene_info_pd = gene_info_pd.merge(pathway_info_pd, how='left', on=["genome_id"])
+    # Fill NaNs that appear after the merge: ----
+    gene_info_pd["pathways"] = gene_info_pd["pathways"].fillna(value="-")
+  else:
+    gene_info_pd["pathways"] = "-"
+
+  # Leave only the columns of interest in the output: ----
+  gene_info_pd = gene_info_pd[["locus_tag", "genome_id", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq", "pathways"]]
+
+  # Transform positions of the gene in the genome from float (as the start and end position are stored in the MongoDB) to int: ----
+  gene_info_pd["start_position"] = gene_info_pd["start_position"].astype(np.int64)
+  gene_info_pd["end_position"] = gene_info_pd["end_position"].astype(np.int64)
+  # ... and sort by the positions: ----
+  gene_info_pd = gene_info_pd.sort_values(by=['start_position', 'end_position'])
+
+  # Transform the df to a list of dictionaries
+  # (the list of dictionaries will serve as the input to csv.DictWriter): ----
+  gene_info_dict = gene_info_pd.to_dict(orient = "records")
+
+  # Create the HttpResponse object with the appropriate CSV header.
+  response = HttpResponse(content_type="text/csv")
+  response['Content-Disposition'] = f"attachment; filename=" + downloaded_file_name
+  writer = csv.DictWriter(response, fieldnames=["locus_tag", "genome_id", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq", "pathways"])
+  writer.writeheader()
+  writer.writerows(gene_info_dict)
+  return response
+
 
 
 # Template renderer for the Dominant and Variant Amino Acid Position Overview of a gene
@@ -105,7 +174,7 @@ def msa(request):
 
 
 
-################### Genome Info Page Templates ###################################
+############################## Genome Info Page Templates ###################################
 # Template renderer for the Genome Info Page
 def genome_info(request):
   template = loader.get_template('gene_function/genome_info.html')
@@ -155,7 +224,7 @@ def genome_barplot(request):
 
 
 
-################### Genome & Gene Info Page Templates ###################################
+################################## Genome & Gene Info Page Templates ###################################
 
 # Template renderer for the Genome Info Page
 def genome_gene_info(request):
@@ -226,7 +295,7 @@ def genome_gene_info(request):
   return HttpResponse(template.render(context, request))
 
 
-################### Pathway Info Page Templates ###################################
+################################ Pathway Info Page Templates ###################################
 def pathway_info(request):
 
   template = loader.get_template('gene_function/pathway_info.html')
