@@ -40,12 +40,12 @@ def download_organisms_table_csv(request):
     downloaded_file_name = "Organisms__" + family + ".csv"
 
   # Get the filtered or full table with organisms as a list of dictionaries: ----
-  organisms = Organisms.objects.filter(**filter_params).values('family', 'species', 'openness', 'gene_class_distribution', 'genomes_num')
+  organisms = Organisms.objects.filter(**filter_params).values('family', 'species', 'openness', 'genomes_num', 'gene_class_distribution')
 
   # Create the HttpResponse object with the appropriate CSV header.
   response = HttpResponse(content_type="text/csv")
   response['Content-Disposition'] = f"attachment; filename=" + downloaded_file_name
-  writer = csv.DictWriter(response, fieldnames=['family', 'species', 'openness', 'gene_class_distribution', 'genomes_num'])
+  writer = csv.DictWriter(response, fieldnames=['family', 'species', 'openness', 'genomes_num', 'gene_class_distribution'])
   writer.writeheader()
   writer.writerows(organisms)
   return response
