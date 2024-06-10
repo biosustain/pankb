@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.http import StreamingHttpResponse
 from django.template import loader
 from .models import GeneAnnotations
+from organisms.models import Organisms
 import json, requests, io, gzip, csv
 import pandas as pd
 
@@ -14,12 +15,16 @@ import pandas as pd
 def overview(request):
   template = loader.get_template('pangenome_analyses/Pangenome_analyses_overview.html')
   species = request.GET['species']
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  r = requests.get(url)
-  json_obj = r.json()
+
+  # Set the filter parameters based on the GET paramater value: ----
+  filter_params = {}
+  filter_params['pangenome_analysis'] = species
+  # Get info about the given organisms from the Organisms collection (in a dictionary): ----
+  organism_info = Organisms.objects.filter(**filter_params).values('species', 'genomes_num', 'gene_class_distribution', 'openness')[0]
+
   # Compose a context for the template rendering
   context = {
-    'speciesData': json.dumps(json_obj)
+    'speciesData': json.dumps(organism_info)
   }
   return HttpResponse(template.render(context, request))
 
@@ -198,13 +203,14 @@ def gene_annotation(request):
   template = loader.get_template('pangenome_analyses/Pangenome_analyses_gene_annotation.html')
   species = request.GET['species']
 
-  url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  r1 = requests.get(url1)
-  json_obj1 = r1.json()
-
   # Set the filter() function parameters: ----
   filter_params = {}
   filter_params['pangenome_analysis'] = species
+
+  # Get info about the given organisms from the Organisms collection (in a dictionary): ----
+  organism_info = Organisms.objects.filter(**filter_params).values('species', 'genomes_num', 'gene_class_distribution', 'openness')[0]
+
+  # Get the gene annotations info form the Gene Annotations collection: ----
   gene_annotations = GeneAnnotations.objects.filter(**filter_params).values()
 
   # Transform the QuerySet with gene annotations into a pandas df: ----
@@ -218,7 +224,7 @@ def gene_annotation(request):
 
   # Compose a context for the template rendering
   context = {
-    'speciesData': json.dumps(json_obj1),
+    'speciesData': json.dumps(organism_info),
     'dataset': gene_annotations_json
   }
   return HttpResponse(template.render(context, request))
@@ -257,12 +263,16 @@ def download_gene_annotation_table_csv(request):
 def phylogenetic_tree(request):
   template = loader.get_template('pangenome_analyses/Pangenome_analyses_phylogetic_tree.html')
   species = request.GET['species']
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  r = requests.get(url)
-  json_obj = r.json()
+
+  # Set the filter parameters based on the GET paramater value: ----
+  filter_params = {}
+  filter_params['pangenome_analysis'] = species
+  # Get info about the given organisms from the Organisms collection (in a dictionary): ----
+  organism_info = Organisms.objects.filter(**filter_params).values('species', 'genomes_num', 'gene_class_distribution', 'openness')[0]
+
   # Compose a context for the template rendering
   context = {
-    'speciesData': json.dumps(json_obj)
+    'speciesData': json.dumps(organism_info)
   }
   return HttpResponse(template.render(context, request))
 

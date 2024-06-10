@@ -41,31 +41,22 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const species = urlParams.get('species');
+    const urlParams = new URLSearchParams(window.location.search);
+    const species = urlParams.get('species');
 
-        const Pangenome_analyses = document.getElementById('Pangenome_analyses');
-        Pangenome_analyses.href = "{% url 'pangenome_analyses_overview' %}?species=" + species;
+    document.getElementById('Pangenome_analyses').href = "{% url 'pangenome_analyses_overview' %}?species=" + species;
+    document.getElementById('Overview').href = "{% url 'pangenome_analyses_overview' %}?species=" + species;
+    document.getElementById('Annotation').href = "{% url 'pangenome_analyses_gene_annotation' %}?species=" + species;
+    document.getElementById('Phylogenetic_tree').href = "{% url 'pangenome_analyses_phylogenetic_tree' %}?species=" + species;
 
-        const Overview = document.getElementById('Overview');
-        Overview.href = "{% url 'pangenome_analyses_overview' %}?species=" + species;
+    speciesData = {{ speciesData | safe }}
 
-        const Gene_annotation = document.getElementById('Annotation');
-        Gene_annotation.href = "{% url 'pangenome_analyses_gene_annotation' %}?species=" + species;
-
-        const Phylogenetic_tree = document.getElementById('Phylogenetic_tree');
-        Phylogenetic_tree.href = "{% url 'pangenome_analyses_phylogenetic_tree' %}?species=" + species;
-
-        speciesData = {{ speciesData | safe }}
-
-        if (speciesData) {
-            document.getElementById('species').innerHTML = '<b>Species:</b><br>' + speciesData.Species;
-            document.getElementById('numGenome').innerHTML = '<b>Number of Genomes:</b><br>' + speciesData.Number_of_genome;
-            document.getElementById('core').innerHTML = '<b>Core:</b><br>' + speciesData.Gene_class[0];
-            document.getElementById('accessory').innerHTML = '<b>Accessory:</b><br>' + speciesData.Gene_class[1];
-            document.getElementById('rare').innerHTML= '<b>Rare:</b><br>' + speciesData.Gene_class[2];
-            document.getElementById('openness').innerHTML = '<b>Openness:</b><br>' + speciesData.Openness;
-        }
-    })
+    if (speciesData) {
+        document.getElementById('species').innerHTML = '<b>Species:</b><br>' + speciesData.species;
+        document.getElementById('numGenome').innerHTML = '<b>Number of Genomes:</b><br>' + speciesData.genomes_num;
+        document.getElementById('core').innerHTML = '<b>Core:</b><br>' + speciesData.gene_class_distribution[0];
+        document.getElementById('accessory').innerHTML = '<b>Accessory:</b><br>' + speciesData.gene_class_distribution[1];
+        document.getElementById('rare').innerHTML= '<b>Rare:</b><br>' + speciesData.gene_class_distribution[2];
+        document.getElementById('openness').innerHTML = '<b>Openness:</b><br>' + speciesData.openness;
+    }
 </script>
