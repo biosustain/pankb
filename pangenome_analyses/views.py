@@ -181,6 +181,7 @@ def ds_dn_ratio(request):
   r = requests.get(url)
   dataset_df = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
   dataset_dict = dataset_df.to_dict(orient='records')
+  dataset_dict = dataset_df.to_dict(orient='records')
   # Compose a context for the template rendering
   context = {
     'dataset': json.dumps(dataset_dict)
@@ -223,7 +224,7 @@ def gene_annotation(request):
   return HttpResponse(template.render(context, request))
 
 
-# A view that serves the Organisms table content in the .csv format
+# A view that serves the Gene Annotation table content in the .csv format
 def download_gene_annotation_table_csv(request):
   species = request.GET.get('species')
   downloaded_file_name = "Gene_annotations__" + species + ".csv"
@@ -231,7 +232,7 @@ def download_gene_annotation_table_csv(request):
   # Adjust filter parameters based on the GET paramater value: ----
   filter_params = {}
   filter_params['pangenome_analysis'] = species
-  # Get the filtered or full table with gene_annotations as a list of dictionaries: ----
+  # Get a table with gene_annotations as a list of dictionaries: ----
   gene_annotations = GeneAnnotations.objects.filter(**filter_params).values('gene', 'pangenomic_class', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency').order_by('gene')
 
   # Transform a list of dictionaries into a list of lists: ----
