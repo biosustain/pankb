@@ -4,7 +4,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!--  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
     <style>
         html, body, #plot {
             height: 100%;
@@ -13,16 +12,13 @@
             padding: 0;
             overflow: hidden;
         }
-
         .legend text {
             opacity: 0.6 !important;
         }
-
         /* Legend styles */
         .legend {
             opacity: 1 !important;  /* Set the opacity of the legend */
         }
-
     </style>
 </head>
 <body>
@@ -124,7 +120,7 @@
                 color: 'rgba(0, 0, 0, 0)' // Invisible
             },
             hoverinfo: 'text',
-            text: Array(numHoverPoints).fill(`Number of Genome: ${x15}`),
+            text: Array(numHoverPoints).fill(`Number of Genomes: ${x15}`),
             showlegend: false
         };
 
@@ -138,7 +134,7 @@
                 color: 'rgba(0, 0, 0, 0)' // Invisible
             },
             hoverinfo: 'text',
-            text: Array(numHoverPoints).fill(`Number of Genome: ${x99}`),
+            text: Array(numHoverPoints).fill(`Number of Genomes: ${x99}`),
             showlegend: false
         };
 
@@ -210,7 +206,7 @@
             showlegend: true,  // Show legend
             legend: {
                 x: 0.5,
-                y: 1.05,
+                y: 1.025,
                 orientation: 'h',  // Set legend orientation to horizontal
                 traceorder: 'reversed',  // Change the order of legend items
                 itemclick: true,  // Disable legend item click
