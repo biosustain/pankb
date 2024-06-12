@@ -81,7 +81,7 @@ def search_results(request):
             pathways_pd = pathways_pd[["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain", "genes", "products"]]
 
         # Get the filtered genes from the DB: ----
-        genes = GeneAnnotations.objects.filter(Q(gene__icontains = q) | Q(protein__icontains = q)).values()
+        genes = GeneAnnotations.objects.filter(Q(gene__icontains = q) | Q(protein__icontains = q) | Q(pfams__icontains=q)).values()
         genes_pd = pd.DataFrame(list(genes), index=None)
         if not genes_pd.empty:
             genes_pd["ratio_gene"] = genes_pd.apply(lambda row: algorithims.levenshtein(row["gene"], q), axis=1)

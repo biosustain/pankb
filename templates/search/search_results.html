@@ -73,7 +73,7 @@
     // and optionally expands a row in the "Genes" table if the text found is in the "Protein" column: ----
     function highlightText(searchTerm) {
         // Get all elements potentially containing text: ----
-        const elements = document.querySelectorAll('#families_list a, #species_list a, #genes_list a, #protein, #pathways_list a, #pathway_name, #pathway_products');
+        const elements = document.querySelectorAll('#families_list a, #species_list a, #genes_list a, #protein, #pfams, #pathways_list a, #pathway_name, #pathway_products');
         // Loop through each of the elements: ----
         elements.forEach((element) => {
             const text = element.innerText;
@@ -95,10 +95,11 @@
             }
         })
         // A hacky, but always working method to expand the rows in cases the query substring was found:
-        // - in the "Protein" column of the Genes search results table.
+        // - in the "Protein" column of the Genes search results table;
+        // - in the "PFAMs" column of the Genes search results table.
         // Note: It is not a good idea to expand the "Product(s)" column of the Pathways search results table,
         // because it can be too long and take a lot of space on the page in the expanded state.
-        const elements_to_expand = document.querySelectorAll('#protein');
+        const elements_to_expand = document.querySelectorAll('#protein, #pfams');
         // Now we have to iterate over some elements of interest again: ----
         elements_to_expand.forEach((element) => {
             const text = element.innerText;
@@ -110,7 +111,6 @@
         });
     }
 </script>
-
 <!-- Include search results for families: -->
 {%  include "search/search_results_families.html" %}
 <!-- ######### -->
@@ -126,9 +126,7 @@
 <!-- Include search results for genes: -->
 {%  include "search/search_results_genes.html" %}
 <!-- ######### -->
-
 <script>
-
     // Get the global query string paramater for the higlight func: ----
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
@@ -205,7 +203,6 @@
         $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
     });
 </script>
-
 <br><br> <!-- Include two empty lines to create some spase after the pagination bar -->
 </body>
 </html>
