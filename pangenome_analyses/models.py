@@ -19,7 +19,7 @@ class GeneAnnotations(models.Model):
        db_table = 'pankb_gene_annotations'
        indexes = [
            models.Index(fields=['pangenome_analysis']),
-           models.Index(fields=['gene', 'protein'])
+           models.Index(fields=['gene', 'protein', 'pfams'])
        ]
 
 
