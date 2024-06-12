@@ -1,4 +1,4 @@
-# PanKB
+# PanKB Website
 <b>The dynamic Python-based version of the website. The Django framework is used as the back-end. Currently, it has been connected to databases, but only Django generated tables are in the DBs. The Microsoft Azure Blob Storage is still used as the data lake. The work under this branch is focused on the data model and ETLs.</b>
 
 ## Development configuration on Ubuntu servers
@@ -67,16 +67,20 @@ sudo apt install git
 ```
 
 ### Set up the repository and build the containers
-Create the necessary directories and change to the /pankb_web
+Create the necessary directories and change to the /pankb_web:
 ```
 sudo mkdir -p /projects
 cd /projects
 sudo mkdir -p pankb_web
 sudo chown -R $USER pankb_web
 cd pankb_web 
-mkdir -p docker_volumes/{mongodb,postgres}
+mkdir -p docker_volumes/mongodb pankb_db pankb_llm
 ```
-Clone the PanKB git repo (the <i>develop</i> branch) into the subdirectory /django_project and change to it:
+First, you must set up and populate your own DEV MongoDB instance as described here: https://github.com/biosustain/pankb_db. 
+
+Second, you must deploy the AI Assistant Web Application (<b>here we need to insert a link to the repo with PanKB LLM, knowledge base creation scripts and streamlit interface. And even before that, the repo must be re-created under the biosustain org</b>).
+
+Finally, in order to deploy the website, clone the PanKB git repo (the <i>develop</i> branch) into the subdirectory /django_project and change to it:
 ```
 git clone --branch develop https://github.com/biosustain/pankb.git django_project
 cd django_project
@@ -85,30 +89,36 @@ Create a file with the name ".env" under the /projects/pankb_web/django_project/
 ```
 ## Do not put this file under version control!
 
+## Server, where the web project is located
+PROJECT_SERVER = 'dev' 
+
+## MongoDB type. Only two possible values:
+# - 'self_deployed' (standalone, deployed on the DEV server in a docker container)
+# or
+# - 'cloud' (MongoDB Atlas or Azure CosmosDB for MongoDB)
+DB_TYPE = 'self_deployed'
+
 ## Django: The secret key
-SECRET_KEY='<any string you choose>'
+SECRET_KEY = '<insert any string you choose>'
 
 ## Django: Super-User Credentials
 SUPER_USER_NAME = 'admin'
-SUPER_USER_PASSWORD = '<any password you choose>'
-SUPER_USER_EMAIL = '<your email>'
+SUPER_USER_PASSWORD = '<insert any password you choose>'
+SUPER_USER_EMAIL = '<insert your email>'
 
-## Django: MongoDB Connection parameters
+## Mongo database name - same both for the PROD and DEV servers
 MONGODB_NAME = 'pankb'
+
+## Django: MongoDB-DEV (self-deployed) connection parameters
 MONGODB_HOST = 'mongodb://mongodb:27017'
 MONGODB_AUTH_MECHANISM = 'SCRAM-SHA-1'
 
-## MongoDB: Docker Compose Env Variables (the last three are also used in the Django's setting file)
-MONGO_INITDB_ROOT_USERNAME = 'allDbAdmin'
-MONGO_INITDB_ROOT_PASSWORD = '<any password you choose>'
+## MongoDB: Docker Compose Env Variables
+MONGO_INITDB_ROOT_USERNAME = 'allDbAdmin'         
+MONGO_INITDB_ROOT_PASSWORD = '<insert any password you choose>'   
 MONGODB_USERNAME = 'pankbDbOwner'
-MONGODB_PASSWORD = '<any password you choose>'
+MONGODB_PASSWORD = '<insert any password you choose>'
 MONGODB_AUTH_SOURCE = 'pankb'
-
-## PostgreSQL: Docker Compose Env Variables
-POSTGRES_PASSWORD = '<any password you choose>'
-POSTGRES_USER = 'postgres'
-POSTGRES_DB = 'postgres'
 ```
 Build the containers with Docker Compose:
 ```
@@ -117,10 +127,10 @@ docker compose up -d --build
 The web-application must now be available in your browser on http://127.0.0.1 (local development) or http://(type-your-public-ip-address-here) (remote server development). If you use a virtual machine, your IP address will be the public address of your virtual machine. It will use the standard 80 port. The command `docker ps` should show two docker containers running:
 ```
 >>> docker ps
-CONTAINER ID   IMAGE                            COMMAND                  CREATED             STATUS             PORTS                                           NAMES
-0d1f4935ad87   django_project-nginx             "/docker-entrypoint.…"   About an hour ago   Up About an hour   0.0.0.0:80->80/tcp, :::80->80/tcp               pankb-nginx
-30daf00e8364   django_project-django_gunicorn   "sh /entrypoint.sh"      About an hour ago   Up About an hour   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp       pankb-web
-b3197b7ed6cb   mongo:7.0-rc                     "docker-entrypoint.s…"   About an hour ago   Up About an hour   0.0.0.0:27017->27017/tcp, :::27017->27017/tcp   pankb-mongodb
-eb78ba6978c0   postgres:14-alpine               "docker-entrypoint.s…"   About an hour ago   Up About an hour   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       pankb-postgresdb
+CONTAINER ID   IMAGE                            COMMAND                  CREATED             STATUS             PORTS                                    NAMES
+39787becaeb7   pankb_web:latest     "sh /entrypoint.sh"      57 minutes ago   Up 57 minutes   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                   pankb-web
+730353f2fdde   pankb_nginx:latest   "/docker-entrypoint.…"   57 minutes ago   Up 57 minutes   0.0.0.0:80->80/tcp, :::80->80/tcp                           pankb-nginx
+54d89d7c4fad   pankb_llm:latest     "streamlit run strea…"   8 days ago       Up 41 hours     0.0.0.0:8501->8501/tcp, :::8501->8501/tcp                   pankb-llm
+b3197b7ed6cb   mongo:6.0-rc         "docker-entrypoint.s…"   About an hour ago   Up About an hour   0.0.0.0:27017->27017/tcp, :::27017->27017/tcp         pankb-mongodb
 ```
 In case you do Python remote server development via SSH (e.g., using PyCharm IDE), you should use the remote Python interpreter from the django_unicorn Docker Compose.
