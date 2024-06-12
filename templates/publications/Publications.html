@@ -3,6 +3,9 @@
 <!doctype html>
 <html lang="en">
 <head>
+    <!-- Include tracking with Google Analytics -->
+    {% include "google_tag.html" %}
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
@@ -119,41 +122,41 @@
 <!-- Datatable -->
 <script>
     $(document).ready(async function () {
-            // Obtain the data rendered in the view: ----
-            data = {{ dataset | safe }}
+        // Obtain the data rendered in the view: ----
+        data = {{ dataset | safe }}
 
-            let table = $('#publications_list').DataTable({
-                data: data,
-                columns: [
-                    { data: 'Title',
-                        render: function(data, type, row) {
-                            return data;
-                        }
-                    },
-                    { data: 'DOI',
-                        render: function(data, type, row) {
-                            if (type === 'display') {
-                                return '<a href="' + data + '" target="_blank">' + data + '</a>';
-                            } else return data;
-                        }
-                    },
-                    { data: 'Scope' }
-                ],
-                columnDefs: [
-                    {
-                        targets: [0, 1, 2],
-                        render: function(data, type, row) {
-                            return data;
-                        }
+        let table = $('#publications_list').DataTable({
+            data: data,
+            columns: [
+                { data: 'Title',
+                    render: function(data, type, row) {
+                        return data;
                     }
-                ],
-                language: {
-                    emptyTable: 'Loading...'
                 },
-                order: [],
-                bSort: true,
-                searching: true
-            });
+                { data: 'DOI',
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            return '<a href="' + data + '" target="_blank">' + data + '</a>';
+                        } else return data;
+                    }
+                },
+                { data: 'Scope' }
+            ],
+            columnDefs: [
+                {
+                    targets: [0, 1, 2],
+                    render: function(data, type, row) {
+                        return data;
+                    }
+                }
+            ],
+            language: {
+                emptyTable: 'Loading...'
+            },
+            order: [],
+            bSort: true,
+            searching: true
+        });
     });
 
 
