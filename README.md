@@ -1,5 +1,5 @@
 # PanKB Website
-<b>The dynamic Python-based version of the website. The Django framework is used as the back-end. Currently, it has been connected to databases, but only Django generated tables are in the DBs. The Microsoft Azure Blob Storage is still used as the data lake. The work under this branch is focused on the data model and ETLs.</b>
+<b>The dynamic Python-based version of the website. The Django framework is used as the back-end. Data about organisms, genes, genomes, locus_tags and KEGG pathways is stored in a database (locally in a self-deployed MongoDB instance or in a cloud-based Cosmos DB for MongoDB). The Microsoft Azure Blob Storage is still used as a data lake to store static semi-structured data, e.g. plots, bibliome and phylogenetic trees (i.e. data that is not used by search or any other scripts generating dynamic content).</b>
 
 ## Development configuration on Ubuntu servers
 Tested on Linux Ubuntu 20.04 (may need tweaks for other systems).
