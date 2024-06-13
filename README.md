@@ -89,7 +89,7 @@ Create a file with the name ".env" under the /projects/pankb_web/django_project/
 ```
 ## Do not put this file under version control!
 
-## Server, where the web project is located
+## Server type, where the web project is located
 PROJECT_SERVER = 'dev' 
 
 ## MongoDB type. Only two possible values:
