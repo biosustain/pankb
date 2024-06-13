@@ -82,7 +82,7 @@ Second, you must deploy the AI Assistant Web Application (<b>here we need to ins
 
 Finally, in order to deploy the website, clone the PanKB git repo (the <i>develop</i> branch) into the subdirectory /django_project and change to it:
 ```
-git clone --branch develop https://github.com/biosustain/pankb.git django_project
+git clone --branch pre-prod https://github.com/biosustain/pankb.git django_project
 cd django_project
 ```
 Create a file with the name ".env" under the /projects/pankb_web/django_project/ folder in the following format:
