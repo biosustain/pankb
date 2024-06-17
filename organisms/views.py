@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 from .models import Organisms
-import json, requests, csv
+import json, requests, csv, time
 import pandas as pd
 
 
@@ -34,10 +34,10 @@ def download_organisms_table_csv(request):
   family = request.GET.get('family')
   # Adjust filter parameters based on the GET paramater value: ----
   filter_params = {}
-  downloaded_file_name = "Organisms.csv"
+  downloaded_file_name = "Organisms" + "__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
   if family:  # if the family get parameter is set
     filter_params['family'] = family
-    downloaded_file_name = "Organisms__" + family + ".csv"
+    downloaded_file_name = "Organisms__" + family + "__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
 
   # Get the filtered or full table with organisms as a list of dictionaries: ----
   organisms = Organisms.objects.filter(**filter_params).values('family', 'species', 'openness', 'genomes_num', 'gene_class_distribution')

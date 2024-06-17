@@ -4,7 +4,7 @@ from django.http import StreamingHttpResponse
 from django.template import loader
 from .models import GeneAnnotations
 from organisms.models import Organisms
-import json, requests, io, gzip, csv
+import json, requests, io, gzip, csv, time
 import pandas as pd
 
 
@@ -159,7 +159,7 @@ def download_matrix_csv(request):
   # User the StreamingHttpResponse instead of HttpResponse to serve potentially large csv files
   # to avoid a load balancer dropping the connection (otherwise we can get the connection timeout): ----
   response = StreamingHttpResponse((writer.writerow(row) for row in rows), content_type="text/csv")
-  downloaded_file_name = "Matrix__" + species + "_" + gene_class + ".csv"
+  downloaded_file_name = "Matrix__" + species + "_" + gene_class + "__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
   response['Content-Disposition'] = f"attachment; filename=" + downloaded_file_name
   return response
 
@@ -233,7 +233,7 @@ def gene_annotation(request):
 # A view that serves the Gene Annotation table content in the .csv format
 def download_gene_annotation_table_csv(request):
   species = request.GET.get('species')
-  downloaded_file_name = "Gene_annotations__" + species + ".csv"
+  downloaded_file_name = "Gene_annotations__" + species + "__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
 
   # Adjust filter parameters based on the GET paramater value: ----
   filter_params = {}

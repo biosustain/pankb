@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
-import json, requests, io, csv
+import json, requests, io, csv, time
 import pandas as pd
 import numpy as np
 from .models import GeneInfo, GenomeInfo, PathwayInfo
@@ -73,7 +73,7 @@ def gene_info(request):
 def download_gene_info_table_csv(request):
   species = request.GET.get('species')
   gene = request.GET.get('gene')
-  downloaded_file_name = "Gene_Info__" + species + "__" + gene + ".csv"
+  downloaded_file_name = "Gene_Info__" + species + "__" + gene + "__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
 
   # Set the filter() function parameters: ----
   filter_params = {}
