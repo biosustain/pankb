@@ -3,7 +3,7 @@
 <!-- Datatable: Families found -->
 <div class="table_padding">
     <h5>Families</h5>
-    <table id="families_list" class="table table-hover" style=" width:15%; table-layout: fixed;">
+    <table id="families_list" class="table table-hover" style="width:35%; table-layout: fixed;">
         <thead>
         <tr>
             <th class="text-left align-left">Family</th>
@@ -14,9 +14,6 @@
 </div>
 
 <script>
-    var template_screen_width = 1920;
-    var current_window_Width = window.innerWidth;
-    var coefficient = current_window_Width / template_screen_width;
     var data = {{ families_results | safe }}
     var tableBody = document.getElementById('table-body-families');
 
@@ -42,7 +39,6 @@
             order: [],     // preserve the original order (needed to order by relevance)
             drawCallback: function(settings) {
                 $('[data-toggle="tooltip"]').tooltip();
-                adjustStyles();
             }
         });
     });

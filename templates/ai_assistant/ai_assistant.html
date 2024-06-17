@@ -6,8 +6,8 @@
     <!-- Include tracking with Google Analytics -->
     {% include "google_tag.html" %}
 
-    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.84.0">
@@ -17,24 +17,24 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <style>
         html {
-            font-size: 18px;
+            font-size: 1vw;
         }
         body{
-            margin: 0;             /* Remove default margin */
+            margin: 0;        /* Remove default margin */
             background-color: #41424c;
             overflow: hidden;
         }
         h1 {
             text-align: center;
-            font-size: 2em; /* Adjust the font-size as needed */
+            font-size: 2rem;   /* Adjust the font-size as needed */
         }
         h2 {
             text-align: center;
-            font-size: 1.8em; /* Adjust the font-size as needed */
+            font-size: 1.8rem; /* Adjust the font-size as needed */
         }
         h3 {
             text-align: center;
-            font-size: 1.6em; /* Adjust the font-size as needed */
+            font-size: 1.6rem; /* Adjust the font-size as needed */
         }
         .navbar-ai_assistant {
             background-color: #41424c;
@@ -44,14 +44,13 @@
         }
         iframe {
             display: block;            /* iframes are inline by default */
-            height: 85vh;             /* Set height to 100% of the viewport height */
+            height: 85vh;              /* Set height to 100% of the viewport height */
             width: 100vw;              /* Set width to 100% of the viewport width */
             border: none;              /* Remove default border */
             background: black;         /* Just for styling */
         }
     </style>
 </head>
-
 <body>
 <!-- Include the top navigation panel, which is the same for every page -->
 {% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" ai_assistant_link_style="nav-link active" %}
@@ -64,45 +63,5 @@
 <!-- Include the stremlit-based AI assistant as a separate web app loaded in an iframe -->
 <iframe src="http://20.223.166.236:8088/"></iframe>
 <!-- ######### -->
-<script>
-    document.addEventListener("DOMContentLoaded", function(){
-        const scrollSpyEl = document.body; // or document.querySelector('.scrollspy-example')
-        const scrollSpy = new bootstrap.ScrollSpy(scrollSpyEl, {
-            target: '#list-example'
-        });
-    });
-
-    function adjustHtmlFontSize(coefficient) {
-        const newFontSize = 18 * coefficient;
-        document.documentElement.style.fontSize = newFontSize + 'px';
-    }
-
-    // Function to adjust title font size
-    function adjustTitleFontSize(coefficient) {
-        const newFontSize = 25 * coefficient;
-        document.getElementById('pankb_title').style.fontSize = newFontSize + 'px';
-    }
-
-    // Function to adjust button styles
-    function adjustButtonStyles(coefficient) {
-        const buttons = document.getElementsByClassName('link_button');
-        for (let i = 0; i < buttons.length; i++) {
-            buttons[i].style.padding = (18 * coefficient) + 'px ' + (18 * coefficient) + 'px';
-            buttons[i].style.fontSize = (20 * coefficient) + 'px';
-        }
-    }
-
-    function adjustStyles() {
-        const template_screen_width = 1920;
-        const current_window_Width = window.innerWidth;
-        const coefficient = current_window_Width / template_screen_width;
-
-        adjustHtmlFontSize(coefficient);
-        adjustTitleFontSize(coefficient);
-        adjustButtonStyles(coefficient);
-    }
-    document.addEventListener("DOMContentLoaded", adjustStyles);
-    window.addEventListener("resize", adjustStyles);
-</script>
 </body>
 </html>

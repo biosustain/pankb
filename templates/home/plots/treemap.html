@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Highcharts Treemap</title>
     <style>
         html, body, #container {
@@ -9,12 +10,8 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
+            font-size: 3vw;
         }
-
-        html {
-            font-size: 18px;
-        }
-
     </style>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/treemap.js"></script>
@@ -22,16 +19,9 @@
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 </head>
 <body>
-
 <div id="container"></div>
-
 <script>
-    const template_screen_width = 655;
-    const current_window_Width = window.innerWidth;
-    const coefficient = current_window_Width / template_screen_width;
-
     const data = {{ dataset|safe }}
-
     const categoryColors = {
         'Animal associated': '#FFFACD',
         'Food associated': '#FDBCB4',
@@ -67,7 +57,7 @@
                         return this.point.name + ': ' + this.point.value + ' strains';
                     },
                     style: {
-                        fontSize: (0.8 * coefficient) + 'em'
+                        fontSize: '0.8rem'
                     }
                 },
                 borderWidth: 3,

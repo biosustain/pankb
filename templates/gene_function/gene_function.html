@@ -6,6 +6,7 @@
     <!-- Include tracking with Google Analytics -->
     {% include "google_tag.html" %}
 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     {% block title %}<title>Genome & Gene Info</title>{% endblock %}
     <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-fixed/">
@@ -19,7 +20,7 @@
     <!-- Include styles shared by the Pangenome analyses sub templates -->
     <style>
         html {
-            font-size: 18px;
+            font-size: 1vw;
         }
     </style>
     <!-- Include styles specific for each template -->
@@ -38,23 +39,5 @@
 
 {% block content %}
 {% endblock %}
-<script>
-    function adjustHtmlFontSize(coefficient) {
-        const newFontSize = 18 * coefficient;
-        document.documentElement.style.fontSize = newFontSize + 'px';
-    }
-
-    // Function to adjust all styles
-    function adjustStyles() {
-        const template_screen_width = 1920;
-        const current_window_Width = window.innerWidth;
-        const coefficient = current_window_Width / template_screen_width;
-        adjustHtmlFontSize(coefficient);
-    }
-
-    // Adjust styles on page load and window resize
-    document.addEventListener("DOMContentLoaded", adjustStyles);
-    window.addEventListener("resize", adjustStyles);
-</script>
 </body>
 </html>

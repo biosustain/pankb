@@ -6,8 +6,8 @@
     <!-- Include tracking with Google Analytics -->
     {% include "google_tag.html" %}
 
-    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
     <title>Species list</title>
     <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-fixed/">
     <!-- DataTables Bootstrap 5 CSS -->
@@ -22,24 +22,27 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <style>
         html {
-            font-size: 18px;
+            font-size: 1vw;
         }
         .table_padding{
-            padding-top:0px;
-            padding-bottom:0px;
-            padding-right:120px;
-            padding-left:120px;
+            padding-top: 0px;
+            padding-bottom: 0px;
+            padding-right: 10rem;
+            padding-left: 10rem;
         }
         th, td{
-            height:50px;
-            font-size: 18px;
+            height: 1.5rem;
+            font-size: 0.9rem;
         }
         td {
             word-wrap: break-word;
             white-space: normal;
         }
-        div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button a {
-            font-size: 1em; /* Adjust this value as needed */
+        .dataTables_length label, .dataTables_filter label, .dataTables_info {
+            font-size: 0.9rem;
+        }
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button a, #species_list_paginate {
+            font-size: 0.9rem; /* Adjust this value as needed */
         }
     </style>
 </head>
@@ -87,9 +90,6 @@
     </div>
 </div>
 <script>
-    const template_screen_width = 1920;
-    const current_window_Width = window.innerWidth;
-    const coefficient = current_window_Width / template_screen_width;
     const data = {{ dataset|safe }}
     const tableBody = document.getElementById('table-body');
 
@@ -125,85 +125,10 @@
         $('#species_list').DataTable({
             drawCallback: function(settings) {
                 $('[data-toggle="tooltip"]').tooltip();
-                adjustStyles();
                 window.scrollTo(0, 0);
             }
         });
     });
-
-    function adjustTableFontSize2(coefficient) {
-        const tableHeadersAndData = document.querySelectorAll('#species_list th, #species_list td');
-        tableHeadersAndData.forEach(element => {
-            element.style.fontSize = (18 * coefficient) + 'px';
-        });
-    }
-
-    function adjustHtmlFontSize(coefficient) {
-        const newFontSize = 18 * coefficient;
-        document.documentElement.style.fontSize = newFontSize + 'px';
-    }
-
-    function adjustTablePadding(coefficient) {
-        const tablePaddingElements = document.querySelectorAll('.table_padding');
-        tablePaddingElements.forEach(element => {
-            element.style.paddingTop = 0 * coefficient + 'px';
-            element.style.paddingBottom = 0 * coefficient + 'px';
-            element.style.paddingRight = 120 * coefficient + 'px';
-            element.style.paddingLeft = 120 * coefficient + 'px';
-        });
-    }
-
-    function adjustTableFontSize(coefficient) {
-        const tableHeadersAndData = document.querySelectorAll('th, td');
-        tableHeadersAndData.forEach(element => {
-            element.style.fontSize = 18 * coefficient + 'px';
-            element.style.height = 40 * coefficient + 'px';
-        });
-    }
-
-    function adjustDataTablesControls(coefficient) {
-        // Adjust font size for the 'Show entries' label and the search input
-        const dataTableControls = document.querySelectorAll('.dataTables_length label, .dataTables_filter label');
-        dataTableControls.forEach(element => {
-            element.style.fontSize = (18 * coefficient) + 'px'; // Adjust the font size as needed
-        });
-    }
-
-    function adjustDataTablesInterface(coefficient) {
-        // Adjust the font size for 'Showing 1 to 10 of 51 entries'
-        const infoElements = document.querySelectorAll('.dataTables_info');
-        infoElements.forEach(element => {
-            element.style.fontSize = (18 * coefficient) + 'px'; // Adjust base font size as needed
-        });
-
-        // Adjust the font size for pagination controls
-        const paginateElements = document.querySelectorAll('.dataTables_paginate');
-        paginateElements.forEach(element => {
-            element.style.fontSize = (14 * coefficient) + 'px'; // Adjust base font size as needed
-        });
-    }
-
-    function adjustDataTablesPagination(coefficient) {
-        const paginateElement = document.querySelector('#species_list_paginate');
-        if (paginateElement) {
-            paginateElement.style.fontSize = (16 * coefficient) + 'px';
-        }
-    }
-
-    function adjustStyles() {
-        const template_screen_width = 1920;
-        const current_window_Width = window.innerWidth;
-        const coefficient = current_window_Width / template_screen_width;
-        console.log('window width: ' + current_window_Width);
-
-        adjustHtmlFontSize(coefficient);
-        adjustTablePadding(coefficient);
-        adjustTableFontSize(coefficient);
-        adjustTableFontSize2(coefficient);
-        adjustDataTablesControls(coefficient);
-        adjustDataTablesInterface(coefficient);
-        adjustDataTablesPagination(coefficient);
-    }
 </script>
 <br><br> <!-- Include two empty lines to create some spase after the pagination bar -->
 </body>

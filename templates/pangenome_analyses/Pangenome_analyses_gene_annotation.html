@@ -30,12 +30,12 @@
             padding-right: 1.1em;
         }
         tr, th {
-            font-size: 1em;
+            font-size: 1rem;
             text-align: center;
             vertical-align: middle;
         }
         td {
-            font-size: 0.9em;
+            font-size: 0.9rem;
             text-align: center;
             width: 12.5% !important;
             white-space: nowrap;
@@ -74,6 +74,9 @@
         table {
             table-layout: auto;
         }
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button a, #genes_list_paginate {
+            font-size: 0.9rem; /* Adjust this value as needed */
+        }
     </style>
 {% endblock %}
 
@@ -92,7 +95,7 @@
             {% include 'pangenome_analyses/info_panel.html' %}
             <!-- ######### -->
             <div class="col-10 center-container">
-                <h2 class="text-center" style="font-size: 1.6em;">Gene Annotation Table</h2>
+                <h2 class="text-center" style="font-size: 1.6rem;">Gene Annotation Table</h2>
                 <form action="{% url 'download_gene_annotation_table_csv' %}" method="GET">
                     <input type="hidden" name="species" value="{{ request.GET.species }}" />
                     <!-- The button styles from Bootstrap:

@@ -6,8 +6,8 @@
     <!-- Include tracking with Google Analytics -->
     {% include "google_tag.html" %}
 
-    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.84.0">
@@ -26,20 +26,21 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <style>
         html {
-            font-size: 18px;
+            font-size: 1vw;
         }
         .table_padding {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding-top:0.5em;
-            padding-bottom:4em;
+            padding-top: 0.5rem;
+            padding-bottom: 4rem;
         }
         /* Add this to make the DataTable pagination centered */
         .dataTables_wrapper .dataTables_paginate {
             float: none;
             text-align: center;
+            font-size: 0.9rem;
         }
         .table-container {
             width: 100%;
@@ -50,11 +51,11 @@
             margin-right: auto;
         }
         tr, th {
-            font-size: 1em;
+            font-size: 1rem;
         }
         td {
-            font-size: 1em;
-            padding: 0.5em;
+            font-size: 0.9rem;
+            padding: 0.5rem;
             width: 14.2%;
         }
         .dataTables_wrapper .dataTables_filter {
@@ -63,7 +64,7 @@
         .dataTables_wrapper thead th {
             text-align: center;
             vertical-align: middle;
-            padding: 1em 0.3em;
+            padding: 1rem 0.3rem;
             position: relative;
         }
         .dataTables_wrapper thead th input {
@@ -72,10 +73,10 @@
             left: 50%;
             transform: translateX(-50%);
             width: 80%;
-            margin-bottom: 0.5em;
+            margin-bottom: 0.5rem;
         }
         .dataTables_wrapper tbody td {
-            padding: 0.5em;
+            padding: 0.5rem;
             word-break: break-word;
         }
         .dataTables_wrapper .dataTables_filter {
@@ -83,13 +84,14 @@
         }
         .dataTables_wrapper .dataTables_filter input {
             width: 100%;
-            max-width: 17em;
+            max-width: 17rem;
             margin: 0 auto;
         }
         #table-container .dataTables_paginate {
             display: flex;
             justify-content: center;
-            margin-top: 1em !important;
+            margin-top: 1rem !important;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -158,25 +160,6 @@
             searching: true
         });
     });
-
-
-    function adjustHtmlFontSize(coefficient) {
-        const newFontSize = 18 * coefficient;
-        document.documentElement.style.fontSize = newFontSize + 'px';
-    }
-
-    // Function to adjust all styles
-    function adjustStyles() {
-        const template_screen_width = 1920;
-        const current_window_Width = window.innerWidth;
-        const coefficient = current_window_Width / template_screen_width;
-
-        adjustHtmlFontSize(coefficient);
-    }
-
-    // Adjust styles on page load and window resize
-    document.addEventListener("DOMContentLoaded", adjustStyles);
-    window.addEventListener("resize", adjustStyles);
 </script>
 </body>
 </html>

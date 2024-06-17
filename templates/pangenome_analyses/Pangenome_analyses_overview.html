@@ -90,32 +90,32 @@
             <div class="col-10 custom-padding">
                 <div class="container-fluid">
                     <div class="row row-spacing border-container gx-0 gx-md-2">
-                        <h2 class="text-center" style="font-size: 1.6em;">Heap's Law and Gene Frequency</h2>
+                        <h2 class="text-center" style="font-size: 1.6rem">Heap's Law and Gene Frequency</h2>
                         <div class="col-12 col-md-6">
                             <div class="figure-container_above responsive-iframe">
-                                <iframe style="border:0;" id="Heaps_Law"></iframe>
+                                <iframe style="border: 0" id="Heaps_Law"></iframe>
                             </div>
                             <br>
                             <div class="figure-container_below responsive-iframe">
-                                <iframe id = 'Barplot' name="Barplot" style="border:0;"></iframe>
+                                <iframe id="Barplot" name="Barplot" style="border: 0"></iframe>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="figure-container_above responsive-iframe">
-                                <iframe style="border:0;" id="Cumulative_Frequency"></iframe>
+                                <iframe style="border: 0" id="Cumulative_Frequency"></iframe>
                             </div>
                             <br>
                             <div class="figure-container_below responsive-iframe">
-                                <iframe style="border:0;" id="Gene_frequency"></iframe>
+                                <iframe style="border: 0" id="Gene_frequency"></iframe>
                             </div>
                         </div>
                     </div>
                     <br>
                     <br>
                     <br>
-                    <div class="row border-container" style="height: 80vh;">
-                        <div class="col-12" style="height: 100%;">
-                            <h2 class="text-center" style="font-size: 1.6em;">Presence/Absence Matrix</h2>
+                    <div class="row border-container" style="height: 80vh">
+                        <div class="col-12" style="height: 100%">
+                            <h2 class="text-center" style="font-size: 1.6rem">Presence/Absence Matrix</h2>
                             <div class="dropdown">
                                 <!-- The button styles from Bootstrap:
                                 https://getbootstrap.com/docs/5.3/components/buttons/ -->
@@ -129,15 +129,15 @@
                                     <li><a class="dropdown-item" href="#" onclick="updateMatrix('above_1', 'Rare: Occurs < 1% of strains, but > 2 strains'); return false;">Rare: Occurs < 1% of strains, but > 2 strains</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="updateMatrix('only_1', 'Rare: Unique genes'); return false;">Rare: Unique genes</a></li>
                                 </ul>
-                                <form name="downloadMatrixForm" action="{% url 'download_matrix_csv' %}" method="GET" style="display: inline;">
-                                    <input type="hidden" name="species" id= "form_species" value="{{ request.GET.species }}" />
-                                    <input type="hidden" name="gene_class" id ="form_gene_class" value="core" />
+                                <form name="downloadMatrixForm" action="{% url 'download_matrix_csv' %}" method="GET" style="display: inline">
+                                    <input type="hidden" name="species" id="form_species" value="{{ request.GET.species }}" />
+                                    <input type="hidden" name="gene_class" id="form_gene_class" value="core" />
                                     <button class="btn btn-secondary" type="submit">Download CSV</button>
                                 </form>
                             </div>
                             <br>
                             <div class="d-flex justify-content-center align-items-center h-100" >
-                                <iframe id="heatmap_all" class="w-100 h-100" style="border:0;"></iframe>
+                                <iframe id="heatmap_all" class="w-100 h-100" style="border: 0"></iframe>
                             </div>
                         </div>
                     </div>
@@ -148,21 +148,21 @@
                     <br>
                     <br>
                     <br>
-                    <div class="row border-container" style="height: 80vh;">
-                        <h2 class="text-center" style="font-size: 1.6em;">Core Alleleome</h2>
+                    <div class="row border-container" style="height: 80vh">
+                        <h2 class="text-center" style="font-size: 1.6rem">Core Alleleome</h2>
                         <div class="col-1">
                             <!-- Empty column -->
                         </div>
 
                         <div class="col-5" style="height: 70vh;">
                             <div class="d-flex justify-content-center align-items-center h-100">
-                                <iframe id="step_histogram" class="w-100 h-100" style="border:0;"></iframe>
+                                <iframe id="step_histogram" class="w-100 h-100" style="border: 0"></iframe>
                             </div>
                         </div>
 
-                        <div class="col-5" style="height: 70vh;">
+                        <div class="col-5" style="height: 70vh">
                             <div class="d-flex justify-content-center align-items-center h-100">
-                                <iframe id="dn_ds" class="w-100 h-100" style="border:0;"></iframe>
+                                <iframe id="dn_ds" class="w-100 h-100" style="border: 0"></iframe>
                             </div>
                         </div>
 
