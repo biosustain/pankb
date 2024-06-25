@@ -19,10 +19,10 @@
         html {
             font-size: 1vw;
         }
-        body{
+        body {
             margin: 0;        /* Remove default margin */
-            background-color: #41424c;
             overflow: hidden;
+            background-color: black;
         }
         h1 {
             text-align: center;
@@ -36,18 +36,14 @@
             text-align: center;
             font-size: 1.6rem; /* Adjust the font-size as needed */
         }
-        .navbar-ai_assistant {
-            background-color: #41424c;
-            margin-top: -2.0rem;
-            padding-top: 2.0rem;
-            margin-bottom: 0;
-        }
         iframe {
             display: block;            /* iframes are inline by default */
-            height: 85vh;              /* Set height to 100% of the viewport height */
+            height: 100vh;              /* Set height to 100% of the viewport height */
             width: 100vw;              /* Set width to 100% of the viewport width */
             border: none;              /* Remove default border */
-            background: black;         /* Just for styling */
+            margin-top: -2.0rem;
+            padding-bottom: 2.0rem;
+            background-color: black;
         }
     </style>
 </head>
@@ -56,12 +52,8 @@
 {% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" ai_assistant_link_style="nav-link active" %}
 <!-- ######### -->
 
-<!-- Include the search bar under the top navigation panel: -->
-{%  include "search/search_bar.html" with search_bar_style="navbar-ai_assistant" %}
-<!-- ######### -->
-
-<!-- Include the stremlit-based AI assistant as a separate web app loaded in an iframe -->
-<iframe src="http://20.223.166.236:8088/"></iframe>
+<!-- Include the streamlit-based AI assistant as a separate web app loaded in an iframe -->
+<iframe src="http://52.169.153.8:8501/"></iframe>
 <!-- ######### -->
 </body>
 </html>
