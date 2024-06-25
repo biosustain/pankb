@@ -1,10 +1,15 @@
 # PanKB Website
 <b>The dynamic Python-based version of the website. The Django framework is used as the back-end. Data about organisms, genes, genomes, locus_tags and KEGG pathways is stored in a database (locally in a self-deployed MongoDB instance or in a cloud-based Cosmos DB for MongoDB). The Microsoft Azure Blob Storage is still used as a data lake to store static semi-structured data, e.g. plots, bibliome and phylogenetic trees (i.e. data that is not used by search or any other scripts generating dynamic content).</b>
 
-## Development configuration on Ubuntu servers
+## Development Server Configuration
 Tested on Linux Ubuntu 20.04 (may need tweaks for other systems).
 
-Requirements: 
+Min hardware requirements solely for the PanKB website deployment (excl. the PanKB DB, ETL and AI Assistant app):
+- 4GB RAM
+- 8GB disk space
+- 4 CPU cores (e.g. for PyCharm Remote IDE development)
+
+System requirements:
 - Docker & Docker Compose
 - Git
 
@@ -66,7 +71,7 @@ Install Git:
 sudo apt install git
 ```
 
-### Set up the repository and build the containers
+### Set up the repositories and build the containers
 Create the necessary directories and change to the /pankb_web:
 ```
 sudo mkdir -p /projects
@@ -76,16 +81,16 @@ sudo chown -R $USER pankb_web
 cd pankb_web 
 mkdir -p docker_volumes/mongodb pankb_db pankb_llm
 ```
-First, you must set up and populate your own DEV MongoDB instance as described here: https://github.com/biosustain/pankb_db. 
+First, you must set up and populate your own DEV MongoDB instance as described here: https://github.com/biosustain/pankb_db. The instructions in this document consider only self-deployed (or locally deployed) MongoDB instances. However, a DEV DB can also be deployed on a Cosmos DB cluster or with any other IaaS cloud service. 
 
-Second, you must deploy the AI Assistant Web Application (<b>here we need to insert a link to the repo with PanKB LLM, knowledge base creation scripts and streamlit interface. And even before that, the repo must be re-created under the biosustain org</b>).
+Second, you must deploy the AI Assistant Web Application as described here: https://github.com/biosustain/pankb_llm.
 
 Finally, in order to deploy the website, clone the PanKB git repo (the <i>develop</i> branch) into the subdirectory /django_project and change to it:
 ```
 git clone --branch develop https://github.com/biosustain/pankb.git django_project
 cd django_project
 ```
-Create a file with the name ".env" under the /projects/pankb_web/django_project/ folder in the following format (do not forget to choose your own SECRET_KEY, SUPER_USER_PASSWORD, SUPER_USER_EMAIL, MONGO_INITDB_ROOT_PASSWORD, MONGODB_PASSWORD, POSTGRES_PASSWORD and optionally other fields):
+Create a file with the name ".env" under the /projects/pankb_web/django_project/ folder in the following format (do not forget to choose your own SECRET_KEY, SUPER_USER_PASSWORD, SUPER_USER_EMAIL, MONGO_INITDB_ROOT_PASSWORD, MONGODB_PASSWORD, POSTGRES_PASSWORD, AI_ASSISTANT_APP_URL and optionally other fields):
 ```
 ## Do not put this file under version control!
 
@@ -119,12 +124,15 @@ MONGO_INITDB_ROOT_PASSWORD = '<insert any password you choose>'
 MONGODB_USERNAME = 'pankbDbOwner'
 MONGODB_PASSWORD = '<insert any password you choose>'
 MONGODB_AUTH_SOURCE = 'pankb'
+
+## URL address of the separately deployed AI Assistant Web Application
+AI_ASSISTANT_APP_URL = '<insert the url here>'
 ```
-Build the containers with Docker Compose:
+Build or (re-build) the containers with Docker Compose:
 ```
-docker compose up -d --build
+docker compose up -d --build --force-recreate
 ```
-The web-application must now be available in your browser on http://127.0.0.1 (local development) or http://(type-your-public-ip-address-here) (remote server development). If you use a virtual machine, your IP address will be the public address of your virtual machine. It will use the standard 80 port. The command `docker ps` should show two docker containers running:
+The web-application must now be available in your browser on http://127.0.0.1 (local development) or http://(type-your-public-ip-address-here) (remote server development). If you use a virtual machine, your IP address will be the public address of your virtual machine. It will use the standard 80 port. The command `docker ps` should show several containers (one with the django web app and wsgi server inside, one with the nginx web server, one with the AI Assistant web app and one with the DEV database if you deploy it locally) up and running:
 ```
 >>> docker ps
 CONTAINER ID   IMAGE                            COMMAND                  CREATED             STATUS             PORTS                                    NAMES
