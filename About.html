@@ -25,7 +25,7 @@
             top: 100px; /* Adjust if necessary, e.g., below a top navbar */
             left: 0;
             height: 100vh;
-            width: 23%;;
+            width: 20%;;
             overflow-y: auto; /* To make sidebar scrollable if content is long */
         }
 
@@ -93,30 +93,28 @@
 </nav>
 
 <div class="row">
-    <div class="col-1">
-<!--        <div id="list-example" class="list-group">-->
-<!--            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#about_pankb">About PanKB</a>-->
-<!--            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#how_to_use">How to use PanKB</a>-->
-<!--            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#Pangenome_Analytics_Dashboards">Pangenome Analytics Dashboards</a>-->
-<!--            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#overview">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Overview</a>-->
-<!--            <a class="list-group-item list-group-item-action" href="#heaps_law_and_gene_frequency">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Heap's Law and Gene Frequency</a>-->
-<!--            <a class="list-group-item list-group-item-action" href="#presence_absence_matrix">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Presence/Absence Matrix</a>-->
-<!--            <a class="list-group-item list-group-item-action" href="#genome_gene_info_page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Genome & Gene Info Page</a>-->
-<!--            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#genee">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Genes</a>-->
-<!--            <a class="list-group-item list-group-item-action" href="#gene_annotation_able">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gene Annotation Table</a>-->
-<!--            <a class="list-group-item list-group-item-action" href="#gene_info_page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gene Info Page</a>-->
-<!--            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#phylogenetic_tree">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Phylogenetic Tree</a>-->
-<!--            <a class="list-group-item list-group-item-action" href="#genome_info_page">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Genome Info Page</a>-->
-<!--        </div>-->
+    <div class="col-2 fixed-sidebar">
+        <div id="list-example" class="list-group">
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#about_pankb">About PanKB</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#how_to_use">Using PanKB</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Pangenomes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pangenomes</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Alleleomes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alleleomes</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Data_Accessibility">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Data Accessibility</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#PanKB_LLM">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PanKB LLM</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#Tools_Methods">Tools and Methods</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Tools">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Collected Pangenomic Publications</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#Publications">Tools and Methods</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Contact">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Contact Us</a>
+        </div>
     </div>
 
-<!--    <div class="col-3 vh-100"></div>-->
+    <div class="col-3 vh-100"></div>
 
-    <div class="col-10">
+    <div class="col-8">
         <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-offset="0" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
             <h1 id="about_pankb" style = 'text-align: center'>About PanKB</h1>
             <br>
-            <p style = 'font-size: 1.2em'>
+            <p style = 'font-size: 1.1em'>
                 Since the assembly of <a href="https://doi.org/10.1007%2Fs10142-015-0433-4"> the first complete
                 microbial genome in 1995</a>,
                 the emergence of efficient and inexpensive sequencing technologies has driven the rapid expansion of
@@ -131,14 +129,14 @@
                 human health, and ecological sustainability, benefiting both humanity and the environment.
             </p>
 
-            <p style = 'font-size: 1.2em'>
+            <p style = 'font-size: 1.1em'>
                 The microbial world holds vast potential for advancements in diverse fields.
                 PanKB is a pangenomic knowledgebase working to empower practitioners to leverage
                 microbial functions beyond those of model organisms.
                 PanKB provides:
             </p>
 
-            <ul style = 'font-size: 1.2em'>
+            <ul style = 'font-size: 1.1em'>
                 <li>A growing dataset of pangenomic results,</li>
                 <li>Interactive data reports and analytics for exploration, analysis, and new potential discoveries,
                 </li>
@@ -154,7 +152,7 @@
                 </li>
             </ul>
 
-            <p style = 'font-size: 1.2em'>
+            <p style = 'font-size: 1.1em'>
                 Combined, PanKB's features enable valuable workflows for enzyme and strain engineering. These include
                 identifying genes for new enzyme production or reintroduction into strains, pinpointing precise gene
                 edits to modify activity, discovering and optimizing valuable pathways, and selecting optimal starting
@@ -166,14 +164,14 @@
 
             <h1 id="how_to_use" style = 'text-align: center'>Using PanKB</h1>
             <br>
-            <h3 style='text-align: center'>Pangenomes</h3>
-            <p style = 'font-size: 1.2em'>
+            <h3 style='text-align: center' id = 'Pangenomes'>Pangenomes</h3>
+            <p style = 'font-size: 1.1em'>
                 PanKB includes multiple interactive analytics and tables that give an overview of a pangenome's
                 contents. These analytics can be found or navigated to on an individual pangenome's page.
             </p>
 
-            <h3 style='text-align: center'>Alleleomes</h3>
-            <p style = 'font-size: 1.2em'>
+            <h3 style='text-align: center' id = 'Alleleomes'>Alleleomes</h3>
+            <p style = 'font-size: 1.1em'>
                 Pangenomes also serve as the foundation for further large-scale analyses, and PanKB is actively
                 integrating their novel results. Recent pangenomic-scale analyses of variants, named <a
                     href="https://doi.org/10.1073/pnas.2218835120">Alleleomics</a>,
@@ -182,8 +180,8 @@
                 can be found on pangenome and specific gene pages.
             </p>
 
-            <h3 style='text-align: center'>Data Accessibility</h3>
-            <p style = 'font-size: 1.2em'>
+            <h3 style='text-align: center' id = 'Data_Accessibility'>Data Accessibility</h3>
+            <p style = 'font-size: 1.1em'>
                 PanKB implements multiple different methods to accessing its data. Users can access all of PanKB's data
                 through its navigation links. Users can also quickly find specific data through the global database
                 search
@@ -191,8 +189,8 @@
                 through the various analytics hosted on database pages.
             </p>
 
-            <h3 style='text-align: center'>PanKB LLM</h3>
-            <p style = 'font-size: 1.2em'>
+            <h3 style='text-align: center' id = 'PanKB_LLM'>PanKB LLM</h3>
+            <p style = 'font-size: 1.1em'>
                 Scientific progress often necessitates extensive literature review, a traditionally time-consuming
                 process. Large Language Models (LLMs) offer a potential solution by aggregating and summarizing
                 knowledge across documents. PanKB includes an LLM chatbot (AI Assistant) focused on an open-access
@@ -205,20 +203,28 @@
 
             <br>
 
-            <h2 style='text-align: center'>Tools and Methods</h2>
-            <p style = 'font-size: 1.2em'>
+            <h1 style='text-align: center' id = 'Tools_Methods'>Tools and Methods</h1>
+            <br>
+            <h3 style='text-align: center' id = 'Tools'>Tools</h3>
+            <p style = 'font-size: 1.1em'>
                  <a href="https://doi.org/10.1093/nar/gkae314">BGCFlow</a>: Nuhamunada M, Mohite OS, Phaneuf PV, Palsson BO,
                 Weber T. BGCFlow: systematic pangenome workflow for the analysis of biosynthetic gene clusters across
                 large
                 genomic datasets. Nucleic Acids Research. 2024 Jun 10;52(10):5478–95.
             </p>
-            <h3 style='text-align: center'>Collected Pangenomic Publication</h3>
-            <p style = 'font-size: 1.2em'>
+            <br>
+
+            <h1 style='text-align: center' id = 'Publications'>Collected Pangenomic Publications</h1>
+            <br>
+
+            <p style = 'font-size: 1.1em'>
                 An interactive table for these can be found in the <a href=" /publications/ ">Collected Publications</a> page.
             </p>
             <br>
-            <h2 style='text-align: center'>Contact Us</h2>
-            <p style = 'font-size: 1.2em'>
+            <h1 style='text-align: center' id = 'Contact'>Contact Us</h1>
+            <br>
+
+            <p style = 'font-size: 1.1em'>
                 If you have questions or find any bugs in the database, please contact <a href="https://orbit.dtu.dk/en/persons/patrick-victor-phaneuf">Patrick Phaneuf</a>
 
             </p>
