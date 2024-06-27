@@ -31,7 +31,7 @@
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const species = urlParams.get('species');
+    const species_name = (urlParams.get('species') || 'Unknown species').replace(/_/g, ' ');
 
     const template_screen_width = 602;
     const current_window_Width = window.innerWidth;
@@ -55,7 +55,7 @@
                 plotBorderColor: '#000000'
             },
             title: {
-                text: 'Dominant versus Variant Amino Acid Frequency Distribution for ' + species + ' Core Genomes',
+                text: 'Dominant versus Variant Amino Acid Frequency Distribution for ' + species_name + ' Core Genomes',
                 style: {
                     fontSize: (1.1 * coefficient) + 'em',
                     color: '#000000'
