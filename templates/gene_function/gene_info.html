@@ -43,7 +43,7 @@
         .expanded-row td {
             white-space: normal;
             word-wrap: break-word;
-    }
+        }
         .dataTables_wrapper .dataTables_filter {
             display: block;
         }
@@ -84,8 +84,15 @@
 {% endblock %}
 
 {% block content %}
-    <h2 style = 'text-align: center; font-size: 1.6em;'>Gene <i>{{request.GET.gene}}</i> Info</h2>
+    <h2 style = 'text-align: center; font-size: 1.6em;'>Gene <i>{{request.GET.gene}}</i></h2>
     <div class="table_padding overflow-auto">
+        <form action="{% url 'download_gene_info_table_csv' %}" method="GET">
+            <input type="hidden" name="species" value="{{ request.GET.species }}" />
+            <input type="hidden" name="gene" value="{{ request.GET.gene }}" />
+            <!-- The button styles from Bootstrap:
+            https://getbootstrap.com/docs/5.3/components/buttons/ -->
+            <button class="btn btn-primary" type="submit">Download CSV</button>
+        </form>
         <div style="width:90%;">
             <table id="gene_info" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
                 <thead>

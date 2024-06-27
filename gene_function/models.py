@@ -61,6 +61,5 @@ class PathwayInfo(models.Model):
        indexes = [
            models.Index(fields=['pathway_id', 'pathway_name', 'product']),
            models.Index(fields=['pangenome_analysis', 'gene', 'genome_id']),
-           models.Index(fields=['genome_id', 'pathway_id']),
            models.Index(fields=['pathway_id', 'strain'])
        ]

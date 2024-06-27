@@ -18,3 +18,7 @@ __pycache__/
 *.rar
 *.tar
 *.zip
+
+# Custom files
+venv/
+misc/

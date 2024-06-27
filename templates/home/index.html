@@ -3,8 +3,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
+    <!-- Include tracking with Google Analytics -->
+    {% include "google_tag.html" %}
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.84.0">
@@ -14,13 +17,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <style>
         html {
-            font-size: 18px;
+            font-size: 1vw;
         }
         .center{
             text-align: center;
         }
         .link_button{
             text-align: center;
+            font-size: 1rem;
+            padding: 1rem;
         }
         .responsive-iframe {
             padding-left: 0;
@@ -61,23 +66,22 @@
             height: 3vh;
         }
     </style>
-
     <!-- Custom styles for this template -->
     <link href=" {% static './css/navbar-top-fixed.css' %} " rel="stylesheet">
 </head>
 
 <body>
 <!-- Include the top navigation panel, which is the same for every page -->
-{% include "navigation.html" with home_link_style="nav-link active" about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" %}
+{% include "navigation.html" with home_link_style="nav-link active" about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" ai_assistant_link_style="nav-link" %}
 <!-- ######### -->
 <!-- The big project logo -->
-<p class = "container-fluid">
+<p class = "container-fluid" style="margin: 0px;">
 <p class="display-5 center" style="margin: 0px;">
     <a class="navbar-brand" href=" {% url 'home' %} ">
-        <img src=" {% static './img/pankb_logo_black.svg' %} " alt="PanKB" class="d-inline-block align-text-top logo-image">
+        <img src="{% static './img/pankb_logo_black.svg' %}" alt="PanKB" class="d-inline-block align-text-top logo-image">
     </a>
 </p>
-<p id = "pankb_title" class="display-6 center" style="font-style: italic;">
+<p id = "pankb_title" class="display-6 center" style="font-style: italic; font-size: 1.25rem;">
     Pangenome Knowledge Base
 </p>
 <!-- ######### -->
@@ -90,25 +94,25 @@
         <!-- Empty column -->
     </div>
     <div class="col-11">
-        <div class="row no-gutters" style="height:60vh">
+        <div class="row no-gutters" style="height: 60vh;">
             <div class="col-3">
                 <!-- First bar plot-->
-                <div class="row" style="height:50%;"> <!-- First row for the first iframe with 50% height -->
-                    <div class="col-12 responsive-iframe" style="height:100%;">
-                        <iframe src=' {% url 'dimension' %} ' style="height:100%; width:100%;"></iframe>
+                <div class="row" style="height: 50%;"> <!-- First row for the first iframe with 50% height -->
+                    <div class="col-12 responsive-iframe" style="height:100%; ">
+                        <iframe src="{% url 'dimension' %}" style="height:100%; width:100%;"></iframe>
                     </div>
                 </div>
                 <!-- Second bar plot-->
-                <div class="row" style="height:50%;"> <!-- Second row for the second iframe with 50% height -->
+                <div class="row" style="height: 50%;"> <!-- Second row for the second iframe with 50% height -->
                     <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 1em; font-weight: bold;">
                         Database size per organism
                     </p>
-                    <div class="col-3-5 responsive-iframe" style="height:100%;">
-                        <iframe src=' {% url 'organism_genome_number' %} ' style="height:100%"></iframe>
+                    <div class="col-3-5 responsive-iframe" style="height: 100%;">
+                        <iframe src="{% url 'organism_genome_number' %}" style="height: 100%"></iframe>
                     </div>
                     <!-- Third bar plot-->
-                    <div class="col-8-5 responsive-iframe" style="height:100%;">
-                        <iframe src=' {% url 'organism_gene_number' %} ' style="height:100%"></iframe>
+                    <div class="col-8-5 responsive-iframe" style="height: 100%;">
+                        <iframe src="{% url 'organism_gene_number' %}" style="height: 100%"></iframe>
                     </div>
                 </div>
             </div>
@@ -116,27 +120,27 @@
                 <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 1em; font-weight: bold;">
                     Pangenomes
                 </p>
-                <iframe src=' {% url 'genome_gene' %} '></iframe>
+                <iframe src="{% url 'genome_gene' %}"></iframe>
             </div>
             <div class="col-4-5 responsive-iframe" style="padding-left: 0; padding-right: 0;">
                 <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 1em; font-weight: bold;">
                     Annotated strain Isolation Sources
                 </p>
-                <iframe src=' {% url 'treemap' %} '></iframe>
+                <iframe src="{% url 'treemap' %}"></iframe>
             </div>
         </div>
     </div>
     <div class="col-0-5">
     </div>
 </div>
-<br><br>
+<br>
 <div class="container-fluid">
     <div class="row">
         <div class="col-3">
         </div>
         <div class="col-6">
             <main class="container">
-                <div class=" p-3 rounded center">
+                <div class="p-3 rounded center">
                     <div>
                         <a class="btn btn-lg btn-primary link_button" href=" {% url 'organisms' %} " >Select an organism</a>
                     </div>
@@ -148,42 +152,5 @@
     </div>
 </div>
 </div>
-<script>
-    // Function to adjust the font size of the html page elements
-    function adjustHtmlFontSize(coefficient) {
-        const newFontSize = 18 * coefficient;
-        document.documentElement.style.fontSize = newFontSize + 'px';
-    }
-
-    // Function to adjust title font size
-    function adjustTitleFontSize(coefficient) {
-        const newFontSize = 25 * coefficient;
-        document.getElementById('pankb_title').style.fontSize = newFontSize + 'px';
-    }
-
-    // Function to adjust button styles
-    function adjustButtonStyles(coefficient) {
-        const buttons = document.getElementsByClassName('link_button');
-        for (let i = 0; i < buttons.length; i++) {
-            buttons[i].style.padding = (18 * coefficient) + 'px ' + (18 * coefficient) + 'px';
-            buttons[i].style.fontSize = (20 * coefficient) + 'px';
-        }
-    }
-
-    // Function to adjust all styles
-    function adjustStyles() {
-        const template_screen_width = 1920;
-        const current_window_Width = window.innerWidth;
-        const coefficient = current_window_Width / template_screen_width;
-
-        adjustHtmlFontSize(coefficient);
-        adjustTitleFontSize(coefficient);
-        adjustButtonStyles(coefficient);
-    }
-
-    // Adjust styles on page load and window resize
-    document.addEventListener("DOMContentLoaded", adjustStyles);
-    window.addEventListener("resize", adjustStyles);
-</script>
 </body>
 </html>

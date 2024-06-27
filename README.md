@@ -1,10 +1,15 @@
-# PanKB
-<b>The dynamic Python-based version of the website. The Django framework is used as the back-end. Data about organisms, genes, genomes, locus_tags and KEGG pathways is stored in a database (in a cloud-based Cosmos DB for MongoDB). The Microsoft Azure Blob Storage is still used as a data lake to store static semi-structured data, e.g. plots, bibliome and phylogenetic trees (i.e. data that is not used by search or any other scripts generating dynamic content).</b>
+# PanKB Website
+<b>The dynamic Python-based version of the website. The Django framework is used as the back-end. Data about organisms, genes, genomes, locus_tags and KEGG pathways is stored in a database (locally in a self-deployed MongoDB instance or in a cloud-based Cosmos DB for MongoDB). The Microsoft Azure Blob Storage is still used as a data lake to store static semi-structured data, e.g. plots, bibliome and phylogenetic trees (i.e. data that is not used by search or any other scripts generating dynamic content).</b>
 
-## Development configuration on Ubuntu servers
+## Development Server Configuration
 Tested on Linux Ubuntu 20.04 (may need tweaks for other systems).
 
-Requirements: 
+Min hardware requirements solely for the PanKB website deployment (excl. the PanKB DB, ETL and AI Assistant app):
+- 4GB RAM
+- 8GB disk space
+- 4 CPU cores (e.g. for PyCharm Remote IDE development)
+
+System requirements:
 - Docker & Docker Compose
 - Git
 
@@ -66,20 +71,23 @@ Install Git:
 sudo apt install git
 ```
 
-### Set up the repository and build the containers
-Create the necessary directories and change to the /pankb_web
+### Set up the repositories and build the containers
+Create the necessary directories and change to the /pankb_web:
 ```
 sudo mkdir -p /projects
 cd /projects
 sudo mkdir -p pankb_web
 sudo chown -R $USER pankb_web
 cd pankb_web 
+<<<<<<< HEAD
 mkdir -p pankb_llm
 ```
-First, you must set up and populate the PROD MongoDB instance on a sharded cluster in the Azure cloud as described here: https://github.com/biosustain/pankb_db. 
+First, you must set up and populate the PROD MongoDB instance on a sharded cluster in the Azure cloud as described here: https://github.com/biosustain/pankb_db.
 
 Second, you must deploy the AI Assistant Web Application (<b>here we need to insert a link to the repo with PanKB LLM, knowledge base creation scripts and streamlit interface. And even before that, the repo must be re-created under the biosustain org</b>).
-
+```
+mkdir -p docker_volumes/mongodb pankb_db pankb_llm
+```
 Finally, in order to deploy the website, clone the PanKB git repo (the <i>develop</i> branch) into the subdirectory /django_project and change to it:
 ```
 git clone --branch pre-prod https://github.com/biosustain/pankb.git django_project
@@ -111,14 +119,18 @@ MONGODB_NAME = 'pankb'
 
 ## MongoDB-PROD (Azure CosmosDB for MongoDB) Connection String
 MONGODB_CONN_STRING = '<insert the connection string for Azure Cosmos DB for MongoDB instance (can be obtained by emailing to liupa@dtu.dk)>'
+
+## URL address of the separately deployed AI Assistant Web Application
+AI_ASSISTANT_APP_URL = '<insert the url here>'
 ```
-Build the containers with Docker Compose:
+Build or (re-build) the containers with Docker Compose:
 ```
-docker compose up -d --build
+docker compose up -d --build --force-recreate
 ```
-The web-application must now be available in your browser on the address http://(type-your-public-ip-address-here). If you use a virtual machine, your IP address will be the public address of your virtual machine. It will use the standard 80 port. The command `docker ps` should show two docker containers running:
+The web-application must now be available at http://(type-your-public-ip-address-here). 
+If you use a virtual machine, your IP address will be the public address of your virtual machine. It will use the standard 80 port. The command `docker ps` should show several containers (one with the django web app and wsgi server inside, one with the nginx web server, one with the AI Assistant web app and one with the DEV database if you deploy it locally) up and running:
 ```
->>> docker ps
+docker ps
 CONTAINER ID   IMAGE                            COMMAND                  CREATED             STATUS             PORTS                                    NAMES
 39787becaeb7   pankb_web:latest     "sh /entrypoint.sh"      57 minutes ago   Up 57 minutes   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                   pankb-web
 730353f2fdde   pankb_nginx:latest   "/docker-entrypoint.…"   57 minutes ago   Up 57 minutes   0.0.0.0:80->80/tcp, :::80->80/tcp                           pankb-nginx

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         html, body, #container {
             height: 100%;
@@ -8,10 +9,7 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-        }
-
-        html {
-            font-size: 18px; /* Base font size for larger screens */
+            font-size: 12vw;
         }
     </style>
     <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -19,16 +17,10 @@
 <body>
 <div id="container"></div>
 <script>
-    const template_screen_width = 135;
-    const current_window_Width = window.innerWidth;
-    const coefficient = current_window_Width / template_screen_width;
-
-
     document.addEventListener('DOMContentLoaded', function() {
                 const data = {{ dataset|safe }}
                 const categories = Object.keys(data);
                 const dataValues = Object.values(data);
-
                 const rgbColors = [
                     [255,127,80],
                     [255,215,0],
@@ -39,16 +31,13 @@
                     [255, 117, 180],
                     [59, 159, 192]
                 ];
-
                 const highchartsColors = rgbColors.map(rgb => `rgb(${rgb.join(',')})`);
-
                 Highcharts.chart('container', {
                     chart: {
                         type: 'bar',
                     },
                     title: {
                         text: ' ',
-
                     },
                     xAxis: {
                         reversed: true,
@@ -67,7 +56,7 @@
                         title: {
                             text: 'Genomes',
                             style: {
-                                fontSize: (0.9 * coefficient) + 'em'
+                                fontSize: '0.9rem'
                             }
                         },
                         type: 'logarithmic',
@@ -79,7 +68,7 @@
                         labels: {
                             align: 'center',
                             style: {
-                                fontSize: (0.9 * coefficient) + 'em'
+                                fontSize: '0.9rem'
                             },
                             formatter: function() {
                                 if (this.value === 1) {
@@ -93,7 +82,6 @@
                                 if (this.value >= 1000) {
                                     return (this.value / 1000) + 'k';
                                 }
-
                                 return this.value;
                             },
                             rotation: 0,
@@ -109,7 +97,7 @@
                     tooltip: {
                         pointFormat: 'Count: <b>{point.y}</b>',
                         style: {
-                            fontSize: (0.9 * coefficient) + 'em'
+                            fontSize: '0.9rem'
                         }
                     },
                     legend: {

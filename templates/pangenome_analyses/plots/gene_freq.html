@@ -4,7 +4,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!--  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
     <style>
         html, body, #plot {
             height: 100%;
@@ -13,16 +12,13 @@
             padding: 0;
             overflow: hidden;
         }
-
         .legend text {
             opacity: 0.6 !important;
         }
-
         /* Legend styles */
         .legend {
             opacity: 1 !important;  /* Set the opacity of the legend */
         }
-
     </style>
 </head>
 <body>
@@ -44,6 +40,16 @@
         const core_max_freq = data['core_max_freq'];
         const max_frequency_count = data['max_frequency_count'];
 
+        // Use a manual Min function to find a Min element in an array, because browsers can not handle Math.Min() in case the input array is very large (e.g., for E.Coli Rare pangenome): ----
+        function getMin(arr) {
+            return arr.reduce((min, v) => min <= v ? min : v);
+        }
+
+        // Use a manual Max function to find a Max element in an array, because browsers can not handle Math.Max() in case the input array is very large (e.g., for E.Coli Rare pangenome): ----
+        function getMax(arr) {
+            return arr.reduce((max, v) => max >= v ? max : v);
+        }
+
         const trace1 = {
             x: frequency.filter(value => value <= x15),
             type: 'histogram',
@@ -51,7 +57,7 @@
             histfunc: 'count',
             autobinx: false,
             xbins: {
-                start: Math.min(...frequency),
+                start: getMin(frequency),
                 end: x15,
                 size: 1
             },
@@ -94,7 +100,7 @@
             autobinx: false,
             xbins: {
                 start: x99,
-                end: Math.max(...frequency),
+                end: getMin(frequency),
                 size: 1
             },
             marker: {
@@ -124,7 +130,7 @@
                 color: 'rgba(0, 0, 0, 0)' // Invisible
             },
             hoverinfo: 'text',
-            text: Array(numHoverPoints).fill(`Number of Genome: ${x15}`),
+            text: Array(numHoverPoints).fill(`Number of Genomes: ${x15}`),
             showlegend: false
         };
 
@@ -138,7 +144,7 @@
                 color: 'rgba(0, 0, 0, 0)' // Invisible
             },
             hoverinfo: 'text',
-            text: Array(numHoverPoints).fill(`Number of Genome: ${x99}`),
+            text: Array(numHoverPoints).fill(`Number of Genomes: ${x99}`),
             showlegend: false
         };
 
@@ -183,7 +189,7 @@
                 },
                 ticks: 'outside',
                 tickWidth: 1,
-                range: [Math.min(...frequency), Math.max(...frequency)]
+                range: [getMin(frequency), getMax(frequency)]
             },
             yaxis: {
                 title: 'Frequency',
@@ -202,7 +208,7 @@
                 ticks: 'outside',
                 tickWidth: 1,
                 tickfont: {
-                    size: 16 * coefficient,
+                    size: 6 * coefficient,    // set a very small tick font in case we have too many ticks (e.g., for E. Coli Rare)
                     family: 'Arial, sans-serif',
                     color: '#000000'
                 }
@@ -210,7 +216,7 @@
             showlegend: true,  // Show legend
             legend: {
                 x: 0.5,
-                y: 1.05,
+                y: 1.025,
                 orientation: 'h',  // Set legend orientation to horizontal
                 traceorder: 'reversed',  // Change the order of legend items
                 itemclick: true,  // Disable legend item click
@@ -260,7 +266,7 @@
                 },
                 {
                     type: 'rect',
-                    x0: Math.min(...frequency),
+                    x0: getMin(frequency),
                     y0: 0,
                     x1: x15,
                     y1: rare_max_freq,
@@ -288,7 +294,7 @@
                     type: 'rect',
                     x0: x99,
                     y0: 0,
-                    x1: Math.max(...frequency),
+                    x1: getMax(frequency),
                     y1: core_max_freq,
                     yref: 'y',
                     fillcolor: 'purple',

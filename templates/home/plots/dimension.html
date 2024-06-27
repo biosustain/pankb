@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         html, body, #container {
             height: 100%;
@@ -8,10 +9,7 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-        }
-
-        html {
-            font-size: 18px; /* Base font size for larger screens */
+            font-size: 3vw;
         }
     </style>
     <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -19,11 +17,6 @@
 <body>
 <div id="container"></div>
 <script>
-
-    const template_screen_width = 437;
-    const current_window_Width = window.innerWidth;
-    const coefficient = current_window_Width / template_screen_width;
-
     document.addEventListener('DOMContentLoaded', function() {
         const data = {{ dataset|safe }}
         const categories = Object.keys(data);
@@ -43,7 +36,7 @@
                     title: {
                         text: 'Database Size',
                         style: {
-                            fontSize: (0.9 * coefficient) + 'em' // Set your desired font size here
+                            fontSize: '1.35rem' // Set your desired font size here
                         }
                     },
                     xAxis: {
@@ -53,7 +46,7 @@
                         },
                         labels: {
                             style: {
-                                fontSize: (0.9 * coefficient) + 'em'
+                                fontSize: '1.25rem'
                             }
                         }
                     },
@@ -61,7 +54,7 @@
                         title: {
                             text: 'Counts',
                             style: {
-                                fontSize: (0.9 * coefficient) + 'em'
+                                fontSize: '1.25rem'
                             }
                         },
                         type: 'logarithmic',
@@ -71,7 +64,7 @@
                         gridLineWidth: 1,
                         labels: {
                             style: {
-                                fontSize: (0.9 * coefficient) + 'em'
+                                fontSize: '1.25rem'
                             }
                         }
                     },
@@ -82,7 +75,7 @@
                     tooltip: {
                         pointFormat: 'Count: <b>{point.y}</b>', // Set tooltip text
                         style: {
-                            fontSize: (0.8 * coefficient) + 'em'
+                            fontSize: '1.25rem'
                         }
                     },
                     legend: {

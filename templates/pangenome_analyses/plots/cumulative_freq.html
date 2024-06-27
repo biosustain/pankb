@@ -9,14 +9,12 @@
             height: 100%;
             width: 100%;
             margin: 0;
-            padding: 0;
+            padding: 0;g
             overflow: hidden;
         }
-
         .legend text {
             opacity: 1 !important;
         }
-
         html {
             font-size: 18px;
         }
@@ -112,7 +110,7 @@
                 color: 'rgba(0, 0, 0, 0)' // Make the marker invisible
             },
             hoverinfo: 'text',
-            text: hoverPointsX15.map(p => `Number of Genome: ${p.x}`), // Customize your hover text
+            text: hoverPointsX15.map(p => `Number of Genomes: ${p.x}`), // Customize your hover text
             showlegend: false
         };
 
@@ -127,7 +125,7 @@
                 color: 'rgba(0, 0, 0, 0)' // Make the marker invisible
             },
             hoverinfo: 'text',
-            text: hoverPointsX99.map(p => `Number of Genome: ${p.x}`), // Customize your hover text
+            text: hoverPointsX99.map(p => `Number of Genomes: ${p.x}`), // Customize your hover text
             showlegend: false
         };
 

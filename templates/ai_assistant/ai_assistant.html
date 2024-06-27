@@ -1,0 +1,58 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Include tracking with Google Analytics -->
+    {% include "google_tag.html" %}
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.84.0">
+    <title>PangenomeLLM: Your Microbial Pangenomics Assistant</title>
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-fixed/">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <style>
+        html {
+            font-size: 1vw;
+        }
+        body {
+            margin: 0;        /* Remove default margin */
+            overflow: hidden;
+            background-color: black;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2rem;   /* Adjust the font-size as needed */
+        }
+        h2 {
+            text-align: center;
+            font-size: 1.8rem; /* Adjust the font-size as needed */
+        }
+        h3 {
+            text-align: center;
+            font-size: 1.6rem; /* Adjust the font-size as needed */
+        }
+        iframe {
+            display: block;            /* iframes are inline by default */
+            height: 100vh;              /* Set height to 100% of the viewport height */
+            width: 100vw;              /* Set width to 100% of the viewport width */
+            border: none;              /* Remove default border */
+            margin-top: -2.0rem;
+            padding-bottom: 2.0rem;
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+<!-- Include the top navigation panel, which is the same for every page -->
+{% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" ai_assistant_link_style="nav-link active" %}
+<!-- ######### -->
+<!-- Include the streamlit-based AI assistant as a separate web app loaded in an iframe -->
+<iframe src="{{ AI_ASSISTANT_APP_URL }}"></iframe>
+<!-- ######### -->
+</body>
+</html>

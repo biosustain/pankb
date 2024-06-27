@@ -14,8 +14,7 @@
 </head>
 
 <body>
-<div id="chart"></div>
-
+<div id="chart">Loading, please wait...</div>
 <script>
     const source_info = {{ dataset|safe }}
 
@@ -19953,56 +19952,53 @@
                         })
                     }
                     document.addEventListener("DOMContentLoaded", (function() {
-                            const urlParams = new URLSearchParams(window.location.search);
-                            const species = urlParams.get('species');
-                            const gene_class = urlParams.get('gene_class');
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const species = urlParams.get('species');
+                        const gene_class = urlParams.get('gene_class');
 
-                            !function() {
-                                var t, e = document.querySelector("#chart");
-                                const decompressedData = {{ heatmapData|safe }};
-                                const r = JSON.parse(decompressedData);
-                                s ? fetch("data/test-tree.nwk").then((function(i) {
-                                        i.text().then((function(i) {
-                                                t = a({
-                                                    ele: e,
-                                                    data: r,
-                                                    newick: i
-                                                })
-                                            }
-                                        ))
-                                    }
-                                )) : t = a({
-                                    ele: e,
-                                    data: r
-                                })
-                                !document.querySelector(".update-btn")
-                                return;
-
-                                document.querySelector(".update-btn").onclick = function() {
-                                    var e = t.getState()
-                                        , i = e.rows.slice(0, 5)
-                                        , r = e.matrix.slice(0, 5)
-                                        , n = e.cols.slice(0, 200);
-                                    r = r.map((function(t) {
-                                            return t.slice(0, 200)
+                        !function () {
+                            var t, e = document.querySelector("#chart");
+                            const decompressedData = {{ heatmapData|safe }};
+                            const r = JSON.parse(decompressedData);
+                            s ? fetch("data/test-tree.nwk").then((function (i) {
+                                    i.text().then((function (i) {
+                                            t = a({
+                                                ele: e,
+                                                data: r,
+                                                newick: i
+                                            })
                                         }
-                                    )),
-                                        t.update({
-                                            rows: i,
-                                            cols: n,
-                                            matrix: r
-                                        })
+                                    ))
                                 }
-                            }()
+                            )) : t = a({
+                                ele: e,
+                                data: r
+                            })
+                            !document.querySelector(".update-btn")
+                            return;
+
+                            document.querySelector(".update-btn").onclick = function () {
+                                var e = t.getState()
+                                    , i = e.rows.slice(0, 5)
+                                    , r = e.matrix.slice(0, 5)
+                                    , n = e.cols.slice(0, 200);
+                                r = r.map((function (t) {
+                                        return t.slice(0, 200)
+                                    }
+                                )),
+                                    t.update({
+                                        rows: i,
+                                        cols: n,
+                                        matrix: r
+                                    })
+                            }
+                        }()
                         }
                     ))
-
                 }
             ]).default
         }
     ));
-    //# sourceMappingURL=app.js.map
 </script>
-
 </body>
 </html>

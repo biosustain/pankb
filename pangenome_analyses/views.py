@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import StreamingHttpResponse
 from django.template import loader
 from .models import GeneAnnotations
-import json, requests, io, gzip
+from organisms.models import Organisms
+import json, requests, io, gzip, csv, time
 import pandas as pd
 
 
@@ -13,12 +15,16 @@ import pandas as pd
 def overview(request):
   template = loader.get_template('pangenome_analyses/Pangenome_analyses_overview.html')
   species = request.GET['species']
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  r = requests.get(url)
-  json_obj = r.json()
+
+  # Set the filter parameters based on the GET paramater value: ----
+  filter_params = {}
+  filter_params['pangenome_analysis'] = species
+  # Get info about the given organisms from the Organisms collection (in a dictionary): ----
+  organism_info = Organisms.objects.filter(**filter_params).values('species', 'genomes_num', 'gene_class_distribution', 'openness')[0]
+
   # Compose a context for the template rendering
   context = {
-    'speciesData': json.dumps(json_obj)
+    'speciesData': json.dumps(organism_info)
   }
   return HttpResponse(template.render(context, request))
 
@@ -101,6 +107,63 @@ def hotmap(request):
   return HttpResponse(template.render(context, request))
 
 
+# Source: https://docs.djangoproject.com/en/5.0/howto/outputting-csv/
+class Echo:
+  """ An object that implements just the write method of the file-like
+  interface.
+  """
+  def write(self, value):
+    """ Write the value by returning it, instead of storing in a buffer. """
+    return value
+
+
+# A view that streams potentially large presence/absence matrices
+def download_matrix_csv(request):
+  species = request.GET['species']
+  gene_class = request.GET['gene_class']
+
+  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/heatmap_' + gene_class + '.json.gz'    # the url of the respective json.gz file stored on the Microsoft Azure Blob Storage
+  r = requests.get(url)
+
+  # Decompress the gzipped content and transform it to a dictionary string
+  matrix_dict_str = str(gzip.decompress(r.content), 'utf-8')
+
+  # Convert the dictionary string to a dictionary: ----
+  matrix_dict = json.loads(matrix_dict_str)
+
+  # Obtain a dictionary with the genomes info: ----
+  genomes_info = matrix_dict["rows"]
+  # Obtain a list with the genome ids: ----
+  genome_names = [""] + [d["name"] for d in genomes_info]
+
+  # Obtain a dictionary with the genes info: ----
+  genes_info = matrix_dict["cols"]
+  # Obtain the gene names: ----
+  gene_names = [[d["name"] for d in genes_info]]
+
+  # Obtain the presence/absence matrix: ----
+  matrix = matrix_dict["matrix"]
+  rows = gene_names + matrix
+  rows = list(zip(genome_names, rows))
+
+  # Format the resulting list iof lists
+  # (the rows = the concatenated genome_id lists and matrix rows as lists of integers transformed to lists of strings): ----
+  res = []
+  for row in rows:
+    res.append([row[0]] + list(map(str, row[1])))
+  rows = res
+
+  pseudo_buffer = Echo()
+  writer = csv.writer(pseudo_buffer)
+
+  # User the StreamingHttpResponse instead of HttpResponse to serve potentially large csv files
+  # to avoid a load balancer dropping the connection (otherwise we can get the connection timeout): ----
+  response = StreamingHttpResponse((writer.writerow(row) for row in rows), content_type="text/csv")
+  downloaded_file_name = "Matrix__" + species + "_" + gene_class + "__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
+  response['Content-Disposition'] = f"attachment; filename=" + downloaded_file_name
+  return response
+
+
 # Template renderer for the first alleleome plot
 def variant_dominant_freq(request):
   template = loader.get_template('pangenome_analyses/plots/variant_dominant_frequency.html')
@@ -123,6 +186,7 @@ def ds_dn_ratio(request):
   r = requests.get(url)
   dataset_df = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
   dataset_dict = dataset_df.to_dict(orient='records')
+  dataset_dict = dataset_df.to_dict(orient='records')
   # Compose a context for the template rendering
   context = {
     'dataset': json.dumps(dataset_dict)
@@ -139,13 +203,14 @@ def gene_annotation(request):
   template = loader.get_template('pangenome_analyses/Pangenome_analyses_gene_annotation.html')
   species = request.GET['species']
 
-  url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  r1 = requests.get(url1)
-  json_obj1 = r1.json()
-
   # Set the filter() function parameters: ----
   filter_params = {}
   filter_params['pangenome_analysis'] = species
+
+  # Get info about the given organisms from the Organisms collection (in a dictionary): ----
+  organism_info = Organisms.objects.filter(**filter_params).values('species', 'genomes_num', 'gene_class_distribution', 'openness')[0]
+
+  # Get the gene annotations info form the Gene Annotations collection: ----
   gene_annotations = GeneAnnotations.objects.filter(**filter_params).values()
 
   # Transform the QuerySet with gene annotations into a pandas df: ----
@@ -159,11 +224,36 @@ def gene_annotation(request):
 
   # Compose a context for the template rendering
   context = {
-    'speciesData': json.dumps(json_obj1),
+    'speciesData': json.dumps(organism_info),
     'dataset': gene_annotations_json
   }
   return HttpResponse(template.render(context, request))
 
+
+# A view that serves the Gene Annotation table content in the .csv format
+def download_gene_annotation_table_csv(request):
+  species = request.GET.get('species')
+  downloaded_file_name = "Gene_annotations__" + species + "__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
+
+  # Adjust filter parameters based on the GET paramater value: ----
+  filter_params = {}
+  filter_params['pangenome_analysis'] = species
+  # Get a table with gene_annotations as a list of dictionaries: ----
+  gene_annotations = GeneAnnotations.objects.filter(**filter_params).values('gene', 'pangenomic_class', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency').order_by('gene')
+
+  # Transform a list of dictionaries into a list of lists: ----
+  rows = list(map(lambda x: list(x.values()), gene_annotations))
+  # Add the column names: ----
+  rows.insert(0, list(gene_annotations[0].keys()))
+
+  pseudo_buffer = Echo()
+  writer = csv.writer(pseudo_buffer)
+
+  # User the StreamingHttpResponse instead of HttpResponse to serve potentially large csv files
+  # to avoid a load balancer dropping the connection (otherwise we can get the connection timeout): ----
+  response = StreamingHttpResponse((writer.writerow(row) for row in rows), content_type="text/csv")
+  response['Content-Disposition'] = f"attachment; filename=" + downloaded_file_name
+  return response
 
 
 ################### Phylogenetic Tree Page Templates ###################################
@@ -173,12 +263,16 @@ def gene_annotation(request):
 def phylogenetic_tree(request):
   template = loader.get_template('pangenome_analyses/Pangenome_analyses_phylogetic_tree.html')
   species = request.GET['species']
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  r = requests.get(url)
-  json_obj = r.json()
+
+  # Set the filter parameters based on the GET paramater value: ----
+  filter_params = {}
+  filter_params['pangenome_analysis'] = species
+  # Get info about the given organisms from the Organisms collection (in a dictionary): ----
+  organism_info = Organisms.objects.filter(**filter_params).values('species', 'genomes_num', 'gene_class_distribution', 'openness')[0]
+
   # Compose a context for the template rendering
   context = {
-    'speciesData': json.dumps(json_obj)
+    'speciesData': json.dumps(organism_info)
   }
   return HttpResponse(template.render(context, request))
 

@@ -30,12 +30,12 @@
             padding-right: 1.1em;
         }
         tr, th {
-            font-size: 1em;
+            font-size: 1rem;
             text-align: center;
             vertical-align: middle;
         }
         td {
-            font-size: 0.9em;
+            font-size: 0.9rem;
             text-align: center;
             width: 12.5% !important;
             white-space: nowrap;
@@ -74,12 +74,15 @@
         table {
             table-layout: auto;
         }
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button a, #genes_list_paginate {
+            font-size: 0.9rem; /* Adjust this value as needed */
+        }
     </style>
 {% endblock %}
 
 {% block content %}
     <!-- Include the top navigation panel, which is the same for every page -->
-    {% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" %}
+    {% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" ai_assistant_link_style="nav-link" %}
     <!-- ######### -->
 
     <!-- Include the search bar under the top navigation panel: -->
@@ -92,7 +95,13 @@
             {% include 'pangenome_analyses/info_panel.html' %}
             <!-- ######### -->
             <div class="col-10 center-container">
-                <h2 class="text-center" style="font-size: 1.6em;">Gene Annotation Table</h2>
+                <h2 class="text-center" style="font-size: 1.6rem;">Gene Annotation Table</h2>
+                <form action="{% url 'download_gene_annotation_table_csv' %}" method="GET">
+                    <input type="hidden" name="species" value="{{ request.GET.species }}" />
+                    <!-- The button styles from Bootstrap:
+                    https://getbootstrap.com/docs/5.3/components/buttons/ -->
+                    <button class="btn btn-primary" type="submit">Download CSV</button>
+                </form>
                 <div class="table_padding">
                     <div class="table-responsive">
                         <table id="example" class="table table-hover" style="table-layout: fixed;">
@@ -150,16 +159,15 @@
                                 loadingRecords: 'Loading...',
                                 zeroRecords: 'Result not found.'
                             },
-
                             initComplete: function () {
-                                var api = this.api();
+                                const api = this.api();
 
                                 // Existing column search code
                                 $(this.api().table().header()).find('th').each(function (index, th) {
-                                    var columnHeader = $(th);
-                                    var columnIndex = index;
+                                    const columnHeader = $(th);
+                                    const columnIndex = index;
 
-                                    var searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 60%; display: block;" />')
+                                    const searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 60%; display: block;" />')
                                         .on('keyup change clear', function () {
                                             api.column(columnIndex).search(this.value).draw();
                                         })
@@ -174,14 +182,14 @@
 
                         // Expand row on click
                         $('#example tbody').on('click', 'td', function () {
-                            var cellText = $(this).text().trim();
-                            var rowIndex = $(this).closest('tr').index();
-                            var row = table.row(rowIndex);
+                            const cellText = $(this).text().trim();
+                            const rowIndex = $(this).closest('tr').index();
+                            const row = table.row(rowIndex);
                             if (row.child.isShown()) {
                                 row.child.hide();
                                 $(this).closest('tr').removeClass('expanded-row');
                             } else {
-                                var expandedRowContent = '<td colspan="8" style="white-space: normal; word-wrap: break-word;">' + cellText + '</td>';
+                                const expandedRowContent = '<td colspan="8" style="white-space: normal; word-wrap: break-word;">' + cellText + '</td>';
                                 row.child(expandedRowContent).show();
                                 $(this).closest('tr').addClass('expanded-row');
                             }

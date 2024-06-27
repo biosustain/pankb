@@ -1,32 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <style>
-        html {
-            font-size: 18px; /* Base font size for larger screens */
-        }
-
         html, body, #container {
             height: 100%;
             width: 100%;
             margin: 0;
             padding: 0;
             overflow: hidden;
+            font-size: 6vw;
         }
-
     </style>
     <script src="https://code.highcharts.com/highcharts.js"></script>
 </head>
 <body>
 <div id="container"></div>
 <script>
-    const template_screen_width = 302;
-    const current_window_Width = window.innerWidth;
-    const coefficient = current_window_Width / template_screen_width;
-
     document.addEventListener('DOMContentLoaded', function() {
                 const data = {{ dataset|safe }}
                 const categories = Object.keys(data);
@@ -69,7 +59,7 @@
                             align: 'center',
                             enable: true,
                             style: {
-                                fontSize: (0.9 * coefficient) + 'em'
+                                fontSize: '0.9rem'
                             }
                         },
                     },
@@ -77,7 +67,7 @@
                         title: {
                             text: 'Genes ',
                             style: {
-                                fontSize: (0.9 * coefficient) + 'em'
+                                fontSize: '0.9rem'
                             }
                         },
                         type: 'logarithmic',
@@ -89,7 +79,7 @@
                         labels: {
                             align: 'center',
                             style: {
-                                fontSize: (0.9 * coefficient) + 'em'
+                                fontSize: '0.9rem'
                             },
                             formatter: function() {
                                 if (this.value === 1) {
@@ -103,10 +93,8 @@
                                 if (this.value >= 1000) {
                                     return (this.value / 1000) + 'k';
                                 }
-
                                 return this.value;
                             },
-
                             rotation: 0,
                         }
                     },
@@ -120,7 +108,7 @@
                     tooltip: {
                         pointFormat: 'Count: <b>{point.y}</b>',
                         style: {
-                            fontSize: (0.9 * coefficient) + 'em'
+                            fontSize: '0.9rem'
                         }
                     },
                     legend: {

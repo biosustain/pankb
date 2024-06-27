@@ -3,8 +3,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
+    <!-- Include tracking with Google Analytics -->
+    {% include "google_tag.html" %}
+
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
     <title>Search results</title>
     <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/navbar-fixed/">
     <!-- DataTables Bootstrap 5 CSS -->
@@ -19,34 +22,38 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <style>
         html {
-            font-size: 18px;
+            font-size: 1vw;
         }
-
         .table_padding{
             padding-top: 0px;
             padding-bottom: 0px;
-            padding-right: 120px;
-            padding-left: 120px;
+            padding-right: 5rem;
+            padding-left: 5rem;
+            font-size: 0.9rem;
         }
-
-        tr, th{
-            height: 50px;
-            font-size: 1.0em;
+        tr, th {
+            height: 1.5rem;
+            font-size: 0.9rem;
             vertical-align: middle;
         }
-
         td {
-            height: 50px;
+            height: 1.5rem;
             word-wrap: break-word;
             white-space: normal;
-            font-size: 1.0em;
+            font-size: 0.9rem;
+        }
+        .dataTables_length label, .dataTables_filter label, .dataTables_info {
+            font-size: 0.9rem;
+        }
+        div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button a, #species_list_paginate {
+            font-size: 0.9rem; /* Adjust this value as needed */
         }
     </style>
 </head>
 
 <body data-bs-spy="scroll" data-bs-target="#navbar-example">
 <!-- Include the top navigation panel, which is the same for every page -->
-{% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" %}
+{% include "navigation.html" with home_link_style="nav-link" about_link_style="nav-link" organisms_link_style="nav-link" publications_link_style="nav-link" ai_assistant_link_style="nav-link" %}
 <!-- ######### -->
 
 <!-- Include the search bar under the top navigation panel: -->
@@ -70,7 +77,7 @@
     // and optionally expands a row in the "Genes" table if the text found is in the "Protein" column: ----
     function highlightText(searchTerm) {
         // Get all elements potentially containing text: ----
-        const elements = document.querySelectorAll('#families_list a, #species_list a, #genes_list a, #protein, #pathways_list a, #pathway_name, #pathway_products');
+        const elements = document.querySelectorAll('#families_list a, #species_list a, #genes_list a, #protein, #pfams, #pathways_list a, #pathway_name, #pathway_products');
         // Loop through each of the elements: ----
         elements.forEach((element) => {
             const text = element.innerText;
@@ -92,10 +99,11 @@
             }
         })
         // A hacky, but always working method to expand the rows in cases the query substring was found:
-        // - in the "Protein" column of the Genes search results table.
+        // - in the "Protein" column of the Genes search results table;
+        // - in the "PFAMs" column of the Genes search results table.
         // Note: It is not a good idea to expand the "Product(s)" column of the Pathways search results table,
         // because it can be too long and take a lot of space on the page in the expanded state.
-        const elements_to_expand = document.querySelectorAll('#protein');
+        const elements_to_expand = document.querySelectorAll('#protein, #pfams');
         // Now we have to iterate over some elements of interest again: ----
         elements_to_expand.forEach((element) => {
             const text = element.innerText;
@@ -107,7 +115,6 @@
         });
     }
 </script>
-
 <!-- Include search results for families: -->
 {%  include "search/search_results_families.html" %}
 <!-- ######### -->
@@ -123,9 +130,7 @@
 <!-- Include search results for genes: -->
 {%  include "search/search_results_genes.html" %}
 <!-- ######### -->
-
 <script>
-
     // Get the global query string paramater for the higlight func: ----
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
@@ -133,67 +138,6 @@
 
     // Highlight text found by the search in the tables: ----
     highlightText(q);
-
-    function adjustTableFontSize2(coefficient) {
-        const tableHeadersAndData = document.querySelectorAll('#families_list th, #families_list td, #species_list th, #species_list td');
-        tableHeadersAndData.forEach(element => {
-            element.style.fontSize = (18 * coefficient) + 'px';
-        });
-    }
-
-    function adjustHtmlFontSize(coefficient) {
-        const newFontSize = 18 * coefficient;
-        document.documentElement.style.fontSize = newFontSize + 'px';
-    }
-
-    function adjustTablePadding(coefficient) {
-        const tablePaddingElements = document.querySelectorAll('.table_padding');
-        tablePaddingElements.forEach(element => {
-            element.style.paddingTop = 0 * coefficient + 'px';
-            element.style.paddingBottom = 0 * coefficient + 'px';
-            element.style.paddingRight = 120 * coefficient + 'px';
-            element.style.paddingLeft = 120 * coefficient + 'px';
-        });
-    }
-
-    function adjustTableFontSize(coefficient) {
-        const tableHeadersAndData = document.querySelectorAll('table');
-        tableHeadersAndData.forEach(element => {
-            element.style.fontSize = 18 * coefficient + 'px';
-            element.style.height = 40 * coefficient + 'px';
-        });
-    }
-
-    function adjustDataTablesInterface(coefficient) {
-        // Adjust the font size for 'Showing 1 to 10 of 51 entries'
-        const infoElements = document.querySelectorAll('.dataTables_info');
-        infoElements.forEach(element => {
-            element.style.fontSize = (18 * coefficient) + 'px'; // Adjust base font size as needed
-        });
-
-        // Adjust the font size for pagination controls
-        const paginateElements = document.querySelectorAll('.dataTables_paginate');
-        paginateElements.forEach(element => {
-            element.style.fontSize = (14 * coefficient) + 'px'; // Adjust base font size as needed
-        });
-    }
-
-    function adjustStyles() {
-        let template_screen_width = 1920;
-        let current_window_Width = window.innerWidth;
-        let coefficient = current_window_Width / template_screen_width;
-
-        adjustHtmlFontSize(coefficient);
-        adjustTablePadding(coefficient);
-        adjustTableFontSize(coefficient);
-        adjustTableFontSize2(coefficient);
-        adjustDataTablesInterface(coefficient);
-    }
-
-    // Adjust styles on page load and window resize
-    document.addEventListener("DOMContentLoaded", adjustStyles);
-    window.addEventListener("resize", adjustStyles);
-
     /* A hacky way to solve a problem with incorrectly working pagination: */
     /* by adjusting the columns when the pagination buttons are clicked */
     $('.dataTables_paginate .paginate_button').click(function() {
@@ -202,7 +146,6 @@
         $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
     });
 </script>
-
 <br><br> <!-- Include two empty lines to create some spase after the pagination bar -->
 </body>
 </html>

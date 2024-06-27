@@ -7,7 +7,7 @@
         <thead>
         <tr>
             <th class="text-left align-left" >Species</th>
-            <th class="text-left align-left" style="width:30%;">Family</th>
+            <th class="text-left align-left" style="width: 30%">Family</th>
         </tr>
         </thead>
         <tbody id="table-body-species"></tbody>
@@ -15,10 +15,7 @@
 </div>
 
 <script>
-    var template_screen_width = 1920;
-    var current_window_Width = window.innerWidth;
-    var coefficient = current_window_Width / template_screen_width;
-    var data = {{ species_results | safe }}
+    var data = {{ species_results | safe }};
     var tableBody = document.getElementById('table-body-species');
 
     // Iterate over each species in case the search results are not empty: ----
@@ -42,7 +39,6 @@
             order: [],    // preserve the original order (needed to order by relevance)
             drawCallback: function(settings) {
                 $('[data-toggle="tooltip"]').tooltip();
-                adjustStyles();
             }
         });
     });
