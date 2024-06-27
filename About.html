@@ -40,18 +40,27 @@
         }
 
         h1 {
-            text-align: center;
+            text-align: left;
             font-size: 2em; /* Adjust the font-size as needed */
         }
 
         h2 {
-            text-align: center;
+            text-align: left;
             font-size: 1.8em; /* Adjust the font-size as needed */
         }
 
         h3 {
-            text-align: center;
+            text-align: left;
             font-size: 1.6em; /* Adjust the font-size as needed */
+        }
+
+        p{
+            font-size: 1.1em;
+            text-align: justify;
+        }
+
+        .no-underline {
+            text-decoration: none; /* Removes underline */
         }
 
     </style>
@@ -95,16 +104,18 @@
 <div class="row">
     <div class="col-2 fixed-sidebar">
         <div id="list-example" class="list-group">
-            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#about_pankb">About PanKB</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#how_to_use">Using PanKB</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Pangenomes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pangenomes</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Alleleomes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alleleomes</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Data_Accessibility">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Data Accessibility</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#PanKB_LLM">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PanKB LLM</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#Tools_Methods">Tools and Methods</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Tools">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Collected Pangenomic Publications</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 1.1em' href="#Publications">Tools and Methods</a>
-            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Contact">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Contact Us</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#about_pankb">About PanKB</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#how_to_use">Using PanKB</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 0.9em' href="#Pangenomes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pangenomes</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 0.9em' href="#Alleleomes">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alleleomes</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 0.9em' href="#Data_Accessibility">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Data Accessibility</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 0.9em' href="#PanKB_LLM">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PanKB LLM</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Tools_Methods">Tools and Methods</a>
+<!--            <a class="list-group-item list-group-item-action" style = 'font-size: 0.9em' href="#Tools">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tools</a>-->
+<!--            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Publications">Tools and Methods</a>-->
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Contact">Contact Us</a>
+            <a class="list-group-item list-group-item-action" style = 'font-size: 1em' href="#Funding">Funding</a>
+
         </div>
     </div>
 
@@ -112,29 +123,13 @@
 
     <div class="col-8">
         <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-offset="0" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
-            <h1 id="about_pankb" style = 'text-align: center'>About PanKB</h1>
             <br>
-            <p style = 'font-size: 1.1em'>
-                Since the assembly of <a href="https://doi.org/10.1007%2Fs10142-015-0433-4"> the first complete
-                microbial genome in 1995</a>,
-                the emergence of efficient and inexpensive sequencing technologies has driven the rapid expansion of
-                publicly available microbial genome data, with <a
-                    href="https://www.biorxiv.org/content/10.1101/2024.03.08.584059v1">almost than 2M microbial genomes
-                in public databases</a>.
-                The rapid accumulation of microbial genome data presents an opportunity to unlock the vast potential of
-                these ubiquitous organisms. The burgeoning field of pangenomics offers a framework for extracting value
-                from this big biological dataset. By comparing genomes across strains, pangenomics reveals the genomic
-                basis for diverse phenotypes, leading to a deeper understanding of microbial functions. This knowledge
-                can be leveraged to drive innovation across multiple application domains, including food production,
-                human health, and ecological sustainability, benefiting both humanity and the environment.
+            <h1 id="about_pankb">About PanKB</h1>
+            <br>
+            <p style = 'font-size: 1.1em;'>
+                The microbial world holds vast potential for advancements in diverse fields such as food production, human health, and ecological sustainability. PanKB is a pangenomic knowledgebase working to empower practitioners to leverage microbial functions beyond those of a select few model organisms. PanKB provides:
             </p>
 
-            <p style = 'font-size: 1.1em'>
-                The microbial world holds vast potential for advancements in diverse fields.
-                PanKB is a pangenomic knowledgebase working to empower practitioners to leverage
-                microbial functions beyond those of model organisms.
-                PanKB provides:
-            </p>
 
             <ul style = 'font-size: 1.1em'>
                 <li>A growing dataset of pangenomic results,</li>
@@ -151,45 +146,72 @@
                     and constrained to not return hallucinated content.
                 </li>
             </ul>
-
-            <p style = 'font-size: 1.1em'>
-                Combined, PanKB's features enable valuable workflows for enzyme and strain engineering. These include
-                identifying genes for new enzyme production or reintroduction into strains, pinpointing precise gene
-                edits to modify activity, discovering and optimizing valuable pathways, and selecting optimal starting
-                strains. Current strain engineering heavily relies on model or familiar strains; the features and data
-                of PanKB empower strain engineers to start leveraging pangenomic data for targeted bioengineering.
-            </p>
-
             <br>
 
-            <h1 id="how_to_use" style = 'text-align: center'>Using PanKB</h1>
+            <h1 id="how_to_use">Using PanKB</h1>
             <br>
-            <h3 style='text-align: center' id = 'Pangenomes'>Pangenomes</h3>
+            <h3 id = 'Pangenomes'>Pangenomes</h3>
             <p style = 'font-size: 1.1em'>
                 PanKB includes multiple interactive analytics and tables that give an overview of a pangenome's
-                contents. These analytics can be found or navigated to on an individual pangenome's page.
+                contents. These analytics can be found or navigated to an individual pangenome's page.
             </p>
 
-            <h3 style='text-align: center' id = 'Alleleomes'>Alleleomes</h3>
+            <p style = 'font-size: 1.1em'>
+                Using <b>Lactiplantibacillus plantarum</b> as an example:
+            <ul style = 'font-size: 1.1em'>
+                <li><a href="https://pankb.org/Pangenome_analyses_overview.html?species=Lactiplantibacillus_plantarum" class="no-underline" target="_blank">Overview Page</a>
+                    shows the presence/absence gene matrix, COG category distribution, core/accessory/rare pangenome gene categorizations, and pangenome openness of Lactiplantibacillus plantarum Pangenome.
+                </li>
+                <li>
+                    <a href="https://pankb.org/Pangenome_analyses_gene_annotation.html?species=Lactiplantibacillus_plantarum" class="no-underline" target="_blank">Gene Annotation Table</a>
+                    provides detailed gene annotation of all gene clusters found in the Lactiplantibacillus plantarum pangenome.
+                </li>
+
+                <li>
+                    <a href="https://pankb.org/Pangenome_analyses_phylogetic_tree.html?species=Lactiplantibacillus_plantarum" class="no-underline" target="_blank">Phylogenetic Tree</a>
+                    displays the phylogenetic structure of Lactiplantibacillus plantarum species.
+                </li>
+
+            </ul>
+            </p>
+            <br>
+
+            <h3 id = 'Alleleomes'>Alleleomes</h3>
             <p style = 'font-size: 1.1em'>
                 Pangenomes also serve as the foundation for further large-scale analyses, and PanKB is actively
                 integrating their novel results. Recent pangenomic-scale analyses of variants, named <a
-                    href="https://doi.org/10.1073/pnas.2218835120">Alleleomics</a>,
-                demonstrated unique value in <a href="https://www.biorxiv.org/content/10.1101/2023.09.17.558058v1">narrowing
-                the solution search space for feasible genetic variants in <i>E.coli</i> </a>. PanKB currently includes the alleleomes of all of its pangenomes. Alleleome analytics
+                    href="https://doi.org/10.1073/pnas.2218835120" class="no-underline" target="_blank">Alleleomics</a>,
+                demonstrated unique value in <a href="https://www.biorxiv.org/content/10.1101/2023.09.17.558058v1" class="no-underline" target="_blank">narrowing
+                the solution search space for feasible genetic variants in <i>E.coli</i></a>. PanKB currently includes the alleleomes of all of its pangenomes. Alleleome analytics
                 can be found on pangenome and specific gene pages.
             </p>
 
-            <h3 style='text-align: center' id = 'Data_Accessibility'>Data Accessibility</h3>
+
             <p style = 'font-size: 1.1em'>
-                PanKB implements multiple different methods to accessing its data. Users can access all of PanKB's data
+                Using <b>Lactiplantibacillus plantarum</b> as an example:
+            <ul style = 'font-size: 1.1em'>
+                <li>
+                    For Core genome alleleome, users can find it in the <a href="https://pankb.org/Pangenome_analyses_overview.html?species=Lactiplantibacillus_plantarum" class="no-underline" target="_blank">Overview Page</a>.
+                </li>
+
+                <li>
+                    For single gene alleleome, for instance, gene <b>accA2</b> in the Lactiplantibacillus plantarum. By clicking on the accA2 in the Lactiplantibacillus plantarum's <a href="https://pankb.org/Pangenome_analyses_gene_annotation.html?species=Lactiplantibacillus_plantarum" class="no-underline" target="_blank">Gene Annotation Table</a>, users can access the <a href="https://pankb.org/Gene_function/locustag.html?species=Lactiplantibacillus_plantarum&gene=accA2&gene_class=Core" class="no-underline" target="_blank">accA2 gene page,</a></li> where shows the alleleome of accA2.
+                </li>
+            </ul>
+            </p>
+            <br>
+
+            <h3 id = 'Data_Accessibility'>Data Accessibility</h3>
+            <p style = 'font-size: 1.1em'>
+                PanKB implements multiple different methods for accessing its data. Users can access all of PanKB's data
                 through its navigation links. Users can also quickly find specific data through the global database
                 search
                 feature accessible on most pages. Finally, users can also download the database's raw data
                 through the various analytics hosted on database pages.
             </p>
+            <br>
 
-            <h3 style='text-align: center' id = 'PanKB_LLM'>PanKB LLM</h3>
+            <h3 id = 'PanKB_LLM'>PanKB LLM</h3>
             <p style = 'font-size: 1.1em'>
                 Scientific progress often necessitates extensive literature review, a traditionally time-consuming
                 process. Large Language Models (LLMs) offer a potential solution by aggregating and summarizing
@@ -199,34 +221,58 @@
                 hallucinate inaccurate content. This feature is an initial experiment towards combining an LLM and a
                 specialized scientific database to accelerate scientific knowledge acquisition through automated
                 knowledge extraction.
+
+                <ul style = 'font-size: 1.1em'>
+                    <li>
+                        PanKB LLM can be accessed by clicking on the <a href="https://pankb.org/LLM.html" class="no-underline" target="_blank">AI Assistant</a> link in the navbar.
+                    </li>
+                </ul>
             </p>
 
             <br>
 
-            <h1 style='text-align: center' id = 'Tools_Methods'>Tools and Methods</h1>
+            <h1 style='text-align: left' id = 'Tools_Methods'>Tools and Methods</h1>
             <br>
-            <h3 style='text-align: center' id = 'Tools'>Tools</h3>
+<!--            <h3 style='text-align: center' id = 'Tools'>Tools</h3>-->
             <p style = 'font-size: 1.1em'>
-                 <a href="https://doi.org/10.1093/nar/gkae314">BGCFlow</a>: Nuhamunada M, Mohite OS, Phaneuf PV, Palsson BO,
-                Weber T. BGCFlow: systematic pangenome workflow for the analysis of biosynthetic gene clusters across
-                large
-                genomic datasets. Nucleic Acids Research. 2024 Jun 10;52(10):5478–95.
+                 Pangenome Analysis: <a href="https://doi.org/10.1093/nar/gkae314" class="no-underline" target="_blank">BGCFlow</a>
+            </p>
+
+            <p style = 'font-size: 1.1em'>
+                Interactive Visualization:
+                <a href="https://doi.org/10.1109/TVCG.2011.185" class="no-underline" target="_blank">D3.js</a>,
+                <a href="https://plotly.com/javascript/" class="no-underline" target="_blank">Plotly.js</a>,
+                <a href="https://www.highcharts.com/" class="no-underline" target="_blank">Highchart.js</a>,
+                <a href="https://github.com/nconrad/hotmap" class="no-underline" target="_blank">hotmap.js</a>,
+                <a href="https://doi.org/10.1093/bioinformatics/btw474" class="no-underline" target="_blank">MSAViewer</a>
+            </p>
+
+            <p style = 'font-size: 1.1em'>
+                Website Framework:
+                <a href="https://getbootstrap.com/" class="no-underline" target="_blank">Bootstrap</a>,
+                <a href="https://jquery.com/" class="no-underline" target="_blank">jQuery</a>
             </p>
             <br>
 
-            <h1 style='text-align: center' id = 'Publications'>Collected Pangenomic Publications</h1>
+<!--            <h1 style='text-align: center' id = 'Publications'>Collected Pangenomic Publications</h1>-->
+<!--            <br>-->
+
+<!--            <p style = 'font-size: 1.1em'>-->
+<!--                An interactive table for these can be found in the <a href=" /publications/ " class="no-underline" target="_blank">Collected Publications</a> page.-->
+<!--            </p>-->
+<!--            <br>-->
+            <h1 id = 'Contact'>Contact Us</h1>
             <br>
 
-            <p style = 'font-size: 1.1em'>
-                An interactive table for these can be found in the <a href=" /publications/ ">Collected Publications</a> page.
+            <p style="font-size: 1.1em;">
+                If you have questions or find any bugs in the database, please contact
+                <a href="https://orbit.dtu.dk/en/persons/patrick-victor-phaneuf" class="no-underline" target="_blank">Patrick Phaneuf</a>
             </p>
             <br>
-            <h1 style='text-align: center' id = 'Contact'>Contact Us</h1>
+            <h1 id = 'Funding'>Funding</h1>
             <br>
-
-            <p style = 'font-size: 1.1em'>
-                If you have questions or find any bugs in the database, please contact <a href="https://orbit.dtu.dk/en/persons/patrick-victor-phaneuf">Patrick Phaneuf</a>
-
+            <p>
+                This work was funded by the Novo Nordisk Foundation through the Center for Biosustainability at the Technical University of Denmark (NNF Grant Number NNF20CC0035580).
             </p>
             <br>
 
