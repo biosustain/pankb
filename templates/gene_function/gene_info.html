@@ -84,7 +84,7 @@
 {% endblock %}
 
 {% block content %}
-    <h2 style = 'text-align: center; font-size: 1.6em;'>Gene <i>{{request.GET.gene}}</i> Info</h2>
+    <h2 style = 'text-align: center; font-size: 1.6em;'>Gene <i>{{request.GET.gene}}</i></h2>
     <div class="table_padding overflow-auto">
         <form action="{% url 'download_gene_info_table_csv' %}" method="GET">
             <input type="hidden" name="species" value="{{ request.GET.species }}" />

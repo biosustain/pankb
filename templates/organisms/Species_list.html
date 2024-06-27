@@ -105,7 +105,7 @@
         row.innerHTML = `
                     <td class="align-middle"><a href="{% url 'organisms' %}?family=${family}" target="_blank">${family}</a></td>
                     <td class="align-middle">
-                      <a href="{% url 'pangenome_analyses_overview' %}?species=${data.pangenome_analysis[index]}" alt="testeststst">${species}</a>
+                      <a href="{% url 'pangenome_analyses_overview' %}?species=${data.pangenome_analysis[index]}">${species}</a>
                     </td>
                     <td class="align-middle">${data.openness[index]}</td>
                     <td class="align-middle">${data.genomes_num[index]}</td>
