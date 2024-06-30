@@ -12,8 +12,6 @@ def organisms(request):
   family = request.GET.get('family')
   # Adjust filter parameters based on the GET paramater value: ----
   filter_params = {}
-  # We want to show only pangenomes with the number of genomes >=30: ----
-  filter_params['genomes_num__gte'] = 30
   if family:  # if the family get parameter is set
     filter_params['family'] = family
   # Get the filtered or full table with organisms: ----
