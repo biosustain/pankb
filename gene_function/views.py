@@ -167,7 +167,7 @@ def msa(request):
 
   # Compose a context for the template rendering: ----
   context = {
-    'jsonData': json.dumps(json_obj1),
+    'AAData': json.dumps(json_obj1),
     'msaData': json.dumps(r2.text)
   }
   return HttpResponse(template.render(context, request))

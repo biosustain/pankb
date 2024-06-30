@@ -14,27 +14,23 @@
     https://github.com/wilzbach/msa/issues/257
     -->
     <style>
-        body {
-            /* overflow-x: hidden; */
-        }
         #tooltip {
             position: absolute;
             padding: 10px;
-            background: red;
+            background: lightpink;
             border-radius: 5px;
-            width: 350px; /* Adjust the width here */
-            height: 550px; /* Adjust the height here */
+            width: 350px;   /* Adjust the width here */
+            height: 550px;  /* Adjust the height here */
             opacity: 0.85;
             transition: visibility 0s, opacity 0.5s linear;
             z-index: 9999; /* New line */
-
         }
         .tooltip-hidden {
             visibility: hidden;
             opacity: 0;
         }
     </style>
-    <div id="tooltip" class="tooltip-hidden" style="position: absolute; padding: 10px;; background: lightpink; border-radius: 5px;">
+    <div id="tooltip" class="tooltip-hidden">
         Frequency information will go here.
     </div>
 </head>
@@ -108,9 +104,9 @@
                                 return;
                             }
 
-							if (panel) {
-								panel.remove();
-							}
+                            if (panel) {
+                                panel.remove();
+                            }
 
                             // Otherwise, store the current sequence ID
                             currentSeqId = data.seqId;
@@ -178,9 +174,9 @@
                             return panel;
                         }
 
-                        m.g.on("column:click", async function(data) {
+                        m.g.on("column:click", function(data) {
                             // Obtain JSON data rendered in the respective view: ----
-                            const jsonData = {{ msaData|safe }};
+                            const jsonData = {{ AAData|safe }};
 
                             const Amino_Acid = {
                                 'A': 'Alanine&nbsp;[A]',
@@ -223,20 +219,20 @@
 
                             const rect = document.getElementById('MSA').getBoundingClientRect();
 
-							tooltip.style.left = (data.evt.pageX - rect.left - 100) + 'px';  // position the tooltip at the mouse pointer
-							tooltip.style.top = (data.evt.pageY - rect.top + 20) + 'px';
-                            tooltip.classList.remove('tooltip-hidden');
-                            tooltip.classList.add('tooltip-showing');
+                            tooltip.style.left = (data.evt.pageX - rect.left - 100) + 'px';  // position the tooltip at the mouse pointer
+                            tooltip.style.top = (data.evt.pageY - rect.top + 20) + 'px';
 
-                            document.addEventListener('click', hideTooltip);
+                            tooltip.classList.remove("tooltip-hidden");
+
+                            document.addEventListener('mouseup', hideTooltip);
 
                             function hideTooltip(event) {
-							    const tooltip = document.getElementById('tooltip');
-							    if (!tooltip.contains(event.target)) {
-								    tooltip.classList.add('tooltip-hidden');
-								    document.removeEventListener('click', hideTooltip); // Remove listener after hiding
-							    }
-						    }
+                                const tooltip = document.getElementById('tooltip');
+                                if (!tooltip.contains(event.target)) {
+                                    tooltip.classList.add("tooltip-hidden");
+                                    document.removeEventListener('click', hideTooltip); // Remove listener after hiding
+                                }
+                            }
                         });
                     }
 
