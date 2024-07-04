@@ -1,0 +1,25 @@
+name: Deploy to Azure Virtual Machine (PRE-PROD)
+
+on:
+  push:
+    branches: [ pre-prod ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Copy files via ssh
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.PANKB_PREPROD_HOST }}
+        username: ${{ secrets.PANKB_SSH_USERNAME }}
+        key: ${{ secrets.PANKB_PRIVATE_SSH_KEY }}
+        source: "."
+        target: "/projects/pankb_web/django_project"
+
+    - name: Start containers
+      run: docker-compose -f "docker-compose.yml" up -d --build --force-recreate
