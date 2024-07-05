@@ -1,5 +1,9 @@
-# PanKB Website
-<b>The dynamic Python-based version of the website. The Django framework is used as the back-end. Data about organisms, genes, genomes, locus_tags and KEGG pathways is stored in a database (locally in a self-deployed MongoDB instance or in a cloud-based Cosmos DB for MongoDB). The Microsoft Azure Blob Storage is still used as a data lake to store static semi-structured data, e.g. plots, bibliome and phylogenetic trees (i.e. data that is not used by search or any other scripts generating dynamic content).</b>
+# PanKB Website (PRE-PROD)
+<b>The dynamic Python-based version of the website. The Django framework is used as the back-end. Data about organisms, genes, genomes, locus_tags and KEGG pathways are stored in a database (in a cloud-based Azure Cosmos DB for MongoDB). The Microsoft Azure Blob Storage is still used as a data lake to store static unstructured or semi-structured data, e.g., plots, bibliome and phylogenetic trees (i.e., data that are not used by search or any other scripts generating dynamic content).</b>
+
+## Contributors
+- Front-end, analytics, LLM, data processing via a bioinformatics pipeline: Binhuan Sun, binsun@biosustain.dtu.dk
+- Back-end, ETL pipeline, the website and vector databases, CI/CD pipeline, the github repo maintenance, versioning and backup systems, infrastructure, DevOps: Liubov Pashkova, liupa@dtu.dk
 
 ## Development Server Configuration
 Tested on Linux Ubuntu 20.04 (may need tweaks for other systems).
@@ -79,60 +83,34 @@ cd /projects
 sudo mkdir -p pankb_web
 sudo chown -R $USER pankb_web
 cd pankb_web 
-<<<<<<< HEAD
 mkdir -p pankb_llm
 ```
-First, you must set up and populate the PROD MongoDB instance on a sharded cluster in the Azure cloud as described here: https://github.com/biosustain/pankb_db.
+First, you must set up and populate the PRE-PROD MongoDB instance on a sharded cluster in the Azure cloud following the instructions from the respective repo: https://github.com/biosustain/pankb_db.
 
-Second, you must deploy the AI Assistant Web Application (<b>here we need to insert a link to the repo with PanKB LLM, knowledge base creation scripts and streamlit interface. And even before that, the repo must be re-created under the biosustain org</b>).
-```
-mkdir -p docker_volumes/mongodb pankb_db pankb_llm
-```
-Finally, in order to deploy the website, clone the PanKB git repo (the <i>develop</i> branch) into the subdirectory /django_project and change to it:
-```
-git clone --branch pre-prod https://github.com/biosustain/pankb.git django_project
-cd django_project
-```
-Create a file with the name ".env" under the /projects/pankb_web/django_project/ folder in the following format:
-```
-## Do not put this file under version control!
+Second, you must deploy (manually or automatically with Github Actions) the AI Assistant Web Application following the instructions from the respective repo: https://github.com/biosustain/pankb_db.
 
-## Server type, where the web project is located
-PROJECT_SERVER = 'prod'   # values = ('dev', 'prod')
-
-## MongoDB type. Only two possible values:
-# - 'self_deployed' (standalone, deployed on the DEV server in a docker container)
-# or
-# - 'cloud' (MongoDB Atlas or Azure CosmosDB for MongoDB)
-DB_TYPE = 'cloud'
-
-## Django: The secret key
-SECRET_KEY = '<insert any string you choose>'
-
-## Django: Super-User Credentials
-SUPER_USER_NAME = 'admin'
-SUPER_USER_PASSWORD = '<insert any password you choose>'
-SUPER_USER_EMAIL = '<insert your email>'
-
-## Mongo database name - same both for the PROD and DEV servers
-MONGODB_NAME = 'pankb'
-
-## MongoDB-PROD (Azure CosmosDB for MongoDB) Connection String
-MONGODB_CONN_STRING = '<insert the connection string for Azure Cosmos DB for MongoDB instance (can be obtained by emailing to liupa@dtu.dk)>'
-
-## URL address of the separately deployed AI Assistant Web Application
-AI_ASSISTANT_APP_URL = '<insert the url here>'
+Every time when one pushes to the `pre-prod` repo (usually from the DEV server), the changes in PanKB site and Assistant Web Applications will be AUTOMATICALLY deployed to the PRE-PROD server. The automation (CI/CD) is achieved with the help of Github Actions enabled for the repository. The respective config file is `.github/workflows/deploy-preprod-to-azurevm.yml`. In order for the automated deployment to work, you should set up the values of the following secret Github Actions secrets:
 ```
-Build or (re-build) the containers with Docker Compose:
+PANKB_PREPROD_HOST - the PRE-PROD server IP address
+PANKB_PREPROD_SSH_USERNAME - the ssh user name to connect to the PRE-PROD server
+PANKB_PREPROD_PRIVATE_SSH_KEY - the ssh key that is used to connect to the PRE-PROD server
+PANKB_PREPROD_DJANGO_SECRET_KEY - Django secret key (set to any string you like)
+PANKB_PREPROD_DJANGO_SUPER_USER_NAME - Django admin name (set to any string you like)
+PANKB_PREPROD_DJANGO_SUPER_USER_PASSWORD - Django admin password (set to any string you like)
+PANKB_PREPROD_DJANGO_SUPER_USER_EMAIL - Django admin email
+PANKB_PREPROD_MONGODB_NAME - the name of the MongoDB PRE-PROD database on the Azure sharded cluster
+PANKB_PREPROD_MONGODB_CONN_STRING - MongoDB PRE-PROD (Azure CosmosDB for MongoDB) Connection String
+PANKB_PREPROD_AI_ASSISTANT_APP_URL - the URL address of the separately deployed AI Assistant Web Application
 ```
-docker compose up -d --build --force-recreate
-```
-The web-application must now be available at http://(type-your-public-ip-address-here). 
-If you use a virtual machine, your IP address will be the public address of your virtual machine. It will use the standard 80 port. The command `docker ps` should show several containers (one with the django web app and wsgi server inside, one with the nginx web server, one with the AI Assistant web app and one with the DEV database if you deploy it locally) up and running:
+These secrets are encrypted and safely stored on Github in the "Settings - Secrets and Variables - Actions - Repository secrets" section. In this section, you can also add new Github Actions secrets and edit the existing ones. However, in order to change a secret name, you have to remove the existing secret and add the new one instead of the old one.
+
+After the Github Actions deployment job has successfully run, the web-application must be available at <a href="pankb.org" target="_blank">pankb.org</a>. 
+
+The command `docker ps` should show several containers (one with the django web app and wsgi server inside, one with the nginx web server, one with the AI Assistant web app and one with the DEV database if you deploy it locally) up and running if the automatic deployment was successful:
 ```
 docker ps
 CONTAINER ID   IMAGE                            COMMAND                  CREATED             STATUS             PORTS                                    NAMES
-39787becaeb7   pankb_web:latest     "sh /entrypoint.sh"      57 minutes ago   Up 57 minutes   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                   pankb-web
-730353f2fdde   pankb_nginx:latest   "/docker-entrypoint.…"   57 minutes ago   Up 57 minutes   0.0.0.0:80->80/tcp, :::80->80/tcp                           pankb-nginx
+39787becaeb7   pankb_web:latest     "sh /entrypoint.sh"      23 seconds ago   Up 12 seconds   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                   pankb-web
+730353f2fdde   pankb_nginx:latest   "/docker-entrypoint.…"   23 seconds ago   Up 12 seconds   0.0.0.0:80->80/tcp, :::80->80/tcp                           pankb-nginx
 54d89d7c4fad   pankb_llm:latest     "streamlit run strea…"   8 days ago       Up 41 hours     0.0.0.0:8501->8501/tcp, :::8501->8501/tcp                   pankb-llm
 ```
