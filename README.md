@@ -104,7 +104,7 @@ PANKB_PROD_AI_ASSISTANT_APP_URL - the URL address of the separately deployed AI 
 ```
 These secrets are encrypted and safely stored on Github in the "Settings - Secrets and Variables - Actions - Repository secrets" section. In this section, you can also add new Github Actions secrets and edit the existing ones. However, in order to change a secret name, you have to remove the existing secret and add the new one instead of the old one.
 
-After the Github Actions deployment job has successfully run, the web-application must be available at pankb.org. 
+After the Github Actions deployment job has successfully run, the web-application must be available at <a href="pankb.org" target="_blank">pankb.org</a>. 
 
 The command `docker ps` should show several containers (one with the django web app and wsgi server inside, one with the nginx web server, one with the AI Assistant web app and one with the DEV database if you deploy it locally) up and running if the automatic deployment was successful:
 ```
