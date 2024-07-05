@@ -1,7 +1,11 @@
-# PanKB Website
-<b>The dynamic Python-based version of the website. The Django framework is used as the back-end. Data about organisms, genes, genomes, locus_tags and KEGG pathways is stored in a database (locally in a self-deployed MongoDB instance or in a cloud-based Cosmos DB for MongoDB). The Microsoft Azure Blob Storage is still used as a data lake to store static semi-structured data, e.g. plots, bibliome and phylogenetic trees (i.e. data that is not used by search or any other scripts generating dynamic content).</b>
+# PanKB Website (DEV)
+<b>The dynamic Python-based version of the website. The Django framework is used as the back-end. Data about organisms, genes, genomes, locus_tags and KEGG pathways are stored in a database (in a cloud-based Azure Cosmos DB for MongoDB). The Microsoft Azure Blob Storage is still used as a data lake to store static unstructured or semi-structured data, e.g., plots, bibliome and phylogenetic trees (i.e., data that are not used by search or any other scripts generating dynamic content).</b>
 
-## Development Server Configuration
+## Contributors
+- Front-end, analytics, LLM, data processing via a bioinformatics pipeline: Binhuan Sun, binsun@biosustain.dtu.dk
+- Back-end, ETL pipeline, the website and vector databases, CI/CD pipeline, the github repo maintenance, versioning and backup systems, infrastructure, DevOps: Liubov Pashkova, liupa@dtu.dk
+
+## Server Configuration
 Tested on Linux Ubuntu 20.04 (may need tweaks for other systems).
 
 Min hardware requirements solely for the PanKB website deployment (excl. the PanKB DB, ETL and AI Assistant app):
@@ -90,11 +94,15 @@ Finally, in order to deploy the website, clone the PanKB git repo (the <i>develo
 git clone --branch develop https://github.com/biosustain/pankb.git django_project
 cd django_project
 ```
+Then, you should choose one of two options for the DEV database. It can be deployed locally on your virtual machine or localhost or a remote MongoDB instance can be located on a cluster in the cloud service (e.g., Azure).
+
+#### 1. Development with a local database
+
 Create a file with the name ".env" under the /projects/pankb_web/django_project/ folder in the following format (do not forget to choose your own SECRET_KEY, SUPER_USER_PASSWORD, SUPER_USER_EMAIL, MONGO_INITDB_ROOT_PASSWORD, MONGODB_PASSWORD, POSTGRES_PASSWORD, AI_ASSISTANT_APP_URL and optionally other fields):
 ```
 ## Do not put this file under version control!
 
-## Server type, where the web project is located
+## Server type, where the web project is located, values = ('dev' for the DEV server, 'prod' for the both PRE-PROD and PROD servers)
 PROJECT_SERVER = 'dev' 
 
 ## MongoDB type. Only two possible values:
@@ -132,13 +140,67 @@ Build or (re-build) the containers with Docker Compose:
 ```
 docker compose up -d --build --force-recreate
 ```
-The web-application must now be available in your browser on http://127.0.0.1 (local development) or http://(type-your-public-ip-address-here) (remote server development). If you use a virtual machine, your IP address will be the public address of your virtual machine. It will use the standard 80 port. The command `docker ps` should show several containers (one with the django web app and wsgi server inside, one with the nginx web server, one with the AI Assistant web app and one with the DEV database if you deploy it locally) up and running:
+The web-application must now be available in your browser on http://127.0.0.1 (local development) or http://(type-your-public-ip-address-here) (remote server development). If you use a virtual machine, your IP address will be the public address of your virtual machine. The command `docker ps` should show several containers (one with the django web app and wsgi server inside, one with the nginx web server, one with the AI Assistant web app and one with the DEV database if you deploy it locally) up and running:
 ```
 >>> docker ps
 CONTAINER ID   IMAGE                            COMMAND                  CREATED             STATUS             PORTS                                    NAMES
-39787becaeb7   pankb_web:latest     "sh /entrypoint.sh"      57 minutes ago   Up 57 minutes   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                   pankb-web
-730353f2fdde   pankb_nginx:latest   "/docker-entrypoint.…"   57 minutes ago   Up 57 minutes   0.0.0.0:80->80/tcp, :::80->80/tcp                           pankb-nginx
+39787becaeb7   pankb_web:latest     "sh /entrypoint.sh"      23 seconds ago   Up 12 seconds   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                   pankb-web
+730353f2fdde   pankb_nginx:latest   "/docker-entrypoint.…"   23 seconds ago   Up 12 seconds   0.0.0.0:80->80/tcp, :::80->80/tcp                           pankb-nginx
 54d89d7c4fad   pankb_llm:latest     "streamlit run strea…"   8 days ago       Up 41 hours     0.0.0.0:8501->8501/tcp, :::8501->8501/tcp                   pankb-llm
 b3197b7ed6cb   mongo:6.0-rc         "docker-entrypoint.s…"   About an hour ago   Up About an hour   0.0.0.0:27017->27017/tcp, :::27017->27017/tcp         pankb-mongodb
 ```
-In case you do Python remote server development via SSH (e.g., using PyCharm IDE), you should use the remote Python interpreter from the django_unicorn Docker Compose.
+
+#### 2. Development with a cloud database
+
+Create a file with the name ".env" under the /projects/pankb_web/django_project/ folder in the following format (do not forget to choose your own SECRET_KEY, SUPER_USER_PASSWORD, SUPER_USER_EMAIL, MONGO_INITDB_ROOT_PASSWORD, MONGODB_PASSWORD, POSTGRES_PASSWORD, AI_ASSISTANT_APP_URL and optionally other fields):
+```
+## Do not put this file under version control!
+
+## Server type, where the web project is located, values = ('dev' for the DEV server, 'prod' for the both PRE-PROD and PROD servers)
+PROJECT_SERVER = 'dev' 
+
+## MongoDB type. Only two possible values:
+# - 'self_deployed' (standalone, deployed on the DEV server in a docker container)
+# or
+# - 'cloud' (MongoDB Atlas or Azure CosmosDB for MongoDB)
+DB_TYPE = 'cloud'
+
+## Django: The secret key
+SECRET_KEY = '<insert any string you choose>'
+
+## Django: Super-User Credentials
+SUPER_USER_NAME = 'admin'
+SUPER_USER_PASSWORD = '<insert any password you choose>'
+SUPER_USER_EMAIL = '<insert your email>'
+
+## Mongo database name - same both for the PROD and DEV servers
+MONGODB_NAME = 'pankb'
+
+## MongoDB PROD (Azure CosmosDB for MongoDB) Connection String
+MONGODB_CONN_STRING = '<insert the connection string here (can be obtained from Azure Portal)>'
+
+## URL address of the separately deployed AI Assistant Web Application
+AI_ASSISTANT_APP_URL = '<insert the url here>'
+```
+Build or (re-build) the containers with Docker Compose:
+```
+docker compose up -d --build --force-recreate
+```
+The web-application must now be available in your browser on http://127.0.0.1 (local development) or http://(type-your-public-ip-address-here) (remote server development). If you use a virtual machine, your IP address will be the public address of your virtual machine. The command `docker ps` should show several containers (one with the django web app and wsgi server inside, one with the nginx web server, one with the AI Assistant web app and one with the DEV database if you deploy it locally) up and running:
+```
+>>> docker ps
+CONTAINER ID   IMAGE                            COMMAND                  CREATED             STATUS             PORTS                                    NAMES
+39787becaeb7   pankb_web:latest     "sh /entrypoint.sh"      23 seconds ago   Up 12 seconds   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                   pankb-web
+730353f2fdde   pankb_nginx:latest   "/docker-entrypoint.…"   23 seconds ago   Up 12 seconds   0.0.0.0:80->80/tcp, :::80->80/tcp                           pankb-nginx
+54d89d7c4fad   pankb_llm:latest     "streamlit run strea…"   8 days ago       Up 41 hours     0.0.0.0:8501->8501/tcp, :::8501->8501/tcp                   pankb-llm
+```
+### Introducing changes to the scripts
+
+In case you modify html or javascript code in the Django templates (the interface or front-end part, the respective files are located under subfolder `/templates`), the changes become visible and incorporated to the webpage immediately. No additional actions are required.
+
+In case you modify Python code, e.g., the views or model (the back-end part), you will have to rebuild the docker image and recreate the respective docker container:
+```
+cd /projects/pankb_web/django_project
+docker compose up -d --build --force-recreate
+```
+When done with the development iteration and testing, remember to commit and push your changes to the proper Github branch. 
