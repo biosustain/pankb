@@ -208,7 +208,7 @@
                 ticks: 'outside',
                 tickWidth: 1,
                 tickfont: {
-                    size: 6 * coefficient,    // set a very small tick font in case we have too many ticks (e.g., for E. Coli Rare)
+                    size: 16 * coefficient,    // set a very small tick font in case we have too many ticks (e.g., for E. Coli Rare)
                     family: 'Arial, sans-serif',
                     color: '#000000'
                 }
@@ -219,7 +219,7 @@
                 y: 1.025,
                 orientation: 'h',  // Set legend orientation to horizontal
                 traceorder: 'reversed',  // Change the order of legend items
-                itemclick: true,  // Disable legend item click
+                itemclick: false,  // Disable legend item click
                 itemdoubleclick: false,  // Disable legend item double-click
                 itemwidth: 30 * coefficient,  // Adjust legend item width as needed
                 itemheight: 20 * coefficient,  // Adjust legend item height as needed

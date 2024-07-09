@@ -5,7 +5,7 @@
 - Front-end, analytics, LLM, data processing via a bioinformatics pipeline: Binhuan Sun, binsun@biosustain.dtu.dk
 - Back-end, ETL pipeline, the website and vector databases, CI/CD pipeline, the github repo maintenance, versioning and backup systems, infrastructure, DevOps: Liubov Pashkova, liupa@dtu.dk
 
-## Development Server Configuration
+## Server Configuration
 Tested on Linux Ubuntu 20.04 (may need tweaks for other systems).
 
 Min hardware requirements solely for the PanKB website deployment (excl. the PanKB DB, ETL and AI Assistant app):
