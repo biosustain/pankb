@@ -20,7 +20,7 @@ jobs:
           key: ${{ secrets.PANKB_PREPROD_PRIVATE_SSH_KEY }}
           source: "."
           target: "/projects/pankb_web/django_project"
-  
+
       - name: Create the .env file and (re-)start containers over SSH
         uses: appleboy/ssh-action@master
         with:
@@ -57,7 +57,7 @@ jobs:
             echo MONGODB_CONN_STRING="${{secrets.PANKB_PREPROD_MONGODB_CONN_STRING}}" >> .env
             echo "" >> .env
             echo "## URL address of the separately deployed AI Assistant Web Application" >> .env
-            echo AI_ASSISTANT_APP_URL="${{secrets.PANKB_PREPROD_AI_ASSISTANT_APP_URL}}" >> .env
+            echo AI_ASSISTANT_APP_URL="${{vars.PANKB_PREPROD_AI_ASSISTANT_APP_URL}}" >> .env
             cat .env
             docker compose up -d --build --force-recreate
-            rm .env
+            docker system prune --all --force
