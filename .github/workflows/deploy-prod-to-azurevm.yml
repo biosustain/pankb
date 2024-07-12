@@ -57,7 +57,7 @@ jobs:
             echo MONGODB_CONN_STRING="${{secrets.PANKB_PROD_MONGODB_CONN_STRING}}" >> .env
             echo "" >> .env
             echo "## URL address of the separately deployed AI Assistant Web Application" >> .env
-            echo AI_ASSISTANT_APP_URL="${{env.PANKB_PROD_AI_ASSISTANT_APP_URL}}" >> .env
+            echo AI_ASSISTANT_APP_URL="${{vars.PANKB_PROD_AI_ASSISTANT_APP_URL}}" >> .env
             cat .env
             docker compose up -d --build --force-recreate
             docker system prune
