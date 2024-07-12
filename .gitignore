@@ -22,3 +22,6 @@ __pycache__/
 # Custom files
 venv/
 misc/
+
+# The Certbot folder
+certbot/
