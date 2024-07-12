@@ -76,7 +76,6 @@ sudo apt install git
 ```
 
 ### Set up the repositories and build the containers
-Create the necessary directories and change to the /pankb_web:
 ```
 sudo mkdir -p /projects
 cd /projects
@@ -85,9 +84,7 @@ sudo chown -R $USER pankb_web
 cd pankb_web 
 mkdir -p pankb_llm
 ```
-First, you must set up and populate the PROD MongoDB instance on a sharded cluster in the Azure cloud following the instructions from the respective repo: https://github.com/biosustain/pankb_db.
-
-Second, you must deploy (manually or automatically with Github Actions) the AI Assistant Web Application following the instructions from the respective repo: https://github.com/biosustain/pankb_db.
+First of all, you must set up and populate the PROD MongoDB instance on a sharded cluster in the Azure cloud following the instructions from the respective repo: https://github.com/biosustain/pankb_db.
 
 Every time when one pushes to the `prod` repo (usually from the DEV server), the changes in PanKB site and Assistant Web Applications will be AUTOMATICALLY deployed to the PROD server. The automation (CI/CD) is achieved with the help of Github Actions enabled for the repository. The respective config file is `.github/workflows/deploy-prod-to-azurevm.yml`. In order for the automated deployment to work, you must set up the values of the following Github Actions secrets:
 ```
@@ -107,13 +104,31 @@ PANKB_PROD_AI_ASSISTANT_APP_URL - the URL address of the separately deployed AI 
 ```
 The Github Actions secrets are encrypted and safely stored on Github in the "Settings - Secrets and Variables - Actions - Secrets - Repository secrets" section. In this section, you can also add new Github Actions secrets and edit the existing ones. However, in order to change a secret name, you have to remove the existing secret and add the new one instead of the old one. The Github Actions variables are not encrypted. Similarly, they are stored on Github in the "Settings - Secrets and Variables - Actions - Variables - Repository variables" section.
 
-After the Github Actions deployment job has successfully run, the web-application must be available at <a href="pankb.org" target="_blank">pankb.org</a>. 
+If this is the first time when the PanKB website is deployed to the PROD server, we must manually create SSL certificates in order to enable HTTPS on the PROD server. We use <a href="https://letsencrypt.org" target="_blank">Let's Encrypt</a> free SSL certificates and the dockerized <a href="https://certbot.eff.org" target="_blank">certbot</a> to generate and renew them. After the website app is deployed on the PROD server, run the certbot in a docker container with the following command:
+```
+cd /projects/pankb_web/django_project
+docker compose run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ -d pankb.org
+```
+When prompted, enter your email for notices from Let's Encrypt. This step is optional, and you can skip it by typing <b>c</b> and pressing <b>Enter</b>. Agree to the <b>Terms of Service</b> by typing <b>y</b> and pressing <b>Enter</b>. Wait for the procedure to finish. If Docker reports no errors, the generated SSL certificate `fullchain.pem` and private key `privkey.pem` should be found under `/projects/pankb_web/django_project/certbot/conf/live/pankb.org/` folder.
+
+Let's Encrypt certificates last for three months. After that, they must be renewed. To renew certificates, execute the following command:
+```
+docker compose run --rm certbot renew
+```
+Alternatively, if you want to renew the SSL certificates at 5 am on the first day every 2nd month, add the following line to the `crontab` file with `sudo crontab -e` command:
+```
+0 5 1 */2 * docker compose -f /projects/pankb_web/django_project/docker-compose.yml run --rm certbot renew
+```
+Once created, the certificates and private keys generated will be safely stored and unmodified under the same folder after each re-deployment to the PROD server automatically triggered by Github Actions.
+
+Finally, you must deploy (manually or automatically with Github Actions) the AI Assistant Web Application following the instructions from the respective repo: https://github.com/biosustain/pankb_llm.
 
 The command `docker ps` should show several containers (one with the django web app and wsgi server inside, one with the nginx web server, one with the AI Assistant web app and one with the DEV database if you deploy it locally) up and running if the automatic deployment was successful:
 ```
 docker ps
-CONTAINER ID   IMAGE                            COMMAND                  CREATED             STATUS             PORTS                                    NAMES
-39787becaeb7   pankb_web:latest     "sh /entrypoint.sh"      23 seconds ago   Up 12 seconds   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                   pankb-web
-730353f2fdde   pankb_nginx:latest   "/docker-entrypoint.…"   23 seconds ago   Up 12 seconds   0.0.0.0:80->80/tcp, :::80->80/tcp                           pankb-nginx
-54d89d7c4fad   pankb_llm:latest     "streamlit run strea…"   8 days ago       Up 41 hours     0.0.0.0:8501->8501/tcp, :::8501->8501/tcp                   pankb-llm
+CONTAINER ID   IMAGE                COMMAND                  CREATED             STATUS             PORTS                                                                      NAMES
+4dd23652d5b0   pankb_web:latest     "sh /entrypoint.sh"      About an hour ago   Up About an hour   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp                                  pankb-web
+6523c2afddd3   pankb_nginx:latest   "/docker-entrypoint.…"   About an hour ago   Up About an hour   0.0.0.0:80->80/tcp, :::80->80/tcp, 0.0.0.0:443->443/tcp, :::443->443/tcp   pankb-nginx
+c3bbd55e070d   pankb_llm:latest     "streamlit run strea…"   2 hours ago         Up 2 hours         0.0.0.0:8501->8501/tcp, :::8501->8501/tcp                                  pankb-llm
 ```
+After the Github Actions deployment job has successfully run, the web-application must be available at <a href="pankb.org" target="_blank">pankb.org</a>.
