@@ -89,7 +89,7 @@ First, you must set up and populate the PROD MongoDB instance on a sharded clust
 
 Second, you must deploy (manually or automatically with Github Actions) the AI Assistant Web Application following the instructions from the respective repo: https://github.com/biosustain/pankb_db.
 
-Every time when one pushes to the `prod` repo (usually from the DEV server), the changes in PanKB site and Assistant Web Applications will be AUTOMATICALLY deployed to the PROD server. The automation (CI/CD) is achieved with the help of Github Actions enabled for the repository. The respective config file is `.github/workflows/deploy-prod-to-azurevm.yml`. In order for the automated deployment to work, you should set up the values of the following secret Github Actions secrets:
+Every time when one pushes to the `prod` repo (usually from the DEV server), the changes in PanKB site and Assistant Web Applications will be AUTOMATICALLY deployed to the PROD server. The automation (CI/CD) is achieved with the help of Github Actions enabled for the repository. The respective config file is `.github/workflows/deploy-prod-to-azurevm.yml`. In order for the automated deployment to work, you must set up the values of the following Github Actions secrets:
 ```
 PANKB_PROD_HOST - the PROD server IP address
 PANKB_PROD_SSH_USERNAME - the ssh user name to connect to the PROD server
@@ -100,9 +100,12 @@ PANKB_PROD_DJANGO_SUPER_USER_PASSWORD - Django admin password (set to any string
 PANKB_PROD_DJANGO_SUPER_USER_EMAIL - Django admin email
 PANKB_PROD_MONGODB_NAME - the name of the MongoDB PROD database on the Azure sharded cluster
 PANKB_PROD_MONGODB_CONN_STRING - MongoDB PROD (Azure CosmosDB for MongoDB) Connection String
+```
+Additionally, you must set up the values of the following Github Actions variables:
+```
 PANKB_PROD_AI_ASSISTANT_APP_URL - the URL address of the separately deployed AI Assistant Web Application
 ```
-These secrets are encrypted and safely stored on Github in the "Settings - Secrets and Variables - Actions - Repository secrets" section. In this section, you can also add new Github Actions secrets and edit the existing ones. However, in order to change a secret name, you have to remove the existing secret and add the new one instead of the old one.
+The Github Actions secrets are encrypted and safely stored on Github in the "Settings - Secrets and Variables - Actions - Secrets - Repository secrets" section. In this section, you can also add new Github Actions secrets and edit the existing ones. However, in order to change a secret name, you have to remove the existing secret and add the new one instead of the old one. The Github Actions variables are not encrypted. Similarly, they are stored on Github in the "Settings - Secrets and Variables - Actions - Variables - Repository variables" section.
 
 After the Github Actions deployment job has successfully run, the web-application must be available at <a href="pankb.org" target="_blank">pankb.org</a>. 
 
