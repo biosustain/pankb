@@ -60,5 +60,4 @@ jobs:
             echo AI_ASSISTANT_APP_URL="${{env.PANKB_PROD_AI_ASSISTANT_APP_URL}}" >> .env
             cat .env
             docker compose up -d --build --force-recreate
-            rm .env
             docker system prune
