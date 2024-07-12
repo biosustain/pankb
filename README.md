@@ -87,7 +87,7 @@ mkdir -p pankb_llm
 ```
 First, you must set up and populate the PRE-PROD MongoDB instance on a sharded cluster in the Azure cloud following the instructions from the respective repo: https://github.com/biosustain/pankb_db.
 
-Second, you must deploy (manually or automatically with Github Actions) the AI Assistant Web Application following the instructions from the respective repo: https://github.com/biosustain/pankb_db.
+Second, you must deploy (manually or automatically with Github Actions) the AI Assistant Web Application following the instructions from the respective repo: https://github.com/biosustain/pankb_llm.
 
 Every time when one pushes to the `pre-prod` repo (usually from the DEV server), the changes in PanKB site and Assistant Web Applications will be AUTOMATICALLY deployed to the PRE-PROD server. The automation (CI/CD) is achieved with the help of Github Actions enabled for the repository. The respective config file is `.github/workflows/deploy-preprod-to-azurevm.yml`. In order for the automated deployment to work, you must set up the values of the following Github Actions secrets:
 ```
