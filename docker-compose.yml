@@ -10,7 +10,7 @@ services:
     image: pankb_web:latest
     restart: always       # for the container to be up and running again even after the VM is brought down
     volumes:
-      - ./static:/static
+      - ./static:/static  # a folder, where the static content will be served from
       # map a folder where the current web project is located to the /app folder inside the container
       # (this way the changes inside and outside the docker container will be synchronized
       # without the necessity to re-build the container): ----
@@ -28,7 +28,7 @@ services:
     image: pankb_nginx:latest
     restart: always       # for the container to be up and running again even after the VM is brought down
     volumes:
-      - ./static:/static
+      - ./static:/static  # a folder, where the static content will be served from
     ports:
       - 80:80
     networks:
