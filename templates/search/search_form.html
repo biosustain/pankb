@@ -65,7 +65,7 @@
 
 <form class="search" action="{% url 'search_results' %}" method="get">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> <!-- needed to retrieve the icon for the submit button -->
-    <input id="q" name="q" type="text" placeholder="Search for a family, species, gene, of functional annotation" value="{{ request.GET.q }}"/>
+    <input id="q" name="q" type="text" placeholder="Search for a family, species, gene, or functional annotation" value="{{ request.GET.q }}"/>
     <button type="submit"><i class="fa fa-search"></i></button>
     <label for="q">
         <span style="color:#a9a6a7;">Examples: </span>
