@@ -29,12 +29,9 @@ services:
     restart: always       # for the container to be up and running again even after the VM is brought down
     volumes:
       - ./static:/static  # a folder, where the static content will be served from
-<<<<<<< HEAD
       - ./certbot/www/:/var/www/certbot/:ro      # a mounted folder that links nginx with certbot
       - ./certbot/conf/live/pankb.org/fullchain.pem:/etc/nginx/ssl/live/pankb.org/fullchain.pem        # the SSL certificate
       - ./certbot/conf/live/pankb.org/privkey.pem:/etc/nginx/ssl/live/pankb.org/privkey.pem            # the SSL private key
-=======
->>>>>>> origin/pre-prod
     ports:
       - 80:80
       - 443:443
