@@ -121,27 +121,6 @@ Alternatively, if you want to renew the SSL certificates at 5 am on the first da
 0 5 1 */2 * docker compose -f /projects/pankb_web/django_project/docker-compose.yml run --rm certbot renew
 ```
 Once created, the certificates and private keys generated will be safely stored and unmodified under the same folder after each re-deployment to the PROD server automatically triggered by Github Actions.
-=======
-Second, you must deploy (manually or automatically with Github Actions) the AI Assistant Web Application following the instructions from the respective repo: https://github.com/biosustain/pankb_llm.
-
-Every time when one pushes to the `pre-prod` repo (usually from the DEV server), the changes in PanKB site and Assistant Web Applications will be AUTOMATICALLY deployed to the PRE-PROD server. The automation (CI/CD) is achieved with the help of Github Actions enabled for the repository. The respective config file is `.github/workflows/deploy-preprod-to-azurevm.yml`. In order for the automated deployment to work, you must set up the values of the following Github Actions secrets:
-```
-PANKB_PREPROD_HOST - the PRE-PROD server IP address
-PANKB_PREPROD_SSH_USERNAME - the ssh user name to connect to the PRE-PROD server
-PANKB_PREPROD_PRIVATE_SSH_KEY - the ssh key that is used to connect to the PRE-PROD server
-PANKB_PREPROD_DJANGO_SECRET_KEY - Django secret key (set to any string you like)
-PANKB_PREPROD_DJANGO_SUPER_USER_NAME - Django admin name (set to any string you like)
-PANKB_PREPROD_DJANGO_SUPER_USER_PASSWORD - Django admin password (set to any string you like)
-PANKB_PREPROD_DJANGO_SUPER_USER_EMAIL - Django admin email
-PANKB_PREPROD_MONGODB_NAME - the name of the MongoDB PRE-PROD database on the Azure sharded cluster
-PANKB_PREPROD_MONGODB_CONN_STRING - MongoDB PRE-PROD (Azure CosmosDB for MongoDB) Connection String
-```
-Additionally, you must set up the values of the following Github Actions variables:
-```
-PANKB_PREPROD_AI_ASSISTANT_APP_URL - the URL address of the separately deployed AI Assistant Web Application
-```
-The Github Actions secrets are encrypted and safely stored on Github in the "Settings - Secrets and Variables - Actions - Secrets - Repository secrets" section. In this section, you can also add new Github Actions secrets and edit the existing ones. However, in order to change a secret name, you have to remove the existing secret and add the new one instead of the old one. The Github Actions variables are not encrypted. Similarly, they are stored on Github in the "Settings - Secrets and Variables - Actions - Variables - Repository variables" section.
->>>>>>> origin/pre-prod
 
 Finally, you must deploy (manually or automatically with Github Actions) the AI Assistant Web Application following the instructions from the respective repo: https://github.com/biosustain/pankb_llm.
 
