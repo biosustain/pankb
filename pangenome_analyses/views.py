@@ -168,7 +168,7 @@ def download_matrix_csv(request):
 def variant_dominant_freq(request):
   template = loader.get_template('pangenome_analyses/plots/variant_dominant_frequency.html')
   species = request.GET['species']
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/alleleome/step_line.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/step_line.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
   json_obj = r.json()
   # Compose a context for the template rendering
@@ -182,7 +182,7 @@ def variant_dominant_freq(request):
 def ds_dn_ratio(request):
   template = loader.get_template('pangenome_analyses/plots//dn_ds_ratio.html')
   species = request.GET['species']
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/alleleome/final_dn_ds_count_per_gene.csv'    # the url of the respective csv file stored on the Microsoft Azure Blob Storage
+  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/final_dn_ds_count_per_gene.csv'    # the url of the respective csv file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
   dataset_df = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
   dataset_dict = dataset_df.to_dict(orient='records')

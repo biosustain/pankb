@@ -139,7 +139,7 @@ def aa_pos_overview(request):
   r1 = requests.get(url1)
   json_obj1 = r1.json()
 
-  url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/alleleome/' + gene + '/' + gene + '_pan_aa_thresh_core_dom_var_pos.csv'    # the url of the respective csv file stored on the Microsoft Azure Blob Storage
+  url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/gene_data/' + gene + '/' + gene + '_pan_aa_thresh_core_dom_var_pos.csv'    # the url of the respective csv file stored on the Microsoft Azure Blob Storage
   r2 = requests.get(url2)
   dataset_df2 = pd.read_csv(io.StringIO(r2.content.decode('utf-8')))
   dataset_dict2 = dataset_df2.to_dict(orient='records')
@@ -158,11 +158,11 @@ def msa(request):
   species = request.GET['species']
   gene = request.GET['gene']
 
-  url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/alleleome/' + gene + '/AA_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/gene_data/' + gene + '/AA_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r1 = requests.get(url1)
   json_obj1 = r1.json()
 
-  url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/alleleome/' + gene +'/MSA.fasta'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/gene_data/' + gene +'/MSA.fasta'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r2 = requests.get(url2)
 
   # Compose a context for the template rendering: ----
