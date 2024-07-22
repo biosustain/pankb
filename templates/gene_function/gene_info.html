@@ -173,12 +173,13 @@
                 row.toggleClass('expanded-row');
             });
 
-            if (gene_class !== 'Core') {
-                document.getElementById('AA_pos_overview_figure').style.display = 'none';
-                document.getElementById('AA_pos_overview').style.display = 'none';
-                document.getElementById('MSA_figure').style.display = 'none';
-                document.getElementById('MSA').style.display = 'none';
-            }
+            // We are not sure anymore for which genes this should be displayed, since only genes that did not pass panalleleome QCQA are missing.
+            // if (gene_class !== 'Core') {
+                // document.getElementById('AA_pos_overview_figure').style.display = 'none';
+                // document.getElementById('AA_pos_overview').style.display = 'none';
+                // document.getElementById('MSA_figure').style.display = 'none';
+                // document.getElementById('MSA').style.display = 'none';
+            // }
         });
 
         document.getElementById('MSA_figure').innerHTML= 'Multiple Sequence Alignment of ' + '<b>' +  gene  + '</b>'

@@ -39,28 +39,8 @@
   const current_window_Width = window.innerWidth;
   const coefficient = current_window_Width / template_screen_width;
 
-  function processData(rawData) {
-    const dataGreaterThanOne = [];
-    const dataEqualToOne = [];
-    const dataLessThanOne = [];
-
-    // Process and categorize the data
-    rawData.forEach(function(row) {
-      const dnds = parseFloat(row['dN/dS']);
-      const synCount = parseFloat(row['Synonymous_count']);
-      const nonSynCount = parseFloat(row['Non_synonymous_count']);
-
-      if (dnds > 1) dataGreaterThanOne.push([synCount, nonSynCount]);
-      else if (dnds === 1) dataEqualToOne.push([synCount, nonSynCount]);
-      else if (dnds < 1) dataLessThanOne.push([synCount, nonSynCount]);
-    });
-
-    // Create the Highcharts chart with processed data
-    createChart(dataGreaterThanOne, dataEqualToOne, dataLessThanOne);
-  }
-
   // Function to create the Highcharts chart
-  function createChart(dataGreaterThanOne, dataEqualToOne, dataLessThanOne) {
+  function createChart(plotData) {
     Highcharts.chart('container', {
       chart: {
         type: 'scatter',
@@ -69,7 +49,7 @@
         plotBorderColor: '#000000'
       },
       title: {
-        text: 'dN/dS Ratios for ' + species_name + ' Core Genomes',
+        text: 'dN/dS Ratios for ' + species_name + ' genomes',
         align: 'center',
         style: {
           fontSize: (1.1 * coefficient) + 'em',
@@ -80,7 +60,7 @@
       xAxis: {
         type: 'logarithmic',
         title: {
-          text: 'Number of synonymous codons per core gene',
+          text: 'Number of synonymous codons per gene',
           style: {
             fontSize: coefficient + 'em',
             color: '#000000'
@@ -102,7 +82,7 @@
       yAxis: {
         type: 'logarithmic',
         title: {
-          text: 'Number of non-synonymous codons per core gene',
+          text: 'Number of non-synonymous codons per gene',
           style: {
             fontSize: coefficient + 'em',
             color: '#000000'
@@ -129,7 +109,7 @@
       },
       series: [{
         name: 'dN/dS > 1',
-        data: dataGreaterThanOne,
+        data: plotData.dNdS_greater_than_one,
         color: 'black',
         marker: {
           symbol: 'circle',
@@ -137,7 +117,7 @@
         }
       }, {
         name: 'dN/dS = 1',
-        data: dataEqualToOne,
+        data: plotData.dNdS_equal_to_one,
         color: 'red',
         marker: {
           symbol: 'circle',
@@ -145,7 +125,7 @@
         }
       }, {
         name: 'dN/dS < 1',
-        data: dataLessThanOne,
+        data: plotData.dNdS_less_than_one,
         color: '#9BABB8',
         marker: {
           symbol: 'circle',
@@ -161,7 +141,7 @@
   // Get the string-transformed dictionary from the view: ----
   const data = {{ dataset|safe }}
   // Create the plot
-  processData(data)
+  createChart(data)
 </script>
 </body>
 </html>
