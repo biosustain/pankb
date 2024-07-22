@@ -141,8 +141,11 @@ def aa_pos_overview(request):
 
   url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/gene_data/' + gene + '/' + gene + '_pan_aa_thresh_core_dom_var_pos.csv'    # the url of the respective csv file stored on the Microsoft Azure Blob Storage
   r2 = requests.get(url2)
-  dataset_df2 = pd.read_csv(io.StringIO(r2.content.decode('utf-8')))
-  dataset_dict2 = dataset_df2.to_dict(orient='records')
+  if r2.status_code == requests.codes.ok:
+    dataset_df2 = pd.read_csv(io.StringIO(r2.content.decode('utf-8')))
+    dataset_dict2 = dataset_df2.to_dict(orient='records')
+  else:
+    dataset_dict2 = []
 
   # Compose a context for the template rendering: ----
   context = {
@@ -160,15 +163,21 @@ def msa(request):
 
   url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/gene_data/' + gene + '/AA_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r1 = requests.get(url1)
-  json_obj1 = r1.json()
+  if r1.status_code == requests.codes.ok:
+    json_obj1 = r1.json()
+  else:
+    json_obj1 = {}
 
   url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/gene_data/' + gene +'/MSA.fasta'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r2 = requests.get(url2)
-
+  if r2.status_code == requests.codes.ok:
+    r2_text = r2.text
+  else:
+    r2_text = ""
   # Compose a context for the template rendering: ----
   context = {
     'AAData': json.dumps(json_obj1),
-    'msaData': json.dumps(r2.text)
+    'msaData': json.dumps(r2_text)
   }
   return HttpResponse(template.render(context, request))
 

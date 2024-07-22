@@ -61,7 +61,11 @@
             });
              */
             const data = {{ dataset|safe }}
-            renderChart(data, number_of_genome)
+
+            // Only plot when there is data available.
+            if (data) {
+                renderChart(data, number_of_genome)
+            }
         }
     }
 
