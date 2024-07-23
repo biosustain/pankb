@@ -182,7 +182,6 @@ def msa(request):
   return HttpResponse(template.render(context, request))
 
 
-
 ############################## Genome Info Page Templates ###################################
 # Template renderer for the Genome Info Page
 def genome_info(request):

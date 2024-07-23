@@ -23,26 +23,26 @@
             height: 550px;  /* Adjust the height here */
             opacity: 0.85;
             transition: visibility 0s, opacity 0.5s linear;
-            z-index: 9999; /* New line */
+            z-index: 9999;  /* New line */
         }
         .tooltip-hidden {
             visibility: hidden;
             opacity: 0;
         }
     </style>
-    <div id="tooltip" class="tooltip-hidden">
+    <div id = "tooltip" class = "tooltip-hidden">
         Frequency information will go here.
     </div>
 </head>
 
 <body>
-<!--A simple website with left and right bars-->
-<div class="row">
-    <div class="col-12">
+<h3 id = "MSA_figure" style = "text-align: center; font-size: 1.6em;"></h3>
+<div class = "row">
+    <div class = "col-12">
         <div>
-            <div style="width: 100%; display: inline-block">
+            <div style="width: 100%; display: inline-block;">
                 <div id="menuDiv"></div>
-                <div id="MSA" style="position: relative;">Loading ...</div>
+                <div id="MSA" style="position: relative; display: none;">Loading ...</div>
                 <script>
                     let opts = {};
                     opts.el = document.getElementById("MSA");
@@ -176,77 +176,78 @@
 
                         m.g.on("column:click", function(data) {
                             // Obtain JSON data rendered in the respective view: ----
-                            const jsonData = {{ AAData|safe }};
+                            const jsonData = {{ AAData | safe }};
 
-                            // Do nothing in the case of an empty dict.
-                            if (Object.keys(obj).length !== 0) {
+                            const Amino_Acid = {
+                                'A': 'Alanine&nbsp;[A]',
+                                'R': 'Arginine&nbsp;[R]',
+                                'N': 'Asparagine&nbsp;[N]',
+                                'D': 'Aspartic&nbsp;Acid&nbsp;[D]',
+                                'C': 'Cysteine&nbsp;[C]',
+                                'Q': 'Glutamine&nbsp;[Q]',
+                                'E': 'Glutamic&nbsp;Acid&nbsp;[E]',
+                                'G': 'Glycine&nbsp;[G]',
+                                'H': 'Histidine&nbsp;[H]',
+                                'I': 'Isoleucine&nbsp;[I]',
+                                'L': 'Leucine&nbsp;[L]',
+                                'K': 'Lysine&nbsp;[K]',
+                                'M': 'Methionine&nbsp;[M]',
+                                'F': 'Phenylalanine&nbsp;[F]',
+                                'P': 'Proline&nbsp;[P]',
+                                'S': 'Serine&nbsp;[S]',
+                                'T': 'Threonine&nbsp;[T]',
+                                'W': 'Tryptophan&nbsp;[W]',
+                                'Y': 'Tyrosine&nbsp;[Y]',
+                                'V': 'Valine&nbsp;[V]',
+                                '-': '-'
+                            };
 
-                                const Amino_Acid = {
-                                    'A': 'Alanine&nbsp;[A]',
-                                    'R': 'Arginine&nbsp;[R]',
-                                    'N': 'Asparagine&nbsp;[N]',
-                                    'D': 'Aspartic&nbsp;Acid&nbsp;[D]',
-                                    'C': 'Cysteine&nbsp;[C]',
-                                    'Q': 'Glutamine&nbsp;[Q]',
-                                    'E': 'Glutamic&nbsp;Acid&nbsp;[E]',
-                                    'G': 'Glycine&nbsp;[G]',
-                                    'H': 'Histidine&nbsp;[H]',
-                                    'I': 'Isoleucine&nbsp;[I]',
-                                    'L': 'Leucine&nbsp;[L]',
-                                    'K': 'Lysine&nbsp;[K]',
-                                    'M': 'Methionine&nbsp;[M]',
-                                    'F': 'Phenylalanine&nbsp;[F]',
-                                    'P': 'Proline&nbsp;[P]',
-                                    'S': 'Serine&nbsp;[S]',
-                                    'T': 'Threonine&nbsp;[T]',
-                                    'W': 'Tryptophan&nbsp;[W]',
-                                    'Y': 'Tyrosine&nbsp;[Y]',
-                                    'V': 'Valine&nbsp;[V]',
-                                    '-': '-'
-                                };
+                            // Get the data for the column that was clicked
+                            const columnData = jsonData[(data.rowPos + 1).toString()];
 
-                                // Get the data for the column that was clicked
-                                const columnData = jsonData[(data.rowPos + 1).toString()];
+                            // Generate the HTML string for the tooltip
+                            let tooltipHtml = "<div style='text-align:center;'><strong>Position " + (data.rowPos + 1) + "</strong></div><br><table style='width: 100%; table-layout: fixed;'>";
+                            tooltipHtml += `<thead><tr><th style='width: 33%; text-align: center;'>Residue</th><th style='width: 33%; text-align: center;'>Count</th><th style='width: 33%; text-align: center;'>Frequency</th></tr></thead><tbody>`;
+                            for (const [aminoAcid, values] of Object.entries(columnData)) {
+                                tooltipHtml += `<tr><td style= 'text-align: center;'>${Amino_Acid[aminoAcid]}</td><td style= 'text-align: center;'>${values[0]}</td><td style= 'text-align: center;'>${values[1]}%</td></tr>`;
+                            }
+                            tooltipHtml += "</tbody></table>";
 
-                                // Generate the HTML string for the tooltip
-                                let tooltipHtml = "<div style='text-align:center;'><strong>Position " + (data.rowPos + 1) + "</strong></div><br><table style='width: 100%; table-layout: fixed;'>";
-                                tooltipHtml += `<thead><tr><th style='width: 33%; text-align: center;'>Residue</th><th style='width: 33%; text-align: center;'>Count</th><th style='width: 33%; text-align: center;'>Frequency</th></tr></thead><tbody>`;
-                                for (const [aminoAcid, values] of Object.entries(columnData)) {
-                                    tooltipHtml += `<tr><td style= 'text-align: center;'>${Amino_Acid[aminoAcid]}</td><td style= 'text-align: center;'>${values[0]}</td><td style= 'text-align: center;'>${values[1]}%</td></tr>`;
-                                }
-                                tooltipHtml += "</tbody></table>";
+                            // Show the generated HTML in the tooltip
+                            const tooltip = document.getElementById('tooltip');
+                            tooltip.innerHTML = tooltipHtml;
 
-                                // Show the generated HTML in the tooltip
+                            const rect = document.getElementById('MSA').getBoundingClientRect();
+
+                            tooltip.style.left = (data.evt.pageX - rect.left - 100) + 'px';  // position the tooltip at the mouse pointer
+                            tooltip.style.top = (data.evt.pageY - rect.top + 20) + 'px';
+
+                            tooltip.classList.remove("tooltip-hidden");
+
+                            document.addEventListener('mouseup', hideTooltip);
+
+                            function hideTooltip(event) {
                                 const tooltip = document.getElementById('tooltip');
-                                tooltip.innerHTML = tooltipHtml;
-
-                                const rect = document.getElementById('MSA').getBoundingClientRect();
-
-                                tooltip.style.left = (data.evt.pageX - rect.left - 100) + 'px';  // position the tooltip at the mouse pointer
-                                tooltip.style.top = (data.evt.pageY - rect.top + 20) + 'px';
-
-                                tooltip.classList.remove("tooltip-hidden");
-
-                                document.addEventListener('mouseup', hideTooltip);
-
-                                function hideTooltip(event) {
-                                    const tooltip = document.getElementById('tooltip');
-                                    if (!tooltip.contains(event.target)) {
-                                        tooltip.classList.add("tooltip-hidden");
-                                        document.removeEventListener('click', hideTooltip); // Remove listener after hiding
-                                    }
+                                if (!tooltip.contains(event.target)) {
+                                    tooltip.classList.add("tooltip-hidden");
+                                    document.removeEventListener('click', hideTooltip); // Remove listener after hiding
                                 }
                             }
+
                         });
                     }
 
                     // Obtain the MSA data rendered by the respective view: ----
                     const data = {{ msaData|safe }};
 
-                    // Do not render the MSA in case of an empty datafile.
+                    // Render the MSA and plot title only in case the datafile is not empty: ----
                     if (data !== "") {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const gene = urlParams.get('gene');
+                        document.getElementById('MSA_figure').innerHTML = "Multiple Sequence Alignment of " + gene;
+                        document.getElementById('MSA').style.display = 'block';
 
-                        // Parse the fasta string
+                        // Parse the FASTA string
                         const seqs = msa.io.fasta.parse(data);
 
                         // Import parsed sequences
@@ -257,7 +258,7 @@
                         const sequenceLength = m.seqs.getMaxLength(); // assuming all sequences have the same length
 
                         // Set the 'boxRectWidth' based on the calculated values
-                        m.g.zoomer.set('boxRectWidth', alignmentWidth / sequenceLength);
+                        m.g.zoomer.set('boxRectWidth', alignmentWidth/sequenceLength);
 
                         // Render MSA
                         renderMSA();

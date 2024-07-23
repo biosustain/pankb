@@ -84,16 +84,16 @@
 {% endblock %}
 
 {% block content %}
-    <h2 style = 'text-align: center; font-size: 1.6em;'>Gene <i>{{request.GET.gene}}</i></h2>
-    <div class="table_padding overflow-auto">
-        <form action="{% url 'download_gene_info_table_csv' %}" method="GET">
+    <h2 style = "text-align: center; font-size: 1.6em;">Gene <i>{{request.GET.gene}}</i></h2>
+    <div class = "table_padding overflow-auto">
+        <form action = "{% url 'download_gene_info_table_csv' %}" method="GET">
             <input type="hidden" name="species" value="{{ request.GET.species }}" />
             <input type="hidden" name="gene" value="{{ request.GET.gene }}" />
             <!-- The button styles from Bootstrap:
             https://getbootstrap.com/docs/5.3/components/buttons/ -->
             <button class="btn btn-primary" type="submit">Download CSV</button>
         </form>
-        <div style="width:90%;">
+        <div style="width: 90%;">
             <table id="gene_info" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
                 <thead>
                 <tr>
@@ -112,20 +112,16 @@
             </table>
         </div>
     </div>
-    <h3 id = 'AA_pos_overview_figure' style = 'text-align: center; padding-top: 5vh; font-size: 1.6em;'; ></h3>
     <div class="table_padding overflow-auto">
         <div style="width:70%;">
-            <iframe id = 'AA_pos_overview' style="width: 100%; height: 60vh; padding-top: 0px"></iframe>
+            <iframe id = "AA_pos_overview" style = "width: 100%; height: 70vh; padding-top: 0px;"></iframe>
         </div>
-    </div>
     </div>
     <br>
-    <h3 id = 'MSA_figure' style = 'text-align: center; font-size: 1.6em;'></h3>
     <div class="table_padding overflow-auto">
-        <div style="width:90%;">
-            <iframe id = 'MSA' style="width: 100%; height: 100vh; padding-top: 1vh"></iframe>
+        <div style="width: 90%;">
+            <iframe id = "MSA" style="width: 100%; height: 100vh; padding-top: 1vh;"></iframe>
         </div>
-    </div>
     </div>
 
     <!-- Datatable -->
@@ -173,21 +169,13 @@
                 row.toggleClass('expanded-row');
             });
 
-            // We are not sure anymore for which genes this should be displayed, since only genes that did not pass panalleleome QCQA are missing.
-            // if (gene_class !== 'Core') {
-                // document.getElementById('AA_pos_overview_figure').style.display = 'none';
-                // document.getElementById('AA_pos_overview').style.display = 'none';
-                // document.getElementById('MSA_figure').style.display = 'none';
-                // document.getElementById('MSA').style.display = 'none';
-            // }
         });
 
-        document.getElementById('MSA_figure').innerHTML= 'Multiple Sequence Alignment of ' + '<b>' +  gene  + '</b>'
+        const AA_pos_overview = document.getElementById('AA_pos_overview');
+        AA_pos_overview.src = "{% url 'aa_pos_overview' %}?species=" + species + '&' + 'gene=' + gene;
+
         const MSA = document.getElementById('MSA');
         MSA.src = "{% url 'msa' %}?species=" + species + '&' + 'gene=' + gene;
 
-        document.getElementById('AA_pos_overview_figure').innerHTML= 'Dominant and Variant Amino Acid Position Overview of ' + '<b>' +  gene  + '</b>'
-        const AA_pos_overview = document.getElementById('AA_pos_overview');
-        AA_pos_overview.src = "{% url 'aa_pos_overview' %}?species=" + species + '&' + 'gene=' + gene;
     </script>
 {% endblock %}
