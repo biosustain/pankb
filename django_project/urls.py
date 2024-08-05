@@ -33,7 +33,7 @@ urlpatterns = [
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
     path('', home_views.home, name='home'),
     path('plots/dimension.html', TemplateView.as_view(template_name='home/plots/dimension.html',
-                                                      extra_context={'dataset': json.dumps(requests.get('https://pankb.blob.core.windows.net/data/PanKB/web_data/pankb_dimension.json').json())}),
+                                                      extra_context={'dataset': json.dumps(requests.get('https://pankb.blob.core.windows.net/data/PanKB/web_data/pankb_dimension_full_panalleleome.json').json())}),
          name='dimension'),
     path('plots/organism_genome_number.html', TemplateView.as_view(template_name='home/plots/organism_genome_number.html',
                                                                    extra_context={'dataset': json.dumps(requests.get('https://pankb.blob.core.windows.net/data/PanKB/web_data/organism_genome_count.json').json())}),
