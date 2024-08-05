@@ -23,26 +23,26 @@
             height: 550px;  /* Adjust the height here */
             opacity: 0.85;
             transition: visibility 0s, opacity 0.5s linear;
-            z-index: 9999; /* New line */
+            z-index: 9999;  /* New line */
         }
         .tooltip-hidden {
             visibility: hidden;
             opacity: 0;
         }
     </style>
-    <div id="tooltip" class="tooltip-hidden">
+    <div id = "tooltip" class = "tooltip-hidden">
         Frequency information will go here.
     </div>
 </head>
 
 <body>
-<!--A simple website with left and right bars-->
-<div class="row">
-    <div class="col-12">
+<h3 id = "MSA_figure" style = "text-align: center; font-size: 1.6em;"></h3>
+<div class = "row">
+    <div class = "col-12">
         <div>
-            <div style="width: 100%; display: inline-block">
+            <div style="width: 100%; display: inline-block;">
                 <div id="menuDiv"></div>
-                <div id="MSA" style="position: relative;">Loading ...</div>
+                <div id="MSA" style="position: relative; display: none;">Loading ...</div>
                 <script>
                     let opts = {};
                     opts.el = document.getElementById("MSA");
@@ -176,7 +176,7 @@
 
                         m.g.on("column:click", function(data) {
                             // Obtain JSON data rendered in the respective view: ----
-                            const jsonData = {{ AAData|safe }};
+                            const jsonData = {{ AAData | safe }};
 
                             const Amino_Acid = {
                                 'A': 'Alanine&nbsp;[A]',
@@ -233,27 +233,36 @@
                                     document.removeEventListener('click', hideTooltip); // Remove listener after hiding
                                 }
                             }
+
                         });
                     }
 
                     // Obtain the MSA data rendered by the respective view: ----
                     const data = {{ msaData|safe }};
 
-                    // Parse the fasta string
-                    const seqs = msa.io.fasta.parse(data);
+                    // Render the MSA and plot title only in case the datafile is not empty: ----
+                    if (data !== "") {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const gene = urlParams.get('gene');
+                        document.getElementById('MSA_figure').innerHTML = "Multiple Sequence Alignment of " + gene;
+                        document.getElementById('MSA').style.display = 'block';
 
-                    // Import parsed sequences
-                    m.seqs.reset(seqs);
+                        // Parse the FASTA string
+                        const seqs = msa.io.fasta.parse(data);
 
-                    // Calculate the alignment width and the length of the sequence
-                    const alignmentWidth = m.g.zoomer.get('alignmentWidth');
-                    const sequenceLength = m.seqs.getMaxLength(); // assuming all sequences have the same length
+                        // Import parsed sequences
+                        m.seqs.reset(seqs);
 
-                    // Set the 'boxRectWidth' based on the calculated values
-                    m.g.zoomer.set('boxRectWidth', alignmentWidth / sequenceLength);
+                        // Calculate the alignment width and the length of the sequence
+                        const alignmentWidth = m.g.zoomer.get('alignmentWidth');
+                        const sequenceLength = m.seqs.getMaxLength(); // assuming all sequences have the same length
 
-                    // Render MSA
-                    renderMSA();
+                        // Set the 'boxRectWidth' based on the calculated values
+                        m.g.zoomer.set('boxRectWidth', alignmentWidth/sequenceLength);
+
+                        // Render MSA
+                        renderMSA();
+                    }
                 </script>
             </div>
         </div>

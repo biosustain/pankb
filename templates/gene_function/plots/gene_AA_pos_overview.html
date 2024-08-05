@@ -15,20 +15,18 @@
             overflow: hidden;
         }
         #container {
-            height: 100%;
+            height: 90vh;
             width: 100%;
             margin: 0;
             padding: 0;
             overflow: hidden;
         }
-        html {
-            font-size: 18px; /* Base font size for larger screens */
-        }
     </style>
 </head>
 
 <body>
-<div id="container" ></div>
+<h3 id = "AA_pos_overview_figure" style = "text-align: center; font-size: 1.6em;"></h3>
+<div id = "container"></div>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const species = urlParams.get('species');
@@ -37,33 +35,6 @@
     const template_screen_width = 1334;
     const current_window_Width = window.innerWidth;
     const coefficient = current_window_Width / template_screen_width;
-    console.log('window width: ' + current_window_Width);
-    async function loadDataAndRenderChart() {
-        // Fetch and wait for the species data
-        /*
-      const speciesResponse = await fetch('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json');
-      const speciesData = await speciesResponse.json();
-         */
-
-        speciesData = {{ speciesData | safe }}
-        // Check if speciesData is available and then proceed
-        if (speciesData) {
-            const number_of_genome = speciesData.Number_of_genome;
-
-            // Fetch and wait for the CSV data
-            /*
-            Papa.parse('https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/alleleome/' + gene + '/' + gene + '_pan_aa_thresh_core_dom_var_pos.csv', {
-                download: true,
-                header: true,
-                complete: function(results) {
-                    renderChart(results.data, number_of_genome);
-                }
-            });
-             */
-            const data = {{ dataset|safe }}
-            renderChart(data, number_of_genome)
-        }
-    }
 
     function renderChart(data, number_of_genome) {
         Highcharts.chart('container', {
@@ -163,6 +134,23 @@
         });
     }
     loadDataAndRenderChart();
+
+    async function loadDataAndRenderChart() {
+
+        speciesData = {{ speciesData | safe }}
+        // Check if speciesData is available and then proceed
+        if (speciesData) {
+            const number_of_genome = speciesData.Number_of_genome;
+
+            const data = {{ dataset|safe }}
+
+            // Only plot when the array with data is not empty: ----
+            if (data.length > 0) {
+                renderChart(data, number_of_genome);
+                document.getElementById('AA_pos_overview_figure').innerHTML = "Dominant and Variant Amino Acid Position Overview of <b>" +  gene  + "</b>";
+            }
+        }
+    }
 </script>
 </body>
 </html>
