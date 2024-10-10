@@ -1,25 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        html, body, #container {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            font-size: 3vw;
-        }
-    </style>
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-</head>
-<body>
-<div id="container"></div>
+<div id="dimension_container" class="plot_container" style="font-size: 3vw;"></div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const data = {{ dataset|safe }}
-        const categories = Object.keys(data);
+        const data = {{ dimension_dataset|safe }}
+        const categories = Object.keys(data).map(value => {
+            return value.replace(' ', '\n');
+        });
         const dataValues = Object.values(data).map(value => {
             return {
                 y: value,
@@ -28,7 +13,7 @@
                 borderWidth: 1 // Set the border width to make it visible
             };
         });
-                Highcharts.chart('container', {
+                Highcharts.chart('dimension_container', {
 
                     chart: {
                         type: 'bar'
@@ -36,7 +21,7 @@
                     title: {
                         text: 'Database size',
                         style: {
-                            fontSize: '1.35rem' // Set your desired font size here
+                            fontSize: '1.0rem' // Set your desired font size here
                         }
                     },
                     xAxis: {
@@ -46,7 +31,7 @@
                         },
                         labels: {
                             style: {
-                                fontSize: '1.25rem'
+                                fontSize: '0.9rem'
                             }
                         }
                     },
@@ -54,7 +39,7 @@
                         title: {
                             text: 'Counts',
                             style: {
-                                fontSize: '1.25rem'
+                                fontSize: '0.8rem'
                             }
                         },
                         type: 'logarithmic',
@@ -64,7 +49,7 @@
                         gridLineWidth: 1,
                         labels: {
                             style: {
-                                fontSize: '1.25rem'
+                                fontSize: '0.8rem'
                             }
                         }
                     },
@@ -75,7 +60,7 @@
                     tooltip: {
                         pointFormat: 'Count: <b>{point.y}</b>', // Set tooltip text
                         style: {
-                            fontSize: '1.25rem'
+                            fontSize: '0.9rem'
                         }
                     },
                     legend: {
@@ -83,10 +68,13 @@
                     },
                     credits: {
                         enabled: false
+                    },
+                    navigation: {
+                        buttonOptions: {
+                            enabled: false
+                        }
                     }
                 });
 
     });
 </script>
-</body>
-</html>

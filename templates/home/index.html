@@ -19,6 +19,9 @@
         html {
             font-size: 1vw;
         }
+        body {
+            min-height: 55rem !important;
+        }
         .center{
             text-align: center;
         }
@@ -32,6 +35,11 @@
             padding-right: 0;
         }
         .responsive-iframe iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .responsive-iframe div {
             width: 100%;
             height: 100%;
             border: none;
@@ -65,9 +73,44 @@
         .logo-image_navbar {
             height: 3vh;
         }
+        .plot_container {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .plot_container svg {
+            display: block;
+        }
     </style>
     <!-- Custom styles for this template -->
     <link href=" {% static './css/navbar-top-fixed.css' %} " rel="stylesheet">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/mouse-wheel-zoom.js"></script>
+    <script src="https://code.highcharts.com/modules/series-label.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://code.highcharts.com/modules/treemap.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>
+    <script>
+        const rgbColors = [
+            [255,127,80],
+            [255,215,0],
+            [102,205,170],
+            [238,130,238],
+            [100,149,237],
+            [173, 216, 230],
+            [255, 117, 180],
+            [59, 159, 192],
+            [255, 99, 99],
+            [120, 88, 255],
+            [255, 177, 75],
+            [137, 255, 82]
+        ];
+    </script>
 </head>
 
 <body>
@@ -94,39 +137,48 @@
         <!-- Empty column -->
     </div>
     <div class="col-11">
-        <div class="row no-gutters" style="height: 60vh;">
-            <div class="col-3">
+        <div class="row no-gutters g-0" style="height: 60vh;">
+            <div class="col-3 h-100 g-0">
                 <!-- First bar plot-->
-                <div class="row" style="height: 50%;"> <!-- First row for the first iframe with 50% height -->
-                    <div class="col-12 responsive-iframe" style="height:100%; ">
-                        <iframe src="{% url 'dimension' %}" style="height:100%; width:100%;"></iframe>
+                <div class="row h-50 g-0"> <!-- First row for the first iframe with 50% height -->
+                    <div class="col-12 h-100 g-0">
+                        {% include "home/plots/dimension.html" %}
                     </div>
                 </div>
                 <!-- Second bar plot-->
-                <div class="row" style="height: 50%;"> <!-- Second row for the second iframe with 50% height -->
-                    <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 1em; font-weight: bold;">
-                        Database size per organism
-                    </p>
-                    <div class="col-3-5 responsive-iframe" style="height: 100%;">
-                        <iframe src="{% url 'organism_genome_number' %}" style="height: 100%"></iframe>
+                <div class="row h-50 g-0"> <!-- Second row for the second iframe with 50% height -->
+                    <div class="col h-100 g-0">
+                        <div class="row g-0" style="height: 10%;">
+                            <div class="col">
+                                <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 1em; font-weight: bold;">
+                                    Database size per organism
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row g-0" style="height: 90%;">
+                            <div class="col-4 h-100 g-0">
+                                {% include "home/plots/organism_genome_number.html" %}
+                            </div>
+                            <!-- Third bar plot-->
+                            <div class="col-8 h-100 g-0">
+                                {% include "home/plots/organism_gene_number.html" %}
+                            </div>
+                        </div>
                     </div>
-                    <!-- Third bar plot-->
-                    <div class="col-8-5 responsive-iframe" style="height: 100%;">
-                        <iframe src="{% url 'organism_gene_number' %}" style="height: 100%"></iframe>
-                    </div>
+
                 </div>
             </div>
-            <div class="col-4-5 responsive-iframe" style="padding-left: 0; padding-right: 0;">
+            <div class="col-4-5 h-100 g-0" style="padding-left: 0; padding-right: 0;">
                 <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 1em; font-weight: bold;">
                     Pangenomes
                 </p>
-                <iframe src="{% url 'genome_gene' %}"></iframe>
+                <div class="h-100 g-0">{% include "home/plots/genome_gene.html" %}</div>
             </div>
-            <div class="col-4-5 responsive-iframe" style="padding-left: 0; padding-right: 0;">
+            <div class="col-4-5 h-100 g-0" style="padding-left: 0; padding-right: 0;">
                 <p class="display-6 center" style="font-family: Arial, Helvetica, sans-serif; font-size: 1em; font-weight: bold;">
                     Annotated strain isolation sources
                 </p>
-                <iframe src="{% url 'treemap' %}"></iframe>
+                <div class="h-100 g-0">{% include "home/plots/treemap.html" %}</div>
             </div>
         </div>
     </div>

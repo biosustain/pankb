@@ -1,38 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        html, body, #container {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            font-size: 12vw;
-        }
-    </style>
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-</head>
-<body>
-<div id="container"></div>
+<div id="organism_genome_number_container" class="plot_container" style="font-size: 12vw;"></div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-                const data = {{ dataset|safe }}
+                const data = {{ organism_genome_dataset|safe }}
                 const categories = Object.keys(data);
                 const dataValues = Object.values(data);
-                const rgbColors = [
-                    [255,127,80],
-                    [255,215,0],
-                    [102,205,170],
-                    [238,130,238],
-                    [100,149,237],
-                    [173, 216, 230],
-                    [255, 117, 180],
-                    [59, 159, 192]
-                ];
                 const highchartsColors = rgbColors.map(rgb => `rgb(${rgb.join(',')})`);
-                Highcharts.chart('container', {
+                Highcharts.chart('organism_genome_number_container', {
                     chart: {
                         type: 'bar',
                     },
@@ -56,7 +29,7 @@
                         title: {
                             text: 'Genomes',
                             style: {
-                                fontSize: '0.9rem'
+                                fontSize: '0.8rem'
                             }
                         },
                         type: 'logarithmic',
@@ -68,7 +41,7 @@
                         labels: {
                             align: 'center',
                             style: {
-                                fontSize: '0.9rem'
+                                fontSize: '0.8rem'
                             },
                             formatter: function() {
                                 if (this.value === 1) {
@@ -105,9 +78,12 @@
                     },
                     credits: {
                         enabled: false
+                    },
+                    navigation: {
+                        buttonOptions: {
+                            enabled: false
+                        }
                     }
                 });
     });
 </script>
-</body>
-</html>

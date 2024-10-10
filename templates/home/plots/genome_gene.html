@@ -1,29 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        html, body, #container {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            font-size: 3vw;
-        }
-    </style>
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/mouse-wheel-zoom.js"></script>
-    <script src="https://code.highcharts.com/modules/series-label.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <script src="https://code.highcharts.com/modules/export-data.js"></script>
-    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.13/jquery.mousewheel.min.js"></script>
-</head>
-
-<body>
-<div id="container"></div>
+<div id="genome_gene_container" class="plot_container"></div>
 <script>
     const template_screen_width = 655;
     const current_window_Width = window.innerWidth;
@@ -36,19 +11,11 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const data = {{ dataset|safe }}
-        const colorList = {
-            'Enterobacteriaceae': 'rgb(255,127,80)',
-            'Lactobacillaceae': 'rgba(255,215,0)',
-            'Bacillaceae': 'rgb(102,205,170)',
-            'Mycobacteriaceae': 'rgb(238,130,238)',
-            'Pseudomonadaceae': 'rgba(100,149,237)',
-            'Streptomycetaceae': 'rgb(173, 216, 230)',
-            'Burkholderiaceae': 'rgba(59, 159, 192)',
-            'Anoxybacillaceae': 'rgba(255, 117, 180)'
-        };
+        const data = {{ genome_gene_dataset |safe }}
+        const highchartsColors = rgbColors.map(rgb => `rgb(${rgb.join(',')})`);
 
-        const orderedSeriesNames = ['Enterobacteriaceae', 'Lactobacillaceae', 'Bacillaceae', 'Mycobacteriaceae', 'Pseudomonadaceae', 'Streptomycetaceae', 'Burkholderiaceae', 'Anoxybacillaceae'];
+        // const orderedSeriesNames = ['Enterobacteriaceae', 'Lactobacillaceae', 'Bacillaceae', 'Mycobacteriaceae', 'Pseudomonadaceae', 'Streptomycetaceae', 'Burkholderiaceae', 'Anoxybacillaceae'];
+        const orderedSeriesNames = Object.keys(data)
         const series = orderedSeriesNames.map(organism => {
             const organismData = data[organism];
             const points = Object.keys(organismData).map(key => {
@@ -64,7 +31,7 @@
 
             return {
                 name: organism,
-                color: colorList[organism],
+                color: highchartsColors[orderedSeriesNames.indexOf(organism)],
                 data: points,
                 marker: {
                     symbol: 'circle',
@@ -80,13 +47,14 @@
             };
         });
 
-        Highcharts.chart('container', {
+        Highcharts.chart('genome_gene_container', {
             chart: {
                 type: 'scatter',
                 zoomType: 'x',
                 zooming: {
                     mouseWheel: false
-                }
+                },
+                marginLeft: 110
             },
             exporting: {
                 enabled: false
@@ -140,7 +108,7 @@
                 layout: 'vertical',
                 align: 'left',
                 verticalAlign: 'top',
-                x: 90 * coefficient,
+                x: 110,
                 y: 1,
                 itemStyle: {
                     fontSize: '0.7em',
@@ -171,5 +139,3 @@
         });
     });
 </script>
-</body>
-</html>

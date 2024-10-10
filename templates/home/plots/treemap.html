@@ -1,45 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Highcharts Treemap</title>
-    <style>
-        html, body, #container {
-            height: 98%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            font-size: 3vw;
-        }
-    </style>
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/treemap.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-</head>
-<body>
-<div id="container"></div>
+<div id="treemap_container" class="plot_container"></div>
 <script>
-    const data = {{ dataset|safe }}
+    const data = {{ treemap_dataset|safe }}
     const categoryColors = {
-        'Animal associated': '#FFFACD',
-        'Food associated': '#FDBCB4',
-        'Missing': '#D3D3D3',
-        'Env associated': '#AFEEEE',
-        'Others': '#CAFFBF',
-        'Plant associated': '#FFDAB9'
+        'animal associated': '#FFFACD',
+        'food associated': '#FDBCB4',
+        'missing': '#D3D3D3',
+        'env associated': '#AFEEEE',
+        'others': '#CAFFBF',
+        'plant associated': '#FFDAB9'
     };
 
     // Assign colors to top-level categories in your data
     const coloredData = data.map(item => {
         if (!item.parent) {
-            item.color = categoryColors[item.name];
+            let lcName = item.name.toLowerCase();
+            if (lcName in categoryColors) {
+                item.color = categoryColors[item.name.toLowerCase()];
+            } else {
+                item.color = categoryColors['missing']
+            }
         }
         return item;
     });
 
-    Highcharts.chart('container', {
+    Highcharts.chart('treemap_container', {
         series: [{
             name: 'Isolation Source',
             type: 'treemap',
@@ -85,5 +69,3 @@
         },
     });
 </script>
-</body>
-</html>
