@@ -15,6 +15,7 @@ class GeneAnnotations(models.Model):
    species = models.CharField(max_length=40)
    family = models.CharField(max_length=40)
    kegg_ko = models.CharField(max_length=100)
+   kegg_pathway = models.CharField(max_length=100)
 
    class Meta:
        managed = True  # tells Django to manage the table’s creation, modification, and deletion

@@ -85,7 +85,29 @@
 
 {% block content %}
     <h2 style = "text-align: center; font-size: 1.6em;">Gene <i>{{request.GET.gene}}</i></h2>
-    <div class = "table_padding overflow-auto">
+
+    <div class="table_padding overflow-auto">
+        <div class="card vh-25" id="speciesCard" style="width: 90%;">
+            <div class="card-body text-left row">
+                <div class="col-3">
+                    <p style="font-size: 0.9rem"><b>Gene:</b><br />{{ pangene_info.gene }}</p>
+                    <p style="font-size: 0.9rem"><b>Species:</b><br /><a href="{% url 'pangenome_analyses_overview' %}?species={{ pangene_info.pangenome_analysis }}">{{ pangene_info.species }}</a></p>
+                    <p style="font-size: 0.9rem"><b>Family:</b><br /><a href="{% url 'organisms' %}?family={{ pangene_info.family }}">{{ pangene_info.family }}</a></p>
+                </div>
+                <div class="col-3">
+                    <p style="font-size: 0.9rem"><b>Description:</b><br />{{ pangene_info.description }}</p>
+                    <p style="font-size: 0.9rem"><b>Protein:</b><br />{{ pangene_info.protein }}</p>
+                </div>
+                <div class="col-3">
+                    <p style="font-size: 0.9rem"><b>Frequency:</b><br />{{ pangene_info.frequency }}</p>
+                    <p style="font-size: 0.9rem"><b>Class:</b><br />{{ pangene_info.pangenomic_class }}</p>
+                    {{ pangene_info.pathways_string | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table_padding overflow-auto">
         <form action = "{% url 'download_gene_info_table_csv' %}" method="GET">
             <input type="hidden" name="species" value="{{ request.GET.species }}" />
             <input type="hidden" name="gene" value="{{ request.GET.gene }}" />

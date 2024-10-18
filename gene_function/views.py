@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
+from django.urls import reverse
 import json, requests, io, csv, time
 import pandas as pd
 import numpy as np
@@ -19,6 +20,20 @@ def gene_info(request):
   template = loader.get_template('gene_function/gene_info.html')
   species = request.GET['species']
   gene = request.GET['gene']
+
+  pangene_info = GeneAnnotations.objects.get(gene=gene, pangenome_analysis=species)
+  pangene_info_dict = model_to_dict(pangene_info, exclude=["_id"])
+
+  pathways_string = []
+  for pathway in pangene_info_dict.get("kegg_pathway", []):
+    kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway}"
+    if pangene_info_dict.get("kegg_ko", False):
+      kegg_link = kegg_link  + '/' + '/'.join(pangene_info_dict["kegg_ko"])
+    pathways_string.append(f'<a href="{reverse('pathway_info')}?pathway_id={pathway}">{pathway}</a> <a href="{kegg_link}" target="_blank">(KEGG)</a>')
+  pathways_string = ', '.join(pathways_string)
+  if len(pathways_string) > 0:
+    pathways_string = f'<p style="font-size: 0.9rem"><b>KEGG Pathways:</b><br />{pathways_string}</p>'
+  pangene_info_dict["pathways_string"] = pathways_string
 
   # Set the filter() function parameters: ----
   filter_params = {}
@@ -50,7 +65,8 @@ def gene_info(request):
 
   # Compose a context for the template rendering: ----
   context = {
-    'dataset': gene_info_json
+    'dataset': gene_info_json,
+    'pangene_info': pangene_info_dict,
   }
   return HttpResponse(template.render(context, request))
 
@@ -255,7 +271,7 @@ def genome_gene_info(request):
     # The line below is a hacky way to wrap list items into links.
     # The HTML must be rendered by Django the templates: ----
     gene_info_pd.loc[gene_info_pd.genome_id == genome_id, 'pathways'] = (
-      ", ".join(list("<a href='/gene_function/pathway_info/?pathway_id=" + pathway_info_pd["pathway_id"] + "&strain=" + pathway_info_pd["strain"] + "' target='_blank'>" + pathway_info_pd["pathway_name"] + "</a>")))
+      ", ".join(list("<a href='/gene_function/pathway_info/?pathway_id=" + pathway_info_pd["pathway_id"] + "'>" + pathway_info_pd["pathway_name"] + "</a>")))
   else:
     gene_info_pd.loc[gene_info_pd.genome_id == genome_id, 'pathways'] = "-"
 
