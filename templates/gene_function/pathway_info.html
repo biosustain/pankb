@@ -10,13 +10,26 @@
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 
-    <h2 style="text-align: center; font-size: 1.6em;" >Pathway: {{pathway_name}}</h2>
-    <h3 style="text-align: center; font-size: 1.0em;" >{{pathway_id}} <a href="{{pathway_kegg_link}}" target="_blank">(KEGG)</a></h3>
+    <h2 style="text-align: center; font-size: 1.6em;" >Pathway Info</h2>
     <div class="row">
         <div class="col-1">
         </div>
         <div class="col-10">
-            <br>
+            <div class="table_padding">
+                <div class="card vh-25" id="speciesCard">
+                    <div class="card-body text-left row">
+                        <div class="col-3">
+                            <p style="font-size: 0.9rem"><b>Pathway:</b><br />{{ pathway_id }}</p>
+                        </div>
+                        <div class="col-3">
+                            <p style="font-size: 0.9rem"><b>Name:</b><br />{{ pathway_name }}</p>
+                        </div>
+                        <div class="col-3">
+                            <p style="font-size: 0.9rem"><b>Map:</b><br /><a href="{{ pathway_kegg_link }}" target="_blank">KEGG</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="table_padding">
                 <table id="pathway_info" class="table table-hover" style="width:100%; table-layout: fixed;">
                     <thead>
