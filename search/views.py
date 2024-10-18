@@ -43,42 +43,42 @@ def search_results(request):
             del species_pd["ratio"]
 
         # Get the filtered pathways from the DB: ----
-        pathways = PathwayInfo.objects.filter(Q(pathway_id__icontains=q) | Q(pathway_name__icontains=q) | Q(product__icontains=q)).values("pathway_id", "pathway_name", "pangenome_analysis", "species", "strain", "gene", "product", "pangenomic_class").order_by('gene').distinct()
+        pathways = PathwayInfo.objects.filter(Q(pathway_id__icontains=q) | Q(pathway_name__icontains=q)).values("pathway_id", "pathway_name").order_by('pathway_id').distinct()
         pathways_pd = pd.DataFrame(list(pathways), index=None)
 
-        if not pathways_pd.empty:
-            pathways_pd["gene"] = "<a href='/gene_function/gene_info/?species=" + pathways_pd[
-                "pangenome_analysis"] + "&gene=" + pathways_pd["gene"] + "&gene_class=" + pathways_pd[
-                                      "pangenomic_class"] + "' target='_blank'>" + pathways_pd["gene"] + "</a>"
+        # if not pathways_pd.empty:
+            # pathways_pd["gene"] = "<a href='/gene_function/gene_info/?species=" + pathways_pd[
+            #     "pangenome_analysis"] + "&gene=" + pathways_pd["gene"] + "&gene_class=" + pathways_pd[
+            #                           "pangenomic_class"] + "' target='_blank'>" + pathways_pd["gene"] + "</a>"
 
-            # Obtain one df and group it by genes creating a distinct (important, each pathway is strain specific, but each strain can correspond to several genomes) list out of them: ---
-            pathways_pd1 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["gene"].apply(lambda x: ', '.join(x))
-            # Obtain one df and group it by gene products creating a distinct (important, each pathway is strain specific, but each strain can correspond to several genomes)  list out of them: ---
-            pathways_pd2 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["product"].apply(lambda x: ', '.join(x))
+            # # Obtain one df and group it by genes creating a distinct (important, each pathway is strain specific, but each strain can correspond to several genomes) list out of them: ---
+            # pathways_pd1 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["gene"].apply(lambda x: ', '.join(x))
+            # # Obtain one df and group it by gene products creating a distinct (important, each pathway is strain specific, but each strain can correspond to several genomes)  list out of them: ---
+            # pathways_pd2 = pathways_pd.groupby(["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain"], as_index=False)["product"].apply(lambda x: ', '.join(x))
 
-            # Rename the columns accordingly and remove the old ones: ----
-            pathways_pd1["genes"] = pathways_pd1["gene"]
-            del pathways_pd1["gene"]
-            pathways_pd2["products"] = pathways_pd2["product"]
-            del pathways_pd2["product"]
+            # # Rename the columns accordingly and remove the old ones: ----
+            # pathways_pd1["genes"] = pathways_pd1["gene"]
+            # del pathways_pd1["gene"]
+            # pathways_pd2["products"] = pathways_pd2["product"]
+            # del pathways_pd2["product"]
 
-            # Merge genes and products together: ----
-            pathways_pd = pathways_pd1.merge(pathways_pd2, how='inner',
-                                             on=["pathway_id", "pathway_name", "pangenome_analysis", "species",
-                                                 "strain"])
+            # # Merge genes and products together: ----
+            # pathways_pd = pathways_pd1.merge(pathways_pd2, how='inner',
+            #                                  on=["pathway_id", "pathway_name", "pangenome_analysis", "species",
+            #                                      "strain"])
 
-            pathways_pd["ratio_pathway_id"] = pathways_pd.apply(lambda row: algorithims.levenshtein(row["pathway_id"], q), axis=1)
-            pathways_pd["ratio_pathway_name"] = pathways_pd.apply(lambda row: algorithims.levenshtein(row['pathway_name'], q), axis=1)
-            pathways_pd["ratio_product"] = pathways_pd.apply(lambda row: algorithims.levenshtein(row['products'], q), axis=1)
-            # Sort the results by the Levenstein distance: ----
-            pathways_pd = pathways_pd.sort_values(by=['ratio_pathway_id', 'ratio_pathway_name', 'ratio_product'], ascending=False)
-            # Remove columns that are not needed in the final results: ----
-            del pathways_pd["ratio_pathway_id"]
-            del pathways_pd["ratio_pathway_name"]
-            del pathways_pd["ratio_product"]
+            # pathways_pd["ratio_pathway_id"] = pathways_pd.apply(lambda row: algorithims.levenshtein(row["pathway_id"], q), axis=1)
+            # pathways_pd["ratio_pathway_name"] = pathways_pd.apply(lambda row: algorithims.levenshtein(row['pathway_name'], q), axis=1)
+            # pathways_pd["ratio_product"] = pathways_pd.apply(lambda row: algorithims.levenshtein(row['products'], q), axis=1)
+            # # Sort the results by the Levenstein distance: ----
+            # pathways_pd = pathways_pd.sort_values(by=['ratio_pathway_id', 'ratio_pathway_name', 'ratio_product'], ascending=False)
+            # # Remove columns that are not needed in the final results: ----
+            # del pathways_pd["ratio_pathway_id"]
+            # del pathways_pd["ratio_pathway_name"]
+            # del pathways_pd["ratio_product"]
 
             # Filter out unnecessary columns: ----
-            pathways_pd = pathways_pd[["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain", "genes", "products"]]
+            # pathways_pd = pathways_pd[["pathway_id", "pathway_name", "pangenome_analysis", "species", "strain", "genes", "products"]]
 
         # Get the filtered genes from the DB: ----
         genes = GeneAnnotations.objects.filter(Q(gene__icontains = q) | Q(protein__icontains = q) | Q(pfams__icontains=q)).values()

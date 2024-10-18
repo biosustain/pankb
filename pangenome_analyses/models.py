@@ -13,6 +13,8 @@ class GeneAnnotations(models.Model):
    pangenomic_class = models.CharField(max_length=9)      # Core, Accessory (9 symbols) or Rare
    pangenome_analysis = models.CharField(max_length=40)
    species = models.CharField(max_length=40)
+   family = models.CharField(max_length=40)
+   kegg_ko = models.CharField(max_length=100)
 
    class Meta:
        managed = True  # tells Django to manage the table’s creation, modification, and deletion

@@ -13,6 +13,7 @@ class GeneInfo(models.Model):
     aminoacid_seq = models.TextField()
     pangenome_analysis = models.CharField(max_length=40)
     species = models.CharField(max_length=40)
+
     class Meta:
         managed = True  # tells Django to manage the table’s creation, modification, and deletion
         db_table = 'pankb_gene_info'
@@ -48,18 +49,17 @@ class PathwayInfo(models.Model):
    _id = models.CharField(max_length=24, primary_key=True)
    pathway_id = models.CharField(max_length=15)
    pathway_name = models.CharField(max_length=100)
-   strain = models.CharField(max_length=100)
-   species = models.CharField(max_length=40)
-   product = models.CharField(max_length=150)
-   genome_id = models.CharField(max_length=15)
-   gene = models.CharField(max_length=20)
-   pangenomic_class = models.CharField(max_length=9)      # Core, Accessory (9 symbols) or Rare
-   pangenome_analysis = models.CharField(max_length=40)
+   genes = models.CharField(max_length=100)
+#    strain = models.CharField(max_length=100)
+#    species = models.CharField(max_length=40)
+#    product = models.CharField(max_length=150)
+#    genome_id = models.CharField(max_length=15)
+#    gene = models.CharField(max_length=20)
+#    pangenomic_class = models.CharField(max_length=9)      # Core, Accessory (9 symbols) or Rare
+#    pangenome_analysis = models.CharField(max_length=40)
    class Meta:
        managed = True  # tells Django to manage the table’s creation, modification, and deletion
        db_table = 'pankb_pathway_info'
        indexes = [
-           models.Index(fields=['pathway_id', 'pathway_name', 'product']),
-           models.Index(fields=['pangenome_analysis', 'gene', 'genome_id']),
-           models.Index(fields=['pathway_id', 'strain'])
+           models.Index(fields=['pathway_id']),
        ]

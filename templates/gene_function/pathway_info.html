@@ -2,52 +2,16 @@
 
 {% block title %}<title>Pathway Info</title>{% endblock %}
 {% block custom_style %}
-    <style>
-        .table_padding{
-            padding-top: 0px;
-            padding-bottom: 0px;
-            padding-right: 1em;
-            padding-left: 1em;
-        }
-        th, td{
-            height: 2.8em;
-            font-size: 0.9em;
-            padding-left: 1em !important;
-            padding-right: 1em !important;
-        }
-        .dataTables_wrapper thead th {
-            text-align: left;
-            vertical-align: middle;
-            padding: 1em;
-            position: relative;
-        }
-        .dataTables_wrapper thead th input {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            margin-bottom: 0.45em;
-        }
-        .dataTables_wrapper tbody td {
-            text-align: left;
-            padding: 0.45em;
-            word-break: break-word;
-        }
-        .responsive-iframe iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 10%;
-            right: 0;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+
 {% endblock %}
 
 {% block content %}
-    <h2 style="text-align: center; font-size: 1.6em;" >Pathway Info Page</h2>
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <h2 style="text-align: center; font-size: 1.6em;" >Pathway: {{pathway_name}}</h2>
+    <h3 style="text-align: center; font-size: 1.0em;" >{{pathway_id}} <a href="{{pathway_kegg_link}}" target="_blank">(KEGG)</a></h3>
     <div class="row">
         <div class="col-1">
         </div>
@@ -57,13 +21,12 @@
                 <table id="pathway_info" class="table table-hover" style="width:100%; table-layout: fixed;">
                     <thead>
                     <tr>
-                        <th>Pathway ID</th>
-                        <th>Source</th>
-                        <th>Name</th>
+                        <th>Gene</th>
                         <th>Species</th>
-                        <th>Strain (NCBI)</th>
-                        <th>Gene Name(s)</th>
-                        <th>Product(s)</th>
+                        <th>Family</th>
+                        <th>Product</th>
+                        <th>Class</th>
+                        <th>KEGG Orthology</th>
                     </tr>
                     </thead>
                     <tbody id="table-body"></tbody>
@@ -75,44 +38,71 @@
     </div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const pathway_id = urlParams.get('pathway_id');
-
-        try {
-            // Obtain data rendered in the respective view
-            const data = {{ dataPathway|safe }}
-            const species = data[pathway_id]['pangenome_analysis']
-
-            const tableBody = document.getElementById('table-body');
-            const row = document.createElement('tr');
-
-            row.innerHTML = `
-                <td>${pathway_id}</td>
-                <td><a href="https://www.kegg.jp/entry/${pathway_id}" target="_blank">KEGG</a></td>
-                <td>${data[pathway_id]['pathway_name']}</td>
-                <td><a href="{% url 'pangenome_analyses_overview' %}?species=${species}" target="_blank">${data[pathway_id]['species']}</a></td>
-                <td>${data[pathway_id]['strain']}</td>
-                <td>${data[pathway_id]['genes']}</td>
-                <td>${data[pathway_id]['products']}</td>
-            `;
-            tableBody.appendChild(row);
-
-            // Initialize tooltips
-            $(function () {
-                $('[data-toggle="tooltip"]').tooltip()
-            })
-            // Initialize DataTable
-            $('#pathway_info').DataTable({
-                searching: false,
+        $(document).ready(async function () {
+            const geneData = {{ dataGenes|safe }}
+    
+            let table = $('#pathway_info').DataTable({
+                responsive: true,
                 lengthChange: false,
-                bPaginate: false,
-                paging: false,
-                bInfo: false,
+                paging: true,
+                destroy: true,
+                order: [],   // preserve the original order (needed to order by relevance)
+                data: geneData,
+                columns: [
+                    {
+                        data: 'gene',
+                        render: function (data, type, row) {
+                            return '<a href="{% url 'gene_info' %}?species=' + row["pangenome_analysis"] + '&gene=' + data + '">' + data + '</a>';
+                        }
+                    },
+                    {
+                        data: 'species',
+                        render: function (data, type, row) {
+                            return '<a href="{% url 'pangenome_analyses_overview' %}?species=' + row["pangenome_analysis"] + '">' + data + '</a>';
+                        }
+                    },
+                    {
+                        data: 'family',
+                        render: function (data, type, row) {
+                            return '<a href="{% url 'organisms' %}?family=' + data + '">' + data + '</a>';
+                        }
+                    },
+                    {
+                        data: 'protein',
+                    },
+                    {
+                        data: 'pangenomic_class',
+                    },
+                    {
+                        data: 'kegg_ko',
+                        render: function(data, type, row) {
+                            return data.join(', ') + '&nbsp;&nbsp;<a style="font-size: 0.8em; font-style: italic;" href="' + row["kegg_link"] + '" target="_blank">(highlight)</a>';
+                        }
+                    }
+                ],
+                language: {
+                    loadingRecords: 'Loading...',
+                    zeroRecords: 'No data available in table'
+                },
+    
+                initComplete: function () {
+                    var api = this.api();
+                    // Existing column search code
+                    $(this.api().table().header()).find('th').each(function (index, th) {
+                        var columnHeader = $(th);
+                        var columnIndex = index;
+                        var searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 60%; display: block; justify-content: center;" />')
+                            .on('keyup change clear', function () {
+                                api.column(columnIndex).search(this.value).draw();
+                            })
+                            .on('click', function(e) {  // Prevent event bubbling on click
+                                e.stopPropagation();
+                            });
+                        $(searchInput).appendTo(columnHeader);
+                    });
+                }
             });
-        }
-        catch(error) {
-            console.error(error)
-        }
+        });
     </script>
 
 {% endblock %}

@@ -40,10 +40,6 @@
             <tr>
                 <th class="text-left">Pathway ID</th>
                 <th class="text-left">Name</th>
-                <th class="text-left">Species</th>
-                <th class="text-left">Strain (NCBI)</th>
-                <th class="text-left">Gene Name(s)</th>
-                <th class="text-left">Product(s)</th>
             </tr>
             </thead>
             <tbody class="text-left" id="tbody">
@@ -82,20 +78,6 @@
                         return '<span id=pathway_name>' + data + '</span>';
                     }
                 },
-                {
-                    data: '2',
-                    render: function (data, type, row) {
-                        return '<a href="{% url 'pangenome_analyses_overview' %}?species=' + encodeURIComponent(data) + '" target="_blank">' + row[3] + '</a>';
-                    }
-                },
-                {data: '4'},
-                {data: '5'},
-                {
-                    data: '6',
-                    render: function (data, type, row) {
-                        return '<span id=pathway_products>' + data + '</span>';
-                    }
-                }
             ],
             language: {
                 loadingRecords: 'Loading...',

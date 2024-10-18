@@ -5,8 +5,11 @@ import json, requests, io, csv, time
 import pandas as pd
 import numpy as np
 from .models import GeneInfo, GenomeInfo, PathwayInfo
+from pangenome_analyses.models import GeneAnnotations
 from django.db.models import Q
-
+from functools import reduce
+from django.forms.models import model_to_dict
+import operator
 
 
 ################################## Gene Info Page Templates ###################################
@@ -31,25 +34,9 @@ def gene_info(request):
 
   # Obtain the list of all genomes containing the given gene: ----
   genome_ids_list = list(set(gene_info_pd["genome_id"]))
-  # Obtain the pathways associated with the given gene and genomes containing it: ----
-  pathway_info = PathwayInfo.objects.filter(Q(pangenome_analysis = species) & Q(gene = gene) & Q(genome_id__in = genome_ids_list)).values('pathway_id', 'pathway_name', 'strain', 'genome_id').order_by('pathway_name')
-  pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
-  if not pathway_info_pd.empty:
-    # Wrap the pathway names with tags: ----
-    pathway_info_pd["pathway_name"] = "<a href='/gene_function/pathway_info/?pathway_id=" + pathway_info_pd["pathway_id"] + "&strain=" + pathway_info_pd["strain"] + "' target='_blank'>" + pathway_info_pd["pathway_name"] + "</a>"
-    pathway_info_pd = pathway_info_pd.groupby(["genome_id", "strain"], as_index=False)["pathway_name"].apply(lambda x: ', '.join(x))
-    # Rename the column accordingly remove the old one: ----
-    pathway_info_pd["pathways"] = pathway_info_pd["pathway_name"]
-    del pathway_info_pd["pathway_name"]
-    # Merge the gene and associated pathways info: ----
-    gene_info_pd = gene_info_pd.merge(pathway_info_pd, how='left', on=["genome_id"])
-    # Fill NaNs that appear after the merge: ----
-    gene_info_pd["pathways"] = gene_info_pd["pathways"].fillna(value="-")
-  else:
-    gene_info_pd["pathways"] = "-"
 
   # Leave only the columns of interest in the output: ----
-  gene_info_pd = gene_info_pd[["locus_tag", "genome_id", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq", "pathways"]]
+  gene_info_pd = gene_info_pd[["locus_tag", "genome_id", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq"]] #, "pathways"
 
   # Transform positions of the gene in the genome from float (as the start and end position are stored in the MongoDB) to int: ----
   gene_info_pd["start_position"] = gene_info_pd["start_position"].astype(np.int64)
@@ -87,27 +74,9 @@ def download_gene_info_table_csv(request):
 
   # Obtain the list of all genomes containing the given gene: ----
   genome_ids_list = list(set(gene_info_pd["genome_id"]))
-  # Obtain the pathways associated with the given gene and genomes containing it: ----
-  pathway_info = PathwayInfo.objects.filter(
-    Q(pangenome_analysis=species) & Q(gene=gene) & Q(genome_id__in=genome_ids_list)).values('pathway_id',
-                                                                                            'pathway_name', 'strain',
-                                                                                            'genome_id').order_by('pathway_name')
-  pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
-  if not pathway_info_pd.empty:
-    # Wrap the pathway names with tags: ----
-    pathway_info_pd = pathway_info_pd.groupby(["genome_id", "strain"], as_index=False)["pathway_name"].apply(lambda x: ', '.join(x))
-    # Rename the column accordingly remove the old one: ----
-    pathway_info_pd["pathways"] = pathway_info_pd["pathway_name"]
-    del pathway_info_pd["pathway_name"]
-    # Merge the gene and associated pathways info: ----
-    gene_info_pd = gene_info_pd.merge(pathway_info_pd, how='left', on=["genome_id"])
-    # Fill NaNs that appear after the merge: ----
-    gene_info_pd["pathways"] = gene_info_pd["pathways"].fillna(value="-")
-  else:
-    gene_info_pd["pathways"] = "-"
 
   # Leave only the columns of interest in the output: ----
-  gene_info_pd = gene_info_pd[["locus_tag", "genome_id", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq", "pathways"]]
+  gene_info_pd = gene_info_pd[["locus_tag", "genome_id", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq"]]
 
   # Transform positions of the gene in the genome from float (as the start and end position are stored in the MongoDB) to int: ----
   gene_info_pd["start_position"] = gene_info_pd["start_position"].astype(np.int64)
@@ -122,7 +91,7 @@ def download_gene_info_table_csv(request):
   # Create the HttpResponse object with the appropriate CSV header.
   response = HttpResponse(content_type="text/csv")
   response['Content-Disposition'] = f"attachment; filename=" + downloaded_file_name
-  writer = csv.DictWriter(response, fieldnames=["locus_tag", "genome_id", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq", "pathways"])
+  writer = csv.DictWriter(response, fieldnames=["locus_tag", "genome_id", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq"])
   writer.writeheader()
   writer.writerows(gene_info_dict)
   return response
@@ -308,41 +277,32 @@ def pathway_info(request):
 
   template = loader.get_template('gene_function/pathway_info.html')
   pathway_id = request.GET['pathway_id']
-  strain = request.GET['strain']
 
-  # Set the filter() function parameters: ----
-  filter_params = {}
-  filter_params['pathway_id'] = pathway_id
-  filter_params['strain'] = strain
+  pathway_info = PathwayInfo.objects.get(pathway_id=pathway_id)
+  pathway_info_dict = model_to_dict(pathway_info, exclude=["_id", "genes"])
+  pathway_kegg_link = f"https://www.kegg.jp/pathway/{pathway_info.pathway_id}"
 
-  pathway_info = PathwayInfo.objects.filter(**filter_params).values()
-  # Transform the data to the dataframe first and remove a columns with ids (as it is not needed in the output): ----
-  pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
-  del pathway_info_pd['_id']
-  species = pathway_info_pd['pangenome_analysis'][0]
+  filter_params = (Q(pangenome_analysis=g["pangenome_analysis"], gene=g["gene"]) for g in pathway_info.genes)
+  filter_params = reduce(operator.or_, filter_params)
 
   # Obtain info about the pathway genes: ----
-  genes_info = PathwayInfo.objects.filter(**filter_params).values('gene', 'product', 'pangenomic_class').order_by('gene').distinct()
-  genes_info_pd = pd.DataFrame(list(genes_info), index=None)
-
-  # The line below is a hacky way to wrap list items into links.
-  # The HTML must be rendered by Django the templates: ----
-  pathway_info_pd.loc[pathway_info_pd.strain == strain, 'genes'] = (", ".join(list("<a href='/gene_function/gene_info/?species=" + species + "&gene=" + genes_info_pd["gene"] + "&gene_class=" + genes_info_pd["pangenomic_class"] + "' target='_blank'>" + genes_info_pd["gene"] + "</a>")))
-  # The pathway products are just proteins obtained from the KEGG DB and coded by the genes included into the pathway: ----
-  pathway_info_pd.loc[pathway_info_pd.strain == strain, 'products'] = (", ".join(list(genes_info_pd["product"])))
-  del pathway_info_pd["gene"]
-  del pathway_info_pd["product"]
-
-  # Transform the pathway df to a dict of dicts like {"pathway_id": {"key_1": value_1, "key_2": value_2, ..., "key_n": value_n}}: ----
-  pathway_info_dict = pathway_info_pd.to_dict(orient="index")
+  genes_info = GeneAnnotations.objects.filter(filter_params).values('gene', "pangenome_analysis", 'species', 'family', "protein", "pangenomic_class", "kegg_ko").order_by('gene')
+  genes_info = list(genes_info)
+  for d in genes_info:
+    kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway_id}"
+    if d["kegg_ko"]:
+      kegg_link = kegg_link  + '/' + '/'.join(d["kegg_ko"])
+    d["kegg_link"] = kegg_link
 
   # Substitute the index with our own: ----
-  dict_vals = {k:v for d in pathway_info_dict.values() for k,v in d.items()}
-  pathway_info_dict = {pathway_id: dict_vals}
   pathway_info_json = json.dumps(pathway_info_dict, default=str)  # json dumps replaces the single quotes with the double ones
+  genes_info_json = json.dumps(genes_info, default=str)
 
   # Compose a context for the template rendering: ----
   context = {
-    'dataPathway': pathway_info_json
+    'pathway_name': pathway_info.pathway_name,
+    'pathway_id': pathway_info.pathway_id,
+    'pathway_kegg_link': pathway_kegg_link,
+    'dataGenes': genes_info_json
   }
   return HttpResponse(template.render(context, request))
