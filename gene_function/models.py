@@ -13,6 +13,10 @@ class GeneInfo(models.Model):
     aminoacid_seq = models.TextField()
     pangenome_analysis = models.CharField(max_length=40)
     species = models.CharField(max_length=40)
+    original_locus_tag = models.CharField(max_length=40)
+    original_gene = models.CharField(max_length=40)
+    original_exact_match = models.BooleanField(default=False)
+    imodulon_data = models.CharField(max_length=100)
 
     class Meta:
         managed = True  # tells Django to manage the table’s creation, modification, and deletion

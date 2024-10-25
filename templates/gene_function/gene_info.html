@@ -103,6 +103,24 @@
                     <p style="font-size: 0.9rem"><b>Class:</b><br />{{ pangene_info.pangenomic_class }}</p>
                     {{ pangene_info.pathways_string | safe }}
                 </div>
+                {% if imodulon_info %}
+                <div class="col-3">
+                    <p style="font-size: 0.9rem"><b>iModulonDB:</b><br />
+                    <ul class="list-group">
+                    {% for im_data in imodulon_info %}
+                        <li class="list-group-item">{% if im_data.exact_match is False %}<span data-toggle="tooltip" data-placement="top" title="Approximate match">&plusmn; </span>{% endif %}<a href="https://imodulondb.org/gene.html?organism={{ im_data.organism | safe }}&dataset={{ im_data.dataset | safe }}&gene_id={{ im_data.locus_tag | safe }}" target="_blank">{{ im_data.gene }}</a> in <a href="https://imodulondb.org/dataset.html?organism={{ im_data.organism | safe }}&dataset={{ im_data.dataset | safe }}" target="_blank">{{ im_data.dataset_name }}:</a><br />
+                            ({{ im_data.genome_id }}:{{ im_data.locus_tag }})<br />
+                            <ul class="list-group">
+                                {% for im in im_data.imodulons %}
+                                <li class="list-group-item"><a href="https://imodulondb.org/iModulon.html?organism={{ im_data.organism | safe }}&dataset={{ im_data.dataset | safe }}&k={{ im.k | safe }}" target="_blank">{{ im.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                    </p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -119,7 +137,7 @@
             <table id="gene_info" class="table table-hover overflow-auto" style="width:100%; table-layout: fixed;">
                 <thead>
                 <tr>
-                    <th>Locus Tag</th>
+                    <th>NCBI Locus Tag</th>
                     <th>Genome ID</th>
                     <th>Protein</th>
                     <th>Start Position</th>
@@ -152,6 +170,27 @@
         const gene = urlParams.get('gene');
         const gene_class = urlParams.get('gene_class');
 
+        function get_original_locus_tag_info(row) {
+            if (("original_locus_tag" in row) && row["original_locus_tag"]) {
+                let original_locus_tag = row["original_locus_tag"]
+                let original_gene = "";
+                let prefix = "";
+                if ("original_gene" in row) {
+                    original_gene = row["original_gene"];
+                }
+                if (!row["original_exact_match"]) {
+                    prefix = "<span data-toggle=\"tooltip\" data-placement=\"top\" title=\"Approximate match\">&plusmn; </span>";
+                }
+                if (original_gene) {
+                    return `${prefix}${original_locus_tag}<br />(<i>gene:</i> ${original_gene})`;
+                } else {
+                    return `${prefix}${original_locus_tag}`;
+                }
+            } else {
+                return "-";
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', async function() {
             try {
                 let geneData = {{ dataset | safe }}; // Convert the data object to an array for DataTables
@@ -159,7 +198,12 @@
                 let table = $('#gene_info').DataTable({
                     data: geneData,
                     columns: [
-                        { data: 'locus_tag' },
+                        { 
+                            data: 'locus_tag',
+                            render: function(data, type, row) {
+                                return get_original_locus_tag_info(row);
+                            }
+                        },
                         {
                             data: 'genome_id',
                             render: function(data, type, row) {

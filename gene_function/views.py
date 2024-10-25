@@ -25,7 +25,10 @@ def gene_info(request):
   pangene_info_dict = model_to_dict(pangene_info, exclude=["_id"])
 
   pathways_string = []
-  for pathway in pangene_info_dict.get("kegg_pathway", []):
+  pathways = pangene_info_dict.get("kegg_pathway", [])
+  if pathways is None:
+    pathways = []
+  for pathway in pathways:
     kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway}"
     if pangene_info_dict.get("kegg_ko", False):
       kegg_link = kegg_link  + '/' + '/'.join(pangene_info_dict["kegg_ko"])
@@ -41,32 +44,28 @@ def gene_info(request):
   filter_params['gene'] = gene
   # Obtain the gene info: ----
   gene_info = GeneInfo.objects.filter(**filter_params).values()
-  # In the Microsoft Azure Blob Storage, we actually store python objects that are dictionaries with the records orientation:
-  # [{"key_1": value_1, "key_2": value_2,..., "key_n": value_n}, ..., {} ]
-  # Transform the data to the dataframe first and remove a columns with ids (not needed in the output): ----
-  gene_info_pd = pd.DataFrame(list(gene_info), index=None)
-  del gene_info_pd['_id']
+  gene_info = list(gene_info)
 
-  # Obtain the list of all genomes containing the given gene: ----
-  genome_ids_list = list(set(gene_info_pd["genome_id"]))
+  imodulon_info = []
 
-  # Leave only the columns of interest in the output: ----
-  gene_info_pd = gene_info_pd[["locus_tag", "genome_id", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq"]] #, "pathways"
+  for g in gene_info:
+    del g["_id"]
+    if "imodulon_data" in g and not g["imodulon_data"] is None:
+      im_data = g["imodulon_data"]
+      for m in im_data:
+        m["genome_id"] = g["genome_id"]
+      imodulon_info.extend(im_data)
+    del g["imodulon_data"]
 
-  # Transform positions of the gene in the genome from float (as the start and end position are stored in the MongoDB) to int: ----
-  gene_info_pd["start_position"] = gene_info_pd["start_position"].astype(np.int64)
-  gene_info_pd["end_position"] = gene_info_pd["end_position"].astype(np.int64)
-  # ... and sort by the positions: ----
-  gene_info_pd = gene_info_pd.sort_values(by=['start_position', 'end_position'])
-
-  # Transform the df to a list of dictionaries: ----
-  gene_info_dict = gene_info_pd.to_dict(orient = "records")
-  gene_info_json = json.dumps(gene_info_dict, default = str)  # json dumps replaces the single quotes with the double ones
+  # # Transform the df to a list of dictionaries: ----
+  # gene_info_dict = gene_info_pd.to_dict(orient = "records")
+  gene_info_json = json.dumps(gene_info, default = str)  # json dumps replaces the single quotes with the double ones
 
   # Compose a context for the template rendering: ----
   context = {
     'dataset': gene_info_json,
     'pangene_info': pangene_info_dict,
+    'imodulon_info': imodulon_info,
   }
   return HttpResponse(template.render(context, request))
 
