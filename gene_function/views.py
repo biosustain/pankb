@@ -289,7 +289,6 @@ def genome_gene_info(request):
 
 ################################ Pathway Info Page Templates ###################################
 def pathway_info(request):
-
   template = loader.get_template('gene_function/pathway_info.html')
   pathway_id = request.GET['pathway_id']
 
@@ -297,11 +296,8 @@ def pathway_info(request):
   pathway_info_dict = model_to_dict(pathway_info, exclude=["_id", "genes"])
   pathway_kegg_link = f"https://www.kegg.jp/pathway/{pathway_info.pathway_id}"
 
-  filter_params = (Q(pangenome_analysis=g["pangenome_analysis"], gene=g["gene"]) for g in pathway_info.genes)
-  filter_params = reduce(operator.or_, filter_params)
-
   # Obtain info about the pathway genes: ----
-  genes_info = GeneAnnotations.objects.filter(filter_params).values('gene', "pangenome_analysis", 'species', 'family', "protein", "pangenomic_class", "kegg_ko").order_by('gene')
+  genes_info = GeneAnnotations.objects.mongo_find({"$or": [{"pangenome_analysis": g["pangenome_analysis"], "gene": g["gene"]} for g in pathway_info.genes]}, sort=[("gene", 1)], projection={'_id': False})
   genes_info = list(genes_info)
   for d in genes_info:
     kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway_id}"
