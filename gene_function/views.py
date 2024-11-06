@@ -120,7 +120,7 @@ def aa_pos_overview(request):
   gene = request.GET['gene']
 
   organism_info = Organisms.objects.get(pangenome_analysis=species)
-  num_genomes = organism_info["num_genomes"]
+  num_genomes = organism_info.num_genomes
 
   # url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   # r1 = requests.get(url1)
