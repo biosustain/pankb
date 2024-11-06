@@ -40,6 +40,7 @@ class GenomeInfo(models.Model):
    antismash_url = models.CharField(max_length=150)
    pangenome_analysis = models.CharField(max_length=40)
    species = models.CharField(max_length=40)
+   phylo_group = models.CharField(max_length=40)
    class Meta:
        managed = True  # tells Django to manage the table’s creation, modification, and deletion
        db_table = 'pankb_genome_info'

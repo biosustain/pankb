@@ -10,7 +10,6 @@ from pangenome_analyses.models import GeneAnnotations
 from django.db.models import Q
 from functools import reduce
 from django.forms.models import model_to_dict
-import operator
 
 
 ################################## Gene Info Page Templates ###################################
@@ -195,7 +194,7 @@ def genome_info(request):
   # Compose a context for the template rendering: ----
   context = {
     'dataGenome': genome_info_json,
-    'antismash_url':  genome_info_dict[genome_id]["antismash_url"]
+    'antismash_url': '' if genome_info_dict[genome_id]["antismash_url"] is None else genome_info_dict[genome_id]["antismash_url"]
   }
   return HttpResponse(template.render(context, request))
 
@@ -282,7 +281,7 @@ def genome_gene_info(request):
   context = {
     'dataGenome': genome_info_json,
     'dataGene': gene_info_json,
-    'antismash_url': genome_info_dict[genome_id]["antismash_url"]
+    'antismash_url': '' if genome_info_dict[genome_id]["antismash_url"] is None else genome_info_dict[genome_id]["antismash_url"]
   }
   return HttpResponse(template.render(context, request))
 

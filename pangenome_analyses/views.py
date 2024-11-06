@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.http import StreamingHttpResponse
 from django.template import loader
 from .models import GeneAnnotations
+from gene_function.models import GenomeInfo
 from organisms.models import Organisms
 import json, requests, io, gzip, csv, time
 import pandas as pd
@@ -91,9 +92,12 @@ def hotmap(request):
   species = request.GET['species']
   gene_class = request.GET['gene_class']
 
-  url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/source_info_' + gene_class + '.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  r1 = requests.get(url1)
-  json_obj1 = r1.json()
+  genome_info = GenomeInfo.objects.filter(pangenome_analysis=species).values("genome_id", "country", "isolation_source", "strain")
+  source_info = {g["genome_id"]: [g["country"], g["isolation_source"], g["strain"]] for g in genome_info}
+
+  # url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/source_info_' + gene_class + '.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  # r1 = requests.get(url1)
+  # json_obj1 = r1.json()
 
   url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/heatmap_' + gene_class + '.json.gz'    # the url of the respective json.gz file stored on the Microsoft Azure Blob Storage
   r2 = requests.get(url2)
@@ -101,7 +105,7 @@ def hotmap(request):
 
   # Compose a context for the template rendering
   context = {
-    'dataset': json.dumps(json_obj1),
+    'dataset': json.dumps(source_info),
     'heatmapData': json.dumps(str2)
   }
   return HttpResponse(template.render(context, request))
