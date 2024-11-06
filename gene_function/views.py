@@ -6,6 +6,7 @@ import json, requests, io, csv, time
 import pandas as pd
 import numpy as np
 from .models import GeneInfo, GenomeInfo, PathwayInfo
+from organisms.models import Organisms
 from pangenome_analyses.models import GeneAnnotations
 from django.db.models import Q
 from functools import reduce
@@ -118,9 +119,12 @@ def aa_pos_overview(request):
   species = request.GET['species']
   gene = request.GET['gene']
 
-  url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  r1 = requests.get(url1)
-  json_obj1 = r1.json()
+  organism_info = Organisms.objects.get(pangenome_analysis=species)
+  num_genomes = organism_info["num_genomes"]
+
+  # url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  # r1 = requests.get(url1)
+  # json_obj1 = r1.json()
 
   url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/gene_data/' + gene + '/' + gene + '_pan_aa_thresh_core_dom_var_pos.csv'    # the url of the respective csv file stored on the Microsoft Azure Blob Storage
   r2 = requests.get(url2)
@@ -132,7 +136,7 @@ def aa_pos_overview(request):
 
   # Compose a context for the template rendering: ----
   context = {
-    'speciesData': json.dumps(json_obj1),
+    'num_genomes': num_genomes,
     'dataset': json.dumps(dataset_dict2)
   }
   return HttpResponse(template.render(context, request))

@@ -136,19 +136,14 @@
     loadDataAndRenderChart();
 
     async function loadDataAndRenderChart() {
+        const number_of_genome = {{ num_genomes|safe }};
 
-        speciesData = {{ speciesData | safe }}
-        // Check if speciesData is available and then proceed
-        if (speciesData) {
-            const number_of_genome = speciesData.Number_of_genome;
+        const data = {{ dataset|safe }}
 
-            const data = {{ dataset|safe }}
-
-            // Only plot when the array with data is not empty: ----
-            if (data.length > 0) {
-                renderChart(data, number_of_genome);
-                document.getElementById('AA_pos_overview_figure').innerHTML = "Dominant and Variant Amino Acid Position Overview of <b>" +  gene  + "</b>";
-            }
+        // Only plot when the array with data is not empty: ----
+        if (data.length > 0) {
+            renderChart(data, number_of_genome);
+            document.getElementById('AA_pos_overview_figure').innerHTML = "Dominant and Variant Amino Acid Position Overview of <b>" +  gene  + "</b>";
         }
     }
 </script>
