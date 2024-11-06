@@ -181,7 +181,7 @@
                 if (!row["original_exact_match"]) {
                     prefix = "<span data-toggle=\"tooltip\" data-placement=\"top\" title=\"Approximate match\">&plusmn; </span>";
                 }
-                if (original_gene) {
+                if (original_gene && (original_gene !== original_locus_tag)) {
                     return `${prefix}${original_locus_tag}<br />(<i>gene:</i> ${original_gene})`;
                 } else {
                     return `${prefix}${original_locus_tag}`;
