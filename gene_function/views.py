@@ -21,22 +21,28 @@ def gene_info(request):
   species = request.GET['species']
   gene = request.GET['gene']
 
-  pangene_info = GeneAnnotations.objects.get(gene=gene, pangenome_analysis=species)
-  pangene_info_dict = model_to_dict(pangene_info, exclude=["_id"])
-
-  pathways_string = []
-  pathways = pangene_info_dict.get("kegg_pathway", [])
-  if pathways is None:
-    pathways = []
-  for pathway in pathways:
-    kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway}"
-    if pangene_info_dict.get("kegg_ko", False):
-      kegg_link = kegg_link  + '/' + '/'.join(pangene_info_dict["kegg_ko"])
-    pathways_string.append(f'<a href="{reverse('pathway_info')}?pathway_id={pathway}">{pathway}</a> <a href="{kegg_link}" target="_blank">(KEGG)</a>')
-  pathways_string = ', '.join(pathways_string)
-  if len(pathways_string) > 0:
-    pathways_string = f'<p style="font-size: 0.9rem"><b>KEGG Pathways:</b><br />{pathways_string}</p>'
-  pangene_info_dict["pathways_string"] = pathways_string
+  pw_agg = GeneAnnotations.objects.mongo_aggregate([
+    {
+      "$match": {"gene" : gene, "pangenome_analysis": species}
+    },
+    {
+      "$lookup":
+        {
+          "from": "pankb_pathway_info",
+          "localField": "kegg_pathway",
+          "foreignField": "pathway_id",
+          "as": "pathway_info"
+        }
+   },
+   {
+    "$project": {"_id": 0, "pathway_info.genes": 0, "pathway_info._id": 0}
+   }
+  ])
+  pw_agg = list(pw_agg)[0]
+  if pw_agg.get("kegg_ko", False):
+    pw_agg["kegg_ko_link"] = '/' + '/'.join(pw_agg["kegg_ko"])
+  else:
+    pw_agg["kegg_ko_link"] = ''
 
   # Set the filter() function parameters: ----
   filter_params = {}
@@ -64,8 +70,9 @@ def gene_info(request):
   # Compose a context for the template rendering: ----
   context = {
     'dataset': gene_info_json,
-    'pangene_info': pangene_info_dict,
+    # 'pangene_info': pangene_info_dict,
     'imodulon_info': imodulon_info,
+    'pangene_info': pw_agg,
   }
   return HttpResponse(template.render(context, request))
 

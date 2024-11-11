@@ -80,6 +80,12 @@
             justify-content: center;
             margin-top: 15px !important;
         }
+        a.badge {
+            text-decoration: none !important;
+        }
+        .compact-list-group-item {
+            padding: 0.3rem 0.6rem;
+        }
     </style>
 {% endblock %}
 
@@ -93,32 +99,35 @@
                     <p style="font-size: 0.9rem"><b>Gene:</b><br />{{ pangene_info.gene }}</p>
                     <p style="font-size: 0.9rem"><b>Species:</b><br /><a href="{% url 'pangenome_analyses_overview' %}?species={{ pangene_info.pangenome_analysis }}">{{ pangene_info.species }}</a></p>
                     <p style="font-size: 0.9rem"><b>Family:</b><br /><a href="{% url 'organisms' %}?family={{ pangene_info.family }}">{{ pangene_info.family }}</a></p>
+                    <p style="font-size: 0.9rem"><b>Frequency:</b><br />{{ pangene_info.frequency }}</p>
                 </div>
                 <div class="col-3">
+                    <p style="font-size: 0.9rem"><b>Class:</b><br />{{ pangene_info.pangenomic_class }}</p>
                     <p style="font-size: 0.9rem"><b>Description:</b><br />{{ pangene_info.description }}</p>
                     <p style="font-size: 0.9rem"><b>Protein:</b><br />{{ pangene_info.protein }}</p>
                 </div>
-                <div class="col-3">
-                    <p style="font-size: 0.9rem"><b>Frequency:</b><br />{{ pangene_info.frequency }}</p>
-                    <p style="font-size: 0.9rem"><b>Class:</b><br />{{ pangene_info.pangenomic_class }}</p>
-                    {{ pangene_info.pathways_string | safe }}
+                {% if pangene_info.pathway_info %}
+                <div class="col-3" style="font-size: 0.9rem">
+                    <b>KEGG Pathways:</b><br />
+                    <ul class="list-group">
+                    {% for pw_data in pangene_info.pathway_info %}
+                        <li class="list-group-item compact-list-group-item"><a href="{% url 'pathway_info' %}?pathway_id={{ pw_data.pathway_id }}">{{ pw_data.pathway_name }}</a> <a href="https://www.kegg.jp/kegg-bin/show_pathway?{{ pw_data.pathway_id | safe }}{{ pangene_info.kegg_ko_link | safe }}" target="_blank" class="badge badge-secondary">{{ pw_data.pathway_id }}</a></li>
+                    {% endfor %}
+                    </ul>
                 </div>
+                {% endif %}
                 {% if imodulon_info %}
-                <div class="col-3">
-                    <p style="font-size: 0.9rem"><b>iModulonDB:</b><br />
+                <div class="col-3" style="font-size: 0.9rem">
+                    <b>iModulonDB:</b><br />
                     <ul class="list-group">
                     {% for im_data in imodulon_info %}
-                        <li class="list-group-item">{% if im_data.exact_match is False %}<span data-toggle="tooltip" data-placement="top" title="Approximate match">&plusmn; </span>{% endif %}<a href="https://imodulondb.org/gene.html?organism={{ im_data.organism | safe }}&dataset={{ im_data.dataset | safe }}&gene_id={{ im_data.locus_tag | safe }}" target="_blank">{{ im_data.gene }}</a> in <a href="https://imodulondb.org/dataset.html?organism={{ im_data.organism | safe }}&dataset={{ im_data.dataset | safe }}" target="_blank">{{ im_data.dataset_name }}:</a><br />
-                            ({{ im_data.genome_id }}:{{ im_data.locus_tag }})<br />
-                            <ul class="list-group">
-                                {% for im in im_data.imodulons %}
-                                <li class="list-group-item"><a href="https://imodulondb.org/iModulon.html?organism={{ im_data.organism | safe }}&dataset={{ im_data.dataset | safe }}&k={{ im.k | safe }}" target="_blank">{{ im.name }}</a></li>
-                                {% endfor %}
-                            </ul>
+                        <li class="list-group-item compact-list-group-item">{% if im_data.exact_match is False %}<span data-toggle="tooltip" data-placement="top" title="Approximate match">&plusmn; </span>{% endif %}<a href="https://imodulondb.org/gene.html?organism={{ im_data.organism | safe }}&dataset={{ im_data.dataset | safe }}&gene_id={{ im_data.locus_tag | safe }}" target="_blank">{{ im_data.gene }}</a> in <a href="https://imodulondb.org/dataset.html?organism={{ im_data.organism | safe }}&dataset={{ im_data.dataset | safe }}" target="_blank">{{ im_data.dataset_name }}</a> matches <span data-toggle="tooltip" data-placement="top" title="{{ im_data.genome_id }}:{{ im_data.locus_tag }}" style="text-decoration: underline;">{{ im_data.locus_tag }}</span>:<br />
+                            {% for im in im_data.imodulons %}
+                            <a href="https://imodulondb.org/iModulon.html?organism={{ im_data.organism | safe }}&dataset={{ im_data.dataset | safe }}&k={{ im.k | safe }}" target="_blank" class="badge badge-secondary">{{ im.name }}</a>
+                            {% endfor %}
                         </li>
                     {% endfor %}
                     </ul>
-                    </p>
                 </div>
                 {% endif %}
             </div>
