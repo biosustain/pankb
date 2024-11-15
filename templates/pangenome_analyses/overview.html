@@ -1,0 +1,134 @@
+{% extends "pangenome_analyses/index.html" %}
+{% block page_title %}Pangenome Analyses{% endblock %}
+{% block content %}
+{% include "navigation.html" with active_page="organisms" %}
+{%  include "search/search.html" %}
+
+<main class="container-fluid">
+    <div class="row">
+        <div class="col-md-4 col-lg-3 col-xl-2 ps-2">
+            {% include 'pangenome_analyses/info_panel.html' with active_subpage="overview" %}
+        </div>
+        <div class="col-md-8 col-lg-9 col-xl-10 p-2">
+            <div class="container-fluid" data-bs-spy="scroll" data-bs-target="#page-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true">
+                <div class="row g-3">
+                    <div class="col-12"><h4 id="scrollspyHeading1" class="display-3 p-2 ps-4">General Analysis</h4></div>
+                </div>
+                <div class="row g-3 pb-4">
+                    <div id="heaps_law_panel" class="col-lg-6 panel-col">
+                        <div class="card shadow w-100 h-100 border-white">
+                            <div class="card-header bg-lightbg d-flex justify-content-between"><span>&nbsp;</span><h6 class="display-6 fw-semibold lh-1">Heap's Law</h6><div><button class="btn btn-outline-dark btn-sm d-none d-lg-block" onclick="toggle_classes('heaps_law_panel', 'col-lg-6', 'col-12')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-expand-vertical" style="display: block;" viewBox="0 0 16 16">
+                                <path d="M8 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L1.707 7.5H5.5a.5.5 0 0 1 0 1H1.707l1.147 1.146a.5.5 0 0 1-.708.708zM10 8a.5.5 0 0 1 .5-.5h3.793l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L14.293 8.5H10.5A.5.5 0 0 1 10 8"/>
+                              </svg></button></div></div>
+                            <div class="card-body p-0">
+                                <div class="figure-container_above responsive-iframe">
+                                    <iframe style="border: 0" id="Heaps_Law"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="cum_freq_panel" class="col-lg-6 panel-col">
+                        <div class="card shadow w-100 h-100 border-white">
+                            <div class="card-header bg-lightbg d-flex justify-content-between"><span>&nbsp;</span><h6 class="display-6 fw-semibold lh-1">Cumulative Gene Frequency Distribution</h6>
+                                <div><button class="btn btn-outline-dark btn-sm d-none d-lg-block" onclick="toggle_classes('cum_freq_panel', 'col-lg-6', 'col-12')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-expand-vertical" style="display: block;" viewBox="0 0 16 16">
+                                <path d="M8 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L1.707 7.5H5.5a.5.5 0 0 1 0 1H1.707l1.147 1.146a.5.5 0 0 1-.708.708zM10 8a.5.5 0 0 1 .5-.5h3.793l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L14.293 8.5H10.5A.5.5 0 0 1 10 8"/>
+                                </svg></button>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="figure-container_above responsive-iframe">
+                                    <iframe style="border: 0" id="Cumulative_Frequency"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="barplot_panel" class="col-lg-6 panel-col">
+                        <div class="card shadow w-100 h-100 border-white">
+                            <div class="card-header bg-lightbg d-flex justify-content-between"><span>&nbsp;</span><h6 class="display-6 fw-semibold lh-1">Barplot</h6>
+                                <div><button class="btn btn-outline-dark btn-sm d-none d-lg-block" onclick="toggle_classes('barplot_panel', 'col-lg-6', 'col-12')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-expand-vertical" style="display: block;" viewBox="0 0 16 16">
+                                <path d="M8 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L1.707 7.5H5.5a.5.5 0 0 1 0 1H1.707l1.147 1.146a.5.5 0 0 1-.708.708zM10 8a.5.5 0 0 1 .5-.5h3.793l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L14.293 8.5H10.5A.5.5 0 0 1 10 8"/>
+                                </svg></button>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="figure-container_above responsive-iframe">
+                                    <iframe id="Barplot" name="Barplot" style="border: 0"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="gene_freq_panel" class="col-lg-6 panel-col">
+                        <div class="card shadow w-100 h-100 border-white">
+                            <div class="card-header bg-lightbg d-flex justify-content-between"><span>&nbsp;</span><h6 class="display-6 fw-semibold lh-1">Gene Frequency</h6>
+                                <div><button class="btn btn-outline-dark btn-sm d-none d-lg-block" onclick="toggle_classes('gene_freq_panel', 'col-lg-6', 'col-12')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-expand-vertical" style="display: block;" viewBox="0 0 16 16">
+                                <path d="M8 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L1.707 7.5H5.5a.5.5 0 0 1 0 1H1.707l1.147 1.146a.5.5 0 0 1-.708.708zM10 8a.5.5 0 0 1 .5-.5h3.793l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L14.293 8.5H10.5A.5.5 0 0 1 10 8"/>
+                                </svg></button>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="figure-container_above responsive-iframe">
+                                    <iframe style="border: 0" id="Gene_frequency"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Obtain the species name from the url: ----
+        const urlParams = new URLSearchParams(window.location.search);
+        const species = urlParams.get('species');
+
+        // Set the initial src property values for different elements: ----
+        document.getElementById('Heaps_Law').src = "{% url 'heaps_law' %}?species=" + species;
+        document.getElementById('Barplot').src = "{% url 'gene_annotation_distribution' %}?species=" + species;
+        document.getElementById('Gene_frequency').src = "{% url 'gene_freq' %}?species=" + species;
+        document.getElementById('Cumulative_Frequency').src = "{% url 'cumulative_freq' %}?species=" + species;
+        // document.getElementById('heatmap_all').src = "{% url 'hotmap' %}?species=" + species + "&gene_class=core"
+        // document.getElementById('step_histogram').src = "{% url 'variant_dominant_freq' %}?species=" + species;
+        // document.getElementById('dn_ds').src = "{% url 'ds_dn_ratio' %}?species=" + species;
+
+        // Species Data from the info panel
+        speciesData = {{ speciesData | safe }}
+
+        // if (speciesData) {
+        //     // Determine the timeout duration based on the number of genomes
+        //     const timeoutDuration = speciesData.Number_of_genome > 1000 ? 5000 : 3000;
+
+        //     setTimeout(function() {
+        //         const overlay = document.getElementById('loading-overlay');
+        //         if (overlay) {
+        //             overlay.parentNode.removeChild(overlay);
+        //         }
+        //     }, timeoutDuration);
+        //     console.log('timeoutDuration: ', timeoutDuration);
+        // }
+    });
+
+    /*
+    A function that updates:
+    - the Presence/Absence Matrix content;
+    - the dropdown select list button text;
+    - the download matrix hidden get parameter (gene_class) value
+    based on the gene class chosen in the dropdown select list.
+    */
+    function updateMatrix(gene_class, gene_class_text) {
+        // Obtain the species name from the url: ----
+        const urlParams = new URLSearchParams(window.location.search);
+        const species = urlParams.get('species');
+
+        // Update the iframe src property value: ----
+        document.getElementById('heatmap_all').src = '{% url "hotmap" %}?species=' + species + '&gene_class=' + gene_class;
+
+        // Update dropdown select list button text: ----
+        document.getElementById('dropdownButton').textContent = gene_class_text;
+
+        // Update the download form hidden element (gene_class) value: ----
+        document.getElementById('form_gene_class').value = gene_class;
+    }
+</script>
+{% endblock %}

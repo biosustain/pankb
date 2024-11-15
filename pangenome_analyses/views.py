@@ -14,18 +14,18 @@ import pandas as pd
 # Template renderer for the Pangenome Analyses Overview page
 # (data for the info panel on the left is contained in the render context)
 def overview(request):
-  template = loader.get_template('pangenome_analyses/Pangenome_analyses_overview.html')
+  template = loader.get_template('pangenome_analyses/overview.html')
   species = request.GET['species']
 
   # Set the filter parameters based on the GET paramater value: ----
   filter_params = {}
   filter_params['pangenome_analysis'] = species
   # Get info about the given organisms from the Organisms collection (in a dictionary): ----
-  organism_info = Organisms.objects.filter(**filter_params).values('species', 'genomes_num', 'gene_class_distribution', 'openness')[0]
+  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')[0]
 
   # Compose a context for the template rendering
   context = {
-    'speciesData': json.dumps(organism_info)
+    'speciesData': organism_info
   }
   return HttpResponse(template.render(context, request))
 

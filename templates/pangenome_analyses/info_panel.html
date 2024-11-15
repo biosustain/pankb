@@ -1,57 +1,42 @@
 {% load static %}
-<div class="col-2">
-    <div class="flex-shrink-0 p-3 bg-light navbar_fixed">
-        <a id="Pangenome_analyses" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom justify-content-center">
-            <span class="text-center fs-5 fw-semibold">Pangenome Analysis Dashboards</span>
-        </a>
-        <ul class="list-unstyled ps-0">
-            <li class="mb-1">
-                <a id="Overview" class="btn fw-semibold align-items-center" role="button">
-                    Overview
-                </a>
+<div class="sticky-top pt-2" style="max-height: 100vh; overflow: auto;">
+    <div class="card bg-infopanel">                  
+        <div class="card-body">
+            <h5 class="card-title display-5 text-break" style="hyphens: auto;">{{ speciesData.species }}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary display-6">{{ speciesData.family }}</h6>
+        </div>
+        <ul class="nav nav-pills nav-fill ps-2 pe-2">
+            <li class="nav-item">
+                <a class="nav-link{% if active_subpage == 'overview' %} active{% endif %}" href="{% url 'pangenome_analyses_overview' %}?species={{ request.GET.species }}">Overview</a>
             </li>
-            <li class="mb-1">
-                <a id="Annotation" class="btn fw-semibold align-items-center" role="button">
-                    Genes
-                </a>
+            <li class="nav-item">
+                <a class="nav-link{% if active_subpage == 'genes' %} active{% endif %}" href="{% url 'pangenome_analyses_gene_annotation' %}?species={{ request.GET.species }}">Genes</a>
             </li>
-            <li class="mb-1 ">
-                <a id="Phylogenetic_tree" class="btn fw-semibold align-items-center" role="button">
-                    Phylogenetic Tree
-                </a>
+            <li class="nav-item">
+                <a class="nav-link{% if active_subpage == 'phylogenetic_tree' %} active{% endif %}" href="{% url 'pangenome_analyses_phylogenetic_tree' %}?species={{ request.GET.species }}">Phylogenetic Tree</a>
             </li>
-            <li class="border-top my-3"></li>
         </ul>
-        <div class="card vh-25" id="speciesCard">
-            <div class="card-body text-left">
-                <p style="font-size: 0.9rem" id="species"></p>
-                <p style="font-size: 0.9rem" id="numGenome"></p>
-                <p style="font-size: 0.9rem" id="core"></p>
-                <p style="font-size: 0.9rem" id="accessory"></p>
-                <p style="font-size: 0.9rem" id="rare"></p>
-                <p style="font-size: 0.9rem" id="openness"></p>
-            </div>
+        <hr />
+        <div class="card-body">
+            <dl class="row g-1 fs-3">
+                <dt class="col-sm-8">Genomes</dt>
+                <dd class="col-sm-4">{{ speciesData.genomes_num }}</dd>
+                
+                <dt class="col-sm-8">Core Genes</dt>
+                <dd class="col-sm-4">{{ speciesData.gene_class_distribution.0 }}</dd>
+                <dt class="col-sm-8">Accessory Genes</dt>
+                <dd class="col-sm-4">{{ speciesData.gene_class_distribution.1 }}</dd>
+                <dt class="col-sm-8">Rare Genes</dt>
+                <dd class="col-sm-4">{{ speciesData.gene_class_distribution.2 }}</dd>
+                
+                <dt class="col-sm-8">Openness</dt>
+                <dd class="col-sm-4">{{ speciesData.openness }}</dd>
+            </dl>
+        </div>
+        <div class="list-group" id="page-nav">
+            <a class="list-group-item list-group-item-action list-group-item-secondary" href="#scrollspyHeading1">General Analysis</a>
+            <a class="list-group-item list-group-item-action list-group-item-secondary" href="#scrollspyHeading2">Gene Presence/Absence</a>
+            <a class="list-group-item list-group-item-action list-group-item-secondary" href="#scrollspyHeading3">Alleleome</a>
         </div>
     </div>
 </div>
-
-<script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const species = urlParams.get('species');
-
-    document.getElementById('Pangenome_analyses').href = "{% url 'pangenome_analyses_overview' %}?species=" + species;
-    document.getElementById('Overview').href = "{% url 'pangenome_analyses_overview' %}?species=" + species;
-    document.getElementById('Annotation').href = "{% url 'pangenome_analyses_gene_annotation' %}?species=" + species;
-    document.getElementById('Phylogenetic_tree').href = "{% url 'pangenome_analyses_phylogenetic_tree' %}?species=" + species;
-
-    speciesData = {{ speciesData | safe }}
-
-    if (speciesData) {
-        document.getElementById('species').innerHTML = '<b>Species:</b><br>' + speciesData.species;
-        document.getElementById('numGenome').innerHTML = '<b>Number of Genomes:</b><br>' + speciesData.genomes_num;
-        document.getElementById('core').innerHTML = '<b>Core:</b><br>' + speciesData.gene_class_distribution[0];
-        document.getElementById('accessory').innerHTML = '<b>Accessory:</b><br>' + speciesData.gene_class_distribution[1];
-        document.getElementById('rare').innerHTML= '<b>Rare:</b><br>' + speciesData.gene_class_distribution[2];
-        document.getElementById('openness').innerHTML = '<b>Openness:</b><br>' + speciesData.openness;
-    }
-</script>
