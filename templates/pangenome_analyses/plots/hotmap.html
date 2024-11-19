@@ -8,7 +8,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.11/pako_inflate.min.js"></script>
     <style>
         /* let's have the body act as container */
-        body { margin: 0; }
+        body { margin: 0; overflow: hidden; }
+        .header { background-color: #899599 !important; }
+        .hotmap .legend .item { color: #FFFFFF !important; }
     </style>
     <title>Hotmap</title>
 </head>
@@ -19928,7 +19930,8 @@
                             },
                             color: {
                                 bins: ["=0", "=1"],
-                                colors: ["#ffffff", "#f32902"]
+                                labels: ["Absent", "Present"],
+                                colors: ["#ffffff", "#ff7f50"]
                             },
                             newick: n,
                             onHover: function(t) {

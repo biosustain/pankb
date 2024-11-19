@@ -1,0 +1,15 @@
+{% load static %}
+<div class="sticky-top pt-2" style="max-height: 100vh; overflow: auto;">
+    <div class="card bg-infopanel">                  
+        <div class="card-body">
+            <h5 class="card-title display-5 text-break" style="hyphens: auto;">{{ speciesData.species }}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary display-6">{{ speciesData.family }}</h6>
+        </div>
+        {% block info_panel_nav %}{% endblock %}
+        <hr />
+        <div class="card-body">
+            {% block info_panel_content %}{% endblock %}
+        </div>
+        {% block info_panel_page_nav %}{% endblock %}
+    </div>
+</div>

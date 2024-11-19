@@ -1,42 +1,33 @@
+{% extends "info_panel.html" %}
 {% load static %}
-<div class="sticky-top pt-2" style="max-height: 100vh; overflow: auto;">
-    <div class="card bg-infopanel">                  
-        <div class="card-body">
-            <h5 class="card-title display-5 text-break" style="hyphens: auto;">{{ speciesData.species }}</h5>
-            <h6 class="card-subtitle mb-2 text-body-secondary display-6">{{ speciesData.family }}</h6>
-        </div>
-        <ul class="nav nav-pills nav-fill ps-2 pe-2">
-            <li class="nav-item">
-                <a class="nav-link{% if active_subpage == 'overview' %} active{% endif %}" href="{% url 'pangenome_analyses_overview' %}?species={{ request.GET.species }}">Overview</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link{% if active_subpage == 'genes' %} active{% endif %}" href="{% url 'pangenome_analyses_gene_annotation' %}?species={{ request.GET.species }}">Genes</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link{% if active_subpage == 'phylogenetic_tree' %} active{% endif %}" href="{% url 'pangenome_analyses_phylogenetic_tree' %}?species={{ request.GET.species }}">Phylogenetic Tree</a>
-            </li>
-        </ul>
-        <hr />
-        <div class="card-body">
-            <dl class="row g-1 fs-3">
-                <dt class="col-sm-8">Genomes</dt>
-                <dd class="col-sm-4">{{ speciesData.genomes_num }}</dd>
-                
-                <dt class="col-sm-8">Core Genes</dt>
-                <dd class="col-sm-4">{{ speciesData.gene_class_distribution.0 }}</dd>
-                <dt class="col-sm-8">Accessory Genes</dt>
-                <dd class="col-sm-4">{{ speciesData.gene_class_distribution.1 }}</dd>
-                <dt class="col-sm-8">Rare Genes</dt>
-                <dd class="col-sm-4">{{ speciesData.gene_class_distribution.2 }}</dd>
-                
-                <dt class="col-sm-8">Openness</dt>
-                <dd class="col-sm-4">{{ speciesData.openness }}</dd>
-            </dl>
-        </div>
-        <div class="list-group" id="page-nav">
-            <a class="list-group-item list-group-item-action list-group-item-secondary" href="#scrollspyHeading1">General Analysis</a>
-            <a class="list-group-item list-group-item-action list-group-item-secondary" href="#scrollspyHeading2">Gene Presence/Absence</a>
-            <a class="list-group-item list-group-item-action list-group-item-secondary" href="#scrollspyHeading3">Alleleome</a>
-        </div>
-    </div>
-</div>
+
+{% block info_panel_nav %}
+<ul class="nav nav-pills nav-fill ps-2 pe-2">
+    <li class="nav-item">
+        <a class="nav-link{% if active_subpage == 'overview' %} active{% endif %}" href="{% url 'pangenome_analyses_overview' %}?species={{ request.GET.species }}">Overview</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link{% if active_subpage == 'genes' %} active{% endif %}" href="{% url 'pangenome_analyses_gene_annotation' %}?species={{ request.GET.species }}">Genes</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link{% if active_subpage == 'phylogenetic_tree' %} active{% endif %}" href="{% url 'pangenome_analyses_phylogenetic_tree' %}?species={{ request.GET.species }}">Phylogenetic Tree</a>
+    </li>
+</ul>
+{% endblock %}
+
+{% block info_panel_content %}
+<dl class="row g-1 fs-3">
+    <dt class="col-sm-8">Genomes</dt>
+    <dd class="col-sm-4">{{ speciesData.genomes_num }}</dd>
+    
+    <dt class="col-sm-8">Core Genes</dt>
+    <dd class="col-sm-4">{{ speciesData.gene_class_distribution.0 }}</dd>
+    <dt class="col-sm-8">Accessory Genes</dt>
+    <dd class="col-sm-4">{{ speciesData.gene_class_distribution.1 }}</dd>
+    <dt class="col-sm-8">Rare Genes</dt>
+    <dd class="col-sm-4">{{ speciesData.gene_class_distribution.2 }}</dd>
+    
+    <dt class="col-sm-8">Openness</dt>
+    <dd class="col-sm-4">{{ speciesData.openness }}</dd>
+</dl>
+{% endblock %}

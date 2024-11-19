@@ -202,7 +202,7 @@ def ds_dn_ratio(request):
 # Template renderer for the Gene Annotation Page
 # (data for the info panel on the left is contained in the render context)
 def gene_annotation(request):
-  template = loader.get_template('pangenome_analyses/Pangenome_analyses_gene_annotation.html')
+  template = loader.get_template('pangenome_analyses/genes.html')
   species = request.GET['species']
 
   # Set the filter() function parameters: ----
@@ -210,7 +210,7 @@ def gene_annotation(request):
   filter_params['pangenome_analysis'] = species
 
   # Get info about the given organisms from the Organisms collection (in a dictionary): ----
-  organism_info = Organisms.objects.filter(**filter_params).values('species', 'genomes_num', 'gene_class_distribution', 'openness')[0]
+  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')[0]
 
   # Get the gene annotations info form the Gene Annotations collection: ----
   gene_annotations = GeneAnnotations.objects.filter(**filter_params).values()
@@ -226,7 +226,7 @@ def gene_annotation(request):
 
   # Compose a context for the template rendering
   context = {
-    'speciesData': json.dumps(organism_info),
+    'speciesData': organism_info,
     'dataset': gene_annotations_json
   }
   return HttpResponse(template.render(context, request))
@@ -263,18 +263,18 @@ def download_gene_annotation_table_csv(request):
 # Template renderer for the Phylogenetic tree page
 # (data for the info panel on the left is contained in the render context)
 def phylogenetic_tree(request):
-  template = loader.get_template('pangenome_analyses/Pangenome_analyses_phylogetic_tree.html')
+  template = loader.get_template('pangenome_analyses/phylogenetic_tree.html')
   species = request.GET['species']
 
   # Set the filter parameters based on the GET paramater value: ----
   filter_params = {}
   filter_params['pangenome_analysis'] = species
   # Get info about the given organisms from the Organisms collection (in a dictionary): ----
-  organism_info = Organisms.objects.filter(**filter_params).values('species', 'genomes_num', 'gene_class_distribution', 'openness')[0]
+  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')[0]
 
   # Compose a context for the template rendering
   context = {
-    'speciesData': json.dumps(organism_info)
+    'speciesData': organism_info
   }
   return HttpResponse(template.render(context, request))
 

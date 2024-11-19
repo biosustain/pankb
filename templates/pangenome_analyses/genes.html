@@ -1,0 +1,177 @@
+{% extends "pangenome_analyses/index.html" %}
+{% block page_title %}Genes{% endblock %}
+{% block content %}
+{% include "navigation.html" with active_page="organisms" %}
+{% include "search/search.html" %}
+
+<style>
+    .center-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+    .table_padding {
+        width: 100%;  /* adjust this value according to your needs */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .table-responsive {
+        width: 100%;  /* make sure it fills its container */
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        /* max-height: 100vh; */
+        /* padding-left: 2.8em; */
+        /* padding-right: 1.1em; */
+    }
+    tr, th {
+        font-size: 1rem;
+        text-align: center;
+        vertical-align: middle;
+    }
+    td {
+        font-size: 0.9rem;
+        text-align: center;
+        width: 12.5% !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    tbody td {
+        padding: 1.1em !important;  /* adjust as needed */
+    }
+    .dataTables_wrapper .dataTables_filter {
+        display: none;
+    }
+    thead th {
+        /* height: 5em; */
+        /* position: relative; */
+        text-align: center;
+        vertical-align: top;
+        padding-right: 0.4em !important;
+    }
+    thead th input {
+        /* position: absolute; */
+        /* bottom: 0.55em; */
+        width: 50%;
+        /* left: 50%; */
+        /* transform: translateX(-50%); */
+        margin-bottom: 0px;
+    }
+    .dataTables_wrapper tbody td {
+        text-align: center;
+        vertical-align: top;
+    }
+    .expanded-row td {
+        white-space: normal;
+        word-wrap: break-word;
+    }
+    table {
+        table-layout: fixed;
+    }
+    div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button a, #genes_list_paginate {
+        font-size: 0.9rem; /* Adjust this value as needed */
+    }
+    .dataTables_length {
+        display: flex;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        padding-top: 0.5rem;
+    }
+    .dataTables_info {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+    .dataTables_length label {
+        display: flex;
+        align-items: center;
+    }
+    .dataTables_length label select {
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+</style>
+
+<main class="container-fluid">
+    <div class="row">
+        <div class="col-lg-3 col-xl-2 ps-2">
+            {% include 'pangenome_analyses/info_panel_genes.html' with active_subpage="genes" %}
+        </div>
+        <div class="col-lg-9 col-xl-10 pt-2 pb-2">
+            {% include 'components/panel_genes_table.html' with panel_name="genes_table" panel_title="Gene Annotation Table" panel_class="col-lg-12" %}
+        </div>
+    </div>
+</div>
+</main>
+<script>
+    $(document).ready(async function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const species = urlParams.get('species');
+
+        data = {{ dataset|safe }}
+
+        const Gene = data;
+        console.log(Gene);
+
+        let table = $('#genes_table').DataTable({
+            destroy: true,
+            data: Gene,
+            columns: [
+                {
+                    data: '0',
+                    render: function (data, type, row) {
+                        return '<a href=" {% url 'gene_info' %}?species=' + species + '&gene=' + encodeURIComponent(data) + '&gene_class=' + encodeURIComponent(row[7]) + '" target="_blank">' + data + '</a>';
+                    }
+                },
+                {data: '7'},
+                {data: '1'},
+                {data: '2'},
+                {data: '3'},
+                {data: '4'},
+                {data: '5'},
+                {data: '6'}
+            ],
+            language: {
+                loadingRecords: 'Loading...',
+                zeroRecords: 'Result not found.'
+            },
+            initComplete: function () {
+                const api = this.api();
+
+                // Existing column search code
+                $(this.api().table().header()).find('th').each(function (index, th) {
+                    const columnHeader = $(th).find('div').first();
+                    const columnIndex = index;
+
+                    const searchInput = $('<div><input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 60%; display: inline;" /></div>')
+                        .on('keyup change clear', function () {
+                            api.column(columnIndex).search(this.value).draw();
+                        })
+                        .on('click', function(e) {  // Prevent event bubbling on click
+                            e.stopPropagation();
+                        });
+
+                    $(searchInput).appendTo(columnHeader);
+                });
+            }
+        });
+
+        // Expand row on click
+        $('#genes_table tbody').on('click', 'td', function () {
+            const cellText = $(this).text().trim();
+            const rowIndex = $(this).closest('tr').index();
+            const row = table.row(rowIndex);
+            if (row.child.isShown()) {
+                row.child.hide();
+                $(this).closest('tr').removeClass('expanded-row');
+            } else {
+                const expandedRowContent = '<td colspan="8" style="white-space: normal; word-wrap: break-word;">' + cellText + '</td>';
+                row.child(expandedRowContent).show();
+                $(this).closest('tr').addClass('expanded-row');
+            }
+        });
+    });
+</script>
+{% endblock %}

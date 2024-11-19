@@ -42,6 +42,15 @@
             width: 100%;
             aspect-ratio: 16 / 9;
         }
+        .responsive-iframe-square > iframe {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+        }
+        .responsive-iframe-full > iframe {
+            width: 100%;
+            height: calc(100vh - 200px);
+            min-height: 400px;
+        }
     </style>
     <script>
         function toggle_classes(element_id, class1, class2) {

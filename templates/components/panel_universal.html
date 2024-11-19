@@ -1,0 +1,28 @@
+{% firstof panel_class 'col-lg-6' as panel_class_updated %}
+{% firstof panel_wide_class 'col-lg-12' as panel_wide_class_updated %}
+<div id="{{panel_name}}_panel" class="{{ panel_class_updated }} panel-col">
+    <div class="card shadow w-100 h-100 border-white">
+        <div class="card-header bg-lightbg d-flex justify-content-between align-items-center">
+            <div class="d-flex">
+                {% block panel_header %}
+                &nbsp;
+                {% endblock %}
+            </div>
+            <div><h6 class="display-6 fw-semibold m-0">{{panel_title}}</h6></div>
+            <div>
+            {% if panel_class_updated != panel_wide_class_updated %}
+            <button class="btn btn-outline-dark btn-sm d-none d-lg-block p-1" onclick="toggle_classes('{{ panel_name }}_panel', '{{ panel_class_updated }}', '{{ panel_wide_class_updated }}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-expand-vertical" style="display: block;" viewBox="0 0 16 16">
+            <path d="M8 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5M.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L1.707 7.5H5.5a.5.5 0 0 1 0 1H1.707l1.147 1.146a.5.5 0 0 1-.708.708zM10 8a.5.5 0 0 1 .5-.5h3.793l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L14.293 8.5H10.5A.5.5 0 0 1 10 8"/>
+            </svg></button>
+            {% endif %}
+            </div>
+        </div>
+        <div class="card-body p-0">
+            {% block panel_content %}
+            <div class="figure-container_above {{panel_iframe_class_updated}}">
+                <iframe style="border: 0" id="{{panel_name}}_iframe" src="{{ panel_iframe_src }}"></iframe>
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,22 @@
+{% extends "components/panel_universal.html" %}
+{% block panel_content %}
+<table id="genes_table" class="table table-hover" style="width: 100%;">
+    <thead>
+    <tr>
+        <th class="text-center"><div class="d-flex flex-column"><div>Gene</div></div></th>
+        <th class="text-center"><div class="d-flex flex-column"><div>Class</div></div></th>
+        <th class="text-center"><div class="d-flex flex-column"><div>COG Category</div></div></th>
+        <th class="text-center"><div class="d-flex flex-column"><div>COG Name</div></div></th>
+        <th class="text-center"><div class="d-flex flex-column"><div>Description</div></div></th>
+        <th class="text-center"><div class="d-flex flex-column"><div>Protein</div></div></th>
+        <th class="text-center"><div class="d-flex flex-column"><div>PFAMs</div></div></th>
+        <th class="text-center"><div class="d-flex flex-column"><div>Frequency</div></div></th>
+    </tr>
+    </thead>
+    <tbody id="tbody">
+    </tbody>
+</table>
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+{% endblock %}

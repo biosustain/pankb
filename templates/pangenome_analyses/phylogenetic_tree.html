@@ -1,0 +1,20 @@
+{% extends "pangenome_analyses/index.html" %}
+{% block page_title %}Phylogenetic Tree{% endblock %}
+{% block content %}
+{% include "navigation.html" with active_page="organisms" %}
+{% include "search/search.html" %}
+
+<main class="container-fluid">
+    <div class="row">
+        <div class="col-md-4 col-lg-3 col-xl-2 ps-2">
+            {% include 'pangenome_analyses/info_panel_phylogenetic_tree.html' with active_subpage="phylogenetic_tree" %}
+        </div>
+        <div class="col-md-8 col-lg-9 col-xl-10 p-2">
+            <div class="container-fluid" data-bs-spy="scroll" data-bs-target="#page-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true">
+                {% url 'phylotree_plot' as url_phylogenetic_tree %}
+                {% include 'components/panel_iframe.html' with panel_name="phylogenetic_tree" panel_title="Phylogenetic Tree" panel_iframe_src=url_phylogenetic_tree|add:"?species="|add:request.GET.species panel_class="col-lg-12" panel_iframe_class="responsive-iframe-full" %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
