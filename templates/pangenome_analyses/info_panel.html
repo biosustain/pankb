@@ -1,6 +1,11 @@
 {% extends "info_panel.html" %}
 {% load static %}
 
+{% block info_panel_titles %}
+<h5 class="card-title display-5 text-break" style="hyphens: auto;">{{ speciesData.species }}</h5>
+<h6 class="card-subtitle mb-2 text-body-secondary display-6"><a style="color: var(--bs-body-secondary-color); text-decoration-color: var(--bs-body-secondary-color) !important;" href="{% url 'organisms' %}?family={{ speciesData.family }}">{{ speciesData.family }}</a></h6>
+{% endblock %}
+
 {% block info_panel_nav %}
 <ul class="nav nav-pills nav-fill ps-2 pe-2">
     <li class="nav-item">

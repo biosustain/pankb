@@ -8,20 +8,17 @@ import pandas as pd
 
 # Template renderer for the Organisms table
 def organisms(request):
-  template = loader.get_template('organisms/Species_list.html')
+  template = loader.get_template('organisms/species.html')
   family = request.GET.get('family')
   # Adjust filter parameters based on the GET paramater value: ----
   filter_params = {}
   if family:  # if the family get parameter is set
     filter_params['family'] = family
   # Get the filtered or full table with organisms: ----
-  organisms = Organisms.objects.filter(**filter_params).values()
-  # In the Microsoft Azure Blob Storage, we actually store python objects that are dictionaries with the list orientation:
-  # {"key_1": [value_1, value_2, ..., value_n], "key_2": [value_1, value_2, ..., value_n], ..., "key_n": [value_1, value_2, ..., value_n]}
-  # Transform the data first to a dataframe and then back to a dictionary (so that the front-end js will be able to work with the data as in the v.1.0.0): ----
+  organisms = Organisms.objects.filter(**filter_params).values('family', 'species', 'pangenome_analysis', 'openness', 'genomes_num', 'gene_class_distribution')
   organisms_pd = pd.DataFrame(list(organisms), index=None)
-  organisms_dict = organisms_pd.to_dict(orient='list')
-  organisms_json = json.dumps(organisms_dict, default=str)  # json dumps replaces the single quotes with the double ones
+  organisms_list = organisms_pd.values.tolist()
+  organisms_json = json.dumps(organisms_list, default=str)  # json dumps replaces the single quotes with the double ones
   # Compose the render context: ----
   context = {
     'dataset': organisms_json

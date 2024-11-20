@@ -1,5 +1,5 @@
 {% extends "index.html" %}
-{% block page_title %}Genes{% endblock %}
+{% block page_title %}Species{% endblock %}
 {% block content %}
 {% include "navigation.html" with active_page="organisms" %}
 {% include "search/search.html" %}
@@ -41,9 +41,6 @@
     }
     tbody td {
         padding: 1.1em !important;  /* adjust as needed */
-    }
-    .dataTables_wrapper .dataTables_filter {
-        display: none;
     }
     thead th {
         /* height: 5em; */
@@ -92,16 +89,27 @@
         margin-left: 1rem;
         margin-right: 1rem;
     }
+    .dataTables_filter {
+        display: flex;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        padding-top: 0.5rem;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    .dataTables_filter label {
+        display: flex;
+        align-items: center;
+    }
+    .dataTables_filter label input {
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
 </style>
 
 <main class="container-fluid">
     <div class="row">
-        <div class="col-lg-3 col-xl-2 ps-2">
-            {% include 'pangenome_analyses/info_panel_genes.html' with active_subpage="genes" %}
-        </div>
-        <div class="col-lg-9 col-xl-10 pt-2 pb-2">
-            {% include 'components/panel_genes_table.html' with panel_name="genes_table" panel_title="Gene Annotation Table" panel_class="col-lg-12" %}
-        </div>
+        {% include 'components/panel_species_table.html' with panel_name="species_table" panel_title="Species" panel_class="col-lg-12" %}
     </div>
 </div>
 </main>
@@ -110,28 +118,40 @@
         const urlParams = new URLSearchParams(window.location.search);
         const species = urlParams.get('species');
 
-        data = {{ dataset|safe }}
+        const dataset = {{ dataset|safe }}
 
-        const Gene = data;
-        console.log(Gene);
-
-        let table = $('#genes_table').DataTable({
+        let table = $('#species_table').DataTable({
             destroy: true,
-            data: Gene,
+            data: dataset,
             columns: [
                 {
                     data: '0',
                     render: function (data, type, row) {
-                        return '<a href=" {% url 'gene_info' %}?species=' + species + '&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
+                        return '<a href="{% url 'organisms' %}?family=' + encodeURIComponent(data) + '">' + data + '</a>';
                     }
                 },
-                {data: '7'},
-                {data: '1'},
-                {data: '2'},
+                {
+                    data: '1',
+                    render: function (data, type, row) {
+                        return '<a href="{% url 'pangenome_analyses_overview' %}?species=' + encodeURIComponent(row[2]) + '">' + data + '</a>';
+                    }
+                },
                 {data: '3'},
                 {data: '4'},
-                {data: '5'},
-                {data: '6'}
+                {
+                    data: '5',
+                    render: function (data, type, row) {
+                        let total = data[0] + data[1] + data[2];
+                        let coreWidth = (data[0] / total) * 100;
+                        let accessoryWidth = (data[1] / total) * 100;
+                        let rareWidth = (data[2] / total) * 100;
+                        return `<div style="display: flex; height: 1.2em; max-width: 80%; margin: 0; border-radius: 0.6em; overflow: hidden;">
+                        <div style="width: ${coreWidth}%; background-color: rgba(128,0,128,0.8);" data-toggle="tooltip" title="Core: ${data[0]}"></div>
+                        <div style="width: ${accessoryWidth}%; background-color: rgba(255,165,0,0.8);" data-toggle="tooltip" title="Accessory: ${data[1]}"></div>
+                        <div style="width: ${rareWidth}%; background-color: rgba(0,128,0,0.8);" data-toggle="tooltip" title="Rare: ${data[2]}"></div>
+                      </div>`;
+                    }
+                },
             ],
             language: {
                 loadingRecords: 'Loading...',
@@ -139,7 +159,7 @@
             },
             initComplete: function () {
                 const api = this.api();
-                
+
                 // Existing column search code
                 $(this.api().table().header()).find('th').each(function (index, th) {
                     const columnHeader = $(th).find('div').first();
@@ -155,21 +175,10 @@
 
                     $(searchInput).appendTo(columnHeader);
                 });
-            }
-        });
-
-        // Expand row on click
-        $('#genes_table tbody').on('click', 'td', function () {
-            const cellText = $(this).text().trim();
-            const rowIndex = $(this).closest('tr').index();
-            const row = table.row(rowIndex);
-            if (row.child.isShown()) {
-                row.child.hide();
-                $(this).closest('tr').removeClass('expanded-row');
-            } else {
-                const expandedRowContent = '<td colspan="8" style="white-space: normal; word-wrap: break-word;">' + cellText + '</td>';
-                row.child(expandedRowContent).show();
-                $(this).closest('tr').addClass('expanded-row');
+            },
+            drawCallback: function(settings) {
+                $('[data-toggle="tooltip"]').tooltip();
+                window.scrollTo(0, 0);
             }
         });
     });

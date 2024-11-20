@@ -213,12 +213,10 @@ def gene_annotation(request):
   organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')[0]
 
   # Get the gene annotations info form the Gene Annotations collection: ----
-  gene_annotations = GeneAnnotations.objects.filter(**filter_params).values()
+  gene_annotations = GeneAnnotations.objects.filter(**filter_params).values('gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class')
 
   # Transform the QuerySet with gene annotations into a pandas df: ----
   gene_annotations_pd = pd.DataFrame(list(gene_annotations), index=None)
-  # Remove the column with ids: ----
-  del  gene_annotations_pd["_id"]
   # Transform the dataframe with gene annotations into a list of lists (imposed by the front-end JS):
   ga_list_of_lists = gene_annotations_pd.values.tolist()
   # Transform the list of lists into a JSON object: ----
