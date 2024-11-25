@@ -7,7 +7,7 @@ import pandas as pd
 
 # Template renderer for the Publications page
 def publications(request):
-  template = loader.get_template('publications/Publications.html')
+  template = loader.get_template('publications/publications.html')
   # The script producing the csv file with the list of pulications
   # is contained under /misc subfolder
   # and may not be included under the version control

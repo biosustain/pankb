@@ -1,4 +1,4 @@
-<div id="dimension_container" class="plot_container" style="font-size: 3vw;"></div>
+<div id="dimension_container" class="plot_container" style="font-size: 1.2rem; width: 100%; height: 14rem;"></div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const data = {{ dimension_dataset|safe }}
@@ -19,7 +19,7 @@
                         type: 'bar'
                     },
                     title: {
-                        text: 'Database size',
+                        text: '',
                         style: {
                             fontSize: '1.0rem' // Set your desired font size here
                         }

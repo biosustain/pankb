@@ -1,4 +1,4 @@
-{% extends "index.html" %}
+{% extends "index_scrollspy.html" %}
 {% block page_title %}Pangenome Analyses{% endblock %}
 {% block content %}
 {% include "navigation.html" with active_page="organisms" %}
@@ -10,7 +10,7 @@
             {% include 'pangenome_analyses/info_panel_overview.html' with active_subpage="overview" %}
         </div>
         <div class="col-md-8 col-lg-9 col-xl-10 p-2">
-            <div class="container-fluid" data-bs-spy="scroll" data-bs-target="#page-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true">
+            <div class="container-fluid">
                 <div class="row g-3">
                     <div class="col-12"><h4 id="general" class="display-3 p-2 ps-4">General Analysis</h4></div>
                 </div>

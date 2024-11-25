@@ -1,33 +1,22 @@
+{% extends "components/panel_universal.html" %}
 {% load static %}
-
-<!-- Datatable: Families found -->
-<div class="table_padding">
-    <h5>Families</h5>
-    <table id="families_list" class="table table-hover" style="width:35%; table-layout: fixed;">
-        <thead>
+{% block panel_content %}
+<table id="families_list" class="table table-hover" style="table-layout: fixed;">
+    <thead>
         <tr>
             <th class="text-left align-left">Family</th>
         </tr>
-        </thead>
-        <tbody id="table-body-families"></tbody>
-    </table>
-</div>
+    </thead>
+    <tbody id="table-body-families">
+        {% for row in families_results %}
+        <tr>
+            <td><a href="{% url 'organisms' %}?family={{ row.family }}">{{ row.family }}</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 <script>
-    var data = {{ families_results | safe }}
-    var tableBody = document.getElementById('table-body-families');
-
-    // Iterate over each species in case the search results are not empty: ----
-    if (!isEmpty(data)) {
-        data.family.forEach((family, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                    <td class="text-left align-left"><a id="${data.family[index]}" href="#" onclick="handleLinkClickFamily(event, '${data.family[index]}')">${data.family[index]}</a></td>
-                    `;
-            tableBody.appendChild(row);
-        });
-    }
-
     $(document).ready(function () {
         // Initialize DataTable with drawCallback after the document is loaded
         $('#families_list').DataTable({
@@ -37,17 +26,7 @@
             paging: false,
             bInfo: false,
             order: [],     // preserve the original order (needed to order by relevance)
-            drawCallback: function(settings) {
-                $('[data-toggle="tooltip"]').tooltip();
-            }
         });
     });
-
-    function handleLinkClickFamily(e, family) {
-        // Prevent the default link behavior
-        e.preventDefault();
-        // Navigate to the new page
-        window.location.href = "{% url 'organisms' %}" + `?family=${family}`
-    }
-
 </script>
+{% endblock %}

@@ -1,11 +1,9 @@
 {% extends "index.html" %}
-{% block page_title %}Genes{% endblock %}
+{% block page_title %}Publications{% endblock %}
 {% block content %}
-{% include "navigation.html" with active_page="organisms" %}
+{% include "navigation.html" with active_page="publications" %}
 {% include "search/search.html" %}
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
 <style>
     .center-container {
         display: flex;
@@ -17,8 +15,6 @@
     .table_padding {
         width: 100%;  /* adjust this value according to your needs */
         display: flex;
-        justify-content: center;
-        align-items: center;
     }
     .table-responsive {
         width: 100%;  /* make sure it fills its container */
@@ -30,13 +26,9 @@
     }
     tr, th {
         font-size: 1rem;
-        text-align: center;
         vertical-align: middle;
     }
     td {
-        font-size: 0.9rem;
-        text-align: center;
-        width: 12.5% !important;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -44,34 +36,13 @@
     tbody td {
         padding: 1.1em !important;  /* adjust as needed */
     }
-    .dataTables_wrapper .dataTables_filter {
-        display: none;
-    }
     thead th {
-        /* height: 5em; */
-        /* position: relative; */
-        text-align: center;
         vertical-align: top;
         padding-right: 0.4em !important;
-    }
-    thead th input {
-        /* position: absolute; */
-        /* bottom: 0.55em; */
-        width: 50%;
-        /* left: 50%; */
-        /* transform: translateX(-50%); */
-        margin-bottom: 0px;
-    }
-    .dataTables_wrapper tbody td {
-        text-align: center;
-        vertical-align: top;
     }
     .expanded-row td {
         white-space: normal;
         word-wrap: break-word;
-    }
-    table {
-        table-layout: fixed;
     }
     div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button a, #genes_list_paginate {
         font-size: 0.9rem; /* Adjust this value as needed */
@@ -94,17 +65,64 @@
         margin-left: 1rem;
         margin-right: 1rem;
     }
+    .dataTables_filter {
+        display: flex;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        padding-top: 0.5rem;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    .dataTables_filter label {
+        display: flex;
+        align-items: center;
+    }
+    .dataTables_filter label input {
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
 </style>
 
 <main class="container-fluid">
     <div class="row">
-        <div class="col-lg-3 col-xl-2 ps-2">
-            {% include 'pangenome_analyses/info_panel_genes.html' with active_subpage="genes" %}
-        </div>
-        <div class="col-lg-9 col-xl-10 pt-2 pb-2">
-            {% include 'components/panel_genes_table.html' with panel_name="genes_table" panel_title="Gene Annotation Table" panel_class="col-lg-12" %}
-        </div>
+        {% include 'components/panel_publications_table.html' with panel_name="publications_table" panel_title="Publications" panel_class="col-lg-12" %}
     </div>
 </div>
 </main>
+<script>
+    $(document).ready(async function () {
+        const dataset = {{ dataset|safe }}
+
+        let table = $('#publications_table').DataTable({
+            destroy: true,
+            data: dataset,
+            columns: [
+                { data: 'Title' },
+                {
+                    data: 'PMID',
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            return '<a href=https://pubmed.ncbi.nlm.nih.gov/' + data + '/ target="_blank">' + data + '</a>';
+                        } else return data;
+                    }
+                },
+            ],
+            columnDefs: [
+                {
+                    targets: [0, 1],
+                    render: function(data, type, row) {
+                        return data;
+                    }
+                }
+            ],
+            language: {
+                loadingRecords: 'Loading...',
+                zeroRecords: 'Result not found.'
+            },
+            order: [],
+            bSort: true,
+            searching: true
+        });
+    });
+</script>
 {% endblock %}

@@ -16,7 +16,95 @@
     <tbody id="tbody">
     </tbody>
 </table>
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    var genes_table = null;
+
+    $(document).ready(async function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const species = urlParams.get('species');
+
+        data = {{ dataset|safe }}
+
+        const Gene = data;
+        console.log(Gene);
+
+        genes_table = $('#genes_table').DataTable({
+            destroy: true,
+            data: Gene,
+            columns: [
+                {
+                    data: '0',
+                    render: function (data, type, row) {
+                        return '<a href=" {% url 'gene_info' %}?species=' + species + '&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
+                    }
+                },
+                {data: '7'},
+                {data: '1'},
+                {data: '2'},
+                {data: '3'},
+                {
+                    data: '4',
+                    className: 'protein',
+                },
+                {
+                    data: '5',
+                    className: 'pfams',
+                },
+                {data: '6'}
+            ],
+            language: {
+                loadingRecords: 'Loading...',
+                zeroRecords: 'Result not found.'
+            },
+            initComplete: function () {
+                const api = this.api();
+                
+                // Existing column search code
+                $(this.api().table().header()).find('th').each(function (index, th) {
+                    const columnHeader = $(th).find('div').first();
+                    const columnIndex = index;
+
+                    const searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 60%; display: flex;" />')
+                        .on('keyup change clear', function () {
+                            api.column(columnIndex).search(this.value).draw();
+                        })
+                        .on('click', function(e) {  // Prevent event bubbling on click
+                            e.stopPropagation();
+                        });
+
+                    $(searchInput).appendTo(columnHeader);
+                });
+
+                let queryString = window.location.search;
+                let urlParams = new URLSearchParams(queryString);
+                let q = urlParams.get('q')
+                highlightText(q);
+            }
+        });
+
+        {% if highlight_text %}
+        genes_table.on("draw", function () {
+            let queryString = window.location.search;
+            let urlParams = new URLSearchParams(queryString);
+            let q = urlParams.get('q')
+            highlightText(q);
+        });
+        {% endif %}
+
+        // Expand row on click
+        $('#genes_table tbody').on('click', 'td', function () {
+            const cellText = $(this).text().trim();
+            const rowIndex = $(this).closest('tr').index();
+            const row = table.row(rowIndex);
+            if (row.child.isShown()) {
+                row.child.hide();
+                $(this).closest('tr').removeClass('expanded-row');
+            } else {
+                const expandedRowContent = '<td colspan="8" style="white-space: normal; word-wrap: break-word;">' + cellText + '</td>';
+                row.child(expandedRowContent).show();
+                $(this).closest('tr').addClass('expanded-row');
+            }
+        });
+    });
+</script>
 {% endblock %}

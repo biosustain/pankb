@@ -1,0 +1,16 @@
+{% extends "components/panel_universal.html" %}
+{% block panel_content %}
+<table id="publications_table" class="table table-hover" style="width: 100%;">
+    <thead>
+    <tr>
+        <th class="text-center w-80"><div class="d-flex flex-column align-items-center"><div>Title</div></div></th>
+        <th class="text-center w-20"><div class="d-flex flex-column align-items-center"><div>PMID</div></div></th>
+    </tr>
+    </thead>
+    <tbody id="tbody">
+    </tbody>
+</table>
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+{% endblock %}

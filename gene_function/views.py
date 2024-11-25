@@ -188,24 +188,14 @@ def genome_info(request):
   filter_params['pangenome_analysis'] = species
   filter_params['genome_id'] = genome_id
   # Obtain the genome info: ----
-  genome_info = GenomeInfo.objects.filter(**filter_params).values()
-  # In the Microsoft Azure Blob Storage, we actually store python objects that are nested dictionaries:
-  # {"genome_id": {"key_1": value_1, "key_2": value_2, ..., "key_n": value_n}}
-  # Transform the data to the dataframe first and remove a columns with ids (not needed in the output): ----
-  genome_info_pd = pd.DataFrame(list(genome_info), index=None)
-  del genome_info_pd['_id']
-
-  # Transform the df to a dict of dicts: ----
-  genome_info_dict = genome_info_pd.to_dict(orient="index")
-  # Substitute the index with our own (genome_id): ----
-  dict_vals = {k:v for d in genome_info_dict.values() for k,v in  d.items()}
-  genome_info_dict = {genome_id: dict_vals}
-  genome_info_json = json.dumps(genome_info_dict, default = str)  # json dumps replaces the single quotes with the double ones
+  genome_info = GenomeInfo.objects.get(**filter_params)
+  genome_info_dict = model_to_dict(genome_info, exclude=["_id"])
+  genome_info_dict["num_genes"] = sum(genome_info_dict["gene_class_distribution"])
 
   # Compose a context for the template rendering: ----
   context = {
-    'dataGenome': genome_info_json,
-    'antismash_url': '' if genome_info_dict[genome_id]["antismash_url"] is None else genome_info_dict[genome_id]["antismash_url"]
+    'dataGenome': genome_info_dict,
+    'antismash_url': '' if genome_info_dict["antismash_url"] is None else genome_info_dict["antismash_url"]
   }
   return HttpResponse(template.render(context, request))
 
