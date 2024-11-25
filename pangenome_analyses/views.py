@@ -1,6 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.http import StreamingHttpResponse
+from django.http import HttpResponse, Http404, StreamingHttpResponse
 from django.template import loader
 from .models import GeneAnnotations
 from gene_function.models import GenomeInfo
@@ -21,7 +20,10 @@ def overview(request):
   filter_params = {}
   filter_params['pangenome_analysis'] = species
   # Get info about the given organisms from the Organisms collection (in a dictionary): ----
-  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')[0]
+  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')
+  if len(organism_info) == 0:
+    raise Http404()
+  organism_info = organism_info[0]
 
   # Compose a context for the template rendering
   context = {
@@ -210,7 +212,10 @@ def gene_annotation(request):
   filter_params['pangenome_analysis'] = species
 
   # Get info about the given organisms from the Organisms collection (in a dictionary): ----
-  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')[0]
+  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')
+  if len(organism_info) == 0:
+    raise Http404()
+  organism_info = organism_info[0]
 
   # Get the gene annotations info form the Gene Annotations collection: ----
   gene_annotations = GeneAnnotations.objects.filter(**filter_params).values('gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class')
@@ -268,7 +273,11 @@ def phylogenetic_tree(request):
   filter_params = {}
   filter_params['pangenome_analysis'] = species
   # Get info about the given organisms from the Organisms collection (in a dictionary): ----
-  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')[0]
+  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')
+  if len(organism_info) == 0:
+    raise Http404()
+  organism_info = organism_info[0]
+
 
   # Compose a context for the template rendering
   context = {

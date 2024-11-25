@@ -75,10 +75,12 @@
                     $(searchInput).appendTo(columnHeader);
                 });
 
+                {% if highlight_text %}
                 let queryString = window.location.search;
                 let urlParams = new URLSearchParams(queryString);
                 let q = urlParams.get('q')
                 highlightText(q);
+                {% endif %}
             }
         });
 
@@ -95,7 +97,7 @@
         $('#genes_table tbody').on('click', 'td', function () {
             const cellText = $(this).text().trim();
             const rowIndex = $(this).closest('tr').index();
-            const row = table.row(rowIndex);
+            const row = genes_table.row(rowIndex);
             if (row.child.isShown()) {
                 row.child.hide();
                 $(this).closest('tr').removeClass('expanded-row');

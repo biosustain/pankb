@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.template import loader
 from django.urls import reverse
 import json, requests, io, csv, time
@@ -38,7 +38,11 @@ def gene_info(request):
     "$project": {"_id": 0, "pathway_info.genes": 0, "pathway_info._id": 0}
    }
   ])
-  pw_agg = list(pw_agg)[0]
+  pw_agg = list(pw_agg)
+  if len(pw_agg) == 0:
+    raise Http404()
+  pw_agg = pw_agg[0]
+
   if pw_agg.get("kegg_ko", False):
     pw_agg["kegg_ko_link"] = '/' + '/'.join(pw_agg["kegg_ko"])
   else:
@@ -188,7 +192,10 @@ def genome_info(request):
   filter_params['pangenome_analysis'] = species
   filter_params['genome_id'] = genome_id
   # Obtain the genome info: ----
-  genome_info = GenomeInfo.objects.get(**filter_params)
+  try:
+    genome_info = GenomeInfo.objects.get(**filter_params)
+  except GenomeInfo.DoesNotExist:
+    raise Http404()
   genome_info_dict = model_to_dict(genome_info, exclude=["_id"])
   genome_info_dict["num_genes"] = sum(genome_info_dict["gene_class_distribution"])
 
@@ -292,7 +299,10 @@ def pathway_info(request):
   template = loader.get_template('gene_function/pathway_info.html')
   pathway_id = request.GET['pathway_id']
 
-  pathway_info = PathwayInfo.objects.get(pathway_id=pathway_id)
+  try:
+    pathway_info = PathwayInfo.objects.get(pathway_id=pathway_id)
+  except PathwayInfo.DoesNotExist:
+    raise Http404()
   pathway_info_dict = model_to_dict(pathway_info, exclude=["_id", "genes"])
   pathway_kegg_link = f"https://www.kegg.jp/pathway/{pathway_info.pathway_id}"
 
