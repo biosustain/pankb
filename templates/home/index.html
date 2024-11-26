@@ -30,7 +30,7 @@
     ];
 </script>
 
-<main class="container-fluid">
+<main class="container-fluid ps-md-4 pe-md-4">
     <div class="row">
         <div class="col-lg-12 text-center">
             <p class="display-5 center" style="margin: 0px;">
@@ -46,14 +46,12 @@
     <div class="row mb-2">
         {% include "search/search_frontpage.html" %}
     </div>
-    <div class="row">
+    <div class="row gy-4">
         <div class="col-xl-3 col-lg-6">
-            <div class="container-fluid">
-                <div class="row">
+            <div class="container-fluid p-0">
+                <div class="row gy-4">
                     {% include 'components/panel_home_dimensions.html' with panel_name="dimensions" panel_title="Database Size" panel_class='col-lg-12' %}
-                </div>
-                <div class="row">
-                    {% include 'components/panel_home_org_genome_gene.html' with panel_name="org_genome_gene" panel_title="Database Size per Organism" panel_class='col-lg-12' %}
+                    {% include 'components/panel_home_org_genome_gene.html' with panel_name="org_genome_gene" panel_title="Families" panel_class='col-lg-12' %}
                 </div>
             </div>
         </div>

@@ -71,12 +71,15 @@ def gene_info(request):
   # gene_info_dict = gene_info_pd.to_dict(orient = "records")
   gene_info_json = json.dumps(gene_info, default = str)  # json dumps replaces the single quotes with the double ones
 
+  deferred_msa_load = pw_agg["frequency"] > 200
+
   # Compose a context for the template rendering: ----
   context = {
     'dataset': gene_info_json,
     # 'pangene_info': pangene_info_dict,
     'imodulon_info': imodulon_info,
     'pangene_info': pw_agg,
+    'deferred_msa_load': deferred_msa_load,
   }
   return HttpResponse(template.render(context, request))
 
@@ -230,66 +233,25 @@ def genome_gene_info(request):
   template = loader.get_template('gene_function/genome_gene_info.html')
   species = request.GET['species']
   genome_id = request.GET['genome_id']
-  gene = request.GET['gene_id']
+  gene = request.GET['gene']
 
-  # Set the filter() function parameters: ----
-  filter_params = {}
-  filter_params['pangenome_analysis'] = species
-  filter_params['genome_id'] = genome_id
-  # Obtain the gene info: ----
-  genome_info = GenomeInfo.objects.filter(**filter_params).values()
-  # In the Microsoft Azure Blob Storage, we actually store python objects that are nested dictionaries:
-  # {"genome_id": {"key_1": value_1, "key_2": value_2, ..., "key_n": value_n}}
-  # Transform the data to the dataframe first and remove a columns with ids (not needed in the output): ----
-  genome_info_pd = pd.DataFrame(list(genome_info), index=None)
-  del genome_info_pd['_id']
+  try:
+    genome_info = GenomeInfo.objects.get(pangenome_analysis=species, genome_id=genome_id)
+  except GenomeInfo.DoesNotExist:
+    raise Http404()
+  genome_info_dict = model_to_dict(genome_info, exclude=["_id"])
+  genome_info_dict["num_genes"] = sum(genome_info_dict["gene_class_distribution"])
 
-  # Transform the df to a dict of dicts: ----
-  genome_info_dict = genome_info_pd.to_dict(orient="index")
-  # Substitute the index with our own (genome_id): ----
-  dict_vals = {k:v for d in genome_info_dict.values() for k,v in  d.items()}
-  genome_info_dict = {genome_id: dict_vals}
-  genome_info_json = json.dumps(genome_info_dict, default = str)  # json dumps replaces the single quotes with the double ones
-
-  ## Gene Info Table: ##
-  # Set the filter() function parameters: ----
-  filter_params = {}
-  filter_params['pangenome_analysis'] = species
-  filter_params['gene'] = gene
-  # Obtain the gene info: ----
-  gene_info = GeneInfo.objects.filter(**filter_params).values()
-  # In the Microsoft Azure Blob Storage, we actually store python objects that are dictionaries with the records orientation:
-  # [{"key_1": value_1, "key_2": value_2,..., "key_n": value_n}, ..., {} ]
-  # Transform the data to the dataframe first and remove a columns with ids (not needed in the output): ----
-  gene_info_pd = pd.DataFrame(list(gene_info), index=None)
-  del gene_info_pd['_id']
-
-  # Iterate over genomes to retrieve info about pathways: ----
-  # Set the filter() function parameters: ----
-  filter_params = {}
-  filter_params['pangenome_analysis'] = species
-  filter_params['gene'] = gene
-  filter_params['genome_id'] = genome_id
-  # Obtain info about associated pathways if any: ----
-  pathway_info = PathwayInfo.objects.filter(**filter_params).values('pathway_id', 'pathway_name', 'strain').order_by('pathway_name')
-  pathway_info_pd = pd.DataFrame(list(pathway_info), index=None)
-  if len(pathway_info_pd) > 0:
-    # The line below is a hacky way to wrap list items into links.
-    # The HTML must be rendered by Django the templates: ----
-    gene_info_pd.loc[gene_info_pd.genome_id == genome_id, 'pathways'] = (
-      ", ".join(list("<a href='/gene_function/pathway_info/?pathway_id=" + pathway_info_pd["pathway_id"] + "'>" + pathway_info_pd["pathway_name"] + "</a>")))
-  else:
-    gene_info_pd.loc[gene_info_pd.genome_id == genome_id, 'pathways'] = "-"
-
-  # Transform the df to a list of dictionaries: ----
-  gene_info_dict = gene_info_pd.to_dict(orient = "records")
-  gene_info_json = json.dumps(gene_info_dict, default = str)  # json dumps replaces the single quotes with the double ones
+  gene_info = GeneInfo.objects.filter(pangenome_analysis=species, genome_id=genome_id, gene=gene).values('locus_tag', 'genome_id', 'gene', 'protein', 'start_position', 'end_position', 'nucleotide_seq', 'aminoacid_seq', 'species', 'pangenome_analysis', 'original_locus_tag', 'original_gene', 'original_exact_match')
+  if len(gene_info) == 0:
+    raise Http404()
+  gene_info = list(gene_info)
 
   # Compose a context for the template rendering: ----
   context = {
-    'dataGenome': genome_info_json,
-    'dataGene': gene_info_json,
-    'antismash_url': '' if genome_info_dict[genome_id]["antismash_url"] is None else genome_info_dict[genome_id]["antismash_url"]
+    'dataGenome': genome_info_dict,
+    'dataGene': gene_info,
+    'gene_id': gene,
   }
   return HttpResponse(template.render(context, request))
 

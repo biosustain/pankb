@@ -1,0 +1,248 @@
+{% extends "gene_function/gene_function.html"%}
+
+{% block title %}<title>Genome & Gene Info</title>{% endblock %}
+{% block custom_style %}
+    <style>
+        .table_padding{
+            padding-top: 0px;
+            padding-bottom: 0px;
+            padding-right: 1em;
+            padding-left: 1em;
+        }
+        th, td{
+            height: 2.8em;
+            font-size: 0.9em;
+            padding-left: 1em !important;
+            padding-right: 1em !important;
+        }
+        .dataTables_wrapper thead th {
+            text-align: left;
+            vertical-align: top;
+            padding: 1em;
+            position: relative;
+        }
+        .dataTables_wrapper thead th input {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            margin-bottom: 0.45em;
+        }
+        .dataTables_wrapper tbody td {
+            text-align: left;
+            vertical-align: top;
+            padding: 0.45em;
+            word-break: break-word;
+        }
+        .responsive-iframe iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 10%;
+            right: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2 style = 'text-align: center; font-size: 1.6em;'>Genome & Gene Info</h2>
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10">
+            <br>
+            <div class="table_padding">
+                <table id="genome_info" class="table table-hover" style="width:100%; table-layout: fixed;">
+                    <thead>
+                    <tr>
+                        <th>Genome ID</th>
+                        <th>Strain (NCBI)</th>
+                        <th>Source</th>
+                        <th>Isolation Source</th>
+                        <th>Country</th>
+                        <th>Geological Location Name</th>
+                        <th>GC Content</th>
+                        <th>Genome Length</th>
+                        <th>Number of Genes</th>
+                        <th>Gene Class Distribution</th>
+                    </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+            <br>
+            <div class="table_padding">
+                <table id="gene_info" class="table table-hover" style="width:100%; table-layout: fixed;">
+                    <thead>
+                    <tr>
+                        <th>Gene ID</th>
+                        <th>Gene Class</th>
+                        <th>Locus Tag</th>
+                        <th>Protein</th>
+                        <th>Start Position</th>
+                        <th>End Position</th>
+                        <th>Nucleotide Seq</th>
+                        <th>Amino Acid Seq</th>
+                        <th>Pathways</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+            <br><br>
+            <div class="d-flex justify-content-center align-items-center" style="height: 50vh;">
+                <iframe id="Genome_page_COG_distribution" class="w-100 h-100" style="border:0;"></iframe>
+            </div>
+            <br><br>
+        </div>
+        <div class="col-1"></div>
+    </div>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const species = urlParams.get('species');
+        const genome_id = urlParams.get('genome_id');
+        const gene_class = urlParams.get('gene_class');
+        let gene_id = urlParams.get('gene_id');
+        if (gene_id.includes('/')) {
+            gene_id = gene_id.replace(/\//g, '_');
+        }
+
+        // Gene Info Table Rendering: ----
+        try {
+            // Obtain data rendered in the respective view
+            const data = {{ dataGenome|safe }}
+
+            const tableBody = document.getElementById('table-body');
+            const geneClassDistribution = data[genome_id]['gene_class_distribution'];
+            const total = geneClassDistribution[0] + geneClassDistribution[1] + geneClassDistribution[2];
+            const coreWidth = (geneClassDistribution[0] / total) * 100;
+            const accessoryWidth = (geneClassDistribution[1] / total) * 100;
+            const rareWidth = (geneClassDistribution[2] / total) * 100;
+            const number_of_genes = geneClassDistribution.reduce((a, b) => a + b, 0);
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${genome_id}
+                {% if antismash_url != '' %}&nbsp;<a href='{{antismash_url|safe}}' target="_blank"><img src="https://antismash.secondarymetabolites.org/images/antismash_logo.svg" alt="antiSMASH - Identified Secondary Metabolite Regions" style="height: 1.7em;"></a>{% endif %}
+                </td>
+                <td>${data[genome_id]['strain']}</td>
+                <td><a href="https://www.ncbi.nlm.nih.gov/datasets/genome/${genome_id}" target="_blank">NCBI</a></td>
+                <td>${data[genome_id]['isolation_source']}</td>
+                <td>${data[genome_id]['country']}</td>
+                <td>${data[genome_id]['geo_loc_name']}</td>
+                <td>${(data[genome_id] && typeof data[genome_id]['gc_content'] === 'number') ? data[genome_id]['gc_content'].toFixed(3) : 'null'}</td>
+                <td>${data[genome_id]['genome_len']}</td>
+                <td>${number_of_genes}</td>
+                <td>
+                    <div style="display: flex; height: 20px; max-width: 80%; margin: 0; border-radius: 10px; overflow: hidden;">
+                        <div style="width: ${coreWidth}%; background-color: rgba(128,0,128,0.8);" data-toggle="tooltip" title="Core: ${geneClassDistribution[0]}"></div>
+                        <div style="width: ${accessoryWidth}%; background-color: rgba(255,165,0,0.8);" data-toggle="tooltip" title="Accessory: ${geneClassDistribution[1]}"></div>
+                        <div style="width: ${rareWidth}%; background-color: rgba(0,128,0,0.8);" data-toggle="tooltip" title="Rare: ${geneClassDistribution[2]}"></div>
+                    </div>
+                </td>
+            `;
+            tableBody.appendChild(row);
+
+            // Initialize tooltips
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+            // Initialize DataTable
+            $('#genome_info').DataTable({
+                searching: false,
+                lengthChange: false,
+                bPaginate: false,
+                paging: false,
+                bInfo: false,
+            });
+        }
+        catch(error) {
+            console.error(error)
+        }
+
+        // Gene Info Table Rendering: ----
+        try {
+            // Convert the data object to an array for DataTables
+            let geneData = {{ dataGene | safe }};
+            // Filter the geneData based on the Genome ID
+            const matchedEntry = geneData.find(entry => entry.genome_id === genome_id);
+            geneData = matchedEntry ? [matchedEntry] : [];
+
+            let emptyTableText = 'Loading...';
+
+            if (geneData.length === 0) {
+                emptyTableText = 'Gene ' + '<b>' +  gene_id  + '</b>' + ' doesn\'t exist in genome ' + '<b>' +  genome_id  + '</b>' ;
+            }
+
+            let table = $('#gene_info').DataTable({
+                data: geneData,
+                columns: [
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            // Render the link to the respective gene info here
+                            return '<a href = "' + "{% url 'gene_info' %}" + '?species=' + species + '&gene=' + encodeURIComponent(gene_id) + '&gene_class=' + encodeURIComponent(gene_class) + '" target="_blank">' + gene_id + '</a>';
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return gene_class;
+                        },
+                    },
+                    { data: 'locus_tag' },
+                    { data: 'protein' },
+                    { data: 'start_position' },
+                    { data: 'end_position' },
+                    { data: 'nucleotide_seq' },
+                    { data: 'aminoacid_seq' },
+                    { data: 'pathways' }
+                ],
+                columnDefs: [
+                    {
+                        targets: [3, 6, 7], // Apply the function to the "Protein", "Nucleotide Seq" and "Amino Acid Seq" columns
+                        render: function(data, type, row) {
+                            if (type === 'display' && data.length > 20) {
+                                return '<span class="truncated" data-toggle="tooltip" data-fulltext="' + data + '" title="' + data + '">' + data.substr(0, 20) + '...</span>';
+                            } else {
+                                return data;
+                            }
+                        }
+                    }
+                ],
+                dom: 'Bfrtip', // Remove the toolbar
+                info: false, // Remove the entry info
+                paging: false, // Remove the page counter
+                searching: false, // Remove the search bar
+                language: {
+                    emptyTable: emptyTableText
+                },
+                order: [],
+                bSort: true
+            });
+        } catch (error) {
+            console.error('Error:', error);
+        }
+
+        $('body').on('click', '.truncated', function() {
+            let fullText = $(this).attr('data-fulltext');
+            let truncatedText = $(this).text();
+            let cell = $(this).closest('td');
+
+            if (fullText !== truncatedText) { // check if fullText is not equal to truncatedText
+                $(this).text(fullText);
+                cell.addClass('expanded');
+            } else {
+                $(this).text(fullText.substr(0, 20) + '...');
+                cell.removeClass('expanded');
+            }
+            table.draw(false); // Redraw the DataTable to readjust the layout
+        });
+
+        const Genome_page_COG_distribution = document.getElementById('Genome_page_COG_distribution');
+        Genome_page_COG_distribution.src = "{% url 'genome_barplot' %}?species=" + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id);
+    </script>
+{% endblock %}

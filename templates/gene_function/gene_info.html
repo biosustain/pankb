@@ -34,7 +34,7 @@
     td {
         font-size: 0.9rem;
         text-align: center;
-        width: 12.5% !important;
+        /* width: 12.5% !important; */
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -112,7 +112,11 @@
         {% include 'components/panel_iframe.html' with panel_name="aa_pos_overview" panel_title="Dominant and Variant Amino Acids" panel_iframe_src=url_aa_pos_overview|add:"?species="|add:request.GET.species|add:"&gene="|add:request.GET.gene panel_iframe_class='responsive-iframe-wide' panel_class='col-lg-12' %}
         
         {% url 'msa' as url_msa %}
+        {% if deferred_msa_load %}
+        {% include 'components/panel_iframe_deferred_load.html' with panel_name="msa" panel_title="Multiple Sequence Alignment" panel_iframe_src=url_msa|add:"?species="|add:request.GET.species|add:"&gene="|add:request.GET.gene panel_class='col-lg-12' panel_iframe_class='responsive-iframe-msa' %}
+        {% else %}
         {% include 'components/panel_iframe.html' with panel_name="msa" panel_title="Multiple Sequence Alignment" panel_iframe_src=url_msa|add:"?species="|add:request.GET.species|add:"&gene="|add:request.GET.gene panel_class='col-lg-12' panel_iframe_class='responsive-iframe-msa' %}
+        {% endif %}
     </div>
 </div>
 <script>
@@ -150,22 +154,46 @@
                 data: geneData,
                 columns: [
                     { 
+                        data: 'gene',
+                        render: function(data, type, row) {
+                            return "<a href='{% url 'genome_gene_info' %}?species={{request.GET.species|safe}}&genome_id=" + encodeURIComponent(row["genome_id"]) + "&gene=" + encodeURIComponent(data) + "'>&gt;</a>";
+                        },
+                        width: '5%',
+                    },
+                    { 
                         data: 'locus_tag',
                         render: function(data, type, row) {
                             return get_original_locus_tag_info(row);
-                        }
+                        },
+                        width: '15%',
                     },
                     {
                         data: 'genome_id',
                         render: function(data, type, row) {
                             return '<a href="{% url 'genome_info' %}?species={{request.GET.species|safe}}&genome_id=' + encodeURIComponent(data) + '" target="_blank">' + data + '</a>';
-                        }
+                        },
+                        width: '15%',
                     },
-                    { data: 'protein' },
-                    { data: 'start_position' },
-                    { data: 'end_position' },
-                    { data: 'nucleotide_seq' },
-                    { data: 'aminoacid_seq' },
+                    {
+                        data: 'protein',
+                        width: '15%',
+                    },
+                    {
+                        data: 'start_position',
+                        width: '10%',
+                    },
+                    {
+                        data: 'end_position',
+                        width: '10%',
+                    },
+                    {
+                        data: 'nucleotide_seq',
+                        width: '15%',
+                    },
+                    {
+                        data: 'aminoacid_seq',
+                        width: '15%',
+                    },
                 ],
                 language: {
                     emptyTable: 'Loading...'
