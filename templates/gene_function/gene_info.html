@@ -1,9 +1,9 @@
-{% extends "index.html" %}
+{% extends "index_with_infopanel.html" %}
 {% block page_title %}Gene Info{% endblock %}
-{% block content %}
+
+{% block header_content %}
 {% include "navigation.html" with active_page="organisms" %}
 {% include "search/search.html" %}
-
 <style>
     .center-container {
         display: flex;
@@ -97,27 +97,24 @@
         height: 780px;
     }
 </style>
+{% endblock %}
 
-<main class="container-fluid">
-    <div class="row">
-        <div class="col-lg-3 col-xl-2 ps-2">
-            {% include 'gene_function/info_panel_gene_info.html' %}
-        </div>
-        <div class="col-lg-9 col-xl-10 pt-2 pb-2">
-            <div class="container-fluid" data-bs-spy="scroll" data-bs-target="#page-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true">
-                <div class="row g-3 pb-4">
-                    {% include 'components/panel_locustags_table.html' with panel_name="locustags_table" panel_title="Locus Tag Table" panel_class="col-lg-12" %}
+{% block infopanel_content %}
+{% include 'gene_function/info_panel_gene_info.html' %}
+{% endblock %}
 
-                    {% url 'aa_pos_overview' as url_aa_pos_overview %}
-                    {% include 'components/panel_iframe.html' with panel_name="aa_pos_overview" panel_title="Dominant and Variant Amino Acids" panel_iframe_src=url_aa_pos_overview|add:"?species="|add:request.GET.species|add:"&gene="|add:request.GET.gene panel_iframe_class='responsive-iframe-wide' panel_class='col-lg-12' %}
-                    
-                    {% url 'msa' as url_msa %}
-                    {% include 'components/panel_iframe.html' with panel_name="msa" panel_title="Multiple Sequence Alignment" panel_iframe_src=url_msa|add:"?species="|add:request.GET.species|add:"&gene="|add:request.GET.gene panel_class='col-lg-12' panel_iframe_class='responsive-iframe-msa' %}
-                </div>
-            </div>
-        </div>
+{% block main_content %}
+<div class="container-fluid" data-bs-spy="scroll" data-bs-target="#page-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true">
+    <div class="row g-3 pb-4">
+        {% include 'components/panel_locustags_table.html' with panel_name="locustags_table" panel_title="Locus Tag Table" panel_class="col-lg-12" %}
+
+        {% url 'aa_pos_overview' as url_aa_pos_overview %}
+        {% include 'components/panel_iframe.html' with panel_name="aa_pos_overview" panel_title="Dominant and Variant Amino Acids" panel_iframe_src=url_aa_pos_overview|add:"?species="|add:request.GET.species|add:"&gene="|add:request.GET.gene panel_iframe_class='responsive-iframe-wide' panel_class='col-lg-12' %}
+        
+        {% url 'msa' as url_msa %}
+        {% include 'components/panel_iframe.html' with panel_name="msa" panel_title="Multiple Sequence Alignment" panel_iframe_src=url_msa|add:"?species="|add:request.GET.species|add:"&gene="|add:request.GET.gene panel_class='col-lg-12' panel_iframe_class='responsive-iframe-msa' %}
     </div>
-</main>
+</div>
 <script>
     // const urlParams = new URLSearchParams(window.location.search);
     // const species = urlParams.get('species');

@@ -1,24 +1,22 @@
-{% extends "index.html" %}
+{% extends "index_with_infopanel.html" %}
 {% block page_title %}Genome Info{% endblock %}
-{% block content %}
+
+{% block header_content %}
 {% include "navigation.html" with active_page="organisms" %}
 {% include "search/search.html" %}
+{% endblock %}
 
-<main class="container-fluid">
+{% block infopanel_content %}
+{% include 'gene_function/info_panel_genome_info.html' %}
+{% endblock %}
+
+{% block main_content %}
+<div class="container-fluid">
     <div class="row">
-        <div class="col-md-4 col-lg-3 col-xl-2 ps-2">
-            {% include 'gene_function/info_panel_genome_info.html' %}
-        </div>
-        <div class="col-md-8 col-lg-9 col-xl-10 p-2">
-            <div class="container-fluid">
-                <div class="row">
-                    {% url 'genome_barplot' as url_cog_distribution %}
-                    {% include 'components/panel_iframe.html' with panel_name="cog_distribution" panel_title="Gene Annotation Distribution" panel_iframe_src=url_cog_distribution|add:"?species="|add:request.GET.species|add:"&genome_id="|add:request.GET.genome_id panel_class='col-lg-12' panel_iframe_class='responsive-iframe-h30' %}
-                </div>
-            </div>
-        </div>
+        {% url 'genome_barplot' as url_cog_distribution %}
+        {% include 'components/panel_iframe.html' with panel_name="cog_distribution" panel_title="Gene Annotation Distribution" panel_iframe_src=url_cog_distribution|add:"?species="|add:request.GET.species|add:"&genome_id="|add:request.GET.genome_id panel_class='col-lg-12' panel_iframe_class='responsive-iframe-h30' %}
     </div>
-</main>
+</div>
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <script>
 $(function () {

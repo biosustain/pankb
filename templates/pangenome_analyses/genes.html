@@ -1,6 +1,7 @@
-{% extends "index.html" %}
+{% extends "index_with_infopanel.html" %}
 {% block page_title %}Genes{% endblock %}
-{% block content %}
+
+{% block header_content %}
 {% include "navigation.html" with active_page="organisms" %}
 {% include "search/search.html" %}
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
@@ -95,16 +96,12 @@
         margin-right: 1rem;
     }
 </style>
+{% endblock %}
 
-<main class="container-fluid">
-    <div class="row">
-        <div class="col-lg-3 col-xl-2 ps-2">
-            {% include 'pangenome_analyses/info_panel_genes.html' with active_subpage="genes" %}
-        </div>
-        <div class="col-lg-9 col-xl-10 pt-2 pb-2">
-            {% include 'components/panel_genes_table.html' with panel_name="genes_table" panel_title="Gene Annotation Table" panel_class="col-lg-12" %}
-        </div>
-    </div>
-</div>
-</main>
+{% block infopanel_content %}
+{% include 'pangenome_analyses/info_panel_genes.html' with active_subpage="genes" %}
+{% endblock %}
+
+{% block main_content %}
+{% include 'components/panel_genes_table.html' with panel_name="genes_table" panel_title="Gene Annotation Table" panel_class="col-lg-12" %}
 {% endblock %}

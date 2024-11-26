@@ -1,51 +1,49 @@
-{% extends "index_scrollspy.html" %}
+{% extends "index_with_infopanel.html" %}
 {% block page_title %}Pangenome Analyses{% endblock %}
-{% block content %}
+
+{% block header_content %}
 {% include "navigation.html" with active_page="organisms" %}
 {% include "search/search.html" %}
+{% endblock %}
 
-<main class="container-fluid">
-    <div class="row">
-        <div class="col-md-4 col-lg-3 col-xl-2 ps-2">
-            {% include 'pangenome_analyses/info_panel_overview.html' with active_subpage="overview" %}
-        </div>
-        <div class="col-md-8 col-lg-9 col-xl-10 p-2">
-            <div class="container-fluid">
-                <div class="row g-3">
-                    <div class="col-12"><h4 id="general" class="display-3 p-2 ps-4">General Analysis</h4></div>
-                </div>
-                <div class="row g-3 pb-4">
-                    {% url 'heaps_law' as url_heaps_law %}
-                    {% include 'components/panel_iframe.html' with panel_name="heaps_law" panel_title="Heap's Law" panel_iframe_src=url_heaps_law|add:"?species="|add:request.GET.species %}
+{% block infopanel_content %}
+{% include 'pangenome_analyses/info_panel_overview.html' with active_subpage="overview" %}
+{% endblock %}
 
-                    {% url 'cumulative_freq' as url_cum_freq %}
-                    {% include 'components/panel_iframe.html' with panel_name="cum_freq" panel_title="Cumulative Gene Frequency Distribution" panel_iframe_src=url_cum_freq|add:"?species="|add:request.GET.species %}
-                    
-                    {% url 'gene_annotation_distribution' as url_gene_ann_distr %}
-                    {% include 'components/panel_iframe.html' with panel_name="gene_ann_distr" panel_title="Gene Annotation Distribution" panel_iframe_src=url_gene_ann_distr|add:"?species="|add:request.GET.species %}
-                    
-                    {% url 'gene_freq' as url_gene_freq %}
-                    {% include 'components/panel_iframe.html' with panel_name="gene_freq" panel_title="Gene Frequency" panel_iframe_src=url_gene_freq|add:"?species="|add:request.GET.species %}
-                </div>
-                <div class="row g-3">
-                    <div class="col-12"><h4 id="presence_absence" class="display-3 p-2 ps-4">Gene Presence/Absence</h4></div>
-                </div>
-                <div class="row g-3 pb-4">
-                    {% url 'hotmap' as url_hotmap %}
-                    {% include 'components/panel_heatmap_iframe.html' with panel_name="heatmap" panel_title="Heatmap" panel_iframe_src=url_hotmap|add:"?species="|add:request.GET.species|add:"&gene_class=core" panel_class="col-lg-12" %}
-                </div>
-                <div class="row g-3">
-                    <div class="col-12"><h4 id="alleleome" class="display-3 p-2 ps-4">Alleleome</h4></div>
-                </div>
-                <div class="row g-3 pb-4">
-                    {% url 'variant_dominant_freq' as url_variant_dominant_freq %}
-                    {% include 'components/panel_iframe.html' with panel_name="variant_dominant_freq" panel_title="Dominant and Variant AA Frequency" panel_iframe_src=url_variant_dominant_freq|add:"?species="|add:request.GET.species panel_iframe_class="responsive-iframe-square" %}
-
-                    {% url 'ds_dn_ratio' as url_dn_ds %}
-                    {% include 'components/panel_iframe.html' with panel_name="dn_ds" panel_title="dN/dS Ratio" panel_iframe_src=url_dn_ds|add:"?species="|add:request.GET.species panel_iframe_class="responsive-iframe-square" %}
-                </div>
-            </div>
-        </div>
+{% block main_content %}
+<div class="container-fluid">
+    <div class="row g-3">
+        <div class="col-12"><h4 id="general" class="display-3 p-2 ps-4">General Analysis</h4></div>
     </div>
-</main>
+    <div class="row g-3 pb-4">
+        {% url 'heaps_law' as url_heaps_law %}
+        {% include 'components/panel_iframe.html' with panel_name="heaps_law" panel_title="Heap's Law" panel_iframe_src=url_heaps_law|add:"?species="|add:request.GET.species %}
+
+        {% url 'cumulative_freq' as url_cum_freq %}
+        {% include 'components/panel_iframe.html' with panel_name="cum_freq" panel_title="Cumulative Gene Frequency Distribution" panel_iframe_src=url_cum_freq|add:"?species="|add:request.GET.species %}
+        
+        {% url 'gene_annotation_distribution' as url_gene_ann_distr %}
+        {% include 'components/panel_iframe.html' with panel_name="gene_ann_distr" panel_title="Gene Annotation Distribution" panel_iframe_src=url_gene_ann_distr|add:"?species="|add:request.GET.species %}
+        
+        {% url 'gene_freq' as url_gene_freq %}
+        {% include 'components/panel_iframe.html' with panel_name="gene_freq" panel_title="Gene Frequency" panel_iframe_src=url_gene_freq|add:"?species="|add:request.GET.species %}
+    </div>
+    <div class="row g-3">
+        <div class="col-12"><h4 id="presence_absence" class="display-3 p-2 ps-4">Gene Presence/Absence</h4></div>
+    </div>
+    <div class="row g-3 pb-4">
+        {% url 'hotmap' as url_hotmap %}
+        {% include 'components/panel_heatmap_iframe.html' with panel_name="heatmap" panel_title="Heatmap" panel_iframe_src=url_hotmap|add:"?species="|add:request.GET.species|add:"&gene_class=core" panel_class="col-lg-12" %}
+    </div>
+    <div class="row g-3">
+        <div class="col-12"><h4 id="alleleome" class="display-3 p-2 ps-4">Alleleome</h4></div>
+    </div>
+    <div class="row g-3 pb-4">
+        {% url 'variant_dominant_freq' as url_variant_dominant_freq %}
+        {% include 'components/panel_iframe.html' with panel_name="variant_dominant_freq" panel_title="Dominant and Variant AA Frequency" panel_iframe_src=url_variant_dominant_freq|add:"?species="|add:request.GET.species panel_iframe_class="responsive-iframe-square" %}
+
+        {% url 'ds_dn_ratio' as url_dn_ds %}
+        {% include 'components/panel_iframe.html' with panel_name="dn_ds" panel_title="dN/dS Ratio" panel_iframe_src=url_dn_ds|add:"?species="|add:request.GET.species panel_iframe_class="responsive-iframe-square" %}
+    </div>
+</div>
 {% endblock %}
