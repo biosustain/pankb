@@ -218,7 +218,7 @@ def gene_annotation(request):
   organism_info = organism_info[0]
 
   # Get the gene annotations info form the Gene Annotations collection: ----
-  gene_annotations = GeneAnnotations.objects.filter(**filter_params).values('gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class')
+  gene_annotations = GeneAnnotations.objects.filter(**filter_params).values('gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class', 'pangenome_analysis')
 
   # Transform the QuerySet with gene annotations into a pandas df: ----
   gene_annotations_pd = pd.DataFrame(list(gene_annotations), index=None)

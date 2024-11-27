@@ -1,87 +1,11 @@
 {% extends "index.html" %}
 {% block page_title %}Publications{% endblock %}
+
+{% block header_load_datatables %}{% include 'tables/load_datatables.html' %}{% endblock %}
+
 {% block content %}
 {% include "navigation.html" with active_page="publications" %}
 {% include "search/search.html" %}
-
-<style>
-    .center-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-    }
-    .table_padding {
-        width: 100%;  /* adjust this value according to your needs */
-        display: flex;
-    }
-    .table-responsive {
-        width: 100%;  /* make sure it fills its container */
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-        /* max-height: 100vh; */
-        /* padding-left: 2.8em; */
-        /* padding-right: 1.1em; */
-    }
-    tr, th {
-        font-size: 1rem;
-        vertical-align: middle;
-    }
-    td {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    tbody td {
-        padding: 1.1em !important;  /* adjust as needed */
-    }
-    thead th {
-        vertical-align: top;
-        padding-right: 0.4em !important;
-    }
-    .expanded-row td {
-        white-space: normal;
-        word-wrap: break-word;
-    }
-    div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button a, #genes_list_paginate {
-        font-size: 0.9rem; /* Adjust this value as needed */
-    }
-    .dataTables_length {
-        display: flex;
-        padding-left: 2rem;
-        padding-right: 2rem;
-        padding-top: 0.5rem;
-    }
-    .dataTables_info {
-        padding-left: 2rem;
-        padding-right: 2rem;
-    }
-    .dataTables_length label {
-        display: flex;
-        align-items: center;
-    }
-    .dataTables_length label select {
-        margin-left: 1rem;
-        margin-right: 1rem;
-    }
-    .dataTables_filter {
-        display: flex;
-        padding-left: 2rem;
-        padding-right: 2rem;
-        padding-top: 0.5rem;
-        flex-direction: column;
-        align-items: flex-end;
-    }
-    .dataTables_filter label {
-        display: flex;
-        align-items: center;
-    }
-    .dataTables_filter label input {
-        margin-left: 1rem;
-        margin-right: 1rem;
-    }
-</style>
 
 <main class="container-fluid ps-md-4 pe-md-4 pt-3 pb-3">
     <div class="row">
@@ -89,40 +13,4 @@
     </div>
 </div>
 </main>
-<script>
-    $(document).ready(async function () {
-        const dataset = {{ dataset|safe }}
-
-        let table = $('#publications_table').DataTable({
-            destroy: true,
-            data: dataset,
-            columns: [
-                { data: 'Title' },
-                {
-                    data: 'PMID',
-                    render: function(data, type, row) {
-                        if (type === 'display') {
-                            return '<a href=https://pubmed.ncbi.nlm.nih.gov/' + data + '/ target="_blank">' + data + '</a>';
-                        } else return data;
-                    }
-                },
-            ],
-            columnDefs: [
-                {
-                    targets: [0, 1],
-                    render: function(data, type, row) {
-                        return data;
-                    }
-                }
-            ],
-            language: {
-                loadingRecords: 'Loading...',
-                zeroRecords: 'Result not found.'
-            },
-            order: [],
-            bSort: true,
-            searching: true
-        });
-    });
-</script>
 {% endblock %}

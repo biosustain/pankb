@@ -1,97 +1,12 @@
 {% extends "index_with_infopanel.html" %}
 {% block page_title %}Gene Info{% endblock %}
 
+{% block header_load_datatables %}{% include 'tables/load_datatables.html' %}{% endblock %}
+
 {% block header_content %}
 {% include "navigation.html" with active_page="organisms" %}
 {% include "search/search.html" %}
 <style>
-    .center-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-    }
-    .table_padding {
-        width: 100%;  /* adjust this value according to your needs */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .table-responsive {
-        width: 100%;  /* make sure it fills its container */
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-        /* max-height: 100vh; */
-        /* padding-left: 2.8em; */
-        /* padding-right: 1.1em; */
-    }
-    tr, th {
-        font-size: 1rem;
-        text-align: center;
-        vertical-align: middle;
-    }
-    td {
-        font-size: 0.9rem;
-        text-align: center;
-        /* width: 12.5% !important; */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    tbody td {
-        padding: 1.1em !important;  /* adjust as needed */
-    }
-    .dataTables_wrapper .dataTables_filter {
-        display: none;
-    }
-    thead th {
-        /* height: 5em; */
-        /* position: relative; */
-        text-align: center;
-        vertical-align: top;
-        padding-right: 0.4em !important;
-    }
-    thead th input {
-        /* position: absolute; */
-        /* bottom: 0.55em; */
-        width: 50%;
-        /* left: 50%; */
-        /* transform: translateX(-50%); */
-        margin-bottom: 0px;
-    }
-    .dataTables_wrapper tbody td {
-        text-align: center;
-        vertical-align: top;
-    }
-    .expanded-row td {
-        white-space: normal;
-        word-wrap: break-word;
-    }
-    table {
-        table-layout: fixed;
-    }
-    div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button a, #genes_list_paginate {
-        font-size: 0.9rem; /* Adjust this value as needed */
-    }
-    .dataTables_length {
-        display: flex;
-        padding-left: 2rem;
-        padding-right: 2rem;
-        padding-top: 0.5rem;
-    }
-    .dataTables_info {
-        padding-left: 2rem;
-        padding-right: 2rem;
-    }
-    .dataTables_length label {
-        display: flex;
-        align-items: center;
-    }
-    .dataTables_length label select {
-        margin-left: 1rem;
-        margin-right: 1rem;
-    }
     .responsive-iframe-msa > iframe {
         width: 100%;
         height: 780px;
@@ -104,7 +19,7 @@
 {% endblock %}
 
 {% block main_content %}
-<div class="container-fluid" data-bs-spy="scroll" data-bs-target="#page-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true">
+<div class="container-fluid ps-2 pe-2 ps-md-3 pe-md-3" data-bs-spy="scroll" data-bs-target="#page-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true">
     <div class="row g-3 pb-4">
         {% include 'components/panel_locustags_table.html' with panel_name="locustags_table" panel_title="Locus Tag Table" panel_class="col-lg-12" %}
 
@@ -119,106 +34,4 @@
         {% endif %}
     </div>
 </div>
-<script>
-    // const urlParams = new URLSearchParams(window.location.search);
-    // const species = urlParams.get('species');
-    // const gene = urlParams.get('gene');
-    // const gene_class = urlParams.get('gene_class');
-
-    function get_original_locus_tag_info(row) {
-        if (("original_locus_tag" in row) && row["original_locus_tag"]) {
-            let original_locus_tag = row["original_locus_tag"]
-            let original_gene = "";
-            let prefix = "";
-            if ("original_gene" in row) {
-                original_gene = row["original_gene"];
-            }
-            if (!row["original_exact_match"]) {
-                prefix = "<span data-toggle=\"tooltip\" data-placement=\"top\" title=\"Approximate match\">&plusmn; </span>";
-            }
-            if (original_gene && (original_gene !== original_locus_tag)) {
-                return `${prefix}${original_locus_tag} <i>(${original_gene})</i>`;
-            } else {
-                return `${prefix}${original_locus_tag}`;
-            }
-        } else {
-            return "-";
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', async function() {
-        try {
-            let geneData = {{ dataset | safe }}; // Convert the data object to an array for DataTables
-
-            let table = $('#locustags_table').DataTable({
-                data: geneData,
-                columns: [
-                    { 
-                        data: 'gene',
-                        render: function(data, type, row) {
-                            return "<a href='{% url 'genome_gene_info' %}?species={{request.GET.species|safe}}&genome_id=" + encodeURIComponent(row["genome_id"]) + "&gene=" + encodeURIComponent(data) + "'>&gt;</a>";
-                        },
-                        width: '5%',
-                    },
-                    { 
-                        data: 'locus_tag',
-                        render: function(data, type, row) {
-                            return get_original_locus_tag_info(row);
-                        },
-                        width: '15%',
-                    },
-                    {
-                        data: 'genome_id',
-                        render: function(data, type, row) {
-                            return '<a href="{% url 'genome_info' %}?species={{request.GET.species|safe}}&genome_id=' + encodeURIComponent(data) + '" target="_blank">' + data + '</a>';
-                        },
-                        width: '15%',
-                    },
-                    {
-                        data: 'protein',
-                        width: '15%',
-                    },
-                    {
-                        data: 'start_position',
-                        width: '10%',
-                    },
-                    {
-                        data: 'end_position',
-                        width: '10%',
-                    },
-                    {
-                        data: 'nucleotide_seq',
-                        width: '15%',
-                    },
-                    {
-                        data: 'aminoacid_seq',
-                        width: '15%',
-                    },
-                ],
-                language: {
-                    emptyTable: 'Loading...'
-                },
-                order: [],
-                bSort: true,
-                searching: true
-            });
-        } catch (error) {
-            console.error('Error:', error);
-        }
-
-        // Expand or collapse a table row on click: ----
-        $('#locustags_table tbody').on('click', 'td', function () {
-            let row = $(this).closest('tr')
-            row.toggleClass('expanded-row');
-        });
-
-    });
-
-    // const AA_pos_overview = document.getElementById('AA_pos_overview');
-    // AA_pos_overview.src = "{% url 'aa_pos_overview' %}?species=" + species + '&' + 'gene=' + gene;
-
-    // const MSA = document.getElementById('MSA');
-    // MSA.src = "{% url 'msa' %}?species=" + species + '&' + 'gene=' + gene;
-
-</script>
 {% endblock %}

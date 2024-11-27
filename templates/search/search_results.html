@@ -1,12 +1,12 @@
 {% extends "index.html" %}
 {% load static %}
 {% block page_title %}Search Results{% endblock %}
+
+{% block header_load_datatables %}{% include 'tables/load_datatables.html' %}{% endblock %}
+
 {% block content %}
 {% include "navigation.html" with active_page="" %}
 {% include "search/search.html" %}
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 <script>
     // Function checking if a JS object is empty: ----
     function isEmpty(obj) {
@@ -22,7 +22,7 @@
     // and optionally expands a row in the "Genes" table if the text found is in the "Protein" column: ----
     function highlightText(searchTerm) {
         // Get all elements potentially containing text: ----
-        const elements = document.querySelectorAll('#families_list a, #species_list a, #genes_table a, .protein, .pfams, #pathways_list a, .pathway_name');
+        const elements = document.querySelectorAll('#families_list a, #species_list a, #genes_table a, .protein div, .pfams div, #pathways_list a, .pathway_name');
         // Loop through each of the elements: ----
         elements.forEach((element) => {
             const text = element.innerText;
@@ -60,73 +60,7 @@
         });
     }
 </script>
-<style>
-    .center-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-    }
-    .table_padding {
-        width: 100%;  /* adjust this value according to your needs */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .table-responsive {
-        width: 100%;  /* make sure it fills its container */
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-        /* max-height: 100vh; */
-        /* padding-left: 2.8em; */
-        /* padding-right: 1.1em; */
-    }
-    td {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    thead th input {
-        width: 50%;
-        margin-bottom: 0px;
-    }
-    #genes_table td {
-        width: 12.5% !important;
-    }
-    #genes_table th {
-        width: 12.5% !important;
-    }
-    #genes_table {
-        table-layout: fixed;
-    }
-    .dataTables_length {
-        display: flex;
-        padding-left: 2rem;
-        padding-right: 2rem;
-        padding-top: 0.5rem;
-    }
-    .dataTables_info {
-        padding-left: 2rem;
-        padding-right: 2rem;
-    }
-    .dataTables_length label {
-        display: flex;
-        align-items: center;
-    }
-    .dataTables_length label select {
-        margin-left: 1rem;
-        margin-right: 1rem;
-    }
-    .expanded-row td {
-        white-space: normal;
-        word-wrap: break-word;
-    }
-    .dataTables_wrapper .dataTables_filter {
-        display: none;
-    }
-</style>
-<main class="container-fluid ps-md-4 pe-md-4">
+<main class="container-fluid ps-2 pe-2 ps-md-3 pe-md-3 overflow-hidden">
     <div class="row g-3">
         <div class="col-12"><h4 class="display-5 p-2 ps-4">Showing {% if families_results %}<a href="#families" class="btn btn-outline-primary">family</a>&nbsp;{% endif %}{% if species_results %}<a href="#species" class="btn btn-outline-primary">species</a>&nbsp;{% endif %}{% if pathways_results %}<a href="#pathways" class="btn btn-outline-primary">pathway</a>&nbsp;{% endif %}{% if "genes" in no_results_list %}{% else %}<a href="#genes" class="btn btn-outline-primary">gene</a>&nbsp;{% endif %} search results for <b>"{{ request.GET.q }}"</b>
             {% if no_results_list %}; No results found in {{ no_results_list | join:', '}}.{% endif %}</h4></div>

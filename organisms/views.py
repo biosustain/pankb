@@ -5,6 +5,7 @@ from .models import Organisms
 import json, requests, csv, time
 import pandas as pd
 
+HIGHLIGHTED_SPECIES = ["Bacillus_subtilis", "Escherichia_coli", "Limosilactobacillus_reuteri", "Pseudomonas_E_putida", "Streptomyces_albidoflavus", "Vibrio_natriegens"]
 
 # Template renderer for the Organisms table
 def organisms(request):
@@ -17,6 +18,7 @@ def organisms(request):
   # Get the filtered or full table with organisms: ----
   organisms = Organisms.objects.filter(**filter_params).values('family', 'species', 'pangenome_analysis', 'openness', 'genomes_num', 'gene_class_distribution')
   organisms_pd = pd.DataFrame(list(organisms), index=None)
+  organisms_pd["highlight"] = organisms_pd["pangenome_analysis"].isin(HIGHLIGHTED_SPECIES).astype(int)
   organisms_list = organisms_pd.values.tolist()
   organisms_json = json.dumps(organisms_list, default=str)  # json dumps replaces the single quotes with the double ones
   # Compose the render context: ----

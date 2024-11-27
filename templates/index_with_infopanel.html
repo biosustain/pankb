@@ -22,12 +22,12 @@
         <path d="M0 14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2zm4.5-6.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5a.5.5 0 0 1 0-1"/>
       </svg></a>
 </div>
-<main class="container-fluid">
+<main class="container-fluid ps-2 pe-2 ps-md-3 pe-md-3" style="overflow-x: hidden;">
     <div class="row">
-        <div id="infopanel" class="col-md-4 col-lg-3 col-xl-2 ps-2">
+        <div id="infopanel" class="col-md-4 col-lg-3 col-xl-2 ps-2 pe-2">
             {% block infopanel_content %}{% endblock %}
         </div>
-        <div id="maincontent" class="col-md-8 col-lg-9 col-xl-10 p-2">
+        <div id="maincontent" class="col-md-8 col-lg-9 col-xl-10 ps-0 pe-0 pt-2 pb-2">
             {% block main_content %}{% endblock %}
         </div>
     </div>

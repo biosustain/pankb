@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block main_content %}
-<div class="container-fluid">
+<div class="container-fluid ps-2 pe-2 ps-md-3 pe-md-3">
     <div class="row">
         {% url 'genome_barplot' as url_cog_distribution %}
         {% include 'components/panel_iframe.html' with panel_name="cog_distribution" panel_title="Gene Annotation Distribution" panel_iframe_src=url_cog_distribution|add:"?species="|add:request.GET.species|add:"&genome_id="|add:request.GET.genome_id panel_class='col-lg-12' panel_iframe_class='responsive-iframe-h30' %}
