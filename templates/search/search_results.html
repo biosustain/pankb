@@ -60,7 +60,7 @@
         });
     }
 </script>
-<main class="container-fluid ps-2 pe-2 ps-md-3 pe-md-3 overflow-hidden">
+<main class="container-fluid pb-4 ps-2 pe-2 ps-md-3 pe-md-3 overflow-hidden">
     <div class="row g-3">
         <div class="col-12"><h4 class="display-5 p-2 ps-4">Showing {% if families_results %}<a href="#families" class="btn btn-outline-primary">family</a>&nbsp;{% endif %}{% if species_results %}<a href="#species" class="btn btn-outline-primary">species</a>&nbsp;{% endif %}{% if pathways_results %}<a href="#pathways" class="btn btn-outline-primary">pathway</a>&nbsp;{% endif %}{% if "genes" in no_results_list %}{% else %}<a href="#genes" class="btn btn-outline-primary">gene</a>&nbsp;{% endif %} search results for <b>"{{ request.GET.q }}"</b>
             {% if no_results_list %}; No results found in {{ no_results_list | join:', '}}.{% endif %}</h4></div>
