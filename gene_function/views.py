@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from django.template import loader
 from django.urls import reverse
+from django.conf import settings
 import json, requests, io, csv, time
 import pandas as pd
 import numpy as np
@@ -136,11 +137,7 @@ def aa_pos_overview(request):
   organism_info = Organisms.objects.get(pangenome_analysis=species)
   num_genomes = organism_info.genomes_num
 
-  # url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/info_panel.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  # r1 = requests.get(url1)
-  # json_obj1 = r1.json()
-
-  url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/gene_data/' + gene + '/' + gene + '_pan_aa_thresh_core_dom_var_pos.csv'    # the url of the respective csv file stored on the Microsoft Azure Blob Storage
+  url2 = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/panalleleome/gene_data/' + gene + '/' + gene + '_pan_aa_thresh_core_dom_var_pos.csv'    # the url of the respective csv file stored on the Microsoft Azure Blob Storage
   r2 = requests.get(url2)
   if r2.status_code == requests.codes.ok:
     dataset_df2 = pd.read_csv(io.StringIO(r2.content.decode('utf-8')))
@@ -162,14 +159,14 @@ def msa(request):
   species = request.GET['species']
   gene = request.GET['gene']
 
-  url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/gene_data/' + gene + '/AA_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  url1 = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/panalleleome/gene_data/' + gene + '/AA_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r1 = requests.get(url1)
   if r1.status_code == requests.codes.ok:
     json_obj1 = r1.json()
   else:
     json_obj1 = {}
 
-  url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/gene_data/' + gene +'/MSA.fasta'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  url2 = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/panalleleome/gene_data/' + gene +'/MSA.fasta'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r2 = requests.get(url2)
   if r2.status_code == requests.codes.ok:
     r2_text = r2.text
@@ -215,7 +212,7 @@ def genome_barplot(request):
   template = loader.get_template('gene_function/plots/genome_barplot.html')
   species = request.GET['species']
   genome_id = request.GET['genome_id']
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/genome_page/' + genome_id + '/COG_distribution.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/genome_page/' + genome_id + '/COG_distribution.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
   json_obj = r.json()
   # Compose a context for the template rendering: ----
