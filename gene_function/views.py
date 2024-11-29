@@ -179,6 +179,18 @@ def msa(request):
   }
   return HttpResponse(template.render(context, request))
 
+def _get_genome_and_isolation_info(pangenome_analysis, genome_id):
+  genome_info_dict = GenomeInfo.get_genome_and_isolation_info({
+          "pangenome_analysis": pangenome_analysis,
+          "genome_id": genome_id
+        })
+  genome_info_dict = list(genome_info_dict)
+  if len(genome_info_dict) == 0:
+    raise Http404()
+  genome_info_dict = genome_info_dict[0]
+
+  genome_info_dict["num_genes"] = sum(genome_info_dict["gene_class_distribution"])
+  return genome_info_dict
 
 ############################## Genome Info Page Templates ###################################
 # Template renderer for the Genome Info Page
@@ -187,22 +199,12 @@ def genome_info(request):
   species = request.GET['species']
   genome_id = request.GET['genome_id']
 
-  # Set the filter() function parameters: ----
-  filter_params = {}
-  filter_params['pangenome_analysis'] = species
-  filter_params['genome_id'] = genome_id
-  # Obtain the genome info: ----
-  try:
-    genome_info = GenomeInfo.objects.get(**filter_params)
-  except GenomeInfo.DoesNotExist:
-    raise Http404()
-  genome_info_dict = model_to_dict(genome_info, exclude=["_id"])
-  genome_info_dict["num_genes"] = sum(genome_info_dict["gene_class_distribution"])
+  genome_info_dict = _get_genome_and_isolation_info(species, genome_id)
 
   # Compose a context for the template rendering: ----
   context = {
     'dataGenome': genome_info_dict,
-    'antismash_url': '' if genome_info_dict["antismash_url"] is None else genome_info_dict["antismash_url"]
+    'antismash_url': '' if not genome_info_dict.get("antismash_url", False) else genome_info_dict["antismash_url"]
   }
   return HttpResponse(template.render(context, request))
 
@@ -232,12 +234,7 @@ def genome_gene_info(request):
   genome_id = request.GET['genome_id']
   gene = request.GET['gene']
 
-  try:
-    genome_info = GenomeInfo.objects.get(pangenome_analysis=species, genome_id=genome_id)
-  except GenomeInfo.DoesNotExist:
-    raise Http404()
-  genome_info_dict = model_to_dict(genome_info, exclude=["_id"])
-  genome_info_dict["num_genes"] = sum(genome_info_dict["gene_class_distribution"])
+  genome_info_dict = _get_genome_and_isolation_info(species, genome_id)
 
   gene_info = GeneInfo.objects.filter(pangenome_analysis=species, genome_id=genome_id, gene=gene).values('locus_tag', 'genome_id', 'gene', 'protein', 'start_position', 'end_position', 'nucleotide_seq', 'aminoacid_seq', 'species', 'pangenome_analysis', 'original_locus_tag', 'original_gene', 'original_exact_match')
   if len(gene_info) == 0:

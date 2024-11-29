@@ -95,8 +95,10 @@ def hotmap(request):
   species = request.GET['species']
   gene_class = request.GET['gene_class']
 
-  genome_info = GenomeInfo.objects.filter(pangenome_analysis=species).values("genome_id", "country", "isolation_source", "strain")
-  source_info = {g["genome_id"]: [g["country"], g["isolation_source"], g["strain"]] for g in genome_info}
+  genome_info = GenomeInfo.get_genome_and_isolation_info({
+          "pangenome_analysis": species,
+        })
+  source_info = {g["genome_id"]: [g["country"], g["isolation_source"], g["strain"]] for g in list(genome_info)}
 
   url2 = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/heatmap_' + gene_class + '.json.gz'    # the url of the respective json.gz file stored on the Microsoft Azure Blob Storage
   r2 = requests.get(url2)
