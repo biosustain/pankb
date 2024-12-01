@@ -9,6 +9,7 @@
                 Highcharts.chart('organism_gene_number_container', {
                     chart: {
                         type: 'bar',
+                        margin: [10, 10, 60, 120]
                     },
                     title: {
                         text: '',
@@ -31,7 +32,8 @@
                             enable: true,
                             style: {
                                 fontSize: '0.75rem'
-                            }
+                            },
+                            overflow: 'allow',
                         },
                     },
                     yAxis: {

@@ -3,11 +3,13 @@
 {% block content %}
 {% include "navigation.html" with active_page="ai_assistant" %}
 <style>
+    html, body {
+        height: 100%;
+    }
     body {
         margin: 0;        /* Remove default margin */
         overflow: hidden;
         background-color: black;
-        height: 100vh;
     }
     iframe {
         display: block;            /* iframes are inline by default */
@@ -15,6 +17,7 @@
         width: 100vw;              /* Set width to 100% of the viewport width */
         border: none;              /* Remove default border */
         background-color: black;
+        margin-top: -10px;
     }
 </style>
 <iframe src="{{ AI_ASSISTANT_APP_URL }}"></iframe>
