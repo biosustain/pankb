@@ -226,6 +226,7 @@ body {
   padding-left: 0px;
   gap: 10px;
   height: 100vh;
+  padding-right: 0px;
 }
 
 /* -----------------------Styles for left section (Toolbar, Tree, Category labels and Matrix) ----------------------- */
@@ -254,7 +255,7 @@ body {
 /* Styles for toolbar column */
 .toolbar-column {
   flex-grow: 1;
-  height: 40px;
+  /* height: 40px; */
 }
 
 /* Styles for toolbar */
@@ -265,9 +266,10 @@ body {
   align-items: center;
   padding: 5px;
   background-color: #ccc;
-  border-radius: 5px;
-  height: 40px;
+  /* border-radius: 5px; */
+  /* height: 40px; */
   flex-grow: 1;
+  flex-wrap: wrap;
 }
 
 /* Styles for toolbar buttons */
@@ -303,7 +305,7 @@ body {
   flex-grow: 1;
   overflow-y: hidden;
   height: 100%;
-  margin-bottom: 50px;
+  /* margin-bottom: 50px; */
   justify-content: end;
 }
 
@@ -402,8 +404,7 @@ body {
 
 /* Styles for collapsed sidebar */
 .sidebar.collapsed {
-  width: 0;
-  overflow: hidden;
+  display: none;
 }
 
 /* Styles for selected branch and tags counter */

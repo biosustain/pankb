@@ -7,7 +7,7 @@
 
   <!-- Latest compiled and minified CSS -->
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" />
 
   <!-- JavaScript Libraries -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
@@ -34,121 +34,117 @@
 
 <body>
   <div class="tooltip" style="position: absolute; opacity: 0;"></div>
+  <div class="container-fluid p-0">
+    <!-- Top Row: Toolbar and Category Labels Side by Side -->
+    <div class="toolbar-and-labels">
+      <!-- Toolbar Styling -->
+      <div class="toolbar-column">
+        <div class="btn-toolbar navbar navbar-expand-lg navbar-light bg-light" role="toolbar" id="toolbar">
 
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid navbar-content">
-      <!-- Left Section: Dropdown Menus -->
-      <div class="navbar-left d-flex">
-        <!-- Dropdown: Tag -->
-        <!-- <div class="dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownTag" role="button" data-bs-toggle="dropdown"
-            aria-expanded="false">
-            Tag
-          </a>
-        </div> -->
+          <!-- Dropdown: Tag -->
+          <!-- <div class="dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownTag" role="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              Tag
+            </a>
+          </div> -->
 
-        <!-- Dropdown: Selection -->
-        <div class="dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownSelection" role="button"
-            data-bs-toggle="dropdown" aria-expanded="false">
-            Selection
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdownSelection">
-            <a id="filter_add" class="dropdown-item" href="#">Add filtered nodes to selection</a>
-            <a id="filter_remove" class="dropdown-item" href="#">Select all but filtered nodes</a>
-            <div class="dropdown-divider"></div>
-            <a id="select_all" class="dropdown-item" href="#">Select all</a>
-            <a id="select_all_internal" class="dropdown-item" href="#">Select all internal nodes</a>
-            <a id="select_all_leaves" class="dropdown-item" href="#">Select all leaf nodes</a>
-            <a id="clear_internal" class="dropdown-item" href="#">Clear all internal nodes</a>
-            <a id="clear_leaves" class="dropdown-item" href="#">Clear all leaves</a>
-            <a id="select_none" class="dropdown-item" href="#">Clear selection</a>
-            <div class="dropdown-divider"></div>
-            <a id="mp_label" class="dropdown-item" href="#">Label internal nodes using maximum parsimony</a>
-            <a id="and_label" class="dropdown-item" href="#">Label internal nodes using conjunction (AND)</a>
-            <a id="or_label" class="dropdown-item" href="#">Label internal nodes using disjunction (OR)</a>
+          <!-- Dropdown: Selection -->
+          <div class="btn-group">
+            <div class="dropdown">
+              <a class="nav-link dropdown-toggle ps-1 pe-1" href="#" id="navbarDropdownSelection" role="button"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Selection
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdownSelection">
+                <a id="filter_add" class="dropdown-item" href="#">Add filtered nodes to selection</a>
+                <a id="filter_remove" class="dropdown-item" href="#">Select all but filtered nodes</a>
+                <div class="dropdown-divider"></div>
+                <a id="select_all" class="dropdown-item" href="#">Select all</a>
+                <a id="select_all_internal" class="dropdown-item" href="#">Select all internal nodes</a>
+                <a id="select_all_leaves" class="dropdown-item" href="#">Select all leaf nodes</a>
+                <a id="clear_internal" class="dropdown-item" href="#">Clear all internal nodes</a>
+                <a id="clear_leaves" class="dropdown-item" href="#">Clear all leaves</a>
+                <a id="select_none" class="dropdown-item" href="#">Clear selection</a>
+                <div class="dropdown-divider"></div>
+                <a id="mp_label" class="dropdown-item" href="#">Label internal nodes using maximum parsimony</a>
+                <a id="and_label" class="dropdown-item" href="#">Label internal nodes using conjunction (AND)</a>
+                <a id="or_label" class="dropdown-item" href="#">Label internal nodes using disjunction (OR)</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button type="button" class="btn btn-light btn-sm" data-direction="vertical" data-amount="1"
+              title="Expand vertical spacing">
+              <i class="fa fa-up-down"></i>
+            </button>
+            <button type="button" class="btn btn-light btn-sm" data-direction="vertical" data-amount="-1"
+              title="Compress vertical spacing">
+              <i class="fa fa-down-left-and-up-right-to-center" style="transform: rotate(135deg);"></i>
+            </button>
+            <button type="button" class="btn btn-light btn-sm" data-direction="horizontal" data-amount="1"
+              title="Expand horizontal spacing">
+              <i class="fa fa-left-right"></i>
+            </button>
+            <button type="button" class="btn btn-light btn-sm" data-direction="horizontal" data-amount="-1"
+              title="Compress horizontal spacing">
+              <i class="fa fa-down-left-and-up-right-to-center" style="transform: rotate(45deg);"></i>
+            </button>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-light btn-sm" id="sort_ascending"
+              title="Sort deepest clades to the bottom">
+              <i class="fa fa-sort-amount-asc"></i>
+            </button>
+            <button type="button" class="btn btn-light btn-sm" id="sort_descending" title="Sort deepest clades to the top">
+              <i class="fa fa-sort-amount-desc"></i>
+            </button>
+            <button type="button" class="btn btn-light btn-sm" id="sort_original" title="Restore original order">
+              <i class="fa fa-sort"></i>
+            </button>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-light btn-sm" id="save_image" title="Save image">
+              <i class="fa fa-image"></i>
+            </button>
+          </div>
+          <!-- REVIEW: Radial doesn't work properly, should be easy to fix though
+          <div class="btn-group" role="group">
+            <button class="btn btn-light btn-sm active phylotree-layout-mode" data-mode="linear">Linear</button>
+            <button class="btn btn-light btn-sm phylotree-layout-mode" data-mode="radial">Radial</button>
+          </div>
+          -->
+          <div class="btn-group" role="group">
+            <button class="btn btn-light btn-sm active phylotree-align-toggler" data-align="left">
+              <i class="fa fa-align-left"></i>
+            </button>
+            <button class="btn btn-light btn-sm phylotree-align-toggler" data-align="right">
+              <i class="fa fa-align-right"></i>
+            </button>
+          </div>
+
+          <div class="btn-group" role="group">
+            <form class="d-flex align-items-center">
+              <input type="text" id="branch_filter" class="form-control" placeholder="Filter branches on"
+                onkeypress="return event.keyCode != 13" />
+            </form>
+          </div>
+
+          <div class="btn-group" role="group">
+            <button id="toggle_iso_sidebar" class="btn btn-light btn-sm" title="Toggle isolation source sidebar">
+              <i class="fa fa-circle-info"></i>
+            </button>
+            <button id="toggle-sidebar" class="btn btn-sm toggle-sidebar-button"><i class="fa fa-bars"></i></button>
           </div>
         </div>
       </div>
-
-      <!-- Right Section: Filter Input -->
-      <div class="navbar-right ms-auto d-flex align-items-center">
-        <form class="d-flex align-items-center my-2 my-lg-0">
-          <input type="text" id="branch_filter" class="form-control" placeholder="Filter branches on"
-            onkeypress="return event.keyCode != 13" />
-        </form>
-      </div>
-      <!-- Toggle Button -->
-      <button id="toggle-sidebar" class="toggle-sidebar-button">☰</button>
     </div>
-  </nav>
+  </div>
 
   <div class="container-fluid" id="main_display">
     <!-- Left Section -->
     <div class="left-section">
-      <!-- Top Row: Toolbar and Category Labels Side by Side -->
-      <div class="toolbar-and-labels">
-        <!-- Toolbar Styling -->
-        <div class="toolbar-column">
-          <div class="btn-toolbar" role="toolbar" id="toolbar">
-            <div class="btn-group">
-              <button type="button" class="btn btn-light btn-sm" data-direction="vertical" data-amount="1"
-                title="Expand vertical spacing">
-                <i class="fa fa-up-down"></i>
-              </button>
-              <button type="button" class="btn btn-light btn-sm" data-direction="vertical" data-amount="-1"
-                title="Compress vertical spacing">
-                <i class="fa fa-down-left-and-up-right-to-center" style="transform: rotate(135deg);"></i>
-              </button>
-              <button type="button" class="btn btn-light btn-sm" data-direction="horizontal" data-amount="1"
-                title="Expand horizontal spacing">
-                <i class="fa fa-left-right"></i>
-              </button>
-              <button type="button" class="btn btn-light btn-sm" data-direction="horizontal" data-amount="-1"
-                title="Compress horizontal spacing">
-                <i class="fa fa-down-left-and-up-right-to-center" style="transform: rotate(45deg);"></i>
-              </button>
-            </div>
-            <div class="btn-group">
-              <button type="button" class="btn btn-light btn-sm" id="sort_ascending"
-                title="Sort deepest clades to the bottom">
-                <i class="fa fa-sort-amount-asc"></i>
-              </button>
-              <button type="button" class="btn btn-light btn-sm" id="sort_descending" title="Sort deepest clades to the top">
-                <i class="fa fa-sort-amount-desc"></i>
-              </button>
-              <button type="button" class="btn btn-light btn-sm" id="sort_original" title="Restore original order">
-                <i class="fa fa-sort"></i>
-              </button>
-            </div>
-            <div class="btn-group">
-              <button type="button" class="btn btn-light btn-sm" id="save_image" title="Save image">
-                <i class="fa fa-image"></i>
-              </button>
-            </div>
-            <!-- REVIEW: Radial doesn't work properly, should be easy to fix though
-            <div class="btn-group" role="group">
-              <button class="btn btn-light btn-sm active phylotree-layout-mode" data-mode="linear">Linear</button>
-              <button class="btn btn-light btn-sm phylotree-layout-mode" data-mode="radial">Radial</button>
-            </div>
-            -->
-            <div class="btn-group" role="group">
-              <button class="btn btn-light btn-sm active phylotree-align-toggler" data-align="left">
-                <i class="fa fa-align-left"></i>
-              </button>
-              <button class="btn btn-light btn-sm phylotree-align-toggler" data-align="right">
-                <i class="fa fa-align-right"></i>
-              </button>
-            </div>
-            <div class="btn-group" role="group">
-              <button id="toggle_iso_sidebar" class="btn btn-light btn-sm" title="Toggle isolation source sidebar">
-                <i class="fa fa-bars"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Bottom Row: Tree and Squares Side by Side -->
       <div class="tree-and-matrix">
         <!-- Left Column: Tree Container -->
