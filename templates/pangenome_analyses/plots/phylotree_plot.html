@@ -348,7 +348,7 @@
 
     // Function to update the height of each grid item in squares-container
     function updateSquareRowHeight() {
-      $(".squares-container > .square, .squares-container > .country-square, .squares-container > .isolation-source-text, .squares-container > .specific-source-square")
+      $(".squares-container > .square, .squares-container > .square, .squares-container > .square, .squares-container > .square")
         .css("height", squaresRowHeight + "px")
         .css("line-height", squaresRowHeight + "px")
         .css("padding-top", "0"); // Ensure no extra padding is applied
@@ -1052,7 +1052,7 @@
     var urlParams = new URLSearchParams(window.location.search);
     var species = urlParams.get('species');
 
-    const categories = ['Country', 'Isolation Source', 'Specific Source'];  // Static definition
+    const categories = ['Country', 'Broad Context', 'Local Context', 'Isolation Source'];  // Static definition
     let metadata = {{ source_info_dataset | safe }};
 
     // // Fetch metadata with caching support
@@ -1312,37 +1312,6 @@
         .style("opacity", 0);
     }
 
-    function generateCategoryColorMaps(metadata, categories) {
-      // Predefined colors for each main category
-      const predefinedColors = {
-        "Env Associated": "blue",
-        "Animal Associated": "red",
-        "Plant Associated": "green",
-        "Food Associated": "orange",
-        "Others": "purple",
-        "Missing": "white"
-      };
-
-      // Create a color map for each category
-      const categoryColorMaps = {};
-
-      categories.forEach(category => {
-        const colorMap = {};
-
-        // Assign colors to each tag in the category
-        Object.values(metadata).forEach(data => {
-          const tag = data[category];
-          if (tag) {
-            colorMap[tag] = predefinedColors[tag] || predefinedColors["Missing"]; // Assign predefined color or white for "Missing"
-          }
-        });
-
-        categoryColorMaps[category] = colorMap;
-      });
-
-      return categoryColorMaps;
-    }
-
     function createSquaresForNodes(tree, metadata, categories) {
       if (!tree || !tree.nodes) {
         console.error("Tree object is not initialized or nodes are not available.");
@@ -1354,58 +1323,39 @@
 
       const leafNodes = getAllLeafNodes(tree);
 
+      // Create rows dynamically for each node
       leafNodes.forEach((genomeId) => {
-        const metadataForNode = metadata[genomeId.trim()];
+        const metadataForNode = metadata[genomeId.trim()] || {};
 
         categories.forEach((category) => {
-          const tag = metadataForNode ? metadataForNode[category] : "No tag available";
-          let element = document.createElement("div");
+          const tag = metadataForNode[category] || "Missing"; // Default to "Missing" if no tag exists
+          const element = document.createElement("div");
           element.setAttribute("data-category", category);
           element.setAttribute("data-original-title", tag);
           element.textContent = tag;
-
-          // Set category-specific classes and content
-          switch (category) {
-            case "Country":
-              element.classList.add("square", "country-square");
-              break;
-            case "Isolation Source":
-              element.classList.add("isolation-source-text");
-              break;
-            case "Specific Source":
-              element.classList.add("square", "specific-source-square");
-              break;
-            default:
-              element.classList.add("square");
-          }
-
+          element.classList.add("square");
           squaresContainer.appendChild(element);
 
-          // Add event listeners for custom tooltips
+          // Add event listeners for tooltips
           element.addEventListener("mouseover", function (event) {
             const tooltipContent = element.getAttribute("data-original-title") || "Missing";
             showTooltip(event, tooltipContent);
-            element.removeAttribute("title"); // Remove default tooltip
           });
 
-          element.addEventListener("mouseout", function () {
-            hideTooltip();
-            element.setAttribute("title", element.getAttribute("data-original-title"));
-          });
+          element.addEventListener("mouseout", hideTooltip);
         });
       });
     }
 
     function createCategoryLabels(categories) {
-      // Select the category labels container and clear existing content
-      const labelsContainer = d3.select("#category_labels");
-      labelsContainer.html(""); // Clear previous labels
+      const labelsContainer = document.getElementById("category_labels");
+      labelsContainer.innerHTML = ''; // Clear existing content
 
-      // Create a label for each category
       categories.forEach((category) => {
-        labelsContainer.append("div")
-          .attr("class", "category-label")
-          .text(category);
+        const label = document.createElement("div");
+        label.className = "category-label";
+        label.textContent = category;
+        labelsContainer.appendChild(label);
       });
     }
 
@@ -1414,12 +1364,7 @@
       const container = d3.select("#highlight-dropdowns-container");
       container.html(""); // Clear any existing dropdowns
 
-      // Generate color maps for each category
-      const categoryColorMaps = generateCategoryColorMaps(metadata, categories);
-
       categories.forEach((category) => {
-        // Sanitize category
-        const safeCategory = category.replace(/["']/g, ""); // Remove quotes from category name
 
         // Create a dropdown for each category
         const dropdownDiv = container.append("div").attr("class", "dropdown mt-3");
@@ -1428,23 +1373,23 @@
         dropdownDiv.append("button")
           .attr("class", "btn btn-secondary dropdown-toggle")
           .attr("type", "button")
-          .attr("id", `${safeCategory}-dropdown`)
-          .attr("data-bs-toggle", "dropdown") // Correct attribute for Bootstrap 5
+          .attr("id", `${category}-dropdown`)
+          .attr("data-bs-toggle", "dropdown")
           .attr("aria-haspopup", "true")
           .attr("aria-expanded", "false")
-          .text(safeCategory);
+          .text(category);
 
         // Create the dropdown menu container
         const dropdownMenu = dropdownDiv.append("div")
           .attr("class", "dropdown-menu")
-          .attr("aria-labelledby", `${safeCategory}-dropdown`)
-          .attr("id", `highlight-${safeCategory}-dropdown`);
+          .attr("aria-labelledby", `${category}-dropdown`)
+          .attr("id", `highlight-${category}-dropdown`);
 
         // Calculate counts for each tag in the current category
         const tagCounts = {};
         Object.values(metadata).forEach((data) => {
           const tag = data[category];
-          if (tag && tag.toLowerCase() !== "missing") {
+          if (tag && tag.toLowerCase() !== "missing") { //REVIEW - don't know if "missing" is good here
             tagCounts[tag] = (tagCounts[tag] || 0) + 1;
           }
         });
@@ -1454,14 +1399,7 @@
 
         // Create dropdown items for each sorted tag with its count and ISO code for countries
         sortedTags.forEach((tag) => {
-          // Sanitize the tag
-          const safeTag = tag.replace(/["']/g, ""); // Remove quotes from tag
-
-          // Get the color for the tag from the color map
-          const color = categoryColorMaps[category][tag] || "#000"; // Default to black if no color
-
-          // Add country code if the category is 'Country'
-          const displayText = category === "Country"
+          const displayText = category
             ? `${tag}`
             : tag;
 
@@ -1471,7 +1409,7 @@
             .attr("href", "javascript:void(0);")
             .text(`${displayText} (${tagCounts[tag]})`)  // Display tag with count
             .on("click", function () {
-              highlightSquaresByTag(safeCategory, tag);
+              highlightSquaresByTag(category, tag);
             });
         });
       });
@@ -1479,14 +1417,14 @@
 
     function highlightSquaresByTag(category, tag) {
   // Clear any previous highlights on squares and leaf nodes
-  d3.selectAll(".square, .isolation-source-text").classed("highlighted", false); // Clear highlighted class for squares and isolation-source-text
+  d3.selectAll(".square, .square").classed("highlighted", false); // Clear highlighted class for squares and square
   d3.selectAll(".leaf-node").style("stroke", null).style("fill", null); // Clear fill and stroke for leaf nodes
 
   // Track the active selection with selectedTagsByCategory
   selectedTagsByCategory = { [category]: new Set([tag]) };
 
   // Highlight squares that match the selected tag in the specified category
-  d3.selectAll(".square, .isolation-source-text")
+  d3.selectAll(".square, .square")
     .each(function () {
       const square = d3.select(this);
       const squareTag = square.attr("data-original-title"); // Use data-original-title to get the tag
@@ -1518,14 +1456,12 @@
       // Apply highlight styling to the node based on shouldHighlight
       nodeSelection
         .style("stroke", shouldHighlight ? "red" : null)
-        .style("fill", shouldHighlight ? "lightcoral" : null)
-        .style("stroke-width", shouldHighlight ? "2px" : null);
+        .style("stroke-width", shouldHighlight ? "1px" : null);
     } else {
       console.warn("Node not found in the DOM for:", node);
     }
   });
 }
-
 
     // Synchronize scrolling between two containers
     function synchronizeScroll(container1, container2, axis = "scrollLeft") {
