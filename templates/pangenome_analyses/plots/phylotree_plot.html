@@ -424,6 +424,9 @@
       var current_mode = $(this).hasClass("active");
       $(this).toggleClass("active");
       $(".matrix-column").toggleClass("d-none");
+      tree.display.update();
+      const treeContainer = document.querySelector(".tree-column");
+      treeContainer.dispatchEvent(new CustomEvent('scroll')); // trigger the scroll event to synchronize the views
     });
 
     function sort_nodes(asc) {
@@ -842,8 +845,9 @@
       tree.display.update();
     }
 
-    var width = 800, //$(container_id).width(),
-      height = 800, //$(container_id).height()
+    var container_id = "#tree_container";
+    var width = $(container_id).width(),
+      height = $(container_id).height()
       selection_set = ["Foreground"],
       current_selection_name = $("#selection_name_box").val(),
       current_selection_id = 0,
@@ -851,7 +855,7 @@
     (color_scheme = d3.scaleOrdinal(d3.schemeCategory10)),
       (selection_menu_element_action = "phylotree_menu_element_action");
 
-    var container_id = "#tree_container";
+    // var container_id = "#tree_container";
     var example_controls = d3.select("#controls_form").append("form");
 
     //var svg = d3.select(container_id).append("svg")

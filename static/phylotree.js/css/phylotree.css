@@ -315,7 +315,7 @@ body {
   overflow: auto;
   flex-grow: 1;
   flex-shrink: 1;
-  max-width: 80%;
+  /* max-width: 80%; */
 
   scrollbar-width: none;
   -ms-overflow-style: none;
