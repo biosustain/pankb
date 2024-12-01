@@ -14,6 +14,13 @@
     
     <dt class="col-sm-12">Isolation Source</dt>
     <dd class="col-sm-12">{{ dataGenome.isolation_source }}</dd>
+    <dd class="col-sm-12">
+      <ol class="breadcrumb" style="--bs-breadcrumb-divider: '>';">
+        {% for category in dataGenome.iso_cat %}
+        <li class="breadcrumb-item">{{ category }}</li>
+        {% endfor %}
+      </ol>    
+    </dd>
     <dt class="col-sm-6">Country</dt>
     <dd class="col-sm-6">{{ dataGenome.country }}</dd>
     <dt class="col-sm-6">Region</dt>

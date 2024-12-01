@@ -201,8 +201,13 @@ def genome_info(request):
 
   genome_info_dict = _get_genome_and_isolation_info(species, genome_id)
 
+  # Obtain the gene info: ----
+  gene_info = GeneInfo.objects.filter(pangenome_analysis=species, genome_id=genome_id).values('gene', 'locus_tag', 'pangenome_analysis', 'genome_id', 'original_locus_tag', 'original_gene', 'original_exact_match', 'protein', 'start_position', 'end_position', 'nucleotide_seq', 'aminoacid_seq')
+  gene_info = list(gene_info)
+
   # Compose a context for the template rendering: ----
   context = {
+    'dataset': json.dumps(gene_info),
     'dataGenome': genome_info_dict,
     'antismash_url': '' if not genome_info_dict.get("antismash_url", False) else genome_info_dict["antismash_url"]
   }
