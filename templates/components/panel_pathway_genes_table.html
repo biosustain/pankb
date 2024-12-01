@@ -2,27 +2,37 @@
 {% block panel_content %}
 <table id="pathway_genes_table" class="table table-hover" style="width: 100%;">
     <thead>
-    <tr>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Gene</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Species</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Family</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Product</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Class</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>KEGG Orthology</div></div></th>
-    </tr>
+        <tr>
+            <th>Gene</th>
+            <th>Species</th>
+            <th>Family</th>
+            <th>Product</th>
+            <th>Class</th>
+            <th>KEGG Orthology</th>
+        </tr>
     </thead>
     <tbody id="tbody">
     </tbody>
+    <tfoot>
+        <tr>
+            <th>Gene</th>
+            <th>Species</th>
+            <th>Family</th>
+            <th>Product</th>
+            <th>Class</th>
+            <th>KEGG Orthology</th>
+        </tr>
+    </tfoot>
 </table>
 <script>
     $(document).ready(async function () {
         const geneData = {{ dataGenes | safe}};
 
         let pathway_genes_table = $('#pathway_genes_table').DataTable({
-            responsive: true,
-            lengthChange: false,
+            autoWidth: true,
+            fixedColumns: true,
+            scrollX: true,
             paging: true,
-            destroy: true,
             order: [],   // preserve the original order (needed to order by relevance)
             data: geneData,
             columns: [
@@ -46,6 +56,9 @@
                 },
                 {
                     data: 'protein',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '260px')
+                    },
                 },
                 {
                     data: 'pangenomic_class',
@@ -53,7 +66,8 @@
                 {
                     data: 'kegg_ko',
                     render: function(data, type, row) {
-                        return data.join(', ') + '&nbsp;&nbsp;<a style="font-size: 0.8em; font-style: italic;" href="' + row["kegg_link"] + '" target="_blank">(highlight)</a>';
+                        inner_text = data.join(', ') + '&nbsp;&nbsp;<a style="font-size: 0.8em; font-style: italic;" href="' + row["kegg_link"] + '" target="_blank">(highlight)</a>';
+                        return wrap_table_text(inner_text, '240px')
                     }
                 }
             ],
@@ -62,23 +76,21 @@
                 zeroRecords: 'No data available in table'
             },
             initComplete: function () {
-                const api = this.api();
-                
-                // Existing column search code
-                $(this.api().table().header()).find('th').each(function (index, th) {
-                    const columnHeader = $(th).find('div').first();
-                    const columnIndex = index;
-
-                    const searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 60%; display: flex;" />')
-                        .on('keyup change clear', function () {
-                            api.column(columnIndex).search(this.value).draw();
-                        })
-                        .on('click', function(e) {  // Prevent event bubbling on click
-                            e.stopPropagation();
-                        });
-
-                    $(searchInput).appendTo(columnHeader);
-                });
+                this.api()
+                    .columns()
+                    .every(function () {
+                        var column = this;
+                        var title = column.footer().textContent;
+        
+                        // Create input element and add event listener
+                        $('<input type="text" class="form-control" placeholder="' + title + '" />')
+                            .appendTo($(column.footer()).empty())
+                            .on('keyup change clear', function () {
+                                if (column.search() !== this.value) {
+                                    column.search(this.value).draw();
+                                }
+                            });
+                    });
             }
         });
         // Expand row on click

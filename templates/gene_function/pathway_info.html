@@ -1,101 +1,11 @@
 {% extends "index_with_infopanel.html" %}
 {% block page_title %}Pathway Info{% endblock %}
 
+{% block header_load_datatables %}{% include 'tables/load_datatables.html' %}{% endblock %}
+
 {% block header_content %}
 {% include "navigation.html" with active_page="organisms" %}
 {% include "search/search.html" %}
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-<style>
-    .center-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-    }
-    .table_padding {
-        width: 100%;  /* adjust this value according to your needs */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .table-responsive {
-        width: 100%;  /* make sure it fills its container */
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-        /* max-height: 100vh; */
-        /* padding-left: 2.8em; */
-        /* padding-right: 1.1em; */
-    }
-    tr, th {
-        font-size: 1rem;
-        text-align: center;
-        vertical-align: middle;
-    }
-    td {
-        font-size: 0.9rem;
-        text-align: center;
-        width: 16% !important;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    tbody td {
-        padding: 1.1em !important;  /* adjust as needed */
-    }
-    .dataTables_wrapper .dataTables_filter {
-        display: none;
-    }
-    thead th {
-        /* height: 5em; */
-        /* position: relative; */
-        text-align: center;
-        vertical-align: top;
-        padding-right: 0.4em !important;
-    }
-    thead th input {
-        /* position: absolute; */
-        /* bottom: 0.55em; */
-        width: 50%;
-        /* left: 50%; */
-        /* transform: translateX(-50%); */
-        margin-bottom: 0px;
-    }
-    .dataTables_wrapper tbody td {
-        text-align: center;
-        vertical-align: top;
-    }
-    .expanded-row td {
-        white-space: normal;
-        word-wrap: break-word;
-    }
-    table {
-        table-layout: fixed;
-    }
-    div.dataTables_wrapper div.dataTables_paginate ul.pagination li.paginate_button a, #genes_list_paginate {
-        font-size: 0.9rem; /* Adjust this value as needed */
-    }
-    .dataTables_length {
-        display: flex;
-        padding-left: 2rem;
-        padding-right: 2rem;
-        padding-top: 0.5rem;
-    }
-    .dataTables_info {
-        padding-left: 2rem;
-        padding-right: 2rem;
-    }
-    .dataTables_length label {
-        display: flex;
-        align-items: center;
-    }
-    .dataTables_length label select {
-        margin-left: 1rem;
-        margin-right: 1rem;
-    }
-</style>
 {% endblock %}
 
 {% block infopanel_content %}
@@ -103,5 +13,7 @@
 {% endblock %}
 
 {% block main_content %}
+<div class="ps-2 pe-2 ps-md-3 pe-md-3">
 {% include 'components/panel_pathway_genes_table.html' with panel_name="pathway_genes_table" panel_title="Genes in Pathway" panel_class="col-lg-12" %}
+</div>
 {% endblock %}

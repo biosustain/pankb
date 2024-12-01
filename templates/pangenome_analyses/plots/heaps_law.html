@@ -1,8 +1,9 @@
 {% load static %}
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     <style>
         html, body, #plot {
@@ -11,9 +12,6 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-        }
-        html {
-            font-size: 18px;
         }
     </style>
 </head>
@@ -30,7 +28,7 @@
 
     const template_screen_width = 746;
     const current_window_Width = window.innerWidth;
-    const coefficient = current_window_Width / template_screen_width;
+    const coefficient = 1.0; //current_window_Width / template_screen_width;
 
     // Data
     var data = {{ dataset|safe }}
@@ -88,12 +86,12 @@
         xaxis: {
             title: 'Number of Genomes',
             titlefont: {
-                size: 16 * coefficient,
+                size: 16,
                 family: 'Arial, sans-serif',
                 color: '#000000'
             },
             tickfont: {
-                size: 16 * coefficient,
+                size: 16,
                 family: 'Arial, sans-serif',
                 color: '#000000'
             },
@@ -103,12 +101,12 @@
         yaxis: {
             title: 'Pangenome Size',
             titlefont: {
-                size: 16 * coefficient,
+                size: 16,
                 family: 'Arial, sans-serif',
                 color: '#000000'
             },
             tickfont: {
-                size: 16 * coefficient,
+                size: 16,
                 family: 'Arial, sans-serif',
                 color: '#000000'
             },
@@ -136,7 +134,7 @@
             orientation: 'h',
             font: {
                 family: 'Arial, sans-serif',
-                size: 16 * coefficient,
+                size: 16,
                 color: '#000000'
             },
         },
@@ -149,7 +147,7 @@
                 text: '\u03BB = ' + alpha,
                 showarrow: false,
                 font: {
-                    size: 16 * coefficient,
+                    size: 16,
                     color: 'black'
                 }
             }
@@ -184,11 +182,6 @@
             Plotly.relayout('plot', update);
         }
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        loadJSONAndCreatePlot();
-
-    });
 </script>
 </body>
 </html>

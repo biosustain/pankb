@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block main_content %}
-<div class="container-fluid" data-bs-spy="scroll" data-bs-target="#page-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true">
+<div class="container-fluid ps-2 pe-2 ps-md-3 pe-md-3">
     {% url 'phylotree_plot' as url_phylogenetic_tree %}
     {% include 'components/panel_iframe.html' with panel_name="phylogenetic_tree" panel_title="Phylogenetic Tree" panel_iframe_src=url_phylogenetic_tree|add:"?species="|add:request.GET.species panel_class="col-lg-12" panel_iframe_class="responsive-iframe-full" %}
 </div>

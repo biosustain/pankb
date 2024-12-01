@@ -1,0 +1,23 @@
+{% extends "components/panel_universal.html" %}
+{% block panel_content %}
+<div class="p-3">
+    <dl class="row g-1 fs-3">
+        {% if dataGene.original_locus_tag %}
+        <dt class="col-sm-6">NCBI Locus Tag</dt>
+        <dd class="col-sm-6">{% if dataGene.original_exact_match == False %}<span data-toggle="tooltip" data-placement="top" title="Approximate match">&plusmn; </span>{% endif %}{{ dataGene.original_locus_tag }}{% if dataGene.original_gene %}<i>({{ dataGene.original_gene }})</i>{% endif %}</dd>
+        {% endif %}
+        
+        <dt class="col-sm-6">Gene</dt>
+        <dd class="col-sm-6"><a href="{% url 'gene_info' %}?species={{ dataGene.pangenome_analysis }}&gene={{ dataGene.gene }}">{{ dataGene.gene }}</a></dd>
+
+        <dt class="col-sm-12">protein</dt>
+        <dd class="col-sm-12">{{ dataGene.protein }}</dd>
+        <dt class="col-sm-6">Position</dt>
+        <dd class="col-sm-6">{{ dataGene.start_position }}-{{ dataGene.end_position }}</dd>
+        <dt class="col-sm-12">Nucleotide Sequence</dt>
+        <dd class="col-sm-12 font-monospace fs-3">{{ dataGene.nucleotide_seq }}</dd>
+        <dt class="col-sm-12">Amino Acid Sequence</dt>
+        <dd class="col-sm-12 font-monospace fs-3">{{ dataGene.aminoacid_seq }}</dd>
+    </dl>
+</div>
+{% endblock %}

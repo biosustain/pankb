@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, Http404, StreamingHttpResponse
 from django.template import loader
+from django.conf import settings
 from .models import GeneAnnotations
 from gene_function.models import GenomeInfo
 from organisms.models import Organisms
@@ -36,7 +37,7 @@ def overview(request):
 def heaps_law(request):
   template = loader.get_template('pangenome_analyses/plots/heaps_law.html')
   species = request.GET['species']
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/gene_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/gene_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
   json_obj = r.json()
   # Compose a context for the template rendering
@@ -50,7 +51,7 @@ def heaps_law(request):
 def cumulative_freq(request):
   template = loader.get_template('pangenome_analyses/plots/cumulative_freq.html')
   species = request.GET['species']
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/gene_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/gene_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
   json_obj = r.json()
   # Compose a context for the template rendering
@@ -64,7 +65,7 @@ def cumulative_freq(request):
 def gene_annotation_distribution(request):
   template = loader.get_template('pangenome_analyses/plots/gene_annotation_barplot.html')
   species = request.GET['species']
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/COG_distribution.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/COG_distribution.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
   json_obj = r.json()
   # Compose a context for the template rendering
@@ -78,7 +79,7 @@ def gene_annotation_distribution(request):
 def gene_freq(request):
   template = loader.get_template('pangenome_analyses/plots/gene_freq.html')
   species = request.GET['species']
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/gene_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/gene_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
   json_obj = r.json()
   # Compose a context for the template rendering
@@ -94,14 +95,12 @@ def hotmap(request):
   species = request.GET['species']
   gene_class = request.GET['gene_class']
 
-  genome_info = GenomeInfo.objects.filter(pangenome_analysis=species).values("genome_id", "country", "isolation_source", "strain")
-  source_info = {g["genome_id"]: [g["country"], g["isolation_source"], g["strain"]] for g in genome_info}
+  genome_info = GenomeInfo.get_genome_and_isolation_info({
+          "pangenome_analysis": species,
+        })
+  source_info = {g["genome_id"]: [g["country"], g["isolation_source"], g["strain"]] for g in list(genome_info)}
 
-  # url1 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/source_info_' + gene_class + '.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
-  # r1 = requests.get(url1)
-  # json_obj1 = r1.json()
-
-  url2 = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/heatmap_' + gene_class + '.json.gz'    # the url of the respective json.gz file stored on the Microsoft Azure Blob Storage
+  url2 = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/heatmap_' + gene_class + '.json.gz'    # the url of the respective json.gz file stored on the Microsoft Azure Blob Storage
   r2 = requests.get(url2)
   str2 = str(gzip.decompress(r2.content), 'utf-8')   # decompress the gzipped content and transform it to a string
 
@@ -128,7 +127,7 @@ def download_matrix_csv(request):
   species = request.GET['species']
   gene_class = request.GET['gene_class']
 
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/heatmap_' + gene_class + '.json.gz'    # the url of the respective json.gz file stored on the Microsoft Azure Blob Storage
+  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/heatmap_' + gene_class + '.json.gz'    # the url of the respective json.gz file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
 
   # Decompress the gzipped content and transform it to a dictionary string
@@ -174,7 +173,7 @@ def download_matrix_csv(request):
 def variant_dominant_freq(request):
   template = loader.get_template('pangenome_analyses/plots/variant_dominant_frequency.html')
   species = request.GET['species']
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/step_line.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/panalleleome/step_line.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
   json_obj = r.json()
   # Compose a context for the template rendering
@@ -188,7 +187,7 @@ def variant_dominant_freq(request):
 def ds_dn_ratio(request):
   template = loader.get_template('pangenome_analyses/plots//dn_ds_ratio.html')
   species = request.GET['species']
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/panalleleome/dn_ds.json'    # the url of the respective csv file stored on the Microsoft Azure Blob Storage
+  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/panalleleome/dn_ds.json'    # the url of the respective csv file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
   json_obj = r.json()
   # Compose a context for the template rendering
@@ -218,7 +217,7 @@ def gene_annotation(request):
   organism_info = organism_info[0]
 
   # Get the gene annotations info form the Gene Annotations collection: ----
-  gene_annotations = GeneAnnotations.objects.filter(**filter_params).values('gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class')
+  gene_annotations = GeneAnnotations.objects.filter(**filter_params).values('gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class', 'pangenome_analysis')
 
   # Transform the QuerySet with gene annotations into a pandas df: ----
   gene_annotations_pd = pd.DataFrame(list(gene_annotations), index=None)
@@ -290,11 +289,12 @@ def phylogenetic_tree(request):
 def phylotree_plot(request):
   template = loader.get_template('pangenome_analyses/plots/phylotree_plot.html')
   species = request.GET['species']
+  
+  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/phylogenetic_tree.newick'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
 
   genome_info = GenomeInfo.objects.filter(pangenome_analysis=species).values("genome_id", "country", "isolation_source")
   source_info = {g["genome_id"].replace('.', ''): {"Country": g["country"], "Isolation Source": g["isolation_source"], "Specific Source": ""} for g in genome_info}
 
-  url = 'https://pankb.blob.core.windows.net/data/PanKB/web_data/species/' + species + '/phylogenetic_tree.newick'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
   
   # Compose a context for the template rendering

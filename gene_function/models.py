@@ -31,9 +31,6 @@ class GenomeInfo(models.Model):
    _id = models.CharField(max_length=24, primary_key=True)
    genome_id = models.CharField(max_length=15)
    strain = models.CharField(max_length=100)
-   isolation_source = models.CharField(max_length=50)
-   country = models.CharField(max_length=30)
-   geo_loc_name = models.CharField(max_length=100)
    gc_content = models.FloatField()
    genome_len = models.IntegerField()
    gene_class_distribution = models.CharField(max_length=20)
@@ -41,6 +38,8 @@ class GenomeInfo(models.Model):
    pangenome_analysis = models.CharField(max_length=40)
    species = models.CharField(max_length=40)
    phylo_group = models.CharField(max_length=40)
+   objects = models.DjongoManager()
+
    class Meta:
        managed = True  # tells Django to manage the table’s creation, modification, and deletion
        db_table = 'pankb_genome_info'
@@ -48,7 +47,23 @@ class GenomeInfo(models.Model):
            models.Index(fields=['pangenome_analysis', 'genome_id']),
            models.Index(fields=['pangenome_analysis', 'strain'])
        ]
-
+   def get_genome_and_isolation_info(genome_match):
+        return GenomeInfo.objects.mongo_aggregate(
+            [
+                {"$match": genome_match},
+                {
+                    "$lookup": {
+                        "from": "pankb_isolation_info",
+                        "localField": "genome_id",
+                        "foreignField": "genome_id",
+                        "as": "isolation_info",
+                    }
+                },
+                {"$unwind": {"path": "$isolation_info"}},
+                {"$replaceRoot": {"newRoot": {"$mergeObjects": ["$$ROOT", "$isolation_info"]}}},
+                {"$project": {"_id": 0, "isolation_info": 0}},
+            ]
+        )
 
 class PathwayInfo(models.Model):
    _id = models.CharField(max_length=24, primary_key=True)

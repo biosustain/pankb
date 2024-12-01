@@ -8,20 +8,121 @@
 </form>
 {% endblock %}
 {% block panel_content %}
-<table id="species_table" class="table table-hover" style="width: 100%;">
+<table id="species_table" class="table table-hover display" style="width: 100%;">
     <thead>
-    <tr>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Family</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Species</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Openness</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Number of Genomes</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Gene Class Distribution</div></div></th>
-    </tr>
+        <tr>
+            <th>Species</th>
+            <th>Family</th>
+            <th>Openness</th>
+            <th>#Genomes</th>
+            <th>Gene Class Distribution</th>
+            {% if highlight_species %}<th>&nbsp;</th>{% endif %}
+        </tr>
     </thead>
     <tbody id="tbody">
     </tbody>
+    <tfoot>
+        <tr>
+            <th>Species</th>
+            <th>Family</th>
+            <th>Openness</th>
+            <th>#Genomes</th>
+            <th>Gene Class Distribution</th>
+            {% if highlight_species %}<th>&nbsp;</th>{% endif %}
+        </tr>
+    </tfoot>
 </table>
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const species = urlParams.get('species');
+
+    const dataset = {{ dataset|safe }}
+
+    $(document).ready(async function () {
+        let table = $('#species_table').DataTable({
+            autoWidth: true,
+            fixedColumns: true,
+            scrollX: true,
+            data: dataset,
+            order: [{% if highlight_species %}[5, 'asc'], {% endif %}[0, 'asc']],
+            columns: [
+                {
+                    data: '1',
+                    render: function (data, type, row) {
+                        return '<a href="{% url 'pangenome_analyses_overview' %}?species=' + encodeURIComponent(row[2]) + '">' + data + '</a>';
+                    },
+                },
+                {
+                    data: '0',
+                    render: function (data, type, row) {
+                        return '<a href="{% url 'organisms' %}?family=' + encodeURIComponent(data) + '">' + data + '</a>';
+                    },
+                },
+                {
+                    data: '3',
+                },
+                {
+                    data: '4',
+                },
+                {
+                    data: '5',
+                    render: function (data, type, row) {
+                        let total = data[0] + data[1] + data[2];
+                        let coreWidth = (data[0] / total) * 100;
+                        let accessoryWidth = (data[1] / total) * 100;
+                        let rareWidth = (data[2] / total) * 100;
+                        return `<div style="display: flex; height: 1.2em; max-width: 80%; margin: 0; border-radius: 0.6em; overflow: hidden;">
+                        <div style="width: ${coreWidth}%; background-color: rgba(128,0,128,0.8);" data-toggle="tooltip" title="Core: ${data[0]}"></div>
+                        <div style="width: ${accessoryWidth}%; background-color: rgba(255,165,0,0.8);" data-toggle="tooltip" title="Accessory: ${data[1]}"></div>
+                        <div style="width: ${rareWidth}%; background-color: rgba(0,128,0,0.8);" data-toggle="tooltip" title="Rare: ${data[2]}"></div>
+                        </div>`;
+                    },
+                },
+                {% if highlight_species %}
+                {
+                    data: '6',
+                    render: function (data, type, row) {
+                        if (data === 1) {
+                            return '<span class="d-none">a</span><span data-toggle="tooltip" data-placement="top" title="Highlighted Species"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#ff7f50" class="bi bi-award" viewBox="0 0 16 16"><path d="M9.669.864 8 0 6.331.864l-1.858.282-.842 1.68-1.337 1.32L2.6 6l-.306 1.854 1.337 1.32.842 1.68 1.858.282L8 12l1.669-.864 1.858-.282.842-1.68 1.337-1.32L13.4 6l.306-1.854-1.337-1.32-.842-1.68zm1.196 1.193.684 1.365 1.086 1.072L12.387 6l.248 1.506-1.086 1.072-.684 1.365-1.51.229L8 10.874l-1.355-.702-1.51-.229-.684-1.365-1.086-1.072L3.614 6l-.25-1.506 1.087-1.072.684-1.365 1.51-.229L8 1.126l1.356.702z"/><path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1z"/></svg></span>';
+                        } else {
+                            return '<span class="d-none">b</span>';
+                        }
+                    },
+                    width: '20px',
+                },
+                {% endif %}
+            ],
+            language: {
+                loadingRecords: 'Loading...',
+                zeroRecords: 'Result not found.'
+            },
+            initComplete: function () {
+                this.api()
+                    .columns()
+                    .every(function () {
+                        var column = this;
+                        var title = column.footer().textContent;
+        
+                        // Create input element and add event listener
+                        $('<input type="text" class="form-control" placeholder="' + title + '" />')
+                            .appendTo($(column.footer()).empty())
+                            .on('keyup change clear', function () {
+                                if (column.search() !== this.value) {
+                                    column.search(this.value).draw();
+                                }
+                            });
+                    });
+            },
+            drawCallback: function(settings) {
+                $('[data-toggle="tooltip"]').tooltip();
+                window.scrollTo(0, 0);
+            },
+            {% if highlight_species %}createdRow: function(row, data, dataIndex){
+                if(data[6] ==  1){
+                    $(row).addClass('highlighted-row');
+                }
+            },{% endif %}
+        });
+    });
+</script>
 {% endblock %}

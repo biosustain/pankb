@@ -1,0 +1,13 @@
+{% extends "pangenome_analyses/info_panel.html" %}
+
+{% block info_panel_titles %}
+<h5 class="card-title display-5">{{ gene_id }}</h5>
+<h6 class="card-subtitle mb-2 text-body-secondary display-6 pt-1"><a style="color: var(--bs-body-secondary-color); text-decoration-color: var(--bs-body-secondary-color) !important;" href="{% url 'genome_info' %}?species={{ dataGenome.pangenome_analysis }}&genome_id={{ datatGenome.genome_id }}">{{ dataGenome.genome_id }}</a></h6>
+<h6 class="card-subtitle mb-2 text-body-secondary display-6 pt-1"><a style="color: var(--bs-body-secondary-color); text-decoration-color: var(--bs-body-secondary-color) !important;" href="{% url 'pangenome_analyses_overview' %}?species={{ dataGenome.pangenome_analysis }}">({{ dataGenome.species }})</a></h6>
+{% endblock %}
+
+{% block info_panel_nav %}{% endblock %}
+
+{% block info_panel_content %}
+<div class="fs-3">Info about the specific gene(s) <i>{{ gene_id }}</i> in strain <i>{{ dataGenome.strain }}</i>.</div>
+{% endblock %}

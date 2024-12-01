@@ -1,10 +1,10 @@
 {% extends "components/panel_universal.html" %}
 {% load static %}
 {% block panel_content %}
-<table id="pathways_list" class="table table-hover" style="table-layout: fixed;">
+<table id="pathways_list" class="table table-hover" style="width: 100%;">
     <thead>
         <tr>
-            <th class="text-left align-left" style="width: 30%;">ID</th>
+            <th class="text-left align-left">ID</th>
             <th class="text-left align-left">Name</th>
         </tr>
     </thead>
@@ -27,6 +27,9 @@
             bPaginate: false,
             paging: false,
             bInfo: false,
+            autoWidth: true,
+            fixedColumns: true,
+            scrollX: true,
             order: [],     // preserve the original order (needed to order by relevance)
         });
     });

@@ -38,7 +38,7 @@ def search_results(request):
         pathways.sort(key=lambda x: min(algorithims.levenshtein(x["pathway_id"], q), algorithims.levenshtein(x["pathway_name"], q)))
 
         # Get the filtered genes from the DB: ----
-        gene_keys = ['gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class']
+        gene_keys = ['gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class', 'pangenome_analysis']
         genes = GeneAnnotations.objects.filter(Q(gene__icontains = q) | Q(protein__icontains = q) | Q(pfams__icontains=q)).values(*gene_keys)
         genes = list(genes)
         genes.sort(key=lambda x: min(algorithims.levenshtein(x["gene"], q), algorithims.levenshtein(x["protein"], q)))

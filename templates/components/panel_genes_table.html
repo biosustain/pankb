@@ -1,79 +1,110 @@
 {% extends "components/panel_universal.html" %}
 {% block panel_content %}
-<table id="genes_table" class="table table-hover" style="width: 100%;">
+<table id="genes_table" class="table table-hover display" style="width: 100%;">
     <thead>
     <tr>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Gene</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Class</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>COG Category</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>COG Name</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Description</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Protein</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>PFAMs</div></div></th>
-        <th class="text-center"><div class="d-flex flex-column align-items-center"><div>Frequency</div></div></th>
+        <th>Gene</th>
+        <th>Class</th>
+        <th>COG</th>
+        <th>COG Name</th>
+        <th>Description</th>
+        <th>Protein</th>
+        <th>PFAMs</th>
+        <th>Count</th>
     </tr>
     </thead>
     <tbody id="tbody">
     </tbody>
+    <tfoot>
+        <tr>
+            <th>Gene</th>
+            <th>Class</th>
+            <th>COG</th>
+            <th>COG Name</th>
+            <th>Description</th>
+            <th>Protein</th>
+            <th>PFAMs</th>
+            <th>Count</th>
+        </tr>
+    </tfoot>
 </table>
 <script>
     var genes_table = null;
 
     $(document).ready(async function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const species = urlParams.get('species');
-
         data = {{ dataset|safe }}
 
         const Gene = data;
-        console.log(Gene);
 
         genes_table = $('#genes_table').DataTable({
-            destroy: true,
             data: Gene,
+            autoWidth: true,
+            fixedColumns: true,
+            scrollX: true,
             columns: [
                 {
                     data: '0',
                     render: function (data, type, row) {
-                        return '<a href=" {% url 'gene_info' %}?species=' + species + '&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
-                    }
+                        return '<a href=" {% url 'gene_info' %}?species=' + row[8] + '&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
+                    },
                 },
-                {data: '7'},
-                {data: '1'},
-                {data: '2'},
-                {data: '3'},
+                {
+                    data: '7',
+                },
+                {
+                    data: '1',
+                },
+                {
+                    data: '2',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '160px')
+                    },
+                },
+                {
+                    data: '3',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '240px')
+                    },
+                },
                 {
                     data: '4',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '220px')
+                    },
                     className: 'protein',
                 },
                 {
                     data: '5',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '120px')
+                    },
                     className: 'pfams',
                 },
-                {data: '6'}
+                {
+                    data: '6',
+                    width: '80px',
+                }
             ],
             language: {
                 loadingRecords: 'Loading...',
                 zeroRecords: 'Result not found.'
             },
             initComplete: function () {
-                const api = this.api();
-                
-                // Existing column search code
-                $(this.api().table().header()).find('th').each(function (index, th) {
-                    const columnHeader = $(th).find('div').first();
-                    const columnIndex = index;
-
-                    const searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 60%; display: flex;" />')
-                        .on('keyup change clear', function () {
-                            api.column(columnIndex).search(this.value).draw();
-                        })
-                        .on('click', function(e) {  // Prevent event bubbling on click
-                            e.stopPropagation();
-                        });
-
-                    $(searchInput).appendTo(columnHeader);
-                });
+                this.api()
+                    .columns()
+                    .every(function () {
+                        var column = this;
+                        var title = column.footer().textContent;
+        
+                        // Create input element and add event listener
+                        $('<input type="text" class="form-control" placeholder="' + title + '" />')
+                            .appendTo($(column.footer()).empty())
+                            .on('keyup change clear', function () {
+                                if (column.search() !== this.value) {
+                                    column.search(this.value).draw();
+                                }
+                            });
+                    });
 
                 {% if highlight_text %}
                 let queryString = window.location.search;
@@ -95,17 +126,8 @@
 
         // Expand row on click
         $('#genes_table tbody').on('click', 'td', function () {
-            const cellText = $(this).text().trim();
-            const rowIndex = $(this).closest('tr').index();
-            const row = genes_table.row(rowIndex);
-            if (row.child.isShown()) {
-                row.child.hide();
-                $(this).closest('tr').removeClass('expanded-row');
-            } else {
-                const expandedRowContent = '<td colspan="8" style="white-space: normal; word-wrap: break-word;">' + cellText + '</td>';
-                row.child(expandedRowContent).show();
-                $(this).closest('tr').addClass('expanded-row');
-            }
+            const row = $(this).closest('tr');
+            row.toggleClass('expanded-row')
         });
     });
 </script>

@@ -19949,7 +19949,7 @@
                                 const genome_id = t.rowName;
                                 const gene_id = t.colName;
                                 const gene_class = t.xMeta[2];
-                                const url = "{% url 'genome_gene_info' %}?species=" + encodeURIComponent(species) + '&genome_id=' + encodeURIComponent(genome_id) + '&gene_id=' + encodeURIComponent(gene_id) + '&gene_class=' + encodeURIComponent(gene_class);
+                                const url = "{% url 'genome_gene_info' %}?species=" + encodeURIComponent(species) + '&genome_id=' + encodeURIComponent(genome_id) + '&gene=' + encodeURIComponent(gene_id) + '&gene_class=' + encodeURIComponent(gene_class);
                                 window.open(url, '_blank');
                             },
                         })
