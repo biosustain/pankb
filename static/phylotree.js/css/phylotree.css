@@ -316,7 +316,6 @@ body {
   flex-grow: 1;
   flex-shrink: 1;
   max-width: 80%;
-  padding-left: 10px;
 
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -337,7 +336,7 @@ body {
 /* Matrix Column as a Unified Grid Layout */
 .matrix-column {
   display: grid;
-  grid-template-columns: auto auto auto; /* Three columns for both labels and data */
+  grid-template-columns: auto auto auto auto; /* Four columns for both labels and data */
   grid-auto-rows: min-content; /* Each row only as tall as its content */
   gap: 0 5px; /* Ensures no additional spacing between grid items */
   overflow-y: auto;
@@ -345,8 +344,8 @@ body {
   padding-top: 24; /* Remove padding unless necessary */
   margin-right: 10px; /* Only horizontal margin if needed */
   flex-shrink: 0;
-  max-width: 350px;
   justify-content: right;
+  margin-left: 5px;
 }
 
 /* Category Labels Container */
@@ -356,7 +355,8 @@ body {
 
 /* Label Styling */
 .category-label {
-  text-align: center;
+  display: flex;
+  justify-content: left;
   font-size: 12px;
   font-family: lato, sans-serif;
   font-weight: 700;
@@ -373,17 +373,25 @@ body {
 }
 
 /* Styling for each grid item in squares */
-.square, .country-square, .isolation-source-text, .specific-source-square {
+.square {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: left;
   line-height: 14px; /* Maintain consistent line height */
   font-size: 12px;
-  text-align: center;
   white-space: nowrap; /* Prevents text wrapping */
   margin: 0; /* Remove any margin */
   padding: 0; /* Remove any padding */
   gap: 5px; /* Spacing between icon and text */
+  max-width: 150px; /* Limit width to prevent overflow */
+  overflow-x: auto;
+  
+  /* Hide scrollbar for WebKit browsers */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* -----------------------Styles for the sidebar (Counters, Tags List and Dropdowns for Categories) ----------------------- */
