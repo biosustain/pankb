@@ -140,6 +140,11 @@
                 <i class="fa fa-align-right"></i>
               </button>
             </div>
+            <div class="btn-group" role="group">
+              <button id="toggle_iso_sidebar" class="btn btn-light btn-sm" title="Toggle isolation source sidebar">
+                <i class="fa fa-bars"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -413,6 +418,12 @@
         $(".phylotree-align-toggler").toggleClass("active");
         tree.display.update();
       }
+    });
+
+    $("#toggle_iso_sidebar").on("click", function (e) {
+      var current_mode = $(this).hasClass("active");
+      $(this).toggleClass("active");
+      $(".matrix-column").toggleClass("d-none");
     });
 
     function sort_nodes(asc) {
