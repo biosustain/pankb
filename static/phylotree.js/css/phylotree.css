@@ -225,7 +225,7 @@ body {
   margin-top: 10px;
   padding-left: 0px;
   gap: 10px;
-  height: 100vh;
+  height: calc(100% - 40px); /* Workaround, should be done using proper bootstrap layout. */
   padding-right: 0px;
 }
 
@@ -387,6 +387,7 @@ body {
   gap: 5px; /* Spacing between icon and text */
   max-width: 150px; /* Limit width to prevent overflow */
   overflow-x: auto;
+  overflow-y: hidden;
   
   /* Hide scrollbar for WebKit browsers */
   scrollbar-width: none;
