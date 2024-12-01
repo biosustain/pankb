@@ -1,9 +1,21 @@
-.tree-selection-brush .extent {
-    fill-opacity: .05;
-    stroke: #fff;
-    shape-rendering: crispEdges;
+/* Global styles for html and body */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
+/* Styles for tree selection brush */
+.tree-selection-brush .extent {
+  fill-opacity: .05;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+/* Styles for tree scale bar */
 .tree-scale-bar text {
   font: sans-serif;
 }
@@ -15,78 +27,396 @@
   shape-rendering: crispEdges;
 }
 
-.node circle, .node ellipse, .node rect {
-fill: steelblue;
-stroke: black;
-stroke-width: 0.5px;
+/* Styles for tree nodes */
+.node circle,
+.node ellipse,
+.node rect {
+  fill: steelblue;
+  stroke: black;
+  stroke-width: 0.5px;
 }
 
-.internal-node circle, .internal-node ellipse, .internal-node rect{
-fill: #CCC;
-stroke: black;
-stroke-width: 0.5px;
+/* Styles for internal nodes */
+.internal-node circle,
+.internal-node ellipse,
+.internal-node rect {
+  fill: #CCC;
+  stroke: black;
+  stroke-width: 0.5px;
+  transition: fill 0.3s, stroke 0.3s, stroke-width 0.3s;
 }
 
+/* Hover styles for internal nodes */
+.internal-node circle:hover,
+.internal-node ellipse:hover,
+.internal-node rect:hover {
+  fill: black;
+  stroke: #CCC;
+  stroke-width: 1.5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: scale(1.1);
+}
+
+/* Styles for node text */
 .node {
-font: 10px sans-serif;
+  font: 10px sans-serif;
 }
 
+/* Styles for selected nodes */
 .node-selected {
-fill: #f00 !important;     
+  fill: #f00 !important;
 }
 
-.node-collapsed circle, .node-collapsed ellipse, .node-collapsed rect{
-fill: black !important;     
+/* Styles for collapsed nodes */
+.node-collapsed circle,
+.node-collapsed ellipse,
+.node-collapsed rect {
+  fill: black !important;
 }
 
+/* Styles for tagged nodes */
 .node-tagged {
-fill: #00f; 
+  fill: #00f;
 }
 
+/* Styles for branches */
 .branch {
-fill: none;
-stroke: #999;
-stroke-width: 2px;
+  fill: none;
+  stroke: #999;
+  stroke-width: 2px;
+  transition: stroke 0.3s, stroke-width 0.3s;
 }
 
+/* Styles for clades */
 .clade {
-fill: lightgrey;
-stroke: #222;
-stroke-width: 2px;
-opacity: 0.5;
+  fill: lightgrey;
+  stroke: #222;
+  stroke-width: 2px;
+  opacity: 0.5;
 }
 
+/* Styles for selected branches */
 .branch-selected {
-stroke: #f00 !important; 
-stroke-width: 3px;
+  stroke: #f00 !important;
+  stroke-width: 3px;
 }
 
+/* Styles for tagged branches */
 .branch-tagged {
-stroke: #00f;
-stroke-dasharray: 10,5;
-stroke-width: 2px;
+  stroke: #00f;
+  stroke-dasharray: 10, 5;
+  stroke-width: 2px;
 }
 
+/* Styles for branch tracer */
 .branch-tracer {
-stroke: #bbb;
-stroke-dasharray: 3,4;
-stroke-width: 1px;
+  stroke: #bbb;
+  stroke-dasharray: 3, 4;
+  stroke-width: 1px;
 }
 
-
+/* Styles for multiple branches */
 .branch-multiple {
-stroke-dasharray: 5, 5, 1, 5;
-stroke-width: 3px;
+  stroke-dasharray: 5, 5, 1, 5;
+  stroke-width: 3px;
 }
 
+/* Hover styles for branches */
 .branch:hover {
-stroke-width: 10px;
+  stroke-width: 10px;
 }
 
-.internal-node circle:hover, .internal-node ellipse:hover, .internal-node rect:hover {
-fill: black;
-stroke: #CCC;
+/* Styles for tooltips */
+.tooltip {
+  position: absolute;
+  background-color: rgba(92, 92, 92);
+  color: #ffffff;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.2s;
+  z-index: 10;
 }
 
-.tree-widget {
+/* Hover styles for tooltips */
+.tooltip:hover {
+  transform: scale(1.05);
+}
+
+/* -----------------------Styles for navbar container----------------------- */
+/* Styles for navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  padding: 5px;
+}
+
+/* Styles for navbar content */
+.navbar-content {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+/* Styles for left section of navbar */
+.navbar-left {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+/* Styles for navbar items */
+.nav-item .dropdown-toggle {
+  color: #444;
+  padding: 3px 8px;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Hover styles for navbar items */
+.nav-item .dropdown-toggle:hover {
+  background-color: #555;
+  color: #fff;
+  border-radius: 5px;
+}
+
+/* Styles for right section of navbar */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+/* Styles for branch filter */
+#branch_filter {
+  width: 150px;
+  max-width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+/* Styles for dropdown menu */
+.dropdown-menu {
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-height: 300px;
+  overflow-y: auto;
+  border-width: 1.5px;
+}
+
+/* -----------------------Styles for Main Page----------------------- */
+/* Styles for main display */
+#main_display {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+  padding-left: 0px;
+  gap: 10px;
+  height: 100vh;
+}
+
+/* -----------------------Styles for left section (Toolbar, Tree, Category labels and Matrix) ----------------------- */
+/* Styles for left section */
+.left-section {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  height: 100%;
+  overflow: hidden;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+}
+
+/* Styles for toolbar and labels */
+.toolbar-and-labels {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  flex-wrap: nowrap;
+  align-items: center;
+  height: auto;
+  width: 100%;
+}
+
+/* Styles for toolbar column */
+.toolbar-column {
+  flex-grow: 1;
+  height: 40px;
+}
+
+/* Styles for toolbar */
+#toolbar {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  background-color: #ccc;
+  border-radius: 5px;
+  height: 40px;
+  flex-grow: 1;
+}
+
+/* Styles for toolbar buttons */
+#toolbar button {
+  background-color: transparent;
+  color: #444;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-weight: 500;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Hover styles for toolbar buttons */
+#toolbar button:hover {
+  background-color: #555;
+  color: #fff;
+}
+
+/* Active styles for toolbar buttons */
+#toolbar button:active {
+  background-color: #333;
+  color: #fff;
+  transform: scale(0.95);
+}
+
+/* Tree and Matrix Container as Flex Row */
+.tree-and-matrix {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  overflow-y: hidden;
+  height: 100%;
+  margin-bottom: 50px;
+  justify-content: end;
+}
+
+/* Tree Column Flex Settings */
+.tree-column {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  overflow: auto;
+  flex-grow: 1;
+  flex-shrink: 1;
+  max-width: 80%;
+  padding-left: 10px;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Tree Container Styling */
+#tree_container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin-right: 0;
+  flex-shrink: 1;
+}
+
+/* Matrix Column as a Unified Grid Layout */
+.matrix-column {
+  display: grid;
+  grid-template-columns: auto auto auto; /* Three columns for both labels and data */
+  grid-auto-rows: min-content; /* Each row only as tall as its content */
+  gap: 0 5px; /* Ensures no additional spacing between grid items */
+  overflow-y: auto;
+  overflow-x: auto;
+  padding-top: 24; /* Remove padding unless necessary */
+  margin-right: 10px; /* Only horizontal margin if needed */
+  flex-shrink: 0;
+  max-width: 350px;
+  justify-content: right;
+}
+
+/* Category Labels Container */
+#category_labels {
+  display: contents; /* Allows the labels to integrate into the unified grid */
+}
+
+/* Label Styling */
+.category-label {
+  text-align: center;
+  font-size: 12px;
+  font-family: lato, sans-serif;
+  font-weight: 700;
+  line-height: 1; /* Tightens label height */
+  margin: 0; /* Remove any margin */
+  padding: 24px 0 0 0; /* Remove any padding */
+  white-space: nowrap; /* Prevents text wrapping */
+  gap: 5px; /* Spacing between icon and text */
+}
+
+/* Squares Container */
+#squares_container {
+  display: contents; /* Allows the squares to integrate into the unified grid */
+}
+
+/* Styling for each grid item in squares */
+.square, .country-square, .isolation-source-text, .specific-source-square {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 14px; /* Maintain consistent line height */
+  font-size: 12px;
+  text-align: center;
+  white-space: nowrap; /* Prevents text wrapping */
+  margin: 0; /* Remove any margin */
+  padding: 0; /* Remove any padding */
+  gap: 5px; /* Spacing between icon and text */
+}
+
+/* -----------------------Styles for the sidebar (Counters, Tags List and Dropdowns for Categories) ----------------------- */
+/* Styles for sidebar */
+.sidebar {
+  flex: 0 1 auto;
+}
+
+/* Styles for collapsed sidebar */
+.sidebar.collapsed {
+  width: 0;
+  overflow: hidden;
+}
+
+/* Styles for selected branch and tags counter */
+#selected_branch_counter,
+#selected-tags-counter {
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+}
+
+.highlighted {
+  fill: red;
+  stroke: red;
+  font-weight: bold;
+  color: red;
+}
+
+#d3_layout_phylotree_context_menu {
+  position: absolute;
+  display: none; /* Hide by default */
+  z-index: 1000; /* Ensure it appears above other elements */
+  /* Add padding, background, border, etc., as needed */
 }

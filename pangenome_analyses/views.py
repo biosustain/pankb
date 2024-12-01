@@ -289,10 +289,17 @@ def phylogenetic_tree(request):
 def phylotree_plot(request):
   template = loader.get_template('pangenome_analyses/plots/phylotree_plot.html')
   species = request.GET['species']
+  
   url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/phylogenetic_tree.newick'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+
+  genome_info = GenomeInfo.objects.filter(pangenome_analysis=species).values("genome_id", "country", "isolation_source")
+  source_info = {g["genome_id"].replace('.', ''): {"Country": g["country"], "Isolation Source": g["isolation_source"], "Specific Source": ""} for g in genome_info}
+
   r = requests.get(url)
+  
   # Compose a context for the template rendering
   context = {
-    'dataset': json.dumps(r.text)
+    'tree_dataset': json.dumps(r.text),
+    'source_info_dataset': json.dumps(source_info)
   }
   return HttpResponse(template.render(context, request))
