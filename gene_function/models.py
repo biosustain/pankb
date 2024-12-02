@@ -77,6 +77,7 @@ class PathwayInfo(models.Model):
 #    gene = models.CharField(max_length=20)
 #    pangenomic_class = models.CharField(max_length=9)      # Core, Accessory (9 symbols) or Rare
 #    pangenome_analysis = models.CharField(max_length=40)
+   objects = models.DjongoManager()
    class Meta:
        managed = True  # tells Django to manage the table’s creation, modification, and deletion
        db_table = 'pankb_pathway_info'

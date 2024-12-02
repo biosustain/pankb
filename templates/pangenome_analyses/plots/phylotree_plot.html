@@ -148,7 +148,7 @@
       <!-- Bottom Row: Tree and Squares Side by Side -->
       <div class="tree-and-matrix">
         <!-- Left Column: Tree Container -->
-        <div class="tree-column">
+        <div class="tree-column hide-scrollbar">
           <div class="tree-container" id="tree_container">
             <!-- Tree will be rendered here -->
           </div>
@@ -420,6 +420,7 @@
       var current_mode = $(this).hasClass("active");
       $(this).toggleClass("active");
       $(".matrix-column").toggleClass("d-none");
+      $(".tree-column").toggleClass("hide-scrollbar");
       tree.display.update();
       const treeContainer = document.querySelector(".tree-column");
       treeContainer.dispatchEvent(new CustomEvent('scroll')); // trigger the scroll event to synchronize the views

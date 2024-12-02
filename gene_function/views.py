@@ -264,12 +264,16 @@ def pathway_info(request):
     pathway_info = PathwayInfo.objects.get(pathway_id=pathway_id)
   except PathwayInfo.DoesNotExist:
     raise Http404()
-  pathway_info_dict = model_to_dict(pathway_info, exclude=["_id", "genes"])
+  pathway_info_dict = model_to_dict(pathway_info, exclude=["_id"])
   pathway_kegg_link = f"https://www.kegg.jp/pathway/{pathway_info.pathway_id}"
 
   # Obtain info about the pathway genes: ----
-  genes_info = GeneAnnotations.objects.mongo_find({"$or": [{"pangenome_analysis": g["pangenome_analysis"], "gene": g["gene"]} for g in pathway_info.genes]}, sort=[("gene", 1)], projection={'_id': False})
-  genes_info = list(genes_info)
+  pa_genes = pathway_info_dict["genes"]
+  genes_info = []
+  for i in range(0, len(pa_genes), 5000):
+    g = GeneAnnotations.objects.mongo_find({"pa_gene": {"$in": pa_genes[i:min((i+1)*5000, len(pa_genes))]}}, {"_id": 0, "pa_gene": 0, "brite": 0, "ec": 0, "kegg_reaction": 0, "kegg_module": 0, "kegg_tc": 0, "pfams": 0, "kegg_pathway": 0, "eggnog_ogs": 0, "cazy": 0, "cog_category": 0, "cog_name": 0, "description": 0, "frequency": 0})
+    genes_info.extend(g)
+
   for d in genes_info:
     kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway_id}"
     if d["kegg_ko"]:
