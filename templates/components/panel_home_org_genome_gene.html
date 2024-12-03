@@ -1,11 +1,10 @@
 {% extends "components/panel_universal.html" %}
 {% block panel_content %}
-<div class="row g-0">
-    <div class="col-4 h-100 g-0">
+<div class="fp-small-plot d-flex">
+    <div class="w-25">
         {% include "home/plots/organism_genome_number.html" %}
     </div>
-    <!-- Third bar plot-->
-    <div class="col-8 h-100 g-0">
+    <div class="w-75">
         {% include "home/plots/organism_gene_number.html" %}
     </div>
 </div>
