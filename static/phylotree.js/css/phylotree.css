@@ -321,11 +321,11 @@ body {
 }
 
 .hide-scrollbar {
-  scrollbar-width: none;
+  /* scrollbar-width: none;
   -ms-overflow-style: none;
   &::-webkit-scrollbar {
     display: none;
-  }
+  } */ /* Seems impossible to hide only the y scrollbar, while retaining the possibility to scroll. Should be fixed by changing layout instead and getting rid of javascript scroll synchronization. */
 }
 
 /* Tree Container Styling */

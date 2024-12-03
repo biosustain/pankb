@@ -45,6 +45,10 @@
             scrollX: true,
             data: dataset,
             order: [{% if highlight_species %}[5, 'asc'], {% endif %}[0, 'asc']],
+            lengthMenu: [
+                [10, 20, 30, 40, 50, 100, -1],
+                [10, 20, 30, 40, 50, 100, 'All']
+            ],
             columns: [
                 {
                     data: '1',
