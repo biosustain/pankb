@@ -35,6 +35,10 @@
             paging: true,
             order: [],   // preserve the original order (needed to order by relevance)
             data: geneData,
+            lengthMenu: [
+                [10, 20, 30, 40, 50, 100, -1],
+                [10, 20, 30, 40, 50, 100, 'All']
+            ],
             columns: [
                 {
                     data: 'gene',

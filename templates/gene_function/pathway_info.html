@@ -16,4 +16,17 @@
 <div class="ps-2 pe-2 ps-md-3 pe-md-3">
 {% include 'components/panel_pathway_genes_table.html' with panel_name="pathway_genes_table" panel_title="Genes in Pathway" panel_class="col-lg-12" %}
 </div>
+<script>
+    $(document).ready(async function () {
+        if ($(window).height() >= "2100"){
+            $('#pathway_genes_table').DataTable().page.len(40).draw();
+        } else if ($(window).height() >= "1700"){
+            $('#pathway_genes_table').DataTable().page.len(30).draw();
+        } else if ($(window).height() >= "1300"){
+            $('#pathway_genes_table').DataTable().page.len(20).draw();
+        } else {
+            $('#pathway_genes_table').DataTable().page.len(10).draw();
+        }
+    });
+</script>
 {% endblock %}

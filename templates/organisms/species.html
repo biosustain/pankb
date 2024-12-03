@@ -14,11 +14,11 @@
 </main>
 <script>
     $(document).ready(async function () {
-        if ($(window).height() >= "2000"){
+        if ($(window).height() >= "2100"){
             $('#species_table').DataTable().page.len(40).draw();
-        } else if ($(window).height() >= "1600"){
+        } else if ($(window).height() >= "1700"){
             $('#species_table').DataTable().page.len(30).draw();
-        } else if ($(window).height() >= "1200"){
+        } else if ($(window).height() >= "1300"){
             $('#species_table').DataTable().page.len(20).draw();
         } else {
             $('#species_table').DataTable().page.len(10).draw();
