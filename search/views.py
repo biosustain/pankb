@@ -1,50 +1,93 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
-from django.db.models import Q
 from organisms.models import Organisms
 from pangenome_analyses.models import GeneAnnotations
 from gene_function.models import PathwayInfo
 import json
-import pandas as pd
 import re
-from fuzzy_match import algorithims
+
+
+def build_multi_search_aggregation(expression, fields):
+    facets = {
+        f"{field}_match": [
+            {"$match": {field: {"$regex": expression, "$options": "i"}}},
+            {"$addFields": {"priority": i}},
+        ]
+        for i, field in enumerate(fields)
+    }
+    return [
+        {"$facet": facets},
+        {
+            "$project": {
+                "results": {"$setUnion": [f"${field}_match" for field in fields]}
+            }
+        },
+        {"$unwind": {"path": "$results"}},
+        {"$replaceRoot": {"newRoot": "$results"}},
+        {"$sort": {"priority": 1}},
+    ]
 
 
 # View: Search Results Page
 def search_results(request):
-    template = loader.get_template('search/search_results.html')
+    template = loader.get_template("search/search_results.html")
     # Get the query string from the URL: ----
-    q = request.GET.get('q')
+    q_orig = request.GET.get("q")
     # Clean the query string: ----
-    q = re.sub(r'[^A-Za-z0-9-_\s]+', '', q)  # remove all symbols except letters, digits, underscores, dashes, whitespaces
-    q = q.strip() # remove the leading and trailing spaces from the query string
+    q = re.sub(
+        r"[^A-Za-z0-9-_\s]+", "", q_orig
+    )  # remove all symbols except letters, digits, underscores, dashes, whitespaces
+    q = q.strip()  # remove the leading and trailing spaces from the query string
     q = " ".join(q.split())  # remove duplicated whitespaces from the query string
 
-    if len(q) >= 2: # only if the cleaned query string length > 2 symbols, perform the DB searches: ----
+    if (
+        len(q) >= 2
+    ):  # only if the cleaned query string length > 2 symbols, perform the DB searches: ----
         # Get the filtered organism families from the DB: ----
-        families = Organisms.objects.filter(Q(family__icontains = q)).values('family').distinct()
-        families = list(families)
-        families.sort(key=lambda x: algorithims.levenshtein(x["family"], q))
+        families = list(
+            Organisms.objects.mongo_find(
+                {"family": {"$regex": q, "$options": "i"}}, {"_id": 0, "family": 1}
+            ).distinct("family")
+        )
 
         # Get the filtered species from the DB: ----
-        species = Organisms.objects.filter(Q(species__icontains = q)).values('species', 'family', 'pangenome_analysis').distinct()
-        species = list(species)
-        species.sort(key=lambda x: algorithims.levenshtein(x["species"], q))
+        species = list(
+            Organisms.objects.mongo_find(
+                {"species": {"$regex": q, "$options": "i"}},
+                {"_id": 0, "species": 1, "family": 1, "pangenome_analysis": 1},
+            )
+        )
 
         # Get the filtered pathways from the DB: ----
-        pathways = PathwayInfo.objects.filter(Q(pathway_id__icontains=q) | Q(pathway_name__icontains=q)).values("pathway_id", "pathway_name").order_by('pathway_id').distinct()
-        pathways = list(pathways)
-        pathways.sort(key=lambda x: min(algorithims.levenshtein(x["pathway_id"], q), algorithims.levenshtein(x["pathway_name"], q)))
+        pathways = list(
+            PathwayInfo.objects.mongo_aggregate(
+                build_multi_search_aggregation(q, ["pathway_id", "pathway_name"])
+                + [{"$project": {"_id": 0, "pathway_id": 1, "pathway_name": 1}}]
+            )
+        )
 
         # Get the filtered genes from the DB: ----
-        gene_keys = ['gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class', 'pangenome_analysis']
-        genes = GeneAnnotations.objects.filter(Q(gene__icontains = q) | Q(protein__icontains = q) | Q(pfams__icontains=q)).values(*gene_keys)
-        genes = list(genes)
-        genes.sort(key=lambda x: min(algorithims.levenshtein(x["gene"], q), algorithims.levenshtein(x["protein"], q)))
-        genes = [[g[gk] for gk in gene_keys] for g in genes]
+        gene_keys = [
+            "gene",
+            "cog_category",
+            "cog_name",
+            "description",
+            "protein",
+            "pfams",
+            "frequency",
+            "pangenomic_class",
+            "pangenome_analysis",
+        ]
+        genes = list(
+            GeneAnnotations.objects.mongo_aggregate(
+                build_multi_search_aggregation(q, ["gene", "protein", "pfams"])
+                + [{"$project": {gk: int(gk != "_id") for gk in ["_id"] + gene_keys}}]
+            )
+        )
+        genes = [[g.get(gk, None) for gk in gene_keys] for g in genes]
 
-    else: # if the cleaned query string is too short or not set, just return the empty DFs: ----
+    else:  # if the cleaned query string is too short or not set, just return the empty DFs: ----
         families = []
         species = []
         pathways = []
@@ -59,13 +102,13 @@ def search_results(request):
         no_results_list.append("pathways")
     if not genes:
         no_results_list.append("genes")
-    
+
     # Compose the render context: ----
     context = {
-        'families_results': families,
-        'species_results': species,
-        'pathways_results': pathways,
-        'genes_results': json.dumps(genes),
-        'no_results_list': no_results_list,
+        "families_results": families,
+        "species_results": species,
+        "pathways_results": pathways,
+        "genes_results": json.dumps(genes),
+        "no_results_list": no_results_list,
     }
     return HttpResponse(template.render(context, request))

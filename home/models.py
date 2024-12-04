@@ -11,5 +11,5 @@ class Statistics(models.Model):
    treemap = models.JSONField()
 
    class Meta:
-       managed = True  # tells Django not to manage the table’s creation, modification, and deletion
+       managed = False
        db_table = 'pankb_stats'

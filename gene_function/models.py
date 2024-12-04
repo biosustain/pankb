@@ -17,9 +17,10 @@ class GeneInfo(models.Model):
     original_gene = models.CharField(max_length=40)
     original_exact_match = models.BooleanField(default=False)
     imodulon_data = models.CharField(max_length=100)
+    objects = models.DjongoManager()
 
     class Meta:
-        managed = True  # tells Django to manage the table’s creation, modification, and deletion
+        managed = False
         db_table = 'pankb_gene_info'
         indexes = [
             models.Index(fields=['pangenome_analysis', 'gene']),
@@ -41,7 +42,7 @@ class GenomeInfo(models.Model):
    objects = models.DjongoManager()
 
    class Meta:
-       managed = True  # tells Django to manage the table’s creation, modification, and deletion
+       managed = False
        db_table = 'pankb_genome_info'
        indexes = [
            models.Index(fields=['pangenome_analysis', 'genome_id']),
@@ -69,7 +70,7 @@ class PathwayInfo(models.Model):
    _id = models.CharField(max_length=24, primary_key=True)
    pathway_id = models.CharField(max_length=15)
    pathway_name = models.CharField(max_length=100)
-   genes = models.CharField(max_length=100)
+#    genes = models.CharField(max_length=100)
 #    strain = models.CharField(max_length=100)
 #    species = models.CharField(max_length=40)
 #    product = models.CharField(max_length=150)
@@ -79,7 +80,7 @@ class PathwayInfo(models.Model):
 #    pangenome_analysis = models.CharField(max_length=40)
    objects = models.DjongoManager()
    class Meta:
-       managed = True  # tells Django to manage the table’s creation, modification, and deletion
+       managed = False
        db_table = 'pankb_pathway_info'
        indexes = [
            models.Index(fields=['pathway_id']),

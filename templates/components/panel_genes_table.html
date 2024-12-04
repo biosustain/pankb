@@ -45,6 +45,9 @@
                 [10, 20, 30, 40, 50, 100, -1],
                 [10, 20, 30, 40, 50, 100, 'All']
             ],
+            {% if highlight_text %}
+            order: [],
+            {% endif %}
             columns: [
                 {
                     data: '0',
@@ -131,7 +134,7 @@
         // Expand row on click
         $('#genes_table tbody').on('click', 'td', function () {
             const row = $(this).closest('tr');
-            row.toggleClass('expanded-row')
+            row.toggleClass('expanded-row');
         });
     });
 </script>

@@ -19,7 +19,7 @@ class GeneAnnotations(models.Model):
    objects = models.DjongoManager()
 
    class Meta:
-       managed = True  # tells Django to manage the table’s creation, modification, and deletion
+       managed = False
        db_table = 'pankb_gene_annotations'
        indexes = [
            models.Index(fields=['pangenome_analysis']),

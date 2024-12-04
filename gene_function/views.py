@@ -268,11 +268,12 @@ def pathway_info(request):
   pathway_kegg_link = f"https://www.kegg.jp/pathway/{pathway_info.pathway_id}"
 
   # Obtain info about the pathway genes: ----
-  pa_genes = pathway_info_dict["genes"]
-  genes_info = []
-  for i in range(0, len(pa_genes), 5000):
-    g = GeneAnnotations.objects.mongo_find({"pa_gene": {"$in": pa_genes[i:min((i+1)*5000, len(pa_genes))]}}, {"_id": 0, "pa_gene": 0, "brite": 0, "ec": 0, "kegg_reaction": 0, "kegg_module": 0, "kegg_tc": 0, "pfams": 0, "kegg_pathway": 0, "eggnog_ogs": 0, "cazy": 0, "cog_category": 0, "cog_name": 0, "description": 0, "frequency": 0})
-    genes_info.extend(g)
+  # pa_genes = pathway_info_dict["genes"]
+  # genes_info = []
+  # for i in range(0, len(pa_genes), 5000):
+  #   g = GeneAnnotations.objects.mongo_find({"pa_gene": {"$in": pa_genes[i:min((i+1)*5000, len(pa_genes))]}}, {"_id": 0, "pa_gene": 0, "brite": 0, "ec": 0, "kegg_reaction": 0, "kegg_module": 0, "kegg_tc": 0, "pfams": 0, "kegg_pathway": 0, "eggnog_ogs": 0, "cazy": 0, "cog_category": 0, "cog_name": 0, "description": 0, "frequency": 0})
+  #   genes_info.extend(g)
+  genes_info = list(GeneAnnotations.objects.mongo_find({"kegg_pathway": pathway_id}, {"_id": 0, "gene": 1, "pangenome_analysis": 1, "species": 1, "family": 1, "protein": 1, "pangenomic_class": 1, "kegg_ko": 1}))
 
   for d in genes_info:
     kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway_id}"
@@ -281,7 +282,6 @@ def pathway_info(request):
     d["kegg_link"] = kegg_link
 
   # Substitute the index with our own: ----
-  pathway_info_json = json.dumps(pathway_info_dict, default=str)  # json dumps replaces the single quotes with the double ones
   genes_info_json = json.dumps(genes_info, default=str)
 
   # Compose a context for the template rendering: ----
