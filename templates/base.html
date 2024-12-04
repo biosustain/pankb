@@ -25,6 +25,9 @@
         body {
             position: relative !important;
         }
+        .search-input {
+            text-overflow: ellipsis;
+        }
         #search-examples-wrapper {
             transition: max-height 0.5s ease;
             max-height: 0rem;
@@ -88,6 +91,18 @@
         }
         @media (min-width: 992px) {
             .fp-small-plot {
+                max-height: 30rem;
+            }
+        }
+        .fp-dimensions-plot {
+            width: 100%;
+            min-height: 12rem;
+            height: 25vh;
+            max-height: 20rem;
+            font-size: 1.2rem;
+        }
+        @media (min-width: 992px) {
+            .fp-dimensions-plot {
                 max-height: 30rem;
             }
         }
