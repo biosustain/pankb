@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, Http404, StreamingHttpResponse
+from django.http import HttpResponse, Http404, StreamingHttpResponse, JsonResponse
 from django.template import loader
 from django.conf import settings
 from .models import GeneAnnotations
@@ -7,6 +7,7 @@ from gene_function.models import GenomeInfo
 from organisms.models import Organisms
 import json, requests, io, gzip, csv, time
 import pandas as pd
+import re
 
 
 ################### Overview Page Templates ###################################
@@ -107,7 +108,7 @@ def hotmap(request):
   # Compose a context for the template rendering
   context = {
     'dataset': json.dumps(source_info),
-    'heatmapData': json.dumps(str2)
+    'heatmapData': str2
   }
   return HttpResponse(template.render(context, request))
 
@@ -216,20 +217,22 @@ def gene_annotation(request):
     raise Http404()
   organism_info = organism_info[0]
 
-  # Get the gene annotations info form the Gene Annotations collection: ----
-  gene_annotations = GeneAnnotations.objects.filter(**filter_params).values('gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class', 'pangenome_analysis')
+  # # Get the gene annotations info form the Gene Annotations collection: ----
+  # gene_annotations = GeneAnnotations.objects.filter(**filter_params).values('gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class', 'pangenome_analysis')
 
-  # Transform the QuerySet with gene annotations into a pandas df: ----
-  gene_annotations_pd = pd.DataFrame(list(gene_annotations), index=None)
-  # Transform the dataframe with gene annotations into a list of lists (imposed by the front-end JS):
-  ga_list_of_lists = gene_annotations_pd.values.tolist()
-  # Transform the list of lists into a JSON object: ----
+  # # Transform the QuerySet with gene annotations into a pandas df: ----
+  # gene_annotations_pd = pd.DataFrame(list(gene_annotations), index=None)
+  # # Transform the dataframe with gene annotations into a list of lists (imposed by the front-end JS):
+  # ga_list_of_lists = gene_annotations_pd.values.tolist()
+  # Transform the list of lists into a JSON object: ---
+  ga_list_of_lists = []
   gene_annotations_json = json.dumps(ga_list_of_lists, default=str)
 
   # Compose a context for the template rendering
   context = {
     'speciesData': organism_info,
-    'dataset': gene_annotations_json
+    'dataset': gene_annotations_json,
+    'pangenome_analysis': species,
   }
   return HttpResponse(template.render(context, request))
 
@@ -311,3 +314,140 @@ def phylotree_plot(request):
     'source_info_dataset': json.dumps(source_info)
   }
   return HttpResponse(template.render(context, request))
+
+def _parse_get_array(req_get, name):
+  data = {}
+  for k, v in req_get.items():
+    if not k.startswith(f"{name}["):
+      continue
+    i, s = k[(len(name) + 1):].split(']', 1)
+    i = int(i)
+    if s[0] != '[':
+      continue
+    s = s[1:]
+    prop, s = s.split(']', 1)
+    if s:
+      if s[0] != '[':
+        continue
+      subprop, s = s[1:].split(']', 1)
+      prop = f"{prop}.{subprop}"
+    if not i in data:
+      data[i] = {}
+    data[i][prop] = v
+  data = [data[i] for i in range(len(data))]
+  return data
+
+# API for datatables
+def gene_annotation_json(request):
+  pangenome_analysis = str(request.GET["pangenome_analysis"])
+  draw = int(request.GET["draw"])
+  start = int(request.GET["start"])
+  length = int(request.GET["length"])
+
+  columns = _parse_get_array(request.GET, "columns")
+  order = _parse_get_array(request.GET, "order")
+  search = {"value": request.GET.get("search[value]", ""), "regex": request.GET.get("search[regex]", "false")}
+
+  gene_keys = ['gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class', 'pangenome_analysis']
+  projection = {f"results.{gk}": 1 for gk in gene_keys}
+  projection["info.total"] = 1
+  projection["info.filtered"] = 1
+
+  filter_pipeline = []
+  results_pipeline = []
+
+  if start > 0:
+    results_pipeline.append({"$skip": start})
+  if length != -1:
+    results_pipeline.append({"$limit": length})
+
+  col_search = {}
+  for column in columns:
+    # if column.get("searchable", "false") != "true":
+    #   continue
+    if column.get("search.value", "") == "":
+      continue
+    q = re.sub(r"[^A-Za-z0-9-_\s]+", "", column["search.value"])
+    q = q.strip()
+    q = " ".join(q.split())
+    col_search[column["name"]] = {"$regex": q, "$options": 'i'}
+
+  glob_search = []
+  if search.get("value", "") != "":
+    q = re.sub(r"[^A-Za-z0-9-_\s]+", "", search["value"])
+    q = q.strip()
+    q = " ".join(q.split())
+    for column in columns:
+      if column.get("searchable", "false") != "true":
+        continue
+      glob_search.append({column["name"]: {"$regex": q, "$options": 'i'}})
+
+  if col_search and not glob_search:
+    filter_pipeline.append({
+      "$match": col_search,
+    })
+  elif glob_search and not col_search:
+    filter_pipeline.append({
+      "$match": {"$or": glob_search},
+    })
+  elif col_search and glob_search:
+    filter_pipeline.append({
+      "$match": {"$and": [col_search, {"$or": glob_search}]},
+    })
+
+
+  if len(order) > 0:
+    filter_pipeline.append(
+      {"$sort":
+        {
+          x["name"]: (-1 if x["dir"] == "desc" else 1) for x in order
+        }
+      }
+    )
+
+  pipeline = [
+    {"$match": {"pangenome_analysis": pangenome_analysis}},
+    {"$facet": {
+      "total_info": [{"$count": "total"}],
+      "filter": filter_pipeline,
+    }},
+    {"$unwind": "$total_info"},
+    {"$unwind": "$filter"},
+    {"$addFields": {"filter.total": "$total_info.total"}},
+    {"$replaceRoot": { "newRoot": "$filter" }},
+    {"$facet": {
+      "info": [{"$count": "filtered"}],
+      "results": results_pipeline,
+    }},
+    {"$unwind": "$info"},
+    {"$addFields": {"first_doc": { "$first": "$results" } } },
+    {"$addFields": {"info.total": "$first_doc.total" } },
+    {"$project": projection},
+    ]
+
+  results = list(GeneAnnotations.objects.mongo_aggregate(pipeline))
+
+  if not results:
+    gene_annotations = []
+    recordsTotal = 0 # TODO: this is not really correct
+    recordsFiltered = 0
+  else:
+    gene_annotations = list(results[0]["results"])
+    recordsTotal = results[0]["info"]["total"]
+    recordsFiltered = results[0]["info"]["filtered"]
+
+    gene_annotations = [[g.get(gk, None) for gk in gene_keys] for g in gene_annotations]
+
+  data = gene_annotations
+
+  draw = draw + 1
+
+  response = {
+    "draw": draw,
+    "recordsTotal": recordsTotal,
+    "recordsFiltered": recordsFiltered,
+    "data": data,
+    "columns": columns,
+    "order": order,
+    }
+  return JsonResponse(response)

@@ -24,7 +24,7 @@
             <th>Description</th>
             <th>Protein</th>
             <th>PFAMs</th>
-            <th class="no_search"></th>
+            <th>Count</th>
         </tr>
     </tfoot>
 </table>
@@ -32,17 +32,10 @@
     var genes_table = null;
 
     $(document).ready(async function () {
-        // data = {{ dataset|safe }}
-
-        // const Gene = data;
-
         genes_table = $('#genes_table').DataTable({
-            // data: Gene,
-            serverSide: true,
             ajax: {
-                url: '{% url "pangenome_analyses_gene_annotation_json" %}',
-                data: {pangenome_analysis: '{{ pangenome_analysis | safe}}'},
-                dataSrc: 'data',
+                url: '{% url "search_genes_json" %}?q={{ q }}',
+                dataSrc: 'results',
             },
             autoWidth: true,
             fixedColumns: true,
@@ -51,39 +44,34 @@
                 [10, 20, 30, 40, 50, 100, -1],
                 [10, 20, 30, 40, 50, 100, 'All']
             ],
+            order: [],
             columns: [
-                {
+            {
                     data: '0',
-                    name: 'gene',
                     render: function (data, type, row) {
                         return '<a href=" {% url 'gene_info' %}?species=' + row[8] + '&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
                     },
                 },
                 {
                     data: '7',
-                    name: 'pangenomic_class',
                 },
                 {
                     data: '1',
-                    name: 'cog_category',
                 },
                 {
                     data: '2',
-                    name: 'cog_name',
                     render: function (data, type, row) {
                         return wrap_table_text(data, '160px')
                     },
                 },
                 {
                     data: '3',
-                    name: 'description',
                     render: function (data, type, row) {
                         return wrap_table_text(data, '240px')
                     },
                 },
                 {
                     data: '4',
-                    name: 'protein',
                     render: function (data, type, row) {
                         return wrap_table_text(data, '220px')
                     },
@@ -91,27 +79,18 @@
                 },
                 {
                     data: '5',
-                    name: 'pfams',
                     render: function (data, type, row) {
-                        let new_data = data;
-                        if (data === null) {
-                            new_data = "-";
-                        } else if (Array.isArray(data)) {
-                            new_data = data.join(', ');
-                        }
-                        return wrap_table_text(new_data, '120px')
+                        return wrap_table_text(data, '120px')
                     },
                     className: 'pfams',
                 },
                 {
                     data: '6',
-                    name: 'frequency',
-                    searchable: false,
                     width: '80px',
                 }
             ],
             language: {
-                loadingRecords: 'Loading...',
+                loadingRecords: '<span class="spinner-border" aria-hidden="true"></span>',
                 zeroRecords: 'Result not found.'
             },
             initComplete: function () {
@@ -120,19 +99,33 @@
                     .every(function () {
                         var column = this;
                         var title = column.footer().textContent;
-                        var searchable = !$(column.footer()).hasClass("no_search");
-                        if (searchable) {
-                            // Create input element and add event listener
-                            $('<input type="text" class="form-control" placeholder="' + title + '" />')
-                                .appendTo($(column.footer()).empty())
-                                .on('keyup change clear', function () {
-                                    if (column.search() !== this.value) {
-                                        column.search(this.value).draw();
-                                    }
-                                });
-                        }
+        
+                        // Create input element and add event listener
+                        $('<input type="text" class="form-control" placeholder="' + title + '" />')
+                            .appendTo($(column.footer()).empty())
+                            .on('keyup change clear', function () {
+                                if (column.search() !== this.value) {
+                                    column.search(this.value).draw();
+                                }
+                            });
                     });
+
+                let queryString = window.location.search;
+                let urlParams = new URLSearchParams(queryString);
+                let q = urlParams.get('q')
+                highlightText(q);
             }
+        });
+
+        genes_table.on("draw", function () {
+            let queryString = window.location.search;
+            let urlParams = new URLSearchParams(queryString);
+            let q = urlParams.get('q')
+            highlightText(q);
+        });
+        genes_table.on('xhr.dt', function (e, settings, json, xhr) {
+            let genesFound = json.results.length > 0;
+            update_results_overview_with_genes(genesFound);
         });
 
         // Expand row on click

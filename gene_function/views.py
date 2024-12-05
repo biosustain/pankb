@@ -179,11 +179,8 @@ def msa(request):
   }
   return HttpResponse(template.render(context, request))
 
-def _get_genome_and_isolation_info(pangenome_analysis, genome_id):
-  genome_info_dict = GenomeInfo.get_genome_and_isolation_info({
-          "pangenome_analysis": pangenome_analysis,
-          "genome_id": genome_id
-        })
+def _get_genome_and_isolation_info(filter_params):
+  genome_info_dict = GenomeInfo.get_genome_and_isolation_info(filter_params)
   genome_info_dict = list(genome_info_dict)
   if len(genome_info_dict) == 0:
     raise Http404()
@@ -196,10 +193,17 @@ def _get_genome_and_isolation_info(pangenome_analysis, genome_id):
 # Template renderer for the Genome Info Page
 def genome_info(request):
   template = loader.get_template('gene_function/genome_info.html')
-  species = request.GET['species']
-  genome_id = request.GET['genome_id']
+  species = request.GET.get('species', None)
+  genome_id = request.GET.get('genome_id', None)
 
-  genome_info_dict = _get_genome_and_isolation_info(species, genome_id)
+  if species is None or genome_id is None:
+    raise Http404()
+
+  filter_params = {
+      "pangenome_analysis": species,
+      "genome_id": genome_id
+  }
+  genome_info_dict = _get_genome_and_isolation_info(filter_params)
 
   # Obtain the gene info: ----
   gene_info = GeneInfo.objects.filter(pangenome_analysis=species, genome_id=genome_id).values('gene', 'locus_tag', 'pangenome_analysis', 'genome_id', 'original_locus_tag', 'original_gene', 'original_exact_match', 'protein', 'start_position', 'end_position', 'nucleotide_seq', 'aminoacid_seq')
@@ -235,22 +239,48 @@ def genome_barplot(request):
 # Template renderer for the Genome Info Page
 def genome_gene_info(request):
   template = loader.get_template('gene_function/genome_gene_info.html')
-  species = request.GET['species']
-  genome_id = request.GET['genome_id']
-  gene = request.GET['gene']
+  species = request.GET.get('species', None)
+  genome_id = request.GET.get('genome_id', None)
+  gene = request.GET.get('gene', None)
+  locus_tag = request.GET.get('locus_tag', None)
 
-  genome_info_dict = _get_genome_and_isolation_info(species, genome_id)
+  if species is None or ((genome_id is None or gene is None) and locus_tag is None):
+    raise Http404()
 
-  gene_info = GeneInfo.objects.filter(pangenome_analysis=species, genome_id=genome_id, gene=gene).values('locus_tag', 'genome_id', 'gene', 'protein', 'start_position', 'end_position', 'nucleotide_seq', 'aminoacid_seq', 'species', 'pangenome_analysis', 'original_locus_tag', 'original_gene', 'original_exact_match')
+  if (not (genome_id is None or gene is None)) and (locus_tag is None):
+    filter_params = {
+        "pangenome_analysis": species,
+        "genome_id": genome_id,
+        "gene": gene,
+    }
+  elif (genome_id is None or gene is None) and (not locus_tag is None):
+    filter_params = {
+        "pangenome_analysis": species,
+        "locus_tag": locus_tag
+    }
+  else:
+    raise Http404()
+
+  gene_info = GeneInfo.objects.filter(**filter_params).values('locus_tag', 'genome_id', 'gene', 'protein', 'start_position', 'end_position', 'nucleotide_seq', 'aminoacid_seq', 'species', 'pangenome_analysis', 'original_locus_tag', 'original_gene', 'original_exact_match')
   if len(gene_info) == 0:
     raise Http404()
   gene_info = list(gene_info)
+
+  genome_id = gene_info[0]['genome_id']
+  gene = gene_info[0]['gene']
+  locus_tag = gene_info[0]['locus_tag']
+
+  genome_info_dict = _get_genome_and_isolation_info({
+        "pangenome_analysis": species,
+        "genome_id": genome_id})
 
   # Compose a context for the template rendering: ----
   context = {
     'dataGenome': genome_info_dict,
     'dataGene': gene_info,
     'gene_id': gene,
+    'genome_id': genome_id,
+    'locus_tag': locus_tag,
   }
   return HttpResponse(template.render(context, request))
 

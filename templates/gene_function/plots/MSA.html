@@ -95,6 +95,7 @@
 
                             // Get the name of the sequence
                             sequenceName = sequence.get('name');
+                            console.log(sequence)
 
                             // If clicking on the same row, hide the panel and return
                             if (currentSeqId === data.seqId) {
@@ -135,7 +136,7 @@
                             jumpBtn.innerHTML = "Info of " + sequenceName;
                             jumpBtn.onclick = function() {
                                 // Define a unique URL for each sequence
-                                const url = "{% url 'genome_info' %}?species=" + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id)
+                                const url = "{% url 'genome_gene_info' %}?species=" + encodeURIComponent(species) + '&locus_tag=' + encodeURIComponent(genome_id)
 
                                 // Open a new page
                                 window.open(url, '_blank');
@@ -153,7 +154,7 @@
                             const copyBtn = document.createElement('button');
                             copyBtn.setAttribute("type", "button");
                             copyBtn.classList.add("btn", "btn-primary", "btn-sm");
-                            copyBtn.innerHTML = "Copy genome id";
+                            copyBtn.innerHTML = "Copy locus tag";
                             copyBtn.onclick = function() {
                                 // Copy sequenceName to clipboard
                                 navigator.clipboard.writeText(sequenceName).then(function() {

@@ -62,8 +62,10 @@
 </script>
 <main class="container-wide pb-4 ps-2 pe-2 ps-md-3 pe-md-3 overflow-hidden">
     <div class="row g-3">
-        <div class="col-12"><h4 class="display-5 p-2 ps-4">Showing {% if families_results %}<a href="#families" class="btn btn-outline-primary">family</a>&nbsp;{% endif %}{% if species_results %}<a href="#species" class="btn btn-outline-primary">species</a>&nbsp;{% endif %}{% if pathways_results %}<a href="#pathways" class="btn btn-outline-primary">pathway</a>&nbsp;{% endif %}{% if "genes" in no_results_list %}{% else %}<a href="#genes" class="btn btn-outline-primary">gene</a>&nbsp;{% endif %} search results for <b>"{{ request.GET.q }}"</b>
-            {% if no_results_list %}; No results found in {{ no_results_list | join:', '}}.{% endif %}</h4></div>
+        <div class="col-12">
+            <h4 id="search_no_results" class="d-none display-5 p-2 ps-4">No search results found for <b>"{{ request.GET.q }}"</b></h4>
+            <h4 id="search_any_results" class="display-5 p-2 ps-4">Showing {% if families_results %}<a href="#families" class="btn btn-outline-primary">family</a>&nbsp;{% endif %}{% if species_results %}<a href="#species" class="btn btn-outline-primary">species</a>&nbsp;{% endif %}{% if pathways_results %}<a href="#pathways" class="btn btn-outline-primary">pathway</a>&nbsp;{% endif %}<a id="genes-button" href="#genes" class="btn btn-outline-primary disabled"><span id="genes-spinner" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>gene</a>&nbsp; search results for <b>"{{ request.GET.q }}"</b>
+            <span id="no-results-list"{% if no_results_list %}{% else %} class="d-none"{% endif %}>; No results found in {{ no_results_list | join:', '}}<span id="no-results-list-genes" class="d-none">, genes</span>.</span></h4></div>
     </div>
     <div class="row gy-3">
         {% if families_results %}
@@ -76,7 +78,7 @@
         {% include "search/search_results_pathways.html" with panel_name="search_pathways" panel_title="<a id='pathways'>Pathways</a>" panel_class="col-lg-5" %}
         {% endif %}
         {% if "genes" in no_results_list %}{% else %}
-        {% include "components/panel_genes_table.html" with panel_name="search_genes" panel_title="<a id='genes'>Genes</a>" panel_class="col-lg-12" dataset=genes_results highlight_text=True %}
+        {% include "search/search_results_genes.html" with panel_name="search_genes" panel_title="<a id='genes'>Genes</a>" panel_class="col-lg-12 opacity-50" panel_wide_class="col-lg-12 opacity-50" %}
         {% endif %}
     </div>
 </main>
@@ -84,7 +86,25 @@
     // Get the global query string paramater for the higlight func: ----
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
-    const q = urlParams.get('q')
+    const q = urlParams.get('q');
+
+    var no_results_list = {{ no_results_list | safe }};
+    function update_results_overview_with_genes(genes_found) {
+        $('#search_genes_panel').toggleClass('opacity-50', false);
+        $('#genes-spinner').toggleClass('d-none', true);
+        $('#genes-button').toggleClass('disabled', false);
+        if (!genes_found) {
+            no_results_list.push('genes');
+            $('#search_genes_panel').toggleClass('d-none', true);
+            $('#genes-button').toggleClass('d-none', true);
+            $('#no-results-list').toggleClass('d-none', false);
+            $('#no-results-list-genes').toggleClass('d-none', false);
+            if (no_results_list.includes('families') && no_results_list.includes('species') && no_results_list.includes('pathways') && no_results_list.includes('genes')) {
+                $('#search_any_results').toggleClass('d-none', true);
+                $('#search_no_results').toggleClass('d-none', false);
+            }
+        }
+    }
 
     // Highlight text found by the search in the tables: ----
     highlightText(q);

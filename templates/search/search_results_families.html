@@ -8,9 +8,9 @@
         </tr>
     </thead>
     <tbody id="table-body-families">
-        {% for row in families_results %}
+        {% for family in families_results %}
         <tr>
-            <td><a href="{% url 'organisms' %}?family={{ row.family }}">{{ row.family }}</a></td>
+            <td><a href="{% url 'organisms' %}?family={{ family }}">{{ family }}</a></td>
         </tr>
         {% endfor %}
     </tbody>

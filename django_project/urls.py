@@ -47,6 +47,7 @@ urlpatterns = [
     path('variant_dominant_freq/', pangenome_analyses_views.variant_dominant_freq, name='variant_dominant_freq'),
     path('ds_dn_ratio/', pangenome_analyses_views.ds_dn_ratio, name='ds_dn_ratio'),
     path('pangenome_analyses/gene_annotation/', pangenome_analyses_views.gene_annotation, name='pangenome_analyses_gene_annotation'),
+    path('pangenome_analyses/gene_annotation/json/', pangenome_analyses_views.gene_annotation_json, name='pangenome_analyses_gene_annotation_json'),
     path('pangenome_analyses/gene_annotation/download_gene_annotation_table_csv', pangenome_analyses_views.download_gene_annotation_table_csv,
          name='download_gene_annotation_table_csv'),
     path('pangenome_analyses/phylogenetic_tree/', pangenome_analyses_views.phylogenetic_tree, name='pangenome_analyses_phylogenetic_tree'),
@@ -60,6 +61,7 @@ urlpatterns = [
     path('gene_function/genome_gene_info/', gene_function_views.genome_gene_info, name='genome_gene_info'),
     path('gene_function/pathway_info/', gene_function_views.pathway_info, name='pathway_info'),
     path('search/', search_views.search_results, name='search_results'),
+    path('search/genes_json/', search_views.gene_annotation_json, name='search_genes_json'),
     path('ai_assistant/', ai_assistant_views.ai_assistant, name='ai_assistant')
     #path('admin/', admin.site.urls)   # make the amdin panel inaccessible via its utl (the admin admin is preserved for the potential future needs)
 ]

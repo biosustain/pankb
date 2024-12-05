@@ -21,7 +21,7 @@
 {% block main_content %}
 <div class="container-fluid ps-2 pe-2 ps-md-3 pe-md-3" data-bs-spy="scroll" data-bs-target="#page-nav" data-bs-root-margin="0px 0px -40%" data-bs-smooth-scroll="true">
     <div class="row g-3 pb-4">
-        {% include 'components/panel_locustags_table.html' with page="gene_info" panel_name="locustags_table" panel_title="Locus Tag Table" panel_class="col-lg-12" %}
+        {% include 'components/panel_locustags_table.html' with page="gene_info" panel_name="locustags_table" panel_title="Locus Tag Table" panel_class="col-lg-12" show_pankb_locus_tag=True %}
 
         {% url 'aa_pos_overview' as url_aa_pos_overview %}
         {% include 'components/panel_iframe.html' with panel_name="aa_pos_overview" panel_title="Dominant and Variant Amino Acids" panel_iframe_src=url_aa_pos_overview|add:"?species="|add:request.GET.species|add:"&gene="|add:request.GET.gene panel_iframe_class='responsive-iframe-wide' panel_class='col-lg-12' %}

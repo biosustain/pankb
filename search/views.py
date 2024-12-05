@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from organisms.models import Organisms
 from pangenome_analyses.models import GeneAnnotations
@@ -68,24 +68,25 @@ def search_results(request):
         )
 
         # Get the filtered genes from the DB: ----
-        gene_keys = [
-            "gene",
-            "cog_category",
-            "cog_name",
-            "description",
-            "protein",
-            "pfams",
-            "frequency",
-            "pangenomic_class",
-            "pangenome_analysis",
-        ]
-        genes = list(
-            GeneAnnotations.objects.mongo_aggregate(
-                build_multi_search_aggregation(q, ["gene", "protein", "pfams"])
-                + [{"$project": {gk: int(gk != "_id") for gk in ["_id"] + gene_keys}}]
-            )
-        )
-        genes = [[g.get(gk, None) for gk in gene_keys] for g in genes]
+        # gene_keys = [
+        #     "gene",
+        #     "cog_category",
+        #     "cog_name",
+        #     "description",
+        #     "protein",
+        #     "pfams",
+        #     "frequency",
+        #     "pangenomic_class",
+        #     "pangenome_analysis",
+        # ]
+        # genes = list(
+        #     GeneAnnotations.objects.mongo_aggregate(
+        #         build_multi_search_aggregation(q, ["gene", "protein", "pfams"])
+        #         + [{"$project": {gk: int(gk != "_id") for gk in ["_id"] + gene_keys}}]
+        #     )
+        # )
+        # genes = [[g.get(gk, None) for gk in gene_keys] for g in genes]
+        genes = []
 
     else:  # if the cleaned query string is too short or not set, just return the empty DFs: ----
         families = []
@@ -100,8 +101,8 @@ def search_results(request):
         no_results_list.append("species")
     if not pathways:
         no_results_list.append("pathways")
-    if not genes:
-        no_results_list.append("genes")
+    # if not genes:
+    #     no_results_list.append("genes")
 
     # Compose the render context: ----
     context = {
@@ -110,5 +111,37 @@ def search_results(request):
         "pathways_results": pathways,
         "genes_results": json.dumps(genes),
         "no_results_list": no_results_list,
+        "q": q,
     }
     return HttpResponse(template.render(context, request))
+
+# JSON data for gene datatable
+def gene_annotation_json(request):
+    q = str(request.GET["q"])
+
+    q = re.sub(
+        r"[^A-Za-z0-9-_\s]+", "", q
+    )  # remove all symbols except letters, digits, underscores, dashes, whitespaces
+    q = q.strip()  # remove the leading and trailing spaces from the query string
+    q = " ".join(q.split())  # remove duplicated whitespaces from the query string
+
+    # Get the filtered genes from the DB: ----
+    gene_keys = [
+        "gene",
+        "cog_category",
+        "cog_name",
+        "description",
+        "protein",
+        "pfams",
+        "frequency",
+        "pangenomic_class",
+        "pangenome_analysis",
+    ]
+    genes = list(
+        GeneAnnotations.objects.mongo_aggregate(
+            build_multi_search_aggregation(q, ["gene", "protein", "pfams"])
+            + [{"$project": {gk: int(gk != "_id") for gk in ["_id"] + gene_keys}}]
+        )
+    )
+    genes = [[g.get(gk, None) for gk in gene_keys] for g in genes]
+    return JsonResponse({"results": genes})

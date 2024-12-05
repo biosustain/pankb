@@ -3,141 +3,158 @@
 {% block content %}
 {% include "navigation.html" with active_page="about" %}
 {% include "search/search.html" %}
-
-<main class="container-wide pb-4">
+<main class="container-xl pb-4" style="margin-bottom: 50vh;">
     <div class="row">
-        <div class="col-lg-3 col-xl-2 ps-2">
-            {% include 'about/info_panel.html' %}
-        </div>
+        <div class="col-lg-3 col-xl-2 ps-2"> {% include 'about/info_panel.html' %} </div>
         <div class="col-lg-9 col-xl-10 pt-2 pb-2">
             <div>
-                <h1 class="display-1" id="about_pankb">About PanKB</h1>
-                <br>
-                <p>
-                    The microbial world holds vast potential for advancements in diverse fields such as food production, human health, and ecological sustainability. PanKB is a pangenomic knowledgebase working to empower practitioners to leverage microbial functions beyond those of a select few model organisms. PanKB provides:
-                </p>
+                <h1 class="display-1" id="about">About PanKB</h1>
+                <p> The microbial world holds vast potential for advancements in diverse fields such as food production,
+                    human health, and ecological sustainability. PanKB is a pangenomic knowledgebase working to empower
+                    practitioners to leverage microbial functions beyond those of a select few model organisms. PanKB
+                    provides: </p>
                 <ul>
                     <li>A growing dataset of pangenomic results,</li>
                     <li>Interactive data reports and analytics for exploration, analysis, and new potential discoveries,
                     </li>
                     <li>Global database search for genes, pathways, products, species, and more,</li>
                     <li>Alleleomes describing the amino acid variants across gene alleles,</li>
-                    <li>Dataset download providing access to raw data, search results, and pangenomics
-                        analytics for custom analysis,
-                    </li>
+                    <li>Dataset download providing access to raw data, search results, and pangenomics analytics for
+                        custom analysis, </li>
                     <li>A bibliome of open-access pangenomic publications,</li>
                     <li>A specialized LLM-powered chat interface to accelerate knowledge acquisition by providing
-                        deeply-detailed query responses on publication content, including supporting references,
-                        and constrained to not return hallucinated content.
-                    </li>
+                        deeply-detailed query responses on publication content, including supporting references, and
+                        constrained to not return hallucinated content. </li>
                 </ul>
-                <br>
-                <h1 id="how_to_use" class="display-1">Using PanKB</h1>
-                <br>
-                <h3 id="Pangenomes" class="display-2">Pangenomes</h3>
-                <p>
-                    PanKB includes multiple interactive analytics and tables that give an overview of a pangenome's
-                    contents. These analytics can be found or navigated to an individual pangenome's page.
+                <p><a class="btn btn-outline-dark ms-2 me-2" href="https://doi.org/10.1093/nar/gkae1042" target="_blank"
+                        role="button">Read the Publication <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                            height="16" fill="currentColor" class="bi bi-file-text-fill ms-2" viewBox="0 0 16 16">
+                            <path
+                                d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1m-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5M5 8h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1m0 2h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1" />
+                        </svg>
+                    </a><a class="btn btn-outline-dark ms-2 me-2" href="https://github.com/biosustain/pankb"
+                        target="_blank" role="button">Browse the Code <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                            height="16" fill="currentColor" class="bi bi-github ms-2" viewBox="0 0 16 16">
+                            <path
+                                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8" />
+                        </svg>
+                    </a>
                 </p>
-                <p>
-                    Using <b>Lactiplantibacillus plantarum</b> as an example:
+                <h1 id="usage" class="display-1">Using PanKB</h1>
+                <h2 id="pangenomes" class="display-2">Pangenomes</h2>
+                <p> PanKB includes multiple interactive analytics and tables that give an overview of a pangenome's
+                    contents. These analytics can be found or navigated to an individual pangenome's page. </p>
+                <p> Using <b>Lactiplantibacillus plantarum</b> as an example:
                 <ul>
-                    <li><a href= "{% url 'pangenome_analyses_overview' %}?species=Lactiplantibacillus_plantarum" class="no-underline" target="_blank">Overview Page</a>
-                        shows the presence/absence gene matrix, COG category distribution, core/accessory/rare pangenome gene categorizations, and pangenome openness of Lactiplantibacillus plantarum Pangenome.
+                    <li><a href="{% url 'pangenome_analyses_overview' %}?species=Lactiplantibacillus_plantarum"
+                            class="no-underline" target="_blank">Overview Page</a> shows the presence/absence gene
+                        matrix, COG category distribution, core/accessory/rare pangenome gene categorizations, and
+                        pangenome openness of Lactiplantibacillus plantarum Pangenome. </li>
+                    <li>
+                        <a href="{% url 'pangenome_analyses_gene_annotation' %}?species=Lactiplantibacillus_plantarum"
+                            class="no-underline" target="_blank">Gene Annotation Table</a> provides detailed gene
+                        annotation of all gene clusters found in the Lactiplantibacillus plantarum pangenome.
                     </li>
                     <li>
-                        <a href="{% url 'pangenome_analyses_gene_annotation' %}?species=Lactiplantibacillus_plantarum" class="no-underline" target="_blank">Gene Annotation Table</a>
-                        provides detailed gene annotation of all gene clusters found in the Lactiplantibacillus plantarum pangenome.
-                    </li>
-                    <li>
-                        <a href="{% url 'pangenome_analyses_phylogenetic_tree' %}?species=Lactiplantibacillus_plantarum" class="no-underline" target="_blank">Phylogenetic Tree</a>
-                        displays the phylogenetic structure of Lactiplantibacillus plantarum species.
+                        <a href="{% url 'pangenome_analyses_phylogenetic_tree' %}?species=Lactiplantibacillus_plantarum"
+                            class="no-underline" target="_blank">Phylogenetic Tree</a> displays the phylogenetic
+                        structure of Lactiplantibacillus plantarum species, annotated with isolation source and country
+                        information.
                     </li>
                 </ul>
                 </p>
-                <br>
-                <h3 id="Alleleomes" class="display-2">Alleleomes</h3>
-                <p>
-                    Pangenomes also serve as the foundation for further large-scale analyses, and PanKB is actively
+                <h2 id="alleleomes" class="display-2">Alleleomes</h2>
+                <p> Pangenomes also serve as the foundation for further large-scale analyses, and PanKB is actively
                     integrating their novel results. Recent pangenomic-scale analyses of variants, named <a
-                        href="https://doi.org/10.1073/pnas.2218835120" class="no-underline" target="_blank">Alleleomics</a>,
-                    demonstrated unique value in <a href="https://www.biorxiv.org/content/10.1101/2023.09.17.558058v1" class="no-underline" target="_blank">narrowing
-                    the solution search space for feasible genetic variants in <i>E.coli</i></a>. PanKB currently includes the alleleomes of all of its pangenomes. Alleleome analytics
-                    can be found on pangenome and specific gene pages.
-                </p>
-                <p>
-                    Using <b>Lactiplantibacillus plantarum</b> as an example:
+                        href="https://doi.org/10.1073/pnas.2218835120" class="no-underline"
+                        target="_blank">Alleleomics</a>, demonstrated unique value in <a
+                        href="https://www.biorxiv.org/content/10.1101/2023.09.17.558058v1" class="no-underline"
+                        target="_blank">narrowing the solution search space for feasible genetic variants in
+                        <i>E.coli</i></a>. PanKB currently includes the alleleomes of all of its pangenomes. Alleleome
+                    analytics can be found on pangenome and specific gene pages. </p>
+                <p> Using <b>Lactiplantibacillus plantarum</b> as an example:
                 <ul>
-                    <li>
-                        For genome alleleome, users can find it in the <a href="{% url 'pangenome_analyses_overview' %}?species=Lactiplantibacillus_plantarum" class="no-underline" target="_blank">Overview Page</a>.
-                    </li>
-                    <li>
-                        For single gene alleleome, for instance, gene <b>accA2</b> in the Lactiplantibacillus plantarum. By clicking on the accA2 in the Lactiplantibacillus plantarum's <a href="{% url 'pangenome_analyses_gene_annotation' %}?species=Lactiplantibacillus_plantarum" class="no-underline" target="_blank">Gene Annotation Table</a>, users can access the <a href="{% url 'gene_info' %}?species=Lactiplantibacillus_plantarum&gene=accA2&gene_class=Core" class="no-underline" target="_blank">accA2 gene page</a>, where shows the alleleome of accA2.
-                    </li>
+                    <li> For genome alleleome, users can find it in the <a
+                            href="{% url 'pangenome_analyses_overview' %}?species=Lactiplantibacillus_plantarum"
+                            class="no-underline" target="_blank">Overview Page</a>. </li>
+                    <li> For single gene alleleome, for instance, gene <b>accA2</b> in the Lactiplantibacillus
+                        plantarum. By clicking on the accA2 in the Lactiplantibacillus plantarum's <a
+                            href="{% url 'pangenome_analyses_gene_annotation' %}?species=Lactiplantibacillus_plantarum"
+                            class="no-underline" target="_blank">Gene Annotation Table</a>, users can access the <a
+                            href="{% url 'gene_info' %}?species=Lactiplantibacillus_plantarum&gene=accA2&gene_class=Core"
+                            class="no-underline" target="_blank">accA2 gene page</a>, where shows the alleleome of
+                        accA2. </li>
                 </ul>
                 </p>
+                <h2 id="data_access" class="display-2">Data Accessibility</h2>
+                <p> PanKB implements multiple different methods for accessing its data. Users can access all of PanKB's
+                    data through its navigation links. Users can also quickly find specific data through the global
+                    database search feature accessible on most pages. Finally, users can also download the database's
+                    raw data through the various analytics hosted on database pages. </p>
                 <br>
-                <h3 id="Data_Accessibility" class="display-2">Data Accessibility</h3>
-                <p>
-                    PanKB implements multiple different methods for accessing its data. Users can access all of PanKB's data
-                    through its navigation links. Users can also quickly find specific data through the global database
-                    search
-                    feature accessible on most pages. Finally, users can also download the database's raw data
-                    through the various analytics hosted on database pages.
-                </p>
+                <h2 id="data_application" class="display-2">Data Application</h2>
+                <p> Combined, PanKB's features enable valuable workflows for enzyme and strain engineering. These
+                    include identifying genes for new enzyme production or reintroduction into strains, pinpointing
+                    precise gene edits to modify activity, discovering and optimizing valuable pathways, and selecting
+                    optimal starting strains. Current strain engineering heavily relies on models or familiar strains;
+                    the features and data of PanKB empower strain engineers to start leveraging pangenomic data for
+                    targeted bioengineering. </p>
                 <br>
-                <h3 id="Data_Application" class="display-2">Data Application</h3>
-                <p>
-                    Combined, PanKB's features enable valuable workflows for enzyme and strain engineering. These include identifying genes for new enzyme production or reintroduction into strains, pinpointing precise gene edits to modify activity, discovering and optimizing valuable pathways, and selecting optimal starting strains. Current strain engineering heavily relies on models or familiar strains; the features and data of PanKB empower strain engineers to start leveraging pangenomic data for targeted bioengineering.
-                </p>
-                <br>
-                <h3 id="PanKB_LLM" class="display-2">PanKB LLM</h3>
-                <p>
-                    Scientific progress often necessitates extensive literature review, a traditionally time-consuming
+                <h2 id="pankb_llm" class="display-2">PanKB LLM</h2>
+                <p> Scientific progress often necessitates extensive literature review, a traditionally time-consuming
                     process. Large Language Models (LLMs) offer a potential solution by aggregating and summarizing
                     knowledge across documents. PanKB includes an LLM chatbot (AI Assistant) focused on an open-access
-                    pangenomic bibliome,
-                    designed to accurately answer deep questions on pangenomics, cite relevant articles, and not attempt to
-                    hallucinate inaccurate content. This feature is an initial experiment towards combining an LLM and a
-                    specialized scientific database to accelerate scientific knowledge acquisition through automated
-                    knowledge extraction. PanKB LLM can be accessed by clicking on the <a href=" {% url 'ai_assistant' %} " class="no-underline" target="_blank">AI Assistant</a> link in the navbar.
-                </p>
-                <br>
-                <h2 id="how_to_cite" class="display-1">How to Cite PanKB</h3>
-                <p>
-                    When using PankB in your researcher we kindly ask that you cite the latest publication. Your citation of PanKB will help us to apply for ongoing funding to maintain this resource.
-                </p>
+                    pangenomic bibliome, designed to accurately answer deep questions on pangenomics, cite relevant
+                    articles, and not attempt to hallucinate inaccurate content. This feature is an initial experiment
+                    towards combining an LLM and a specialized scientific database to accelerate scientific knowledge
+                    acquisition through automated knowledge extraction. PanKB LLM can be accessed by clicking on the <a
+                        href=" {% url 'ai_assistant' %} " class="no-underline" target="_blank">AI Assistant</a> link in
+                    the navbar. </p>
+                <h1 id="citing" class="display-1">How to Cite PanKB</h1>
+                <p> When using PankB in your researcher we kindly ask that you cite the latest publication. Your
+                    citation of PanKB will help us to apply for ongoing funding to maintain this resource. </p>
                 <h3 class="display-3">Latest Publication:</h3>
-                <p>
-                    Sun, Binhuan, Liubov Pashkova, Pascal Aldo Pieters, Archana Sanjay Harke, Omkar Satyavan Mohite, Alberto Santos, Daniel C. Zielinski, Bernhard O. Palsson, and Patrick Victor Phaneuf. 2024. “PanKB: An Interactive Microbial Pangenome Knowledgebase for Research, Biotechnological Innovation, and Knowledge Mining.” Nucleic Acids Research, November, gkae1042.
-                </p>
-                <br>
-                <h1 id="Contact" class="display-1">Contact Us</h1>
-                <br>
-                <p>
-                    We value your feedback and are here to assist with any questions or issues.
-                </p>
-                <p>
-                    For reporting bugs, suggesting features, or asking questions, please visit our <a href="https://github.com/biosustain/pankb/issues" class="no-underline" target="_blank">GitHub Issue Tracker</a>.
-                </p>
-                <p>
-                    For general inquiries or if you prefer to reach out via email, feel free to reach out to the team:
+                <p> Sun, Binhuan, Liubov Pashkova, Pascal Aldo Pieters, Archana Sanjay Harke, Omkar Satyavan Mohite,
+                    Alberto Santos, Daniel C. Zielinski, Bernhard O. Palsson, and Patrick Victor Phaneuf. 2024. “PanKB:
+                    An Interactive Microbial Pangenome Knowledgebase for Research, Biotechnological Innovation, and
+                    Knowledge Mining.” Nucleic Acids Research, November, gkae1042. </p>
+                <h1 id="contact" class="display-1">Contact Us</h1>
+                <p> We value your feedback and are here to assist with any questions or issues. </p>
+                <p> For reporting bugs, suggesting features, or asking questions, please visit our <a
+                        href="https://github.com/biosustain/pankb/issues" class="no-underline" target="_blank">GitHub
+                        Issue Tracker</a>. </p>
+                <p> For general inquiries or if you prefer to reach out via email, feel free to reach out to the team:
                 </p>
                 <ul>
-                    <li><a href="https://orbit.dtu.dk/en/persons/pascal-aldo-pieters" class="no-underline" target="_blank">Pascal Pieters</a></li>
-                    <li><a href="https://orbit.dtu.dk/en/persons/binhuan-sun" class="no-underline" target="_blank">Binhuan Sun</a></li>
-                    <li><a href="https://orbit.dtu.dk/en/persons/patrick-victor-phaneuf" class="no-underline" target="_blank">GitHub Issue Tracker</a></li>
+                    <li><a href="https://orbit.dtu.dk/en/persons/pascal-aldo-pieters" class="no-underline"
+                            target="_blank">Pascal Pieters</a></li>
+                    <li><a href="https://orbit.dtu.dk/en/persons/binhuan-sun" class="no-underline"
+                            target="_blank">Binhuan Sun</a></li>
+                    <li><a href="https://orbit.dtu.dk/en/persons/patrick-victor-phaneuf" class="no-underline"
+                            target="_blank">GitHub Issue Tracker</a></li>
                 </ul>
-                <br>
-                <h1 id="Funding" class="display-1">Funding</h1>
-                <br>
-                <p>
-                    This work was funded by the Novo Nordisk Foundation through the Center for Biosustainability at the Technical University of Denmark (NNF Grant Number NNF20CC0035580).
+                <h1 id="contributors" class="display-1">Contributors</h1>
+                <p> The following people contributed to the development of PanKB:
+                <ul>
+                    <li>Binhuan Sun</li>
+                    <li>Pascal A. Pieters</li>
+                    <li>Liubov Pashkova</li>
+                    <li>Aaron C. Thiel</li>
+                    <li>Archana S. Harke</li>
+                    <li>Omkar S. Mohite</li>
+                    <li>Alberto Santos</li>
+                    <li>Daniel C. Zielinski</li>
+                    <li>Bernhard Ö. Palsson</li>
+                    <li>Patrick Victor Phaneuf</li>
+                </ul>
                 </p>
+                <h1 id="funding" class="display-1">Funding</h1>
+                <p> This work was funded by the Novo Nordisk Foundation through the Center for Biosustainability at the
+                    Technical University of Denmark (NNF Grant Number NNF20CC0035580). </p>
                 <br>
             </div>
         </div>
     </div>
-</div>
+    </div>
 </main>
 {% endblock %}

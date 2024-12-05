@@ -30,14 +30,17 @@
     const current_window_Width = window.innerWidth;
     const coefficient = 1.0; //current_window_Width / template_screen_width;
 
+    function range(size, startAt = 0) {
+        return [...Array(size).keys()].map(i => i + startAt);
+    }
     // Data
     var data = {{ dataset|safe }}
-    const x_core = data['x_core'];
     const avg_core = data['avg_core'];
-    const x_acc = data['x_acc'];
+    const x_core = range(avg_core.length, 1);
     const avg_acc = data['avg_acc'];
-    const x_pan = data['x_pan'];
+    const x_acc = range(avg_acc.length, 1);
     const avg_pan = data['avg_pan'];
+    const x_pan = range(avg_pan.length, 1);
     const max_frequency_count = data['max_frequency_count'];
     const alpha = roundToDecimal(1 - (data['alpha']), 3)
 
