@@ -60,6 +60,7 @@ urlpatterns = [
     path('genome_barplot/', gene_function_views.genome_barplot, name='genome_barplot'),
     path('gene_function/genome_gene_info/', gene_function_views.genome_gene_info, name='genome_gene_info'),
     path('gene_function/pathway_info/', gene_function_views.pathway_info, name='pathway_info'),
+    path('gene_function/pathway_info/genes_json/', gene_function_views.pathway_gene_annotation_json, name='pathway_info_genes_json'),
     path('search/', search_views.search_results, name='search_results'),
     path('search/genes_json/', search_views.gene_annotation_json, name='search_genes_json'),
     path('ai_assistant/', ai_assistant_views.ai_assistant, name='ai_assistant')

@@ -48,6 +48,11 @@
               Tag
             </a>
           </div> -->
+          <div class="btn-group">
+            <button id="help_info" type="button" class="btn btn-light btn-sm" title="Help">
+              <i class="fa fa-circle-question"></i>
+            </button>
+          </div>
 
           <!-- Dropdown: Selection -->
           <div class="btn-group">
@@ -74,7 +79,7 @@
             </div>
           </div>
 
-          <div class="btn-group">
+          <div class="btn-group">         
             <button type="button" class="btn btn-light btn-sm" data-direction="vertical" data-amount="1"
               title="Expand vertical spacing">
               <i class="fa fa-up-down"></i>
@@ -146,23 +151,21 @@
     <!-- Left Section -->
     <div class="left-section">
       <!-- Bottom Row: Tree and Squares Side by Side -->
-      <div class="tree-and-matrix">
+      <div class="tree-and-matrix .tree-and-matrix-2-cols">
         <!-- Left Column: Tree Container -->
-        <div class="tree-column hide-scrollbar">
-          <div class="tree-container" id="tree_container">
+        <div class="tree-column" id="tree_container">
             <!-- Tree will be rendered here -->
-          </div>
         </div>
 
         <!-- Right Column: Squares Container -->
-        <div class="matrix-column">
+         <div class="matrix-column" id="matrix-container">
           <!-- Category Labels -->
           <div id="category_labels" class="category-labels-container vertical">
             <!-- Category labels will be rendered here -->
           </div>
           <!-- Squares -->
           <div id="squares_container" class="squares-container">
-            
+          
           </div>
         </div>
       </div>
@@ -420,10 +423,10 @@
       var current_mode = $(this).hasClass("active");
       $(this).toggleClass("active");
       $(".matrix-column").toggleClass("d-none");
-      $(".tree-column").toggleClass("hide-scrollbar");
+      $(".tree-and-matrix").toggleClass("tree-and-matrix-1-col");
       tree.display.update();
-      const treeContainer = document.querySelector(".tree-column");
-      treeContainer.dispatchEvent(new CustomEvent('scroll')); // trigger the scroll event to synchronize the views
+      // const treeContainer = document.querySelector(".tree-column");
+      // treeContainer.dispatchEvent(new CustomEvent('scroll')); // trigger the scroll event to synchronize the views
     });
 
     function sort_nodes(asc) {
@@ -1479,28 +1482,28 @@
     function synchronizeScroll(container1, container2, axis = "scrollLeft") {
       let isSyncing = false;
       
-      container1.addEventListener('scroll', function () {
-        if (!isSyncing) {
-          isSyncing = true;
-          container2[axis] = container1[axis];
-        }
-        isSyncing = false;
-      });
+      // container1.addEventListener('scroll', function () {
+      //   if (!isSyncing) {
+      //     isSyncing = true;
+      //     container2[axis] = container1[axis];
+      //   }
+      //   isSyncing = false;
+      // });
 
-      container2.addEventListener('scroll', function () {
-        if (!isSyncing) {
-          isSyncing = true;
-          container1[axis] = container2[axis];
-        }
-        isSyncing = false;
-      });
+      // container2.addEventListener('scroll', function () {
+      //   if (!isSyncing) {
+      //     isSyncing = true;
+      //     container1[axis] = container2[axis];
+      //   }
+      //   isSyncing = false;
+      // });
     }
 
     // Initialize scroll synchronization and sidebar toggle after DOM is loaded
     document.addEventListener("DOMContentLoaded", function () {
       const squaresContainer = document.querySelector('.squares-container');
       const labelsContainer = document.querySelector('.category-labels-container');
-      const treeContainer = document.querySelector(".tree-column");
+      // const treeContainer = document.querySelector(".tree-column");
       const matrixContainer = document.querySelector(".matrix-column");
       const toggleButton = document.getElementById("toggle-sidebar");
       const sidebar = document.getElementById("sidebar");
@@ -1511,9 +1514,9 @@
       }
 
       // Synchronize vertical scrolling between tree and matrix containers
-      if (treeContainer && matrixContainer) {
-        synchronizeScroll(treeContainer, matrixContainer, "scrollTop");
-      }
+      // if (treeContainer && matrixContainer) {
+      //   synchronizeScroll(treeContainer, matrixContainer, "scrollTop");
+      // }
 
       // Sidebar toggle functionality
       if (toggleButton && sidebar) {
@@ -1521,6 +1524,10 @@
           sidebar.classList.toggle("collapsed");
         });
       }
+      $("#help_info").tooltip({
+        title: "Hold <shift> while scrolling to scroll horizontally.",
+        placement: "bottom"
+      });
     });
 
     initializeComponents();

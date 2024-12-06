@@ -337,18 +337,15 @@ def _parse_get_array(req_get, name):
   data = [data[i] for i in range(len(data))]
   return data
 
-# API for datatables
-def gene_annotation_json(request):
-  pangenome_analysis = str(request.GET["pangenome_analysis"])
-  draw = int(request.GET["draw"])
-  start = int(request.GET["start"])
-  length = int(request.GET["length"])
+def create_datatables_gene_annotation_api(request_get, select_pipeline, gene_keys, as_list=True):
+  draw = int(request_get["draw"])
+  start = int(request_get["start"])
+  length = int(request_get["length"])
 
-  columns = _parse_get_array(request.GET, "columns")
-  order = _parse_get_array(request.GET, "order")
-  search = {"value": request.GET.get("search[value]", ""), "regex": request.GET.get("search[regex]", "false")}
+  columns = _parse_get_array(request_get, "columns")
+  order = _parse_get_array(request_get, "order")
+  search = {"value": request_get.get("search[value]", ""), "regex": request_get.get("search[regex]", "false")}
 
-  gene_keys = ['gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class', 'pangenome_analysis']
   projection = {f"results.{gk}": 1 for gk in gene_keys}
   projection["info.total"] = 1
   projection["info.filtered"] = 1
@@ -405,8 +402,7 @@ def gene_annotation_json(request):
       }
     )
 
-  pipeline = [
-    {"$match": {"pangenome_analysis": pangenome_analysis}},
+  pipeline = (select_pipeline + [
     {"$facet": {
       "total_info": [{"$count": "total"}],
       "filter": filter_pipeline,
@@ -423,7 +419,7 @@ def gene_annotation_json(request):
     {"$addFields": {"first_doc": { "$first": "$results" } } },
     {"$addFields": {"info.total": "$first_doc.total" } },
     {"$project": projection},
-    ]
+    ])
 
   results = list(GeneAnnotations.objects.mongo_aggregate(pipeline))
 
@@ -435,10 +431,8 @@ def gene_annotation_json(request):
     gene_annotations = list(results[0]["results"])
     recordsTotal = results[0]["info"]["total"]
     recordsFiltered = results[0]["info"]["filtered"]
-
-    gene_annotations = [[g.get(gk, None) for gk in gene_keys] for g in gene_annotations]
-
-  data = gene_annotations
+    if as_list:
+      gene_annotations = [[g.get(gk, None) for gk in gene_keys] for g in gene_annotations]
 
   draw = draw + 1
 
@@ -446,8 +440,18 @@ def gene_annotation_json(request):
     "draw": draw,
     "recordsTotal": recordsTotal,
     "recordsFiltered": recordsFiltered,
-    "data": data,
+    "data": gene_annotations,
     "columns": columns,
     "order": order,
     }
+  return response
+
+# API for datatables
+def gene_annotation_json(request):
+  pangenome_analysis = str(request.GET["pangenome_analysis"])
+  gene_keys = ['gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class', 'pangenome_analysis']
+  select_pipeline = [{"$match": {"pangenome_analysis": pangenome_analysis}}]
+
+  response = create_datatables_gene_annotation_api(request.GET, select_pipeline, gene_keys)
+
   return JsonResponse(response)

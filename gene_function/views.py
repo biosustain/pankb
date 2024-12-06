@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from django.template import loader
 from django.urls import reverse
 from django.conf import settings
@@ -9,6 +9,7 @@ import numpy as np
 from .models import GeneInfo, GenomeInfo, PathwayInfo
 from organisms.models import Organisms
 from pangenome_analyses.models import GeneAnnotations
+from pangenome_analyses.views import create_datatables_gene_annotation_api
 from django.db.models import Q
 from functools import reduce
 from django.forms.models import model_to_dict
@@ -303,22 +304,41 @@ def pathway_info(request):
   # for i in range(0, len(pa_genes), 5000):
   #   g = GeneAnnotations.objects.mongo_find({"pa_gene": {"$in": pa_genes[i:min((i+1)*5000, len(pa_genes))]}}, {"_id": 0, "pa_gene": 0, "brite": 0, "ec": 0, "kegg_reaction": 0, "kegg_module": 0, "kegg_tc": 0, "pfams": 0, "kegg_pathway": 0, "eggnog_ogs": 0, "cazy": 0, "cog_category": 0, "cog_name": 0, "description": 0, "frequency": 0})
   #   genes_info.extend(g)
-  genes_info = list(GeneAnnotations.objects.mongo_find({"kegg_pathway": pathway_id}, {"_id": 0, "gene": 1, "pangenome_analysis": 1, "species": 1, "family": 1, "protein": 1, "pangenomic_class": 1, "kegg_ko": 1}))
+  # genes_info = list(GeneAnnotations.objects.mongo_find({"kegg_pathway": pathway_id}, {"_id": 0, "gene": 1, "pangenome_analysis": 1, "species": 1, "family": 1, "protein": 1, "pangenomic_class": 1, "kegg_ko": 1}))
 
-  for d in genes_info:
-    kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway_id}"
-    if d["kegg_ko"]:
-      kegg_link = kegg_link  + '/' + '/'.join(d["kegg_ko"])
-    d["kegg_link"] = kegg_link
+  # for d in genes_info:
+  #   kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway_id}"
+  #   if d["kegg_ko"]:
+  #     kegg_link = kegg_link  + '/' + '/'.join(d["kegg_ko"])
+  #   d["kegg_link"] = kegg_link
 
   # Substitute the index with our own: ----
-  genes_info_json = json.dumps(genes_info, default=str)
+  # genes_info_json = json.dumps(genes_info, default=str)
 
   # Compose a context for the template rendering: ----
   context = {
     'pathway_name': pathway_info.pathway_name,
     'pathway_id': pathway_info.pathway_id,
     'pathway_kegg_link': pathway_kegg_link,
-    'dataGenes': genes_info_json
+    # 'dataGenes': genes_info_json
   }
   return HttpResponse(template.render(context, request))
+
+# API for datatables
+def pathway_gene_annotation_json(request):
+  pathway_id = request.GET['pathway_id']
+  gene_keys = ['gene', 'pangenome_analysis', 'species', 'family', 'protein', 'pangenomic_class', 'kegg_ko']
+  select_pipeline = [
+    {"$match": {"kegg_pathway": pathway_id}},
+    {"$project": {gk: 1 for gk in gene_keys}} # This projection keeps document size smaller
+    ]
+
+  response = create_datatables_gene_annotation_api(request.GET, select_pipeline, gene_keys, as_list=False)
+
+  for d in response["data"]:
+    kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway_id}"
+    if d["kegg_ko"]:
+      kegg_link = kegg_link  + '/' + '/'.join(d["kegg_ko"])
+    d["kegg_link"] = kegg_link
+
+  return JsonResponse(response)

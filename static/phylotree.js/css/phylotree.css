@@ -300,42 +300,33 @@ body {
 
 /* Tree and Matrix Container as Flex Row */
 .tree-and-matrix {
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
-  overflow-y: hidden;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
   height: 100%;
-  /* margin-bottom: 50px; */
+  width: 100%;
+  overflow-y: scroll;
   justify-content: end;
+}
+.tree-and-matrix-1-col {
+  grid-template-columns: 1fr !important;
 }
 
 /* Tree Column Flex Settings */
 .tree-column {
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: flex-start;
-  overflow: auto;
-  flex-grow: 1;
-  flex-shrink: 1;
-  /* max-width: 80%; */
-}
-
-.hide-scrollbar {
-  /* scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar {
-    display: none;
-  } */ /* Seems impossible to hide only the y scrollbar, while retaining the possibility to scroll. Should be fixed by changing layout instead and getting rid of javascript scroll synchronization. */
+  overflow-x: scroll;
+  overflow-y: visible;
+  height: min-content;
+  border-right: #888 dashed 1px;
 }
 
 /* Tree Container Styling */
-#tree_container {
+/* #tree_container {
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
   margin-right: 0;
   flex-shrink: 1;
-}
+} */
 
 /* Matrix Column as a Unified Grid Layout */
 .matrix-column {
@@ -343,13 +334,15 @@ body {
   grid-template-columns: auto auto auto auto; /* Four columns for both labels and data */
   grid-auto-rows: min-content; /* Each row only as tall as its content */
   gap: 0 5px; /* Ensures no additional spacing between grid items */
-  overflow-y: auto;
-  overflow-x: auto;
+  /* overflow-y: auto; */
   padding-top: 24; /* Remove padding unless necessary */
   margin-right: 10px; /* Only horizontal margin if needed */
-  flex-shrink: 0;
-  justify-content: right;
+  /* justify-content: right; */
   margin-left: 5px;
+  padding-bottom: 20px;
+  overflow-x: hidden;
+  overflow-y: visible;
+  height: min-content;
 }
 
 /* Category Labels Container */
