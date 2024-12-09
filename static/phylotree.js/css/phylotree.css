@@ -353,10 +353,12 @@ body {
 
 /* Tree Column Flex Settings */
 .tree-column {
-  overflow-x: scroll;
+  overflow-x: auto;
   overflow-y: visible;
   height: min-content;
   position: relative;
+  display: inline-block;
+  text-align: right;
 }
 
 /* Tree Container Styling */
