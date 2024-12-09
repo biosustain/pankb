@@ -315,13 +315,17 @@ body {
   transform: scale(0.95);
 }
 
+.tree-and-matrix-wrapper {
+  height: 100%;
+  overflow-y: scroll;
+  position: relative;
+}
+
 /* Tree and Matrix Container as Flex Row */
 .tree-and-matrix {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  height: 100%;
   width: 100%;
-  overflow-y: scroll;
   justify-content: end;
 }
 @media (max-width:800px) {

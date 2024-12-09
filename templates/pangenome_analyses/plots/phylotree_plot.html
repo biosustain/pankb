@@ -33,7 +33,7 @@
 -->
 
 <body>
-  <div class="tooltip" style="position: absolute; opacity: 0;"></div>
+  <div class="tooltip" style="position: absolute; opacity: 0; z-index: 2000;"></div>
   <div class="container-fluid p-0">
     <!-- Top Row: Toolbar and Category Labels Side by Side -->
     <div class="toolbar-and-labels">
@@ -159,7 +159,8 @@
       <div class="left-section">
         <div id="tree_overlay" class="tree-overlay d-none"></div>
         <!-- Bottom Row: Tree and Squares Side by Side -->
-        <div class="tree-and-matrix .tree-and-matrix-2-cols">
+        <div id="tree_and_matrix_wrapper" class="tree-and-matrix-wrapper">
+        <div id="tree_and_matrix" class="tree-and-matrix .tree-and-matrix-2-cols">
           <!-- Left Column: Tree Container -->
           <div class="tree-column" id="tree_container">
               <!-- Tree will be rendered here -->
@@ -176,6 +177,7 @@
             
             </div>
           </div>
+        </div>
         </div>
       </div>
 
@@ -204,7 +206,7 @@
     var phylotree_extensions = new Object();
     var phylotree_mouse_mode = "select";
     const scrollable_x = document.querySelector('#tree_container');
-    const scrollable_y = document.querySelector('.tree-and-matrix');
+    const scrollable_y = document.querySelector('#tree_and_matrix_wrapper');
     const scrollable_xy_source = document.querySelector('#tree_overlay');
     var pointerFrom_x = 0;
     var pointerFrom_y = 0;

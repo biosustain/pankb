@@ -340,7 +340,7 @@ def phylotree_plot(request):
     g["genome_id"].replace('.', ''): {
       "Country": "-" if g["country"] == "?" else g["country"],
       "Broad Context": get_iso_context(g["iso_cat"], 0),
-      "Local Context": get_iso_context(g["iso_cat"], 0),
+      "Local Context": get_iso_context(g["iso_cat"], 1),
       "Isolation Source": "-" if str(g["isolation_source"]).lower() == "missing" else str(g["isolation_source"])
       } for g in genome_info_dict}
 

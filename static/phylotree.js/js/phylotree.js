@@ -2525,19 +2525,20 @@
                 .update();
             });
         }
-  
-        menu_object
-            .append("a")
-            .attr("class", "dropdown-item")
-            .attr("tabindex", "-1")
-            .text("Search for this strain")
-            .on("click", d => {
-              const urlParams = new URLSearchParams(window.location.search);
-              const species = urlParams.get('species');
-              const nodename = node.data.name.slice(0, -1) + '.' + node.data.name.slice(-1);
-              let url = "../../Gene_function/genome_page/genome_page.html?species=" + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(nodename);
-              window.open(url, "_blank");
-            });
+        if (!Object.hasOwn(node.data, "children")) { // If node is leaf
+          menu_object
+              .append("a")
+              .attr("class", "dropdown-item")
+              .attr("tabindex", "-1")
+              .text("Search for this strain")
+              .on("click", d => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const species = urlParams.get('species');
+                const nodename = node.data.name.slice(0, -1) + '.' + node.data.name.slice(-1);
+                let url = "/gene_function/genome_info/?species=" + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(nodename);
+                window.open(url, "_blank");
+              });
+        }
       }
   
       // Positioning logic with error handling for missing container
@@ -2547,7 +2548,7 @@
   
         // Calculate menu position
         const xPos = event.clientX + 50; // Adjusted for fine-tuning
-        const yPos = event.clientY - 30;  // Adjusted for fine-tuning
+        const yPos = event.clientY + tree_container.parentNode.scrollTop - 50;  // Adjusted for fine-tuning
   
         // Set the position and display the menu
         menu_object
@@ -3011,6 +3012,7 @@
           this.svg.append("defs");
         }
 
+        // d3__namespace.select(this.container).on(
         d3__namespace.select(this.container).on(
           "click",
           d => {
@@ -4059,7 +4061,8 @@
     }
 
     handle_node_click(node, event) {
-      this.nodeDropdownMenu(node, this.container, this, this.options, event);
+      // this.nodeDropdownMenu(node, this.container, this, this.options, event);
+      this.nodeDropdownMenu(node, "#tree_and_matrix", this, this.options, event);
     }
 
     refresh() {
