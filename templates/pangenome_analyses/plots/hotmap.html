@@ -8,7 +8,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.11/pako_inflate.min.js"></script>
     <style>
         /* let's have the body act as container */
-        body { margin: 0; }
+        body { margin: 0; overflow: hidden; }
+        .header { background-color: #899599 !important; }
+        .hotmap .legend .item { color: #FFFFFF !important; }
     </style>
     <title>Hotmap</title>
 </head>
@@ -17,6 +19,21 @@
 <div id="chart">Loading, please wait...</div>
 <script>
     const source_info = {{ dataset|safe }}
+
+    var getJSON = function(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.responseType = 'json';
+        xhr.onload = function() {
+        var status = xhr.status;
+        if (status === 200) {
+            callback(null, xhr.response);
+        } else {
+            callback(status, xhr.response);
+        }
+        };
+        xhr.send();
+    };
 
     // T__T (crying) Had to copy the full app.js right here because it is not possible to send variables wrapped with Django tags to static JS files! T___T
     //
@@ -15336,9 +15353,9 @@
                                                     , l = t.ele.querySelector(".y-drag-icon");
                                                 l.className = "y-drag-icon",
                                                     l.querySelector("svg").setAttribute("height", h),
-                                                    n.innerHTML = '<div class="y-drag-icon-container" style="margin-top: '.concat(a, 'px;">') + l.innerHTML + "</div>" + '<div class="y-drag-text" style="font-size: '.concat(s, "px; margin-top: ").concat(a, "px; padding-right: ").concat($o, 'px;">') + t.yAxis.querySelector(".row-".concat(i)).innerHTML + "</div>";
+                                                    n.innerHTML = '<div class="y-drag-text" style="font-size: '.concat(s, "px; margin-top: ").concat(a, "px; padding-right: ").concat($o, 'px;">') + t.yAxis.querySelector(".row-".concat(i)).innerHTML + "</div>";
                                                 var u = t.yStart + i
-                                                    , c = t.yMeta && 0 != t.yMetaLabels.length ? t.yMeta[i].map((function(e, i) {
+                                                    , c = t.yMeta && 0 != t.yMetaLabels.length ? t.yMeta[u].map((function(e, i) {
                                                         return "<div><b>".concat(t.yMetaLabels[i], ":</b> ").concat(e, "</div>")
                                                     }
                                                 )).join("") : ""
@@ -15347,41 +15364,41 @@
                                             }
                                         }
                                         ,
-                                        n.ondragstart = function(i) {
-                                            n.classList.add("dragging"),
-                                                t.dragging = !0,
-                                                e = t.yMousePosToRowIdx(i)
-                                        }
-                                        ,
-                                        n.ondrag = function(e) {
-                                            if (t.dragging) {
-                                                t.svg.querySelectorAll(".drag-line").forEach((function(t) {
-                                                        return t.remove()
-                                                    }
-                                                ));
-                                                var r = t.yMousePosToRowIdx(e)
-                                                    , n = Ko.left + t.yMetaWidth + qo * t.cellW
-                                                    , o = t.cellPosYToMousePosY(r) + t.cellH
-                                                    , s = So(0, o, n, o, {
-                                                    class: "drag-line",
-                                                    stroke: "#333"
-                                                });
-                                                t.svg.appendChild(s),
-                                                r < 0 || (i = r)
-                                            }
-                                        }
-                                        ,
-                                        n.ondragend = function() {
-                                            t.svg.querySelectorAll(".drag-line").forEach((function(t) {
-                                                    return t.remove()
-                                                }
-                                            )),
-                                                t.dragging = !1,
-                                                n.style.display = "none",
-                                                n.classList.remove("dragging"),
-                                                t.moveRow(e + t.yStart, i + t.yStart)
-                                        }
-                                        ,
+                                        // n.ondragstart = function(i) {
+                                        //     n.classList.add("dragging"),
+                                        //         t.dragging = !0,
+                                        //         e = t.yMousePosToRowIdx(i)
+                                        // }
+                                        // ,
+                                        // n.ondrag = function(e) {
+                                        //     if (t.dragging) {
+                                        //         t.svg.querySelectorAll(".drag-line").forEach((function(t) {
+                                        //                 return t.remove()
+                                        //             }
+                                        //         ));
+                                        //         var r = t.yMousePosToRowIdx(e)
+                                        //             , n = Ko.left + t.yMetaWidth + qo * t.cellW
+                                        //             , o = t.cellPosYToMousePosY(r) + t.cellH
+                                        //             , s = So(0, o, n, o, {
+                                        //             class: "drag-line",
+                                        //             stroke: "#333"
+                                        //         });
+                                        //         t.svg.appendChild(s),
+                                        //         r < 0 || (i = r)
+                                        //     }
+                                        // }
+                                        // ,
+                                        // n.ondragend = function() {
+                                        //     t.svg.querySelectorAll(".drag-line").forEach((function(t) {
+                                        //             return t.remove()
+                                        //         }
+                                        //     )),
+                                        //         t.dragging = !1,
+                                        //         n.style.display = "none",
+                                        //         n.classList.remove("dragging"),
+                                        //         t.moveRow(e + t.yStart, i + t.yStart)
+                                        // }
+                                        // ,
                                         n.onclick = function(e) {
                                             if (t.onSelection) {
                                                 var i = t.yMousePosToRowIdx(e)
@@ -15432,7 +15449,7 @@
                                                     , l = t.ele.querySelector(".x-drag-icon");
                                                 l.className = "x-drag-icon",
                                                     l.querySelector("svg").setAttribute("width", h),
-                                                    n.innerHTML = '<div class="x-drag-icon-container" style="left: '.concat(t.cellW / 2 - h / 2, 'px">') + l.innerHTML + "</div>" + '<div class="x-drag-text" style="bottom: '.concat(5, "px; left: ").concat(a, "px; font-size: ").concat(s, 'px;">') + t.xAxis.querySelector('[data-i="'.concat(i, '"]')).innerHTML + "</div>";
+                                                    n.innerHTML = '<div class="x-drag-text" style="bottom: '.concat(5, "px; left: ").concat(a, "px; font-size: ").concat(s, 'px;">') + t.xAxis.querySelector('[data-i="'.concat(i, '"]')).innerHTML + "</div>";
                                                 var u = t.xStart + i
                                                     , c = t.xMeta && 0 != t.xMetaLabels.length ? t.xMeta[u].map((function(e, i) {
                                                         return "<div><b>".concat(t.xMetaLabels[i], ":</b> ").concat(e, "</div>")
@@ -17618,7 +17635,7 @@
                     }()
                 }
                 , function(t, e, i) {
-                    t.exports = '<div class=hotmap> <div class=header> <button class="btn fullscreen-btn" title="Enter fullscreen mode"></button> <div class=search-container> <i>' + i(36) + '</i> <input type=text class=search placeholder="Search columns..."/> <button class="reset-btn hidden" type=reset></button> </div> <button class="btn opts-btn"> <span class=opts-label>Options</span> <span class=caret-down></span> </button> <div class=legend-container> <div class=legend></div> <button class="btn color-btn" title="change color scheme">' + i(37) + '</button> </div> </div> <div class=options> <button class="close-btn btn">&times;</button> <div class="colors option-set hidden"> <div class=option-title>Color Scheme</div> <div class=option-group> <a data-id=bins class=active>Bins</a> <a data-id=gradient>Gradient</a> </div> </div> <div class="download option-set"> <div class=option-title>Download SVG</div> <div class=option-group> <a data-id=snapshot>Snapshot</a> <a data-id=full-chart>Entire Chart</a> </div> <small class="download-progress muted"></small> </div> </div> <div class=chart> <div class=scale-ctrls> <button class="btn lock-btn" title="Lock x and y scaling"></button> <input type=range min=1 max=50 class="slider y-slider"> <input type=range min=1 max=50 class="slider x-slider"> </div> <div class=search-count></div> <div class=select-count></div> <div class=tree></div> <div class=webgl-canvas></div> <div class=svg-canvas></div> <div class=hmap-tt></div> <div class=scroll-container></div> <div class=y-drag-box draggable=true ondragstart=\'event.dataTransfer.setData("text/plain",null)\'></div> <div class=x-drag-box draggable=true ondragstart=\'event.dataTransfer.setData("text/plain",null)\'></div> <i class=y-drag-icon style=display:none>' + i(16) + "</i> <i class=x-drag-icon style=display:none>" + i(16) + '</i> </div> <a class="version hidden" href=https://github.com/nconrad/hotmap.git target=_blank> v0.2.33 </a> </div>'
+                    t.exports = '<div class=hotmap> <div class=header> <button class="btn fullscreen-btn" title="Enter fullscreen mode"></button> <div class=search-container> <i>' + i(36) + '</i> <input type=text class=search placeholder="Search columns..."/> <button class="reset-btn hidden" type=reset></button> </div> <button class="btn opts-btn"> <span class=opts-label>Options</span> <span class=caret-down></span> </button> <div class=legend-container> <div class=legend></div> <button class="btn color-btn" title="change color scheme">' + i(37) + '</button> </div> </div> <div class=options> <button class="close-btn btn">&times;</button> <div class="colors option-set hidden"> <div class=option-title>Color Scheme</div> <div class=option-group> <a data-id=bins class=active>Bins</a> <a data-id=gradient>Gradient</a> </div> </div> <div class="download option-set"> <div class=option-title>Download SVG</div> <div class=option-group> <a data-id=snapshot>Snapshot</a> <a data-id=full-chart>Entire Chart</a> </div> <small class="download-progress muted"></small> </div> </div> <div class=chart> <div class=scale-ctrls> <button class="btn lock-btn" title="Lock x and y scaling"></button> <input type=range min=1 max=50 class="slider y-slider"> <input type=range min=1 max=50 class="slider x-slider"> </div> <div class=search-count></div> <div class=select-count></div> <div class=tree></div> <div class=webgl-canvas></div> <div class=svg-canvas></div> <div class=hmap-tt></div> <div class=scroll-container></div> <div class=y-drag-box draggable=false ondragstart=\'event.dataTransfer.setData("text/plain",null)\'></div> <div class=x-drag-box draggable=false ondragstart=\'event.dataTransfer.setData("text/plain",null)\'></div> <i class=y-drag-icon style=display:none>' + i(16) + "</i> <i class=x-drag-icon style=display:none>" + i(16) + '</i> </div> <a class="version hidden" href=https://github.com/nconrad/hotmap.git target=_blank> v0.2.33 </a> </div>'
                 }
                 , function(t, e) {
                     t.exports = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 26 26" version="1.1"><g id="surface1"><path style=" " d="M 16 0 C 13.789063 0 11.878906 0.917969 10.6875 2.40625 C 9.496094 3.894531 9 5.824219 9 7.90625 L 9 9 L 12 9 L 12 7.90625 C 12 6.328125 12.390625 5.085938 13.03125 4.28125 C 13.671875 3.476563 14.542969 3 16 3 C 17.460938 3 18.328125 3.449219 18.96875 4.25 C 19.609375 5.050781 20 6.308594 20 7.90625 L 20 9 L 23 9 L 23 7.90625 C 23 5.8125 22.472656 3.863281 21.28125 2.375 C 20.089844 0.886719 18.207031 0 16 0 Z M 9 10 C 7.34375 10 6 11.34375 6 13 L 6 23 C 6 24.65625 7.34375 26 9 26 L 23 26 C 24.65625 26 26 24.65625 26 23 L 26 13 C 26 11.34375 24.65625 10 23 10 Z M 16 15 C 17.105469 15 18 15.894531 18 17 C 18 17.738281 17.597656 18.371094 17 18.71875 L 17 21 C 17 21.550781 16.550781 22 16 22 C 15.449219 22 15 21.550781 15 21 L 15 18.71875 C 14.402344 18.371094 14 17.738281 14 17 C 14 15.894531 14.894531 15 16 15 Z "></path></g></svg>'
@@ -19928,25 +19945,26 @@
                             },
                             color: {
                                 bins: ["=0", "=1"],
-                                colors: ["#ffffff", "#f32902"]
+                                labels: ["Absent", "Present"],
+                                colors: ["#ffffff", "#319831"]
                             },
                             newick: n,
                             onHover: function(t) {
                                 const e = t.rowMeta;
                                 let source = source_info[t.yLabel];
-                                let l = ["Isolation Country", "Host", "Species (NCBI)"];
+                                let l = ["Isolation Country", "Source", "Species (NCBI)"];
                                 return "<div><b>Pangenome Class: </b>".concat(t.colMeta[2], "</div><br>  <div><b>Pangenome Group:</b> ").concat(t.xLabel, "<div>    <div><b>COG Categories:</b> ").concat(t.colMeta[0], "<div>  <div><b>COG Annotation:</b> ").concat(t.colMeta[1], "<div><br>    <div><b>Genome ID:</b> ").concat(t.yLabel, "<div>              <div><b>").concat(l[0], ":</b> ").concat(source && "undefined" != source[0] ? source[0] : "N/A", "</div>\n              <div><b>").concat(l[1], ":</b> ").concat(source && "undefined" != source[1] ? source[1] : "N/A", "</div>\n              <div><b>").concat(l[2], ":</b> ").concat(source && "undefined" != source[2] ? source[2] : "N/A", "</div><br>\n              <div><b>Value:</b> ").concat(t.value,"</div><br>")
                             },
-                            onSelection: function(t) {
-                                alert("Selected ".concat(t.length, " cell(s)\n\n") + JSON.stringify(t, null, 4).slice(0, 1e4))
-                            },
+                            // onSelection: function(t) {
+                            //     alert("Selected ".concat(t.length, " cell(s)\n\n") + JSON.stringify(t, null, 4).slice(0, 1e4))
+                            // },
                             onClick: function(t) {
                                 const urlParams = new URLSearchParams(window.location.search);
                                 const species = urlParams.get('species');
                                 const genome_id = t.rowName;
                                 const gene_id = t.colName;
                                 const gene_class = t.xMeta[2];
-                                const url = "{% url 'genome_gene_info' %}?species=" + encodeURIComponent(species) + '&genome_id=' + encodeURIComponent(genome_id) + '&gene_id=' + encodeURIComponent(gene_id) + '&gene_class=' + encodeURIComponent(gene_class);
+                                const url = "{% url 'genome_gene_info' %}?species=" + encodeURIComponent(species) + '&genome_id=' + encodeURIComponent(genome_id) + '&gene=' + encodeURIComponent(gene_id) + '&gene_class=' + encodeURIComponent(gene_class);
                                 window.open(url, '_blank');
                             },
                         })
@@ -19956,10 +19974,10 @@
                         const species = urlParams.get('species');
                         const gene_class = urlParams.get('gene_class');
 
-                        !function () {
+                        getJSON("{% url 'hotmap_data' %}?species=" + species + "&gene_class=" + gene_class, function (err, data) {
                             var t, e = document.querySelector("#chart");
-                            const decompressedData = {{ heatmapData|safe }};
-                            const r = JSON.parse(decompressedData);
+                            const r = data;
+                            // const r = JSON.parse(decompressedData);
                             s ? fetch("data/test-tree.nwk").then((function (i) {
                                     i.text().then((function (i) {
                                             t = a({
@@ -19992,7 +20010,7 @@
                                         matrix: r
                                     })
                             }
-                        }()
+                        });
                         }
                     ))
                 }

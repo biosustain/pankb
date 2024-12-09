@@ -36,7 +36,6 @@
 </head>
 
 <body>
-<h3 id = "MSA_figure" style = "text-align: center; font-size: 1.6em;"></h3>
 <div class = "row">
     <div class = "col-12">
         <div>
@@ -63,9 +62,9 @@
                         autoResize: true,
                         columnWidth: 30,
                         labelPadding: 100,
-                        overviewboxHeight: 200,
+                        overviewboxHeight: 50,
                         boxRectWidth: 0.1,
-                        alignmentHeight: 600,
+                        alignmentHeight: 550,
                         labelNameLength: 120,
                         markerFontsize: "10px",
                         markerStepSize: 2,
@@ -96,6 +95,7 @@
 
                             // Get the name of the sequence
                             sequenceName = sequence.get('name');
+                            console.log(sequence)
 
                             // If clicking on the same row, hide the panel and return
                             if (currentSeqId === data.seqId) {
@@ -136,7 +136,7 @@
                             jumpBtn.innerHTML = "Info of " + sequenceName;
                             jumpBtn.onclick = function() {
                                 // Define a unique URL for each sequence
-                                const url = "{% url 'genome_info' %}?species=" + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(genome_id)
+                                const url = "{% url 'genome_gene_info' %}?species=" + encodeURIComponent(species) + '&locus_tag=' + encodeURIComponent(genome_id)
 
                                 // Open a new page
                                 window.open(url, '_blank');
@@ -154,7 +154,7 @@
                             const copyBtn = document.createElement('button');
                             copyBtn.setAttribute("type", "button");
                             copyBtn.classList.add("btn", "btn-primary", "btn-sm");
-                            copyBtn.innerHTML = "Copy genome id";
+                            copyBtn.innerHTML = "Copy locus tag";
                             copyBtn.onclick = function() {
                                 // Copy sequenceName to clipboard
                                 navigator.clipboard.writeText(sequenceName).then(function() {
@@ -244,7 +244,6 @@
                     if (data !== "") {
                         const urlParams = new URLSearchParams(window.location.search);
                         const gene = urlParams.get('gene');
-                        document.getElementById('MSA_figure').innerHTML = "Multiple Sequence Alignment of " + gene;
                         document.getElementById('MSA').style.display = 'block';
 
                         // Parse the FASTA string

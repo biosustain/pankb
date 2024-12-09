@@ -1,53 +1,37 @@
+{% extends "components/panel_universal.html" %}
 {% load static %}
-
-<!-- Datatable: Species found -->
-<div class="table_padding" style="width: 50%">
-    <h5>Species</h5>
-    <table id="species_list" class="table table-hover" style="table-layout: fixed;">
-        <thead>
+{% block panel_content %}
+<table id="species_list" class="table table-hover" style="width: 100%;">
+    <thead>
         <tr>
-            <th class="text-left align-left" >Species</th>
-            <th class="text-left align-left" style="width: 30%">Family</th>
+            <th class="text-left align-left">Species</th>
+            <th class="text-left align-left" style="width: 30%;">Family</th>
         </tr>
-        </thead>
-        <tbody id="table-body-species"></tbody>
-    </table>
-</div>
+    </thead>
+    <tbody id="table-body-species">
+        {% for row in species_results %}
+        <tr>
+            <td><a href="{% url 'pangenome_analyses_overview' %}?species={{ row.pangenome_analysis }}">{{ row.species }}</a></td>
+            <td>{{ row.family }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 <script>
-    var data = {{ species_results | safe }};
-    var tableBody = document.getElementById('table-body-species');
-
-    // Iterate over each species in case the search results are not empty: ----
-    if (!isEmpty(data)) {
-        data.species.forEach((species, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                    <td class="text-left align-left"><a id="${data.species[index]}" href="#" onclick="handleLinkClickSpecies(event, '${data.pangenome_analysis[index]}')">${data.species[index]}</a></td>
-                    <td class="text-left align-left">${data.family[index]}</td>
-                    `;
-            tableBody.appendChild(row);
-        });
-    };
-
     $(document).ready(function () {
         // Initialize DataTable with drawCallback after the document is loaded
         $('#species_list').DataTable({
             searching: false,
             lengthChange: false,
-            bPaginate: true,
+            bPaginate: false,
+            paging: false,
+            bInfo: false,
+            autoWidth: true,
+            fixedColumns: true,
+            scrollX: true,
             order: [],    // preserve the original order (needed to order by relevance)
-            drawCallback: function(settings) {
-                $('[data-toggle="tooltip"]').tooltip();
-            }
         });
     });
-
-    function handleLinkClickSpecies(e, species) {
-        // Prevent the default link behavior
-        e.preventDefault();
-        // Navigate to the new page
-        window.location.href = "{% url 'pangenome_analyses_overview' %}" + `?species=${species}`
-    }
-
 </script>
+{% endblock %}

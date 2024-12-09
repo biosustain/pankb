@@ -1,0 +1,16 @@
+{% extends "components/panel_universal.html" %}
+{% block panel_content %}
+{% firstof panel_iframe_class 'responsive-iframe' as panel_iframe_class_updated %}
+<div class="figure-container_above {{panel_iframe_class_updated}}">
+    <div class="d-flex justify-content-center w-100 h-100 bg-lightbg p-3" id="{{panel_name}}_deferred_overlay"><button type="button" class="btn btn-primary" onclick="load_iframe();">Load Data</button></div>
+    <iframe class="d-none" style="border: 0" id="{{panel_name}}_iframe" src="about:blank"></iframe>
+</div>
+<script>
+    function load_iframe() {
+        var iframe = document.getElementById("{{panel_name}}_iframe");
+        iframe.src = "{{ panel_iframe_src | safe }}";
+        document.getElementById("{{panel_name}}_deferred_overlay").remove();
+        iframe.classList.toggle("d-none");
+    }
+</script>
+{% endblock %}

@@ -25,7 +25,6 @@
 </head>
 
 <body>
-<h3 id = "AA_pos_overview_figure" style = "text-align: center; font-size: 1.6em;"></h3>
 <div id = "container"></div>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
@@ -47,7 +46,7 @@
             title: {
                 text: '',
                 style: {
-                    fontSize: (1.1 * coefficient) + 'em',
+                    fontSize: 1 + 'rem',
                     color: '#000000'
                 },
             },
@@ -55,13 +54,13 @@
                 title: {
                     text: 'Amino Acid Position',
                     style: {
-                        fontSize: coefficient + 'em',
+                        fontSize: 1 + 'rem',
                         color: '#000000'
                     }
                 },
                 labels: {
                     style: {
-                        fontSize: (0.9 * coefficient) + 'em',
+                        fontSize: 1 + 'rem',
                         color: '#000000'
                     }
                 },
@@ -76,14 +75,14 @@
                 title: {
                     text: 'Number of Genomes',
                     style: {
-                        fontSize: coefficient + 'em',
+                        fontSize: 1 + 'rem',
                         color: '#000000'
                     }
                 },
                 labels: {
                     offset: 10,
                     style: {
-                        fontSize: (0.9 * coefficient) + 'em',
+                        fontSize: 1 + 'rem',
                         color: '#000000'
                     }
                 },
@@ -110,10 +109,10 @@
             plotOptions: {
                 scatter: {
                     marker: {
-                        radius: 8,
+                        radius: 6,
                         symbol: 'circle',
                         lineWidth: 1,
-                        lineColor: '#666666'
+                        lineColor: '#000000'
                     }
                 }
             },
@@ -121,12 +120,12 @@
                 name: 'Variant',
                 data: data.filter(item => item.Sequence_type === 'Variant')
                     .map(item => [parseInt(item.AA_pos), parseInt(item.Genome_count)]),
-                color: '#EB1D36'
+                color: '#ff7f50'
             }, {
                 name: 'Dominant',
                 data: data.filter(item => item.Sequence_type === 'Dominant')
                     .map(item => [parseInt(item.AA_pos), parseInt(item.Genome_count)]),
-                color: '#25316D'
+                color: '#5b6366'
             }],
             credits: {
                 enabled: false
@@ -136,19 +135,13 @@
     loadDataAndRenderChart();
 
     async function loadDataAndRenderChart() {
+        const number_of_genome = {{ num_genomes|safe }};
 
-        speciesData = {{ speciesData | safe }}
-        // Check if speciesData is available and then proceed
-        if (speciesData) {
-            const number_of_genome = speciesData.Number_of_genome;
+        const data = {{ dataset|safe }}
 
-            const data = {{ dataset|safe }}
-
-            // Only plot when the array with data is not empty: ----
-            if (data.length > 0) {
-                renderChart(data, number_of_genome);
-                document.getElementById('AA_pos_overview_figure').innerHTML = "Dominant and Variant Amino Acid Position Overview of <b>" +  gene  + "</b>";
-            }
+        // Only plot when the array with data is not empty: ----
+        if (data.length > 0) {
+            renderChart(data, number_of_genome);
         }
     }
 </script>

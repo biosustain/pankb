@@ -26,7 +26,7 @@
     function loadJSONAndCreatePlot() {
         const template_screen_width = 746;
         const current_window_Width = window.innerWidth;
-        const coefficient = current_window_Width / template_screen_width;
+        const coefficient = 1.0; //current_window_Width / template_screen_width;
 
         var jsondata = {{ dataset|safe }};
         const categories = jsondata.categories;
@@ -89,26 +89,26 @@
             autosize: true,
             margin: {
                 l: 80 * coefficient,  // left margin
-                r: 60 * coefficient,  // right margin
+                r: 20 * coefficient,  // right margin
                 b: 80 * coefficient, // bottom margin
-                t: 60 * coefficient, // top margin
+                t: 20 * coefficient, // top margin
                 pad: 0 // padding
             },
-            title: {
-                text: "Gene Annotation Distribution",
-                font: {
-                    family: 'Arial, sans-serif',
-                    size: 20 * coefficient,
-                    color: '#000000'
-                },
-                tickfont: {
-                    size: 16 * coefficient,
-                    family: 'Arial, sans-serif',
-                    color: '#000000'
-                },
-                xref: 'paper',
-                x: 0.5,
-            },
+            // title: {
+            //     text: "Gene Annotation Distribution",
+            //     font: {
+            //         family: 'Arial, sans-serif',
+            //         size: 20 * coefficient,
+            //         color: '#000000'
+            //     },
+            //     tickfont: {
+            //         size: 16 * coefficient,
+            //         family: 'Arial, sans-serif',
+            //         color: '#000000'
+            //     },
+            //     xref: 'paper',
+            //     x: 0.5,
+            // },
             xaxis: {
                 title: 'COG Category',
                 titlefont: {

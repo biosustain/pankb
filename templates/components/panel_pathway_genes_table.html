@@ -1,0 +1,116 @@
+{% extends "components/panel_universal.html" %}
+{% block panel_content %}
+<table id="pathway_genes_table" class="table table-hover" style="width: 100%;">
+    <thead>
+        <tr>
+            <th>Gene</th>
+            <th>Species</th>
+            <th>Family</th>
+            <th>Product</th>
+            <th>Class</th>
+            <th>KEGG Orthology</th>
+        </tr>
+    </thead>
+    <tbody id="tbody">
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Gene</th>
+            <th>Species</th>
+            <th>Family</th>
+            <th>Product</th>
+            <th>Class</th>
+            <th>KEGG Orthology</th>
+        </tr>
+    </tfoot>
+</table>
+<script>
+    $(document).ready(async function () {
+        let pathway_genes_table = $('#pathway_genes_table').DataTable({
+            serverSide: true,
+            ajax: {
+                url: '{% url "pathway_info_genes_json" %}',
+                data: {pathway_id: '{{ pathway_id | safe}}'},
+                dataSrc: 'data',
+            },
+            autoWidth: true,
+            fixedColumns: true,
+            scrollX: true,
+            paging: true,
+            order: [],   // preserve the original order (needed to order by relevance)
+            lengthMenu: [
+                [10, 20, 30, 40, 50, 100, -1],
+                [10, 20, 30, 40, 50, 100, 'All']
+            ],
+            columns: [
+                {
+                    data: 'gene',
+                    name: 'gene',
+                    render: function (data, type, row) {
+                        return '<a href="{% url 'gene_info' %}?species=' + row["pangenome_analysis"] + '&gene=' + data + '">' + data + '</a>';
+                    }
+                },
+                {
+                    data: 'species',
+                    name: 'species',
+                    render: function (data, type, row) {
+                        return '<a href="{% url 'pangenome_analyses_overview' %}?species=' + row["pangenome_analysis"] + '">' + data + '</a>';
+                    }
+                },
+                {
+                    data: 'family',
+                    name: 'family',
+                    render: function (data, type, row) {
+                        return '<a href="{% url 'organisms' %}?family=' + data + '">' + data + '</a>';
+                    }
+                },
+                {
+                    data: 'protein',
+                    name: 'protein',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '260px')
+                    },
+                },
+                {
+                    data: 'pangenomic_class',
+                    name: 'pangenomic_class',
+                },
+                {
+                    data: 'kegg_ko',
+                    name: 'kegg_ko',
+                    render: function(data, type, row) {
+                        inner_text = data.join(', ') + '&nbsp;&nbsp;<a style="font-size: 0.8em; font-style: italic;" href="' + row["kegg_link"] + '" target="_blank">(highlight)</a>';
+                        return wrap_table_text(inner_text, '240px')
+                    }
+                }
+            ],
+            language: {
+                loadingRecords: 'Loading...',
+                zeroRecords: 'No data available in table'
+            },
+            initComplete: function () {
+                this.api()
+                    .columns()
+                    .every(function () {
+                        var column = this;
+                        var title = column.footer().textContent;
+        
+                        // Create input element and add event listener
+                        $('<input type="text" class="form-control" placeholder="' + title + '" />')
+                            .appendTo($(column.footer()).empty())
+                            .on('keyup change clear', function () {
+                                if (column.search() !== this.value) {
+                                    column.search(this.value).draw();
+                                }
+                            });
+                    });
+            }
+        });
+        // Expand row on click
+        $('#pathway_genes_table tbody').on('click', 'td', function () {
+            const row = $(this).closest('tr');
+            row.toggleClass('expanded-row')
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "components/panel_universal.html" %}
+{% block panel_content %}
+<div class="p-3">
+    <dl class="row g-1 fs-3">
+        <dt class="col-sm-6">Genome ID</dt>
+        <dd class="col-sm-6"><a href="{% url 'genome_info' %}?species={{ dataGenome.pangenome_analysis }}&genome_id={{ dataGenome.genome_id }}">{{ dataGenome.genome_id }}</a></dd>
+
+        <dt class="col-sm-12">Strain (<a href="https://www.ncbi.nlm.nih.gov/datasets/genome/{{dataGenome.genome_id|safe}}" target="_blank">NCBI</a>)</dt>
+        <dd class="col-sm-12">{{ dataGenome.strain }}</dd>
+        
+        <dt class="col-sm-12">Isolation Source</dt>
+        <dd class="col-sm-12">{{ dataGenome.isolation_source }}</dd>
+        <dt class="col-sm-6">Country</dt>
+        <dd class="col-sm-6">{{ dataGenome.country }}</dd>
+        <dt class="col-sm-6">Region</dt>
+        <dd class="col-sm-6">{{ dataGenome.geo_loc_name }}</dd>
+        <dt class="col-sm-6">GC Content</dt>
+        <dd class="col-sm-6">{{ dataGenome.gc_content | floatformat:3 }}</dd>
+        <dt class="col-sm-6">Genome Length</dt>
+        <dd class="col-sm-6">{{ dataGenome.genome_len }}</dd>
+        <dt class="col-sm-6">Number of Genes</dt>
+        <dd class="col-sm-6">{{ dataGenome.num_genes }}</dd>
+
+        <dt class="col-sm-12">Gene Class Distribution</dt>
+        <dd class="col-sm-12">
+            <div style="display: flex; height: 1.2em; max-width: 100%; margin: 0; border-radius: 0.6em; overflow: hidden;">
+            <div style="width: calc(100%*{{ dataGenome.gene_class_distribution.0 }}/{{ dataGenome.num_genes }}); background-color: rgba(128,0,128,0.8);" data-toggle="tooltip" title="Core: {{ dataGenome.gene_class_distribution.0 }}"></div>
+            <div style="width: calc(100%*{{ dataGenome.gene_class_distribution.1 }}/{{ dataGenome.num_genes }}); background-color: rgba(255,165,0,0.8);" data-toggle="tooltip" title="Accessory: {{ dataGenome.gene_class_distribution.1 }}"></div>
+            <div style="width: calc(100%*{{ dataGenome.gene_class_distribution.2 }}/{{ dataGenome.num_genes }}); background-color: rgba(0,128,0,0.8);" data-toggle="tooltip" title="Rare: {{ dataGenome.gene_class_distribution.2 }}"></div>
+        </div>
+        </dd>
+    </dl>
+</div>
+{% endblock %}

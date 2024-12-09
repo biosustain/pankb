@@ -1,0 +1,11 @@
+{% extends "components/panel_universal.html" %}
+{% block panel_content %}
+<div class="fp-small-plot d-flex">
+    <div class="w-25">
+        {% include "home/plots/organism_genome_number.html" %}
+    </div>
+    <div class="w-75">
+        {% include "home/plots/organism_gene_number.html" %}
+    </div>
+</div>
+{% endblock %}
