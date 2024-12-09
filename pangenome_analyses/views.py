@@ -38,7 +38,7 @@ def overview(request):
 def heaps_law(request):
   template = loader.get_template('pangenome_analyses/plots/heaps_law.html')
   species = request.GET['species']
-  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/gene_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/heaps_law.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
   json_obj = r.json()
   # Compose a context for the template rendering
@@ -52,7 +52,7 @@ def heaps_law(request):
 def cumulative_freq(request):
   template = loader.get_template('pangenome_analyses/plots/cumulative_freq.html')
   species = request.GET['species']
-  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/gene_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/cum_freq.json'    # the url of the respective json file stored on the Microsoft Azure Blob Storage
   r = requests.get(url)
   json_obj = r.json()
   # Compose a context for the template rendering
@@ -101,17 +101,26 @@ def hotmap(request):
         })
   source_info = {g["genome_id"]: [g["country"], g["isolation_source"], g["strain"]] for g in list(genome_info)}
 
-  url2 = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/heatmap_' + gene_class + '.json.gz'    # the url of the respective json.gz file stored on the Microsoft Azure Blob Storage
-  r2 = requests.get(url2)
-  str2 = str(gzip.decompress(r2.content), 'utf-8')   # decompress the gzipped content and transform it to a string
+  # url2 = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/heatmap_' + gene_class + '.json.gz'    # the url of the respective json.gz file stored on the Microsoft Azure Blob Storage
+  # r2 = requests.get(url2)
+  # str2 = str(gzip.decompress(r2.content), 'utf-8')   # decompress the gzipped content and transform it to a string
 
   # Compose a context for the template rendering
   context = {
     'dataset': json.dumps(source_info),
-    'heatmapData': str2
+    # 'heatmapData': str2
   }
   return HttpResponse(template.render(context, request))
 
+def hotmap_data(request):
+  species = request.GET['species']
+  gene_class = request.GET['gene_class']
+
+  url = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/heatmap_' + gene_class + '.json.gz'
+  r = requests.get(url)
+  response = HttpResponse(r.content, content_type="application/json")
+  response['Content-Encoding'] = 'gzip'
+  return response
 
 # Source: https://docs.djangoproject.com/en/5.0/howto/outputting-csv/
 class Echo:
@@ -237,6 +246,28 @@ def gene_annotation(request):
   return HttpResponse(template.render(context, request))
 
 
+def genome(request):
+  template = loader.get_template('pangenome_analyses/genomes.html')
+  species = request.GET['species']
+
+  # Set the filter() function parameters: ----
+  filter_params = {}
+  filter_params['pangenome_analysis'] = species
+
+  # Get info about the given organisms from the Organisms collection (in a dictionary): ----
+  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')
+  if len(organism_info) == 0:
+    raise Http404()
+  organism_info = organism_info[0]
+
+  # Compose a context for the template rendering
+  context = {
+    'speciesData': organism_info,
+    'pangenome_analysis': species,
+  }
+  return HttpResponse(template.render(context, request))
+
+
 # A view that serves the Gene Annotation table content in the .csv format
 def download_gene_annotation_table_csv(request):
   species = request.GET.get('species')
@@ -287,6 +318,13 @@ def phylogenetic_tree(request):
   }
   return HttpResponse(template.render(context, request))
 
+def get_iso_context(iso_cat, i):
+  x = "-"
+  if iso_cat and len(iso_cat) > 0:
+    x = iso_cat[i]
+  if x == "Missing":
+    x = "-"
+  return x
 
 # Template renderer for the Phylogenetic Tree plot subtemplate
 def phylotree_plot(request):
@@ -300,10 +338,10 @@ def phylotree_plot(request):
       })
   source_info = {
     g["genome_id"].replace('.', ''): {
-      "Country": g["country"],
-      "Broad Context": (g["iso_cat"][0] if g["iso_cat"] and len(g["iso_cat"]) > 0 else "Missing"),
-      "Local Context": (g["iso_cat"][1] if g["iso_cat"] and len(g["iso_cat"]) > 1 else "Missing"),
-      "Isolation Source": g["isolation_source"]
+      "Country": "-" if g["country"] == "?" else g["country"],
+      "Broad Context": get_iso_context(g["iso_cat"], 0),
+      "Local Context": get_iso_context(g["iso_cat"], 0),
+      "Isolation Source": "-" if g["isolation_source"].lower() == "missing" else g["isolation_source"]
       } for g in genome_info_dict}
 
   r = requests.get(url)
@@ -337,7 +375,7 @@ def _parse_get_array(req_get, name):
   data = [data[i] for i in range(len(data))]
   return data
 
-def create_datatables_gene_annotation_api(request_get, select_pipeline, gene_keys, as_list=True):
+def create_datatables_api(mongo_aggregate, request_get, select_pipeline, out_keys, as_list=True):
   draw = int(request_get["draw"])
   start = int(request_get["start"])
   length = int(request_get["length"])
@@ -346,7 +384,7 @@ def create_datatables_gene_annotation_api(request_get, select_pipeline, gene_key
   order = _parse_get_array(request_get, "order")
   search = {"value": request_get.get("search[value]", ""), "regex": request_get.get("search[regex]", "false")}
 
-  projection = {f"results.{gk}": 1 for gk in gene_keys}
+  projection = {f"results.{gk}": 1 for gk in out_keys}
   projection["info.total"] = 1
   projection["info.filtered"] = 1
 
@@ -421,18 +459,18 @@ def create_datatables_gene_annotation_api(request_get, select_pipeline, gene_key
     {"$project": projection},
     ])
 
-  results = list(GeneAnnotations.objects.mongo_aggregate(pipeline))
+  results = list(mongo_aggregate(pipeline))
 
   if not results:
-    gene_annotations = []
+    data = []
     recordsTotal = 0 # TODO: this is not really correct
     recordsFiltered = 0
   else:
-    gene_annotations = list(results[0]["results"])
+    data = list(results[0]["results"])
     recordsTotal = results[0]["info"]["total"]
     recordsFiltered = results[0]["info"]["filtered"]
     if as_list:
-      gene_annotations = [[g.get(gk, None) for gk in gene_keys] for g in gene_annotations]
+      data = [[g.get(gk, None) for gk in out_keys] for g in data]
 
   draw = draw + 1
 
@@ -440,7 +478,7 @@ def create_datatables_gene_annotation_api(request_get, select_pipeline, gene_key
     "draw": draw,
     "recordsTotal": recordsTotal,
     "recordsFiltered": recordsFiltered,
-    "data": gene_annotations,
+    "data": data,
     "columns": columns,
     "order": order,
     }
@@ -452,6 +490,31 @@ def gene_annotation_json(request):
   gene_keys = ['gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class', 'pangenome_analysis']
   select_pipeline = [{"$match": {"pangenome_analysis": pangenome_analysis}}]
 
-  response = create_datatables_gene_annotation_api(request.GET, select_pipeline, gene_keys)
+  response = create_datatables_api(GeneAnnotations.objects.mongo_aggregate, request.GET, select_pipeline, gene_keys)
 
+  return JsonResponse(response)
+
+def genome_json(request):
+  pangenome_analysis = str(request.GET["pangenome_analysis"])
+  genome_keys = ['pangenome_analysis', 'genome_id', 'strain', 'phylo_group', 'genome_len', 'gc_content', 'country', 'isolation_source', 'iso_cat']
+  select_pipeline = GenomeInfo.get_genome_and_isolation_info_pipeline({"pangenome_analysis": pangenome_analysis})
+
+  response = create_datatables_api(GenomeInfo.objects.mongo_aggregate, request.GET, select_pipeline, genome_keys)
+
+  for d in response["data"]:
+    x = d.pop(-1)
+    cats = []
+    if len(x) > 0:
+      cats.append(x[0])
+    else:
+      cats.append("-")
+    if len(x) > 1:
+      cats.append(x[1])
+    else:
+      cats.append("-")
+    if len(x) > 2:
+      cats.append(x[2])
+    else:
+      cats.append("-")
+    d.extend(cats)
   return JsonResponse(response)

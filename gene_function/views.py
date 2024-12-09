@@ -9,7 +9,7 @@ import numpy as np
 from .models import GeneInfo, GenomeInfo, PathwayInfo
 from organisms.models import Organisms
 from pangenome_analyses.models import GeneAnnotations
-from pangenome_analyses.views import create_datatables_gene_annotation_api
+from pangenome_analyses.views import create_datatables_api
 from django.db.models import Q
 from functools import reduce
 from django.forms.models import model_to_dict
@@ -333,7 +333,7 @@ def pathway_gene_annotation_json(request):
     {"$project": {gk: 1 for gk in gene_keys}} # This projection keeps document size smaller
     ]
 
-  response = create_datatables_gene_annotation_api(request.GET, select_pipeline, gene_keys, as_list=False)
+  response = create_datatables_api(GeneAnnotations.objects.mongo_aggregate, request.GET, select_pipeline, gene_keys, as_list=False)
 
   for d in response["data"]:
     kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway_id}"

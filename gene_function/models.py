@@ -1,5 +1,6 @@
 from djongo import models
 
+
 # Model for the Gene Info table content
 class GeneInfo(models.Model):
     _id = models.CharField(max_length=24, primary_key=True)
@@ -21,67 +22,78 @@ class GeneInfo(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'pankb_gene_info'
+        db_table = "pankb_gene_info"
         indexes = [
-            models.Index(fields=['pangenome_analysis', 'gene']),
-            models.Index(fields=['pangenome_analysis', 'genome_id'])
+            models.Index(fields=["pangenome_analysis", "gene"]),
+            models.Index(fields=["pangenome_analysis", "genome_id"]),
         ]
+
 
 # Model for the Genome Info table content
 class GenomeInfo(models.Model):
-   _id = models.CharField(max_length=24, primary_key=True)
-   genome_id = models.CharField(max_length=15)
-   strain = models.CharField(max_length=100)
-   gc_content = models.FloatField()
-   genome_len = models.IntegerField()
-   gene_class_distribution = models.CharField(max_length=20)
-   antismash_url = models.CharField(max_length=150)
-   pangenome_analysis = models.CharField(max_length=40)
-   species = models.CharField(max_length=40)
-   phylo_group = models.CharField(max_length=40)
-   objects = models.DjongoManager()
+    _id = models.CharField(max_length=24, primary_key=True)
+    genome_id = models.CharField(max_length=15)
+    strain = models.CharField(max_length=100)
+    gc_content = models.FloatField()
+    genome_len = models.IntegerField()
+    gene_class_distribution = models.CharField(max_length=20)
+    antismash_url = models.CharField(max_length=150)
+    pangenome_analysis = models.CharField(max_length=40)
+    species = models.CharField(max_length=40)
+    phylo_group = models.CharField(max_length=40)
+    objects = models.DjongoManager()
 
-   class Meta:
-       managed = False
-       db_table = 'pankb_genome_info'
-       indexes = [
-           models.Index(fields=['pangenome_analysis', 'genome_id']),
-           models.Index(fields=['pangenome_analysis', 'strain'])
-       ]
-   def get_genome_and_isolation_info(genome_match):
+    class Meta:
+        managed = False
+        db_table = "pankb_genome_info"
+        indexes = [
+            models.Index(fields=["pangenome_analysis", "genome_id"]),
+            models.Index(fields=["pangenome_analysis", "strain"]),
+        ]
+
+    def get_genome_and_isolation_info_pipeline(genome_match):
+        return [
+            {"$match": genome_match},
+            {
+                "$lookup": {
+                    "from": "pankb_isolation_info",
+                    "localField": "genome_id",
+                    "foreignField": "genome_id",
+                    "as": "isolation_info",
+                }
+            },
+            {"$unwind": {"path": "$isolation_info"}},
+            {
+                "$replaceRoot": {
+                    "newRoot": {"$mergeObjects": ["$$ROOT", "$isolation_info"]}
+                }
+            },
+            {"$project": {"_id": 0, "isolation_info": 0}},
+        ]
+
+    def get_genome_and_isolation_info(genome_match):
         return GenomeInfo.objects.mongo_aggregate(
-            [
-                {"$match": genome_match},
-                {
-                    "$lookup": {
-                        "from": "pankb_isolation_info",
-                        "localField": "genome_id",
-                        "foreignField": "genome_id",
-                        "as": "isolation_info",
-                    }
-                },
-                {"$unwind": {"path": "$isolation_info"}},
-                {"$replaceRoot": {"newRoot": {"$mergeObjects": ["$$ROOT", "$isolation_info"]}}},
-                {"$project": {"_id": 0, "isolation_info": 0}},
-            ]
+            GenomeInfo.get_genome_and_isolation_info_pipeline(genome_match)
         )
 
+
 class PathwayInfo(models.Model):
-   _id = models.CharField(max_length=24, primary_key=True)
-   pathway_id = models.CharField(max_length=15)
-   pathway_name = models.CharField(max_length=100)
-#    genes = models.CharField(max_length=100)
-#    strain = models.CharField(max_length=100)
-#    species = models.CharField(max_length=40)
-#    product = models.CharField(max_length=150)
-#    genome_id = models.CharField(max_length=15)
-#    gene = models.CharField(max_length=20)
-#    pangenomic_class = models.CharField(max_length=9)      # Core, Accessory (9 symbols) or Rare
-#    pangenome_analysis = models.CharField(max_length=40)
-   objects = models.DjongoManager()
-   class Meta:
-       managed = False
-       db_table = 'pankb_pathway_info'
-       indexes = [
-           models.Index(fields=['pathway_id']),
-       ]
+    _id = models.CharField(max_length=24, primary_key=True)
+    pathway_id = models.CharField(max_length=15)
+    pathway_name = models.CharField(max_length=100)
+    #    genes = models.CharField(max_length=100)
+    #    strain = models.CharField(max_length=100)
+    #    species = models.CharField(max_length=40)
+    #    product = models.CharField(max_length=150)
+    #    genome_id = models.CharField(max_length=15)
+    #    gene = models.CharField(max_length=20)
+    #    pangenomic_class = models.CharField(max_length=9)      # Core, Accessory (9 symbols) or Rare
+    #    pangenome_analysis = models.CharField(max_length=40)
+    objects = models.DjongoManager()
+
+    class Meta:
+        managed = False
+        db_table = "pankb_pathway_info"
+        indexes = [
+            models.Index(fields=["pathway_id"]),
+        ]

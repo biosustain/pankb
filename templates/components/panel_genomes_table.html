@@ -1,30 +1,32 @@
 {% extends "components/panel_universal.html" %}
 {% block panel_content %}
-<table id="genes_table" class="table table-hover display" style="width: 100%;">
+<table id="genomes_table" class="table table-hover display" style="width: 100%;">
     <thead>
     <tr>
-        <th>Gene</th>
-        <th>Class</th>
-        <th>COG</th>
-        <th>COG Name</th>
-        <th>Description</th>
-        <th>Protein</th>
-        <th>PFAMs</th>
-        <th>Count</th>
+        <th>Genome</th>
+        <th>Stain (NCBI)</th>
+        <th>Phylo Group</th>
+        <th>Length</th>
+        <th>%GC</th>
+        <th>Country</th>
+        <th>Broad Context</th>
+        <th>Local Context</th>
+        <th>Isolation Source</th>
     </tr>
     </thead>
     <tbody id="tbody">
     </tbody>
     <tfoot>
         <tr>
-            <th>Gene</th>
-            <th data-get="class">Class</th>
-            <th>COG</th>
-            <th>COG Name</th>
-            <th>Description</th>
-            <th>Protein</th>
-            <th>PFAMs</th>
+            <th>Genome</th>
+            <th>Stain (NCBI)</th>
+            <th>Phylo Group</th>
             <th class="no_search"></th>
+            <th class="no_search"></th>
+            <th>Country</th>
+            <th>Broad Context</th>
+            <th>Local Context</th>
+            <th>Isolation Source</th>
         </tr>
     </tfoot>
 </table>
@@ -33,11 +35,11 @@
     const urlParams = new URLSearchParams(window.location.search);
 
     $(document).ready(async function () {
-        genes_table = $('#genes_table').DataTable({
+        genes_table = $('#genomes_table').DataTable({
             // data: Gene,
             serverSide: true,
             ajax: {
-                url: '{% url "pangenome_analyses_gene_annotation_json" %}',
+                url: '{% url "pangenome_analyses_genome_json" %}',
                 data: {pangenome_analysis: '{{ pangenome_analysis | safe}}'},
                 dataSrc: 'data',
             },
@@ -50,62 +52,75 @@
             ],
             columns: [
                 {
-                    data: '0',
-                    name: 'gene',
+                    data: '1',
+                    name: 'genome_id',
                     render: function (data, type, row) {
-                        return '<a href=" {% url 'gene_info' %}?species=' + row[8] + '&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
+                        return '<a href=" {% url 'genome_info' %}?species=' + row[0] + '&genome_id=' + encodeURIComponent(data) + '">' + data + '</a>';
+                    },
+                },
+                {
+                    data: '2',
+                    name: 'strain',
+                },
+                {
+                    data: '3',
+                    name: 'phylo_group',
+                },
+                {
+                    data: '4',
+                    name: 'genome_len',
+                },
+                {
+                    data: '5',
+                    name: 'gc_content',
+                    render: function (data, type, row) {
+                        return (data*100).toFixed(2)
+                    },
+                },
+                {
+                    data: '6',
+                    name: 'country',
+                    render: function (data, type, row) {
+                        if (data == "?") {
+                            return "-"
+                        } else {
+                            return data
+                        }
+                    },
+                },
+                {
+                    data: '8',
+                    name: 'iso_cat.0',
+                    render: function (data, type, row) {
+                        if (data == "?" || data == "Missing" || data == "missing") {
+                            return "-"
+                        } else {
+                            return data
+                        }
+                    },
+                },
+                {
+                    data: '9',
+                    name: 'iso_cat.1',
+                    render: function (data, type, row) {
+                        if (data == "?" || data == "Missing" || data == "missing") {
+                            return "-"
+                        } else {
+                            return data
+                        }
                     },
                 },
                 {
                     data: '7',
-                    name: 'pangenomic_class',
-                },
-                {
-                    data: '1',
-                    name: 'cog_category',
-                },
-                {
-                    data: '2',
-                    name: 'cog_name',
+                    name: 'isolation_source',
                     render: function (data, type, row) {
-                        return wrap_table_text(data, '160px')
-                    },
-                },
-                {
-                    data: '3',
-                    name: 'description',
-                    render: function (data, type, row) {
-                        return wrap_table_text(data, '240px')
-                    },
-                },
-                {
-                    data: '4',
-                    name: 'protein',
-                    render: function (data, type, row) {
-                        return wrap_table_text(data, '220px')
-                    },
-                    className: 'protein',
-                },
-                {
-                    data: '5',
-                    name: 'pfams',
-                    render: function (data, type, row) {
-                        let new_data = data;
-                        if (data === null) {
-                            new_data = "-";
-                        } else if (Array.isArray(data)) {
-                            new_data = data.join(', ');
+                        if (data == "?" || data == "Missing" || data == "missing") {
+                            return "-"
+                        } else {
+                            return data
                         }
-                        return wrap_table_text(new_data, '120px')
                     },
-                    className: 'pfams',
                 },
-                {
-                    data: '6',
-                    name: 'frequency',
-                    searchable: false,
-                    width: '80px',
-                }
             ],
             language: {
                 loadingRecords: 'Loading...',

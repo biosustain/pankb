@@ -49,8 +49,14 @@
             </a>
           </div> -->
           <div class="btn-group">
-            <button id="help_info" type="button" class="btn btn-light btn-sm" title="Help">
+            <button id="help_info" type="button" class="btn btn-sm" title="Help">
               <i class="fa fa-circle-question"></i>
+            </button>
+            <button id="mouse_mode_select" type="button" class="btn btn-sm active" title="Select">
+              <i class="fa-solid fa-arrow-pointer"></i>
+            </button>
+            <button id="mouse_mode_pan" type="button" class="btn btn-sm" title="Pan">
+              <i class="fa-solid fa-arrows-up-down-left-right"></i>
             </button>
           </div>
 
@@ -137,52 +143,55 @@
           </div>
 
           <div class="btn-group" role="group">
-            <button id="toggle_iso_sidebar" class="btn btn-light btn-sm" title="Toggle isolation source sidebar">
+            <button id="toggle_iso_sidebar" class="btn btn-light btn-sm active" title="Toggle isolation source sidebar">
               <i class="fa fa-circle-info"></i>
             </button>
-            <button id="toggle-sidebar" class="btn btn-sm toggle-sidebar-button"><i class="fa fa-bars"></i></button>
+            <button id="toggle-sidebar" class="btn btn-sm toggle-sidebar-button active"><i class="fa fa-bars"></i></button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="container-fluid" id="main_display">
-    <!-- Left Section -->
-    <div class="left-section">
-      <!-- Bottom Row: Tree and Squares Side by Side -->
-      <div class="tree-and-matrix .tree-and-matrix-2-cols">
-        <!-- Left Column: Tree Container -->
-        <div class="tree-column" id="tree_container">
-            <!-- Tree will be rendered here -->
-        </div>
-
-        <!-- Right Column: Squares Container -->
-         <div class="matrix-column" id="matrix-container">
-          <!-- Category Labels -->
-          <div id="category_labels" class="category-labels-container vertical">
-            <!-- Category labels will be rendered here -->
+  <div class="container-fluid" id="main_wrapper">
+    <div class="container-fluid" id="main_display">
+      <!-- Left Section -->
+      <div class="left-section">
+        <div id="tree_overlay" class="tree-overlay d-none"></div>
+        <!-- Bottom Row: Tree and Squares Side by Side -->
+        <div class="tree-and-matrix .tree-and-matrix-2-cols">
+          <!-- Left Column: Tree Container -->
+          <div class="tree-column" id="tree_container">
+              <!-- Tree will be rendered here -->
           </div>
-          <!-- Squares -->
-          <div id="squares_container" class="squares-container">
-          
+
+          <!-- Right Column: Squares Container -->
+          <div class="matrix-column" id="matrix-container">
+            <!-- Category Labels -->
+            <div id="category_labels" class="category-labels-container vertical">
+              <!-- Category labels will be rendered here -->
+            </div>
+            <!-- Squares -->
+            <div id="squares_container" class="squares-container">
+            
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Right Section: Selected Information -->
-    <div id="sidebar" class="right-section sidebar">
-      <!-- Existing Selected Tags and Branches -->
-      <label>
-        <span class="badge badge-secondary" id="selected_branch_counter">0</span> <!-- TODO: consider removing -->
-        <b>branches with current label.</b>
-      </label>
-      <br>
+      <!-- Right Section: Selected Information -->
+      <div id="sidebar" class="right-section sidebar">
+        <!-- Existing Selected Tags and Branches -->
+        <label>
+          <span class="badge badge-secondary" id="selected_branch_counter">0</span> <!-- TODO: consider removing -->
+          <b>branches with current label.</b>
+        </label>
+        <br>
 
-      <!-- Highlighting Dropdown Menus for Each Category -->
-      <div id="highlight-dropdowns-container" class="mt-4">
-        <!-- Dropdown menus for each category will be dynamically generated here -->
+        <!-- Highlighting Dropdown Menus for Each Category -->
+        <div id="highlight-dropdowns-container" class="mt-4">
+          <!-- Dropdown menus for each category will be dynamically generated here -->
+        </div>
       </div>
     </div>
   </div>
@@ -193,6 +202,40 @@
 
   <script>
     var phylotree_extensions = new Object();
+    var phylotree_mouse_mode = "select";
+    const scrollable_x = document.querySelector('#tree_container');
+    const scrollable_y = document.querySelector('.tree-and-matrix');
+    const scrollable_xy_source = document.querySelector('#tree_overlay');
+    var pointerFrom_x = 0;
+    var pointerFrom_y = 0;
+    var elementFrom_x = 0;
+    var elementFrom_y = 0;
+
+    const onDragXY = (event) => {
+      scrollable_x.scrollLeft = elementFrom_x - event.clientX + pointerFrom_x;
+      scrollable_y.scrollTop = elementFrom_y - event.clientY + pointerFrom_y;
+    };
+    scrollable_xy_source.addEventListener('pointerdown', (event) => {
+      if (phylotree_mouse_mode == "pan") {
+        pointerFrom_x = event.clientX;
+        elementFrom_x = scrollable_x.scrollLeft;
+        pointerFrom_y = event.clientY;
+        elementFrom_y = scrollable_y.scrollTop;
+        document.addEventListener('pointermove', onDragXY);
+        event.stopPropagation();
+      }
+    });
+    document.addEventListener('pointerup', (event) => {
+      if (phylotree_mouse_mode == "pan") {
+        document.removeEventListener('pointermove', onDragXY);
+        event.stopPropagation();
+      }
+    });
+    scrollable_xy_source.addEventListener('wheel', (event) =>{
+      event.preventDefault();
+      scrollable_x.scrollLeft = scrollable_x.scrollLeft + event.deltaX;
+      scrollable_y.scrollTop = scrollable_y.scrollTop + event.deltaY;
+    });
 
     $("#newick_export_modal").on("show.bs.modal", function (e) {
       $('textarea[id$="nwk_export_spec"]').val(
@@ -427,6 +470,19 @@
       tree.display.update();
       // const treeContainer = document.querySelector(".tree-column");
       // treeContainer.dispatchEvent(new CustomEvent('scroll')); // trigger the scroll event to synchronize the views
+    });
+
+    $("#mouse_mode_select").on("click", function (e) {
+      $(this).toggleClass("active", true);
+      $("#mouse_mode_pan").toggleClass("active", false);
+      $("#tree_overlay").toggleClass("d-none", true);
+      phylotree_mouse_mode = "select";
+    });
+    $("#mouse_mode_pan").on("click", function (e) {
+      $(this).toggleClass("active", true);
+      $("#mouse_mode_select").toggleClass("active", false);
+      $("#tree_overlay").toggleClass("d-none", false);
+      phylotree_mouse_mode = "pan";
     });
 
     function sort_nodes(asc) {
@@ -1386,7 +1442,7 @@
 
         // Create a button for each category dropdown
         dropdownDiv.append("button")
-          .attr("class", "btn btn-secondary dropdown-toggle")
+          .attr("class", "btn btn-sm btn-secondary dropdown-toggle")
           .attr("type", "button")
           .attr("id", `${category}-dropdown`)
           .attr("data-bs-toggle", "dropdown")
@@ -1522,12 +1578,20 @@
       if (toggleButton && sidebar) {
         toggleButton.addEventListener("click", function () {
           sidebar.classList.toggle("collapsed");
+          toggleButton.classList.toggle("active");
         });
       }
       $("#help_info").tooltip({
         title: "Hold <shift> while scrolling to scroll horizontally.",
         placement: "bottom"
       });
+      let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+      if (vw < 1100) {
+        $("#toggle-sidebar").click();
+      }
+      if (vw < 800) {
+        $("#toggle_iso_sidebar").click();
+      }
     });
 
     initializeComponents();

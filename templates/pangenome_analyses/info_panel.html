@@ -15,6 +15,9 @@
         <a class="nav-link{% if active_subpage == 'genes' %} active{% endif %}" href="{% url 'pangenome_analyses_gene_annotation' %}?species={{ request.GET.species }}">Genes</a>
     </li>
     <li class="nav-item">
+        <a class="nav-link{% if active_subpage == 'genomes' %} active{% endif %}" href="{% url 'pangenome_analyses_genome' %}?species={{ request.GET.species }}">Genomes</a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link{% if active_subpage == 'phylogenetic_tree' %} active{% endif %}" href="{% url 'pangenome_analyses_phylogenetic_tree' %}?species={{ request.GET.species }}">Phylogenetic Tree</a>
     </li>
 </ul>
@@ -23,14 +26,14 @@
 {% block info_panel_content %}
 <dl class="row g-1 fs-3">
     <dt class="col-sm-8">Genomes</dt>
-    <dd class="col-sm-4">{{ speciesData.genomes_num }}</dd>
+    <dd class="col-sm-4"><a class="infopanel_link" href="{% url 'pangenome_analyses_genome' %}?species={{ request.GET.species }}">{{ speciesData.genomes_num }}</a></dd>
     
     <dt class="col-sm-8">Core Genes</dt>
-    <dd class="col-sm-4">{{ speciesData.gene_class_distribution.0 }}</dd>
+    <dd class="col-sm-4"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Core">{{ speciesData.gene_class_distribution.0 }}</a></dd>
     <dt class="col-sm-8">Accessory Genes</dt>
-    <dd class="col-sm-4">{{ speciesData.gene_class_distribution.1 }}</dd>
+    <dd class="col-sm-4"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Accessory">{{ speciesData.gene_class_distribution.1 }}</a></dd>
     <dt class="col-sm-8">Rare Genes</dt>
-    <dd class="col-sm-4">{{ speciesData.gene_class_distribution.2 }}</dd>
+    <dd class="col-sm-4"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Rare">{{ speciesData.gene_class_distribution.2 }}</a></dd>
     
     <dt class="col-sm-12">Openness</dt>
     <dd class="col-sm-12">{{ speciesData.openness }}</dd>

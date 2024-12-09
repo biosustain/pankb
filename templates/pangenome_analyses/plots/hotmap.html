@@ -20,6 +20,21 @@
 <script>
     const source_info = {{ dataset|safe }}
 
+    var getJSON = function(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.responseType = 'json';
+        xhr.onload = function() {
+        var status = xhr.status;
+        if (status === 200) {
+            callback(null, xhr.response);
+        } else {
+            callback(status, xhr.response);
+        }
+        };
+        xhr.send();
+    };
+
     // T__T (crying) Had to copy the full app.js right here because it is not possible to send variables wrapped with Django tags to static JS files! T___T
     //
     // [AIV_SHORT]  Build version: 0.2.33 - Wednesday, December 11th, 2019, 7:04:57 PM
@@ -19959,9 +19974,9 @@
                         const species = urlParams.get('species');
                         const gene_class = urlParams.get('gene_class');
 
-                        !function () {
+                        getJSON("{% url 'hotmap_data' %}?species=" + species + "&gene_class=" + gene_class, function (err, data) {
                             var t, e = document.querySelector("#chart");
-                            const r = {{ heatmapData|safe }};
+                            const r = data;
                             // const r = JSON.parse(decompressedData);
                             s ? fetch("data/test-tree.nwk").then((function (i) {
                                     i.text().then((function (i) {
@@ -19995,7 +20010,7 @@
                                         matrix: r
                                     })
                             }
-                        }()
+                        });
                         }
                     ))
                 }

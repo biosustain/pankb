@@ -7,6 +7,10 @@ body {
   overflow: hidden;
   box-sizing: border-box;
 }
+body {
+  display: flex;
+  flex-flow: column;
+}
 
 /* Styles for tree selection brush */
 .tree-selection-brush .extent {
@@ -220,13 +224,22 @@ body {
 /* -----------------------Styles for Main Page----------------------- */
 /* Styles for main display */
 #main_display {
+	display: flex;
+	flex-direction: row;
+	gap: 10px;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	padding: 0;
+}
+
+#main_wrapper {
+  flex: 1;
   display: flex;
-  flex-direction: row;
-  margin-top: 10px;
-  padding-left: 0px;
-  gap: 10px;
-  height: calc(100% - 40px); /* Workaround, should be done using proper bootstrap layout. */
-  padding-right: 0px;
+  position: relative;
+  padding: 0;
 }
 
 /* -----------------------Styles for left section (Toolbar, Tree, Category labels and Matrix) ----------------------- */
@@ -237,8 +250,7 @@ body {
   flex-grow: 1;
   height: 100%;
   overflow: hidden;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
+  position: relative;
 }
 
 /* Styles for toolbar and labels */
@@ -292,7 +304,12 @@ body {
 }
 
 /* Active styles for toolbar buttons */
-#toolbar button:active {
+/* #toolbar button:active {
+  background-color: #333;
+  color: #fff;
+  transform: scale(0.95);
+} */
+#toolbar button.active {
   background-color: #333;
   color: #fff;
   transform: scale(0.95);
@@ -307,8 +324,31 @@ body {
   overflow-y: scroll;
   justify-content: end;
 }
+@media (max-width:800px) {
+  .tree-and-matrix {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width:550px) {
+  .tree-and-matrix {
+    grid-template-columns: 1fr 2fr;
+  }
+}
 .tree-and-matrix-1-col {
   grid-template-columns: 1fr !important;
+}
+
+.tree-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom:0;
+  right:0;
+  background-color: #fff;
+  opacity: 0;
+  cursor: grab;
+  z-index: 1001;
+  touch-action: none;
 }
 
 /* Tree Column Flex Settings */
@@ -316,7 +356,7 @@ body {
   overflow-x: scroll;
   overflow-y: visible;
   height: min-content;
-  border-right: #888 dashed 1px;
+  position: relative;
 }
 
 /* Tree Container Styling */
@@ -343,6 +383,8 @@ body {
   overflow-x: hidden;
   overflow-y: visible;
   height: min-content;
+  border-left: #888 dashed 1px;
+  padding-left: 3px;
 }
 
 /* Category Labels Container */
@@ -396,11 +438,16 @@ body {
 /* Styles for sidebar */
 .sidebar {
   flex: 0 1 auto;
+  padding: 0.3rem;
 }
 
 /* Styles for collapsed sidebar */
 .sidebar.collapsed {
   display: none;
+}
+
+#highlight-dropdowns-container button {
+  width: 100%;
 }
 
 /* Styles for selected branch and tags counter */
