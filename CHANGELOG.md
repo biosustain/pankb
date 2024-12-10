@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
+=======
 
 ## PanKB v2.0.0 - 15.07.2024
 
@@ -31,3 +32,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 Here we write upgrading notes for the PanKB web-app project. It's a team effort to make them as
 straightforward as possible.
 
+- The HTML fonts are scaled automatically depending on the viewport width and height (the pages do not have to be re-scaled via JS AFTER they are loaded).

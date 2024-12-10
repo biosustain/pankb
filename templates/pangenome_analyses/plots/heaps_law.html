@@ -42,7 +42,7 @@
     const avg_pan = data['avg_pan'];
     const x_pan = range(avg_pan.length, 1);
     const max_frequency_count = data['max_frequency_count'];
-    const alpha = roundToDecimal(1 - (data['alpha']), 3)
+    const alpha = roundToDecimal(data['alpha'], 3)
 
     // Create trace for core genome
     var traceCore = {
