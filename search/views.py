@@ -46,14 +46,14 @@ def search_results(request):
     ):  # only if the cleaned query string length > 2 symbols, perform the DB searches: ----
         # Get the filtered organism families from the DB: ----
         families = list(
-            Organisms.objects.mongo_find(
+            Organisms.objects.find(
                 {"family": {"$regex": q, "$options": "i"}}, {"_id": 0, "family": 1}
             ).distinct("family")
         )
 
         # Get the filtered species from the DB: ----
         species = list(
-            Organisms.objects.mongo_find(
+            Organisms.objects.find(
                 {"species": {"$regex": q, "$options": "i"}},
                 {"_id": 0, "species": 1, "family": 1, "pangenome_analysis": 1},
             )
@@ -61,31 +61,11 @@ def search_results(request):
 
         # Get the filtered pathways from the DB: ----
         pathways = list(
-            PathwayInfo.objects.mongo_aggregate(
+            PathwayInfo.objects.aggregate(
                 build_multi_search_aggregation(q, ["pathway_id", "pathway_name"])
                 + [{"$project": {"_id": 0, "pathway_id": 1, "pathway_name": 1}}]
             )
         )
-
-        # Get the filtered genes from the DB: ----
-        # gene_keys = [
-        #     "gene",
-        #     "cog_category",
-        #     "cog_name",
-        #     "description",
-        #     "protein",
-        #     "pfams",
-        #     "frequency",
-        #     "pangenomic_class",
-        #     "pangenome_analysis",
-        # ]
-        # genes = list(
-        #     GeneAnnotations.objects.mongo_aggregate(
-        #         build_multi_search_aggregation(q, ["gene", "protein", "pfams"])
-        #         + [{"$project": {gk: int(gk != "_id") for gk in ["_id"] + gene_keys}}]
-        #     )
-        # )
-        # genes = [[g.get(gk, None) for gk in gene_keys] for g in genes]
         genes = []
 
     else:  # if the cleaned query string is too short or not set, just return the empty DFs: ----
@@ -138,7 +118,7 @@ def gene_annotation_json(request):
         "pangenome_analysis",
     ]
     genes = list(
-        GeneAnnotations.objects.mongo_aggregate(
+        GeneAnnotations.objects.aggregate(
             build_multi_search_aggregation(q, ["gene", "protein", "pfams"])
             + [{"$project": {gk: int(gk != "_id") for gk in ["_id"] + gene_keys}}]
         )

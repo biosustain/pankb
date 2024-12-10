@@ -6,4 +6,4 @@ sass ./style/scss/custom.scss /static/css/custom.css
 
 # DJANGO_SUPERUSER_PASSWORD=$SUPER_USER_PASSWORD python manage.py createsuperuser --username $SUPER_USER_NAME --email $SUPER_USER_EMAIL --noinput
 
-gunicorn django_project.wsgi:application --bind 0.0.0.0:8000 --timeout 1800
+gunicorn django_project.wsgi:application --bind 0.0.0.0:8000 --timeout 1800 -w 5

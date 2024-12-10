@@ -10,7 +10,7 @@ from .models import Publication
 def publications(request):
   template = loader.get_template('publications/publications.html')
 
-  publications = Publication.objects.filter().values("title", "source")
+  publications = Publication.objects.find(projection=["title", "source"])
   publications = list(publications)
   
   # Compose a context for the template rendering
