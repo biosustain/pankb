@@ -23,7 +23,7 @@
       overflow: hidden;
     }
     html {
-      font-size: 18px; /* Base font size for larger screens */
+      font-size: 1rem; /* Base font size for larger screens */
     }
   </style>
 </head>
@@ -48,21 +48,24 @@
         plotBorderWidth: 1,
         plotBorderColor: '#000000'
       },
+      // title: {
+      //   text: 'dN/dS Ratios for ' + species_name + ' genomes',
+      //   align: 'center',
+      //   style: {
+      //     fontSize: (1.1 * coefficient) + 'em',
+      //     color: '#000000'
+      //   },
+      //   x: 38 * coefficient
+      // },
       title: {
-        text: 'dN/dS Ratios for ' + species_name + ' genomes',
-        align: 'center',
-        style: {
-          fontSize: (1.1 * coefficient) + 'em',
-          color: '#000000'
-        },
-        x: 38 * coefficient
+        text: '',
       },
       xAxis: {
         type: 'logarithmic',
         title: {
           text: 'Number of synonymous codons per gene',
           style: {
-            fontSize: coefficient + 'em',
+            fontSize: 1 + 'rem',
             color: '#000000'
           }
         },
@@ -70,7 +73,7 @@
           align: 'center',
           enable: true,
           style: {
-            fontSize: (0.9 * coefficient) + 'em',
+            fontSize: 0.9 + 'rem',
             color: '#000000'
           }
         },
@@ -84,7 +87,7 @@
         title: {
           text: 'Number of non-synonymous codons per gene',
           style: {
-            fontSize: coefficient + 'em',
+            fontSize: 1 + 'rem',
             color: '#000000'
           }
         },
@@ -92,7 +95,7 @@
           align: 'center',
           enable: true,
           style: {
-            fontSize: (0.9 * coefficient) + 'em',
+            fontSize: 0.9 + 'rem',
             color: '#000000'
           }
         },

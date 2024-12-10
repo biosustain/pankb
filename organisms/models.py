@@ -9,7 +9,8 @@ class Organisms(models.Model):
    gene_class_distribution = models.CharField(max_length=20)
    genomes_num = models.IntegerField()
    pangenome_analysis = models.CharField(max_length=40)
+   objects = models.DjongoManager()
 
    class Meta:
-       managed = True  # tells Django not to manage the table’s creation, modification, and deletion
+       managed = False
        db_table = 'pankb_organisms'

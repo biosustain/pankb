@@ -1,8 +1,9 @@
 {% load static %}
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8">
     <style>
         html, body, #plot {
@@ -11,9 +12,6 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-        }
-        html {
-            font-size: 18px;
         }
     </style>
 </head>
@@ -30,16 +28,19 @@
 
     const template_screen_width = 746;
     const current_window_Width = window.innerWidth;
-    const coefficient = current_window_Width / template_screen_width;
+    const coefficient = 1.0; //current_window_Width / template_screen_width;
 
+    function range(size, startAt = 0) {
+        return [...Array(size).keys()].map(i => i + startAt);
+    }
     // Data
     var data = {{ dataset|safe }}
-    const x_core = data['x_core'];
     const avg_core = data['avg_core'];
-    const x_acc = data['x_acc'];
+    const x_core = range(avg_core.length, 1);
     const avg_acc = data['avg_acc'];
-    const x_pan = data['x_pan'];
+    const x_acc = range(avg_acc.length, 1);
     const avg_pan = data['avg_pan'];
+    const x_pan = range(avg_pan.length, 1);
     const max_frequency_count = data['max_frequency_count'];
     const alpha = roundToDecimal(data['alpha'], 3)
 
@@ -80,20 +81,20 @@
         autosize: true,
         margin: {
             l: 80 * coefficient, // left margin
-            r: 60 * coefficient, // right margin
+            r: 20 * coefficient, // right margin
             b: 60 * coefficient, // bottom margin
-            t: 80 * coefficient, // top margin
+            t: 20 * coefficient, // top margin
             pad: 0 // padding
         },
         xaxis: {
             title: 'Number of Genomes',
             titlefont: {
-                size: 16 * coefficient,
+                size: 16,
                 family: 'Arial, sans-serif',
                 color: '#000000'
             },
             tickfont: {
-                size: 16 * coefficient,
+                size: 16,
                 family: 'Arial, sans-serif',
                 color: '#000000'
             },
@@ -103,12 +104,12 @@
         yaxis: {
             title: 'Pangenome Size',
             titlefont: {
-                size: 16 * coefficient,
+                size: 16,
                 family: 'Arial, sans-serif',
                 color: '#000000'
             },
             tickfont: {
-                size: 16 * coefficient,
+                size: 16,
                 family: 'Arial, sans-serif',
                 color: '#000000'
             },
@@ -118,15 +119,18 @@
             showline: true,
             tickwidth: 1
         },
+        // title: {
+        //     text: "Heap's Law",
+        //     font: {
+        //         family: 'Arial, sans-serif',
+        //         size: 20 * coefficient,
+        //         color: '#000000'
+        //     },
+        //     xref: 'paper',
+        //     x: 0.5
+        // },
         title: {
-            text: "Heap's Law",
-            font: {
-                family: 'Arial, sans-serif',
-                size: 20 * coefficient,
-                color: '#000000'
-            },
-            xref: 'paper',
-            x: 0.5
+            text: null,
         },
         legend: {
             x: 0.5,
@@ -136,7 +140,7 @@
             orientation: 'h',
             font: {
                 family: 'Arial, sans-serif',
-                size: 16 * coefficient,
+                size: 16,
                 color: '#000000'
             },
         },
@@ -149,7 +153,7 @@
                 text: '\u03BB = ' + alpha,
                 showarrow: false,
                 font: {
-                    size: 16 * coefficient,
+                    size: 16,
                     color: 'black'
                 }
             }
@@ -184,11 +188,6 @@
             Plotly.relayout('plot', update);
         }
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        loadJSONAndCreatePlot();
-
-    });
 </script>
 </body>
 </html>

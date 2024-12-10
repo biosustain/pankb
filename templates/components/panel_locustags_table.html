@@ -1,0 +1,170 @@
+{% extends "components/panel_universal.html" %}
+{% block panel_header %}
+{% if page == "gene_info" %}
+<form action="{% url 'download_gene_info_table_csv' %}" method="GET" style="display: inline">
+    <input type="hidden" name="species" value="{{ request.GET.species }}" />
+    <input type="hidden" name="gene" value="{{ request.GET.gene }}" />
+    <button class="btn btn-outline-dark btn-sm" type="submit"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" style="display: inline; position: relative; top: -2px;" fill="currentColor" class="bi bi-filetype-csv" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5zM3.517 14.841a1.13 1.13 0 0 0 .401.823q.195.162.478.252.284.091.665.091.507 0 .859-.158.354-.158.539-.44.187-.284.187-.656 0-.336-.134-.56a1 1 0 0 0-.375-.357 2 2 0 0 0-.566-.21l-.621-.144a1 1 0 0 1-.404-.176.37.37 0 0 1-.144-.299q0-.234.185-.384.188-.152.512-.152.214 0 .37.068a.6.6 0 0 1 .246.181.56.56 0 0 1 .12.258h.75a1.1 1.1 0 0 0-.2-.566 1.2 1.2 0 0 0-.5-.41 1.8 1.8 0 0 0-.78-.152q-.439 0-.776.15-.337.149-.527.421-.19.273-.19.639 0 .302.122.524.124.223.352.367.228.143.539.213l.618.144q.31.073.463.193a.39.39 0 0 1 .152.326.5.5 0 0 1-.085.29.56.56 0 0 1-.255.193q-.167.07-.413.07-.175 0-.32-.04a.8.8 0 0 1-.248-.115.58.58 0 0 1-.255-.384zM.806 13.693q0-.373.102-.633a.87.87 0 0 1 .302-.399.8.8 0 0 1 .475-.137q.225 0 .398.097a.7.7 0 0 1 .272.26.85.85 0 0 1 .12.381h.765v-.072a1.33 1.33 0 0 0-.466-.964 1.4 1.4 0 0 0-.489-.272 1.8 1.8 0 0 0-.606-.097q-.534 0-.911.223-.375.222-.572.632-.195.41-.196.979v.498q0 .568.193.976.197.407.572.626.375.217.914.217.439 0 .785-.164t.55-.454a1.27 1.27 0 0 0 .226-.674v-.076h-.764a.8.8 0 0 1-.118.363.7.7 0 0 1-.272.25.9.9 0 0 1-.401.087.85.85 0 0 1-.478-.132.83.83 0 0 1-.299-.392 1.7 1.7 0 0 1-.102-.627zm8.239 2.238h-.953l-1.338-3.999h.917l.896 3.138h.038l.888-3.138h.879z"/>
+      </svg></button>
+</form>
+{% endif %}
+{% endblock %}
+{% block panel_content %}
+<table id="locustags_table" class="table table-hover" style="width: 100%;">
+    <thead>
+    <tr>
+        <th class="text-center">{% if show_pankb_locus_tag %}PanKB Locus Tag{% else %}&nbsp;{% endif %}</th>
+        <th class="text-center">NCBI Locus Tag</th>
+        {% if page == "gene_info" %}
+        <th class="text-center">Genome ID</th>
+        {% else %}
+        <th class="text-center">Gene</th>
+        {% endif %}
+        <th class="text-center">Protein</th>
+        <th class="text-center">Start Position</th>
+        <th class="text-center">End Position</th>
+        <th class="text-center">Nucleotide Seq</th>
+        <th class="text-center">Amino Acid Seq</th>
+    </tr>
+    </thead>
+    <tbody id="tbody">
+    </tbody>
+    <tfoot>
+        <tr>
+            <th class="text-center">{% if show_pankb_locus_tag %}PanKB Locus Tag{% else %}&nbsp;{% endif %}</th>
+            <th class="text-center">NCBI Locus Tag</th>
+            {% if page == "gene_info" %}
+            <th class="text-center">Genome ID</th>
+            {% else %}
+            <th class="text-center">Gene</th>
+            {% endif %}
+            <th class="text-center">Protein</th>
+            <th class="text-center">Start Position</th>
+            <th class="text-center">End Position</th>
+            <th class="text-center">Nucleotide Seq</th>
+            <th class="text-center">Amino Acid Seq</th>
+        </tr>
+    </tfoot>
+</table>
+<script>
+    function get_original_locus_tag_info(row) {
+        if (("original_locus_tag" in row) && row["original_locus_tag"]) {
+            let original_locus_tag = row["original_locus_tag"]
+            let original_gene = "";
+            let prefix = "";
+            if ("original_gene" in row) {
+                original_gene = row["original_gene"];
+            }
+            if (!row["original_exact_match"]) {
+                prefix = "<span data-toggle=\"tooltip\" data-placement=\"top\" title=\"Approximate match\">&plusmn; </span>";
+            }
+            if (original_gene && (original_gene !== original_locus_tag)) {
+                return `${prefix}${original_locus_tag} <i>(${original_gene})</i>`;
+            } else {
+                return `${prefix}${original_locus_tag}`;
+            }
+        } else {
+            return "-";
+        }
+    }
+
+    $(document).ready(async function () {
+        let geneData = {{ dataset | safe }}; // Convert the data object to an array for DataTables
+
+        let table = $('#locustags_table').DataTable({
+            data: geneData,
+            autoWidth: true,
+            fixedColumns: true,
+            scrollX: true,
+            columns: [
+                { 
+                    data: 'locus_tag',
+                    render: function(data, type, row) {
+                        {% if show_pankb_locus_tag %}
+                        return "<a href='{% url 'genome_gene_info' %}?species={{request.GET.species|safe}}&genome_id=" + encodeURIComponent(row["genome_id"]) + "&gene=" + encodeURIComponent(row["gene"]) + "'>" + data + "</a>";
+                        {% else %}
+                        return "<a href='{% url 'genome_gene_info' %}?species={{request.GET.species|safe}}&genome_id=" + encodeURIComponent(row["genome_id"]) + "&gene=" + encodeURIComponent(row["gene"]) + "'><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-info-square\" viewBox=\"0 0 16 16\"><path d=\"M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z\"/><path d=\"m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0\"/></svg></a>";
+                        {% endif %}
+                    },
+                },
+                { 
+                    data: 'gene',
+                    render: function(data, type, row) {
+                        return get_original_locus_tag_info(row);
+                    },
+                },
+                {% if page == "gene_info" %}
+                {
+                    data: 'genome_id',
+                    render: function(data, type, row) {
+                        return '<a href="{% url 'genome_info' %}?species={{request.GET.species|safe}}&genome_id=' + encodeURIComponent(data) + '" target="_blank">' + data + '</a>';
+                    },
+                },
+                {% else %}
+                {
+                    data: 'gene',
+                    render: function(data, type, row) {
+                        return '<a href="{% url 'gene_info' %}?species={{request.GET.species|safe}}&gene=' + encodeURIComponent(data) + '" target="_blank">' + data + '</a>';
+                    },
+                },
+                {% endif %}
+                {
+                    data: 'protein',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '160px')
+                    },
+                },
+                {
+                    data: 'start_position',
+                },
+                {
+                    data: 'end_position',
+                },
+                {
+                    data: 'nucleotide_seq',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '160px')
+                    },
+                },
+                {
+                    data: 'aminoacid_seq',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '160px')
+                    },
+                },
+            ],
+            language: {
+                emptyTable: 'Loading...'
+            },
+            order: [],
+            bSort: true,
+            searching: true,
+            initComplete: function () {
+                this.api()
+                    .columns()
+                    .every(function () {
+                        var column = this;
+                        var title = column.footer().textContent;
+        
+                        // Create input element and add event listener
+                        $('<input type="text" class="form-control" placeholder="' + title + '" />')
+                            .appendTo($(column.footer()).empty())
+                            .on('keyup change clear', function () {
+                                if (column.search() !== this.value) {
+                                    column.search(this.value).draw();
+                                }
+                            });
+                    });
+            },
+        });
+
+        // Expand or collapse a table row on click: ----
+        $('#locustags_table tbody').on('click', 'td', function () {
+            let row = $(this).closest('tr')
+            row.toggleClass('expanded-row');
+        });
+
+    });
+</script>
+{% endblock %}

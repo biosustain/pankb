@@ -1,0 +1,151 @@
+{% extends "components/panel_universal.html" %}
+{% block panel_content %}
+<table id="genes_table" class="table table-hover display" style="width: 100%;">
+    <thead>
+    <tr>
+        <th>Gene</th>
+        <th>Class</th>
+        <th>COG</th>
+        <th>COG Name</th>
+        <th>Description</th>
+        <th>Protein</th>
+        <th>PFAMs</th>
+        <th>Count</th>
+    </tr>
+    </thead>
+    <tbody id="tbody">
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Gene</th>
+            <th data-get="class">Class</th>
+            <th>COG</th>
+            <th>COG Name</th>
+            <th>Description</th>
+            <th>Protein</th>
+            <th>PFAMs</th>
+            <th class="no_search"></th>
+        </tr>
+    </tfoot>
+</table>
+<script>
+    var genes_table = null;
+    const urlParams = new URLSearchParams(window.location.search);
+
+    $(document).ready(async function () {
+        genes_table = $('#genes_table').DataTable({
+            // data: Gene,
+            serverSide: true,
+            ajax: {
+                url: '{% url "pangenome_analyses_gene_annotation_json" %}',
+                data: {pangenome_analysis: '{{ pangenome_analysis | safe}}'},
+                dataSrc: 'data',
+            },
+            autoWidth: true,
+            fixedColumns: true,
+            scrollX: true,
+            lengthMenu: [
+                [10, 20, 30, 40, 50, 100, -1],
+                [10, 20, 30, 40, 50, 100, 'All']
+            ],
+            columns: [
+                {
+                    data: '0',
+                    name: 'gene',
+                    render: function (data, type, row) {
+                        return '<a href=" {% url 'gene_info' %}?species=' + row[8] + '&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
+                    },
+                },
+                {
+                    data: '7',
+                    name: 'pangenomic_class',
+                },
+                {
+                    data: '1',
+                    name: 'cog_category',
+                },
+                {
+                    data: '2',
+                    name: 'cog_name',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '160px')
+                    },
+                },
+                {
+                    data: '3',
+                    name: 'description',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '240px')
+                    },
+                },
+                {
+                    data: '4',
+                    name: 'protein',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '220px')
+                    },
+                    className: 'protein',
+                },
+                {
+                    data: '5',
+                    name: 'pfams',
+                    render: function (data, type, row) {
+                        let new_data = data;
+                        if (data === null) {
+                            new_data = "-";
+                        } else if (Array.isArray(data)) {
+                            new_data = data.join(', ');
+                        }
+                        return wrap_table_text(new_data, '120px')
+                    },
+                    className: 'pfams',
+                },
+                {
+                    data: '6',
+                    name: 'frequency',
+                    searchable: false,
+                    width: '80px',
+                }
+            ],
+            language: {
+                loadingRecords: 'Loading...',
+                zeroRecords: 'Result not found.'
+            },
+            initComplete: function () {
+                this.api()
+                    .columns()
+                    .every(function () {
+                        var column = this;
+                        var title = column.footer().textContent;
+                        var footer = $(column.footer());
+                        var searchable = !footer.hasClass("no_search");
+                        if (searchable) {
+                            // Create input element and add event listener
+                            let value = "";
+                            let data_get = footer.data("get");
+                            if (data_get) {
+                                let data_get_value = urlParams.get(data_get);
+                                if (data_get_value) {
+                                    value = ' value="' + data_get_value + '"';
+                                }
+                            }
+                            $('<input type="text" class="form-control" placeholder="' + title + '"' + value + ' />')
+                                .appendTo($(column.footer()).empty())
+                                .on('keyup change clear', function () {
+                                    if (column.search() !== this.value) {
+                                        column.search(this.value).draw();
+                                    }
+                                }).keyup();
+                        }
+                    });
+            }
+        });
+
+        // Expand row on click
+        $('#genes_table tbody').on('click', 'td', function () {
+            const row = $(this).closest('tr');
+            row.toggleClass('expanded-row');
+        });
+    });
+</script>
+{% endblock %}

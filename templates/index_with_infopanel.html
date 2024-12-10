@@ -1,0 +1,36 @@
+{% extends "index_scrollspy.html" %}
+{% block content %}
+{% block header_content %}{% endblock %}
+<script>
+    function toggle_infopanel() {
+        var infopanel = document.getElementById('infopanel');
+        infopanel.classList.toggle('col-md-4');
+        infopanel.classList.toggle('col-lg-3');
+        infopanel.classList.toggle('col-xl-2');
+        infopanel.classList.toggle('d-md-none');
+        var maincontent = document.getElementById('maincontent');
+        maincontent.classList.toggle('col-md-8');
+        maincontent.classList.toggle('col-lg-9');
+        maincontent.classList.toggle('col-xl-10');
+        maincontent.classList.toggle('col-12');
+        var infopanel_toggle = document.getElementById('infopanel-toggle-top');
+        infopanel_toggle.classList.toggle('d-md-block');
+    }
+</script>
+<div id="infopanel-toggle-top" class="d-none" style="width: 24px; height: 20px; margin-bottom: -20px; position: relative; top: 2px; left: 2px; z-index: 5001;">
+    <a href="#" onclick="toggle_infopanel();"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#cccdce" class="bi bi-arrow-right-square-fill" viewBox="0 0 16 16">
+        <path d="M0 14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2zm4.5-6.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5a.5.5 0 0 1 0-1"/>
+      </svg></a>
+</div>
+<main class="container-fluid pb-4 ps-2 pe-2 ps-md-3 pe-md-3" style="overflow-x: hidden;">
+    <div class="row">
+        <div id="infopanel" class="col-md-4 col-lg-3 col-xl-2 ps-2 pe-2">
+            {% block infopanel_content %}{% endblock %}
+        </div>
+        <div id="maincontent" class="col-md-8 col-lg-9 col-xl-10 ps-0 pe-0 pt-2 pb-2">
+            {% block main_content %}{% endblock %}
+        </div>
+    </div>
+</main>
+{% block footer_content %}{% endblock %}
+{% endblock %}

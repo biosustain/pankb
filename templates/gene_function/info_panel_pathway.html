@@ -1,0 +1,12 @@
+{% extends "info_panel.html" %}
+
+{% block info_panel_titles %}
+<h5 class="card-title display-5">{{ pathway_id }}</h5>
+{% endblock %}
+
+{% block info_panel_nav %}{% endblock %}
+
+{% block info_panel_content %}
+<h6 class="card-subtitle mb-2 text-body-secondary display-6 pt-1">{{ pathway_name }}</h6>
+<a style="color: var(--bs-body-secondary-color); text-decoration-color: var(--bs-body-secondary-color) !important;" href="{{ pathway_kegg_link }}" target="_blank">(KEGG)</a>
+{% endblock %}
