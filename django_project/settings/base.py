@@ -15,8 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = "/app"
 
-AZURE_WEB_DATA_URL = "https://pankb.blob.core.windows.net/data/PanKB/web_data_v2/"
-
 # SECURITY WARNING: don't run with debug turned on in production!
 if os.environ['PROJECT_SERVER'] == 'dev':
     DEBUG = True

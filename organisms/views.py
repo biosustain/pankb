@@ -1,9 +1,7 @@
-from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 from .models import Organisms
-import json, requests, csv, time
-import pandas as pd
+import json, csv, time
 
 HIGHLIGHTED_SPECIES = ["Bacillus_subtilis", "Escherichia_coli", "Limosilactobacillus_reuteri", "Pseudomonas_E_putida", "Streptomyces_albidoflavus", "Vibrio_natriegens"]
 
@@ -16,11 +14,11 @@ def organisms(request):
   if family:  # if the family get parameter is set
     filter_params['family'] = family
   # Get the filtered or full table with organisms: ----
-  organisms = Organisms.objects.filter(**filter_params).values('family', 'species', 'pangenome_analysis', 'openness', 'genomes_num', 'gene_class_distribution')
-  organisms_pd = pd.DataFrame(list(organisms), index=None)
-  organisms_pd["highlight"] = organisms_pd["pangenome_analysis"].isin(HIGHLIGHTED_SPECIES).astype(int)
-  organisms_list = organisms_pd.values.tolist()
-  organisms_json = json.dumps(organisms_list, default=str)  # json dumps replaces the single quotes with the double ones
+  org_keys = ['family', 'species', 'pangenome_analysis', 'openness', 'genomes_num', 'gene_class_distribution']
+  organisms = Organisms.objects.find(filter_params, org_keys)
+
+  organisms = [([org[k] for k in org_keys] + [int(org["pangenome_analysis"] in HIGHLIGHTED_SPECIES)]) for org in organisms]
+  organisms_json = json.dumps(organisms, default=str)  # json dumps replaces the single quotes with the double ones
   # Compose the render context: ----
   context = {
     'dataset': organisms_json
@@ -39,7 +37,7 @@ def download_organisms_table_csv(request):
     downloaded_file_name = "Organisms__" + family + "__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
 
   # Get the filtered or full table with organisms as a list of dictionaries: ----
-  organisms = Organisms.objects.filter(**filter_params).values('family', 'species', 'openness', 'genomes_num', 'gene_class_distribution')
+  organisms = list(Organisms.objects.find(filter_params, ['family', 'species', 'openness', 'genomes_num', 'gene_class_distribution']))
 
   # Create the HttpResponse object with the appropriate CSV header.
   response = HttpResponse(content_type="text/csv")
