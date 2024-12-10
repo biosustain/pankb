@@ -23,7 +23,7 @@ def gene_info(request):
   species = request.GET['species']
   gene = request.GET['gene']
 
-  pw_agg = GeneAnnotations.objects.mongo_aggregate([
+  pw_agg = GeneAnnotations.objects.aggregate([
     {
       "$match": {"gene" : gene, "pangenome_analysis": species}
     },
@@ -55,22 +55,20 @@ def gene_info(request):
   filter_params['pangenome_analysis'] = species
   filter_params['gene'] = gene
   # Obtain the gene info: ----
-  gene_info = GeneInfo.objects.filter(**filter_params).values()
-  gene_info = list(gene_info)
+  gene_info = list(GeneInfo.objects.find(filter_params, {"_id": 0}))
 
   imodulon_info = []
 
   for g in gene_info:
-    del g["_id"]
     if "imodulon_data" in g and not g["imodulon_data"] is None:
       im_data = g["imodulon_data"]
       for m in im_data:
         m["genome_id"] = g["genome_id"]
       imodulon_info.extend(im_data)
-    del g["imodulon_data"]
+    if "imodulon_data" in g:
+      del g["imodulon_data"]
 
   # # Transform the df to a list of dictionaries: ----
-  # gene_info_dict = gene_info_pd.to_dict(orient = "records")
   gene_info_json = json.dumps(gene_info, default = str)  # json dumps replaces the single quotes with the double ones
 
   deferred_msa_load = pw_agg["frequency"] > 200
@@ -93,38 +91,21 @@ def download_gene_info_table_csv(request):
   gene = request.GET.get('gene')
   downloaded_file_name = "Gene_Info__" + species + "__" + gene + "__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
 
+  fields = ["locus_tag", "genome_id", "gene", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq", "species", "original_locus_tag", "original_gene", "original_exact_match"]
+
   # Set the filter() function parameters: ----
   filter_params = {}
   filter_params['pangenome_analysis'] = species
   filter_params['gene'] = gene
   # Obtain the gene info: ----
-  gene_info = GeneInfo.objects.filter(**filter_params).values()
-  # Transform the data to the dataframe first and remove a columns with ids (not needed in the output): ----
-  gene_info_pd = pd.DataFrame(list(gene_info), index=None)
-  del gene_info_pd['_id']
-
-  # Obtain the list of all genomes containing the given gene: ----
-  genome_ids_list = list(set(gene_info_pd["genome_id"]))
-
-  # Leave only the columns of interest in the output: ----
-  gene_info_pd = gene_info_pd[["locus_tag", "genome_id", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq"]]
-
-  # Transform positions of the gene in the genome from float (as the start and end position are stored in the MongoDB) to int: ----
-  gene_info_pd["start_position"] = gene_info_pd["start_position"].astype(np.int64)
-  gene_info_pd["end_position"] = gene_info_pd["end_position"].astype(np.int64)
-  # ... and sort by the positions: ----
-  gene_info_pd = gene_info_pd.sort_values(by=['start_position', 'end_position'])
-
-  # Transform the df to a list of dictionaries
-  # (the list of dictionaries will serve as the input to csv.DictWriter): ----
-  gene_info_dict = gene_info_pd.to_dict(orient = "records")
+  gene_info = list(GeneInfo.objects.find(filter_params, fields, sort=[("start_position", 1), ("end_position", 1)]))
 
   # Create the HttpResponse object with the appropriate CSV header.
   response = HttpResponse(content_type="text/csv")
   response['Content-Disposition'] = f"attachment; filename=" + downloaded_file_name
-  writer = csv.DictWriter(response, fieldnames=["locus_tag", "genome_id", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq"])
+  writer = csv.DictWriter(response, fieldnames=fields)
   writer.writeheader()
-  writer.writerows(gene_info_dict)
+  writer.writerows(gene_info)
   return response
 
 
@@ -135,8 +116,8 @@ def aa_pos_overview(request):
   species = request.GET['species']
   gene = request.GET['gene']
 
-  organism_info = Organisms.objects.get(pangenome_analysis=species)
-  num_genomes = organism_info.genomes_num
+  organism_info = Organisms.objects.find_one({"pangenome_analysis": species})
+  num_genomes = organism_info["genomes_num"]
 
   url2 = settings.AZURE_WEB_DATA_URL + 'species/' + species + '/panalleleome/gene_data/' + gene + '/' + gene + '_pan_aa_thresh_core_dom_var_pos.csv'    # the url of the respective csv file stored on the Microsoft Azure Blob Storage
   r2 = requests.get(url2)
@@ -207,7 +188,7 @@ def genome_info(request):
   genome_info_dict = _get_genome_and_isolation_info(filter_params)
 
   # Obtain the gene info: ----
-  gene_info = GeneInfo.objects.filter(pangenome_analysis=species, genome_id=genome_id).values('gene', 'locus_tag', 'pangenome_analysis', 'genome_id', 'original_locus_tag', 'original_gene', 'original_exact_match', 'protein', 'start_position', 'end_position', 'nucleotide_seq', 'aminoacid_seq')
+  gene_info = GeneInfo.objects.find({"pangenome_analysis": species, "genome_id": genome_id}, ['gene', 'locus_tag', 'pangenome_analysis', 'genome_id', 'original_locus_tag', 'original_gene', 'original_exact_match', 'protein', 'start_position', 'end_position', 'nucleotide_seq', 'aminoacid_seq'])
   gene_info = list(gene_info)
 
   # Compose a context for the template rendering: ----
@@ -262,7 +243,7 @@ def genome_gene_info(request):
   else:
     raise Http404()
 
-  gene_info = GeneInfo.objects.filter(**filter_params).values('locus_tag', 'genome_id', 'gene', 'protein', 'start_position', 'end_position', 'nucleotide_seq', 'aminoacid_seq', 'species', 'pangenome_analysis', 'original_locus_tag', 'original_gene', 'original_exact_match')
+  gene_info = list(GeneInfo.objects.find(filter_params, ['locus_tag', 'genome_id', 'gene', 'protein', 'start_position', 'end_position', 'nucleotide_seq', 'aminoacid_seq', 'species', 'pangenome_analysis', 'original_locus_tag', 'original_gene', 'original_exact_match']))
   if len(gene_info) == 0:
     raise Http404()
   gene_info = list(gene_info)
@@ -292,28 +273,11 @@ def pathway_info(request):
   pathway_id = request.GET['pathway_id']
 
   try:
-    pathway_info = PathwayInfo.objects.get(pathway_id=pathway_id)
+    pathway_info = PathwayInfo.objects.find_one({"pathway_id": pathway_id}, {"_id": 0})
   except PathwayInfo.DoesNotExist:
     raise Http404()
-  pathway_info_dict = model_to_dict(pathway_info, exclude=["_id"])
+  # pathway_info_dict = model_to_dict(pathway_info, exclude=["_id"])
   pathway_kegg_link = f"https://www.kegg.jp/pathway/{pathway_info.pathway_id}"
-
-  # Obtain info about the pathway genes: ----
-  # pa_genes = pathway_info_dict["genes"]
-  # genes_info = []
-  # for i in range(0, len(pa_genes), 5000):
-  #   g = GeneAnnotations.objects.mongo_find({"pa_gene": {"$in": pa_genes[i:min((i+1)*5000, len(pa_genes))]}}, {"_id": 0, "pa_gene": 0, "brite": 0, "ec": 0, "kegg_reaction": 0, "kegg_module": 0, "kegg_tc": 0, "pfams": 0, "kegg_pathway": 0, "eggnog_ogs": 0, "cazy": 0, "cog_category": 0, "cog_name": 0, "description": 0, "frequency": 0})
-  #   genes_info.extend(g)
-  # genes_info = list(GeneAnnotations.objects.mongo_find({"kegg_pathway": pathway_id}, {"_id": 0, "gene": 1, "pangenome_analysis": 1, "species": 1, "family": 1, "protein": 1, "pangenomic_class": 1, "kegg_ko": 1}))
-
-  # for d in genes_info:
-  #   kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway_id}"
-  #   if d["kegg_ko"]:
-  #     kegg_link = kegg_link  + '/' + '/'.join(d["kegg_ko"])
-  #   d["kegg_link"] = kegg_link
-
-  # Substitute the index with our own: ----
-  # genes_info_json = json.dumps(genes_info, default=str)
 
   # Compose a context for the template rendering: ----
   context = {
@@ -333,7 +297,7 @@ def pathway_gene_annotation_json(request):
     {"$project": {gk: 1 for gk in gene_keys}} # This projection keeps document size smaller
     ]
 
-  response = create_datatables_api(GeneAnnotations.objects.mongo_aggregate, request.GET, select_pipeline, gene_keys, as_list=False)
+  response = create_datatables_api(GeneAnnotations.objects.aggregate, request.GET, select_pipeline, gene_keys, as_list=False)
 
   for d in response["data"]:
     kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway_id}"

@@ -1,12 +1,10 @@
-from django.shortcuts import render
 from django.http import HttpResponse, Http404, StreamingHttpResponse, JsonResponse
 from django.template import loader
 from django.conf import settings
 from .models import GeneAnnotations
 from gene_function.models import GenomeInfo
 from organisms.models import Organisms
-import json, requests, io, gzip, csv, time
-import pandas as pd
+import json, requests, gzip, csv, time
 import re
 
 
@@ -22,7 +20,7 @@ def overview(request):
   filter_params = {}
   filter_params['pangenome_analysis'] = species
   # Get info about the given organisms from the Organisms collection (in a dictionary): ----
-  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')
+  organism_info = list(Organisms.objects.find(filter_params, ['species', 'family', 'genomes_num', 'gene_class_distribution', 'openness']))
   if len(organism_info) == 0:
     raise Http404()
   organism_info = organism_info[0]
@@ -221,26 +219,14 @@ def gene_annotation(request):
   filter_params['pangenome_analysis'] = species
 
   # Get info about the given organisms from the Organisms collection (in a dictionary): ----
-  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')
+  organism_info = list(Organisms.objects.find(filter_params, ['species', 'family', 'genomes_num', 'gene_class_distribution', 'openness']))
   if len(organism_info) == 0:
     raise Http404()
   organism_info = organism_info[0]
 
-  # # Get the gene annotations info form the Gene Annotations collection: ----
-  # gene_annotations = GeneAnnotations.objects.filter(**filter_params).values('gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class', 'pangenome_analysis')
-
-  # # Transform the QuerySet with gene annotations into a pandas df: ----
-  # gene_annotations_pd = pd.DataFrame(list(gene_annotations), index=None)
-  # # Transform the dataframe with gene annotations into a list of lists (imposed by the front-end JS):
-  # ga_list_of_lists = gene_annotations_pd.values.tolist()
-  # Transform the list of lists into a JSON object: ---
-  ga_list_of_lists = []
-  gene_annotations_json = json.dumps(ga_list_of_lists, default=str)
-
   # Compose a context for the template rendering
   context = {
     'speciesData': organism_info,
-    'dataset': gene_annotations_json,
     'pangenome_analysis': species,
   }
   return HttpResponse(template.render(context, request))
@@ -255,7 +241,7 @@ def genome(request):
   filter_params['pangenome_analysis'] = species
 
   # Get info about the given organisms from the Organisms collection (in a dictionary): ----
-  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')
+  organism_info = list(Organisms.objects.find(filter_params, ['species', 'family', 'genomes_num', 'gene_class_distribution', 'openness']))
   if len(organism_info) == 0:
     raise Http404()
   organism_info = organism_info[0]
@@ -273,11 +259,12 @@ def download_gene_annotation_table_csv(request):
   species = request.GET.get('species')
   downloaded_file_name = "Gene_annotations__" + species + "__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
 
-  # Adjust filter parameters based on the GET paramater value: ----
-  filter_params = {}
-  filter_params['pangenome_analysis'] = species
   # Get a table with gene_annotations as a list of dictionaries: ----
-  gene_annotations = GeneAnnotations.objects.filter(**filter_params).values('gene', 'pangenomic_class', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency').order_by('gene')
+  gene_annotations = GeneAnnotations.objects.find(
+    {'pangenome_analysis': species},
+    ['gene', 'pangenomic_class', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency'],
+    sort=[('gene', 1)]
+    )
 
   # Transform a list of dictionaries into a list of lists: ----
   rows = list(map(lambda x: list(x.values()), gene_annotations))
@@ -306,7 +293,7 @@ def phylogenetic_tree(request):
   filter_params = {}
   filter_params['pangenome_analysis'] = species
   # Get info about the given organisms from the Organisms collection (in a dictionary): ----
-  organism_info = Organisms.objects.filter(**filter_params).values('species', 'family', 'genomes_num', 'gene_class_distribution', 'openness')
+  organism_info = list(Organisms.objects.find(filter_params, ['species', 'family', 'genomes_num', 'gene_class_distribution', 'openness']))
   if len(organism_info) == 0:
     raise Http404()
   organism_info = organism_info[0]
@@ -490,7 +477,7 @@ def gene_annotation_json(request):
   gene_keys = ['gene', 'cog_category', 'cog_name', 'description', 'protein', 'pfams', 'frequency', 'pangenomic_class', 'pangenome_analysis']
   select_pipeline = [{"$match": {"pangenome_analysis": pangenome_analysis}}]
 
-  response = create_datatables_api(GeneAnnotations.objects.mongo_aggregate, request.GET, select_pipeline, gene_keys)
+  response = create_datatables_api(GeneAnnotations.objects.aggregate, request.GET, select_pipeline, gene_keys)
 
   return JsonResponse(response)
 
@@ -499,7 +486,7 @@ def genome_json(request):
   genome_keys = ['pangenome_analysis', 'genome_id', 'strain', 'phylo_group', 'genome_len', 'gc_content', 'country', 'isolation_source', 'iso_cat']
   select_pipeline = GenomeInfo.get_genome_and_isolation_info_pipeline({"pangenome_analysis": pangenome_analysis})
 
-  response = create_datatables_api(GenomeInfo.objects.mongo_aggregate, request.GET, select_pipeline, genome_keys)
+  response = create_datatables_api(GenomeInfo.objects.aggregate, request.GET, select_pipeline, genome_keys)
 
   for d in response["data"]:
     x = d.pop(-1)

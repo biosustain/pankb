@@ -1,15 +1,7 @@
-from django.db import models
+from common import utils
 
-# Model representing info on the Organisms page: ----
-class Statistics(models.Model):
-   _id = models.CharField(max_length=24, primary_key=True)
-   date = models.DateTimeField()
-   pankb_dimensions = models.JSONField()
-   species_genome_gene = models.JSONField()
-   organism_genome_count = models.JSONField()
-   organism_gene_count = models.JSONField()
-   treemap = models.JSONField()
+class Statistics:
+    objects = utils.MongoDBObjects('pankb_stats')
 
-   class Meta:
-       managed = False
-       db_table = 'pankb_stats'
+    def get_latest():
+        return Statistics.objects.find().sort("date", -1).limit(1).next()
