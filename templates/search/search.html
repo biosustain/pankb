@@ -1,0 +1,21 @@
+{% load static %}
+<div class="navbar-expand-lg bg-searchbar border-bottom">
+    <form id="search-form" role="search" action="{% url 'search_results' %}">
+        <div class="container-wide">
+            <div id="search-row" class="row justify-content-center">
+                <div class="col-sm-12 col-md-10 col-lg-8 col-xl-7 pt-2 pb-2 d-flex">
+                    <div class="input-group">
+                        <input id="q" name="q" class="form-control search-input" type="search" placeholder="Search for a family, species, gene or annotation" aria-label="Search">
+                        <button class="btn btn-outline-light" type="submit"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-search" style="display: block;" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                        </svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="search-examples-wrapper" class="col-sm-12 col-md-10 col-lg-8 col-xl-7">
+                    <div id="search-examples" class="pb-1 fs-3 text-white">Examples: <a href="{% url 'search_results' %}?q=Limosilactobacillus+reuteri" class="link-light">Limosilactobacillus reuteri</a>, <a href="{% url 'search_results' %}?q=Rhamnolipid" class="link-light">Rhamnolipid</a>, <a href="{% url 'search_results' %}?q=adhE" class="link-light">adhE</a>, <a href="{% url 'search_results' %}?q=mannosylglycerate hydrolase" class="link-light">mannosylglycerate hydrolase</a>, <a href="{% url 'search_results' %}?q=lacto" class="link-light">lacto</a></div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,28 @@
+{% extends "index.html" %}
+{% block page_title %}Species{% endblock %}
+
+{% block header_load_datatables %}{% include 'tables/load_datatables.html' %}{% endblock %}
+
+{% block content %}
+{% include "navigation.html" with active_page="organisms" %}
+{% include "search/search.html" %}
+<main class="container-wide pb-4 ps-md-4 pe-md-4 pt-3 pb-3">
+    <div class="row">
+        {% include 'components/panel_species_table.html' with panel_name="species_table" panel_title="Species" panel_class="col-lg-12" highlight_species=True %}
+    </div>
+</div>
+</main>
+<script>
+    $(document).ready(async function () {
+        if ($(window).height() >= "2100"){
+            $('#species_table').DataTable().page.len(40).draw();
+        } else if ($(window).height() >= "1700"){
+            $('#species_table').DataTable().page.len(30).draw();
+        } else if ($(window).height() >= "1300"){
+            $('#species_table').DataTable().page.len(20).draw();
+        } else {
+            $('#species_table').DataTable().page.len(10).draw();
+        }
+    });
+</script>
+{% endblock %}

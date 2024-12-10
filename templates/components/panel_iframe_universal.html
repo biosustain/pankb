@@ -1,0 +1,7 @@
+{% extends "components/panel_universal.html" %}
+{% block panel_content %}
+{% firstof panel_iframe_class 'responsive-iframe' as panel_iframe_class_updated %}
+<div class="figure-container_above {{panel_iframe_class_updated}}">
+    <iframe style="border: 0" id="{{panel_name}}_iframe" src="{{ panel_iframe_src }}"></iframe>
+</div>
+{% endblock %}

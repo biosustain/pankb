@@ -9,7 +9,7 @@
             height: 100%;
             width: 100%;
             margin: 0;
-            padding: 0;g
+            padding: 0;
             overflow: hidden;
         }
         .legend text {
@@ -31,7 +31,7 @@
 
         const template_screen_width = 746;
         const current_window_Width = window.innerWidth;
-        const coefficient = current_window_Width / template_screen_width;
+        const coefficient = 1.0; //current_window_Width / template_screen_width;
 
         var data = {{ dataset|safe }}
         // Data
@@ -133,21 +133,21 @@
             autosize: true,
             margin: {
                 l: 80 * coefficient,  // left margin
-                r: 60 * coefficient,  // right margin
+                r: 20 * coefficient,  // right margin
                 b: 60 * coefficient, // bottom margin
-                t: 80 * coefficient, // top margin
+                t: 20 * coefficient, // top margin
                 pad: 0 // padding
             },
-            title: {
-                text: "Cumulative Gene Frequency Distribution",
-                font: {
-                    family: 'Arial, sans-serif',
-                    size: 20 * coefficient,
-                    color: '#000000'
-                },
-                xref: 'paper',
-                x: 0.5
-            },
+            // title: {
+            //     text: "Cumulative Gene Frequency Distribution",
+            //     font: {
+            //         family: 'Arial, sans-serif',
+            //         size: 20 * coefficient,
+            //         color: '#000000'
+            //     },
+            //     xref: 'paper',
+            //     x: 0.5
+            // },
             xaxis: {
                 title: 'Number of Genomes',
                 titlefont: {

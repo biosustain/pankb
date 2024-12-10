@@ -91,17 +91,7 @@
                 pad: 0 // padding
             },
             title: {
-                text: "Gene Annotation Distribution of " + genome_id,
-                titlefont: {
-                    size: 16,
-                    family: 'Arial, sans-serif' // Use Arial font family
-                },
-                tickfont: {
-                    size: 12,
-                    family: 'Arial, sans-serif' // Use Arial font family
-                },
-                xref: 'paper',
-                x: 0.5,
+                text: '',
             },
             xaxis: {
                 title: 'COG Category',
@@ -160,6 +150,7 @@
 
         const config = {
             displayModeBar: false,
+            responsive: true,
         };
 
         Plotly.newPlot('plot', data, layout, config).then(function () {

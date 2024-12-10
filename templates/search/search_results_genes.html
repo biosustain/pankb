@@ -1,144 +1,138 @@
-{% load static %}
-
-<style>
-    .table-responsive {
-        width: 100%;  /* make sure it fills its container */
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-        display: flex;
-    }
-    td {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .expanded-row td {
-        white-space: normal;
-        word-wrap: break-word;
-    }
-    thead th input {
-        width: 80%;
-    }
-    .table {
-        table-layout: fixed;
-    }
-    .dataTables_filter {
-        display: none;    /* Remove the "Search" filter above the table */
-    }
-    .dataTables_paginate {
-        padding-right: 5px;
-    }
-</style>
-
-<!-- Datatable: Genes found -->
-<div class="table_padding" style="width:100%;">
-    <h5>Genes</h5>
-    <div class="table-responsive">
-        <table id="genes_list" class="table table-hover">
-            <thead>
-            <tr>
-                <th class="text-left">Gene Name</th>
-                <th class="text-left">Species</th>
-                <th class="text-left">Class</th>
-                <th class="text-left">Frequency</th>
-                <th class="text-left">COG Category</th>
-                <th class="text-left">COG Name</th>
-                <th class="text-left">Protein</th>
-                <th class="text-left">Description</th>
-                <th class="text-left">PFAMs</th>
-            </tr>
-            </thead>
-            <tbody class="text-left align-middle" id="tbody">
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-
+{% extends "components/panel_universal.html" %}
+{% block panel_content %}
+<table id="genes_table" class="table table-hover display" style="width: 100%;">
+    <thead>
+    <tr>
+        <th>Gene</th>
+        <th>Class</th>
+        <th>COG</th>
+        <th>COG Name</th>
+        <th>Description</th>
+        <th>Protein</th>
+        <th>PFAMs</th>
+        <th>Count</th>
+    </tr>
+    </thead>
+    <tbody id="tbody">
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Gene</th>
+            <th>Class</th>
+            <th>COG</th>
+            <th>COG Name</th>
+            <th>Description</th>
+            <th>Protein</th>
+            <th>PFAMs</th>
+            <th>Count</th>
+        </tr>
+    </tfoot>
+</table>
 <script>
+    var genes_table = null;
+
     $(document).ready(async function () {
-
-        data = {{ genes_results | safe }}
-        const Gene = data;
-
-        let table = $('#genes_list').DataTable({
-            responsive: true,
-            lengthChange: false,
-            paging: true,
-            destroy: true,
-            order: [],   // preserve the original order (needed to order by relevance)
-            data: Gene,
+        genes_table = $('#genes_table').DataTable({
+            ajax: {
+                url: '{% url "search_genes_json" %}?q={{ q }}',
+                dataSrc: 'results',
+            },
+            autoWidth: true,
+            fixedColumns: true,
+            scrollX: true,
+            lengthMenu: [
+                [10, 20, 30, 40, 50, 100, -1],
+                [10, 20, 30, 40, 50, 100, 'All']
+            ],
+            order: [],
             columns: [
-                {
+            {
                     data: '0',
                     render: function (data, type, row) {
-                        return '<a href=" {% url 'gene_info' %}?species=' + encodeURIComponent(row[8]) + '&gene=' + encodeURIComponent(data) + '&gene_class=' + encodeURIComponent(row[7]) + '" target="_blank">' + data + '</a>';
-                    }
+                        return '<a href=" {% url 'gene_info' %}?species=' + row[8] + '&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
+                    },
                 },
                 {
-                    data: '9',
-                    render: function (data, type, row) {
-                        return '<a href=" {% url 'pangenome_analyses_overview' %}?species=' + encodeURIComponent(row[8]) + '" target="_blank">' + data + '</a>';
-                    }
+                    data: '7',
                 },
-                {data: '7'},
-                {data: '6'},
-                {data: '1'},
-                {data: '2'},
+                {
+                    data: '1',
+                },
+                {
+                    data: '2',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '160px')
+                    },
+                },
+                {
+                    data: '3',
+                    render: function (data, type, row) {
+                        return wrap_table_text(data, '240px')
+                    },
+                },
                 {
                     data: '4',
                     render: function (data, type, row) {
-                        return '<span id=protein>' + data + '</span>';
-                    }
+                        return wrap_table_text(data, '220px')
+                    },
+                    className: 'protein',
                 },
-                {data: '3'},
                 {
                     data: '5',
                     render: function (data, type, row) {
-                        return '<span id=pfams>' + data + '</span>';
-                    }
+                        return wrap_table_text(data, '120px')
+                    },
+                    className: 'pfams',
                 },
+                {
+                    data: '6',
+                    width: '80px',
+                }
             ],
             language: {
-                loadingRecords: 'Loading...',
-                zeroRecords: 'No data available in table'
+                loadingRecords: '<span class="spinner-border" aria-hidden="true"></span>',
+                zeroRecords: 'Result not found.'
             },
-
-            drawCallback: function (settings) {
-                // Get the query string from the the URL parameter: ----
-                const queryString = window.location.search;
-                const urlParams = new URLSearchParams(queryString);
-                const q = urlParams.get('q')
-                // Highlight text found by the search and optinally expand some rows if the text is found in the "Annotation" column
-                // after the table is re-drawn (e.g., after the page is changed)
-                highlightText(q);
-            },
-
             initComplete: function () {
-                var api = this.api();
-                // Existing column search code
-                $(this.api().table().header()).find('th').each(function (index, th) {
-                    var columnHeader = $(th);
-                    var columnIndex = index;
-                    var searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="Search" style="width: 60%; display: block; justify-content: center;" />')
-                        .on('keyup change clear', function () {
-                            api.column(columnIndex).search(this.value).draw();
-                        })
-                        .on('click', function(e) {  // Prevent event bubbling on click
-                            e.stopPropagation();
-                        });
-                    $(searchInput).appendTo(columnHeader);
-                });
+                this.api()
+                    .columns()
+                    .every(function () {
+                        var column = this;
+                        var title = column.footer().textContent;
+        
+                        // Create input element and add event listener
+                        $('<input type="text" class="form-control" placeholder="' + title + '" />')
+                            .appendTo($(column.footer()).empty())
+                            .on('keyup change clear', function () {
+                                if (column.search() !== this.value) {
+                                    column.search(this.value).draw();
+                                }
+                            });
+                    });
+
+                let queryString = window.location.search;
+                let urlParams = new URLSearchParams(queryString);
+                let q = urlParams.get('q')
+                highlightText(q);
             }
         });
 
-        // Expand or collapse a table row on click: ----
-        $('#genes_list tbody').on('click', 'td', function () {
-            let row = $(this).closest('tr')
+        genes_table.on("draw", function () {
+            let queryString = window.location.search;
+            let urlParams = new URLSearchParams(queryString);
+            let q = urlParams.get('q')
+            highlightText(q);
+        });
+        genes_table.on('xhr.dt', function (e, settings, json, xhr) {
+            let genesFound = json.results.length > 0;
+            update_results_overview_with_genes(genesFound);
+        });
+
+        // Expand row on click
+        $('#genes_table tbody').on('click', 'td', function () {
+            const row = $(this).closest('tr');
             row.toggleClass('expanded-row');
         });
     });
 </script>
+{% endblock %}

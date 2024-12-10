@@ -21,7 +21,7 @@
             overflow: hidden;
         }
         html {
-            font-size: 18px; /* Base font size for larger screens */
+            font-size: 1rem; /* Base font size for larger screens */
         }
     </style>
 </head>
@@ -35,7 +35,7 @@
 
     const template_screen_width = 602;
     const current_window_Width = window.innerWidth;
-    const coefficient = current_window_Width / template_screen_width;
+    const coefficient = 1.0; //current_window_Width / template_screen_width;
 
     function createChart(data) {
         // Convert JSON data to format suitable for Highcharts
@@ -54,28 +54,31 @@
                 plotBorderWidth: 1,
                 plotBorderColor: '#000000'
             },
-            title: {
-                text: 'Dominant versus Variant Amino Acid Frequency Distribution for ' + species_name + ' Genomes',
-                style: {
-                    fontSize: (1.1 * coefficient) + 'em',
-                    color: '#000000'
-                },
-                align: 'center',
-                x: 25 * coefficient,
+            // title: {
+            //     text: 'Dominant versus Variant Amino Acid Frequency Distribution for ' + species_name + ' Genomes',
+            //     style: {
+            //         fontSize: (1.1 * coefficient) + 'em',
+            //         color: '#000000'
+            //     },
+            //     align: 'center',
+            //     x: 25 * coefficient,
 
+            // },
+            title: {
+                text: '',
             },
             xAxis: {
                 type: 'logarithmic',
                 title: {
                     text: 'Amino Acid Frequency',
                     style: {
-                        fontSize: coefficient + 'em',
+                        fontSize: 1 + 'rem',
                         color: '#000000'
                     }
                 },
                 labels: {
                     style: {
-                        fontSize: (0.9 * coefficient) + 'em',
+                        fontSize: 0.9 + 'rem',
                         color: '#000000'
                     },
                     formatter: function() {
@@ -93,9 +96,9 @@
             },
             yAxis: {
                 title: {
-                    text: 'Number of Genomes (normalized c = 0 - 1)',
+                    text: 'Number of Genomes (normalized)',
                     style: {
-                        fontSize: coefficient + 'em',
+                        fontSize: 1 + 'rem',
                         color: '#000000'
                     }
                 },
@@ -103,7 +106,7 @@
                     align: 'center',
                     enable: true,
                     style: {
-                        fontSize: (0.9 * coefficient) + 'em',
+                        fontSize: 0.9 + 'rem',
                         color: '#000000'
                     }
                 },
@@ -127,7 +130,7 @@
                     const displayX = this.x - 1; // flip the x and y
                     const roundedY = Math.round(this.y * 100) / 100; // flip the x and y
                     return 'Amino Acid Frequency: ' + displayX+
-                        '<br>(Normalized) Number of Gennome: ' + roundedY;
+                        '<br>(Normalized) Number of Genomes: ' + roundedY;
                 }
             },
             series: [{

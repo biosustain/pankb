@@ -1,0 +1,66 @@
+<link href="https://cdn.datatables.net/v/bs5/dt-2.1.8/fc-5.0.4/datatables.min.css" rel="stylesheet">
+<script src="https://cdn.datatables.net/v/bs5/dt-2.1.8/fc-5.0.4/datatables.min.js"></script>
+<script>
+    function wrap_table_text(text, width) {
+        return '<div class="wrap-table-text" style="max-width: ' + width + ';">' + text + '</div>';
+    }
+</script>
+<style>
+    .dt-container {
+        width: 100%;
+        overflow: hidden;
+    }
+    table td {
+        text-wrap: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    table tr.expanded-row td {
+        text-wrap: wrap !important;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+    tr .wrap-table-text {
+        text-wrap: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    tr.expanded-row .wrap-table-text {
+        text-wrap: wrap !important;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+    table.dtfc-scrolling-start td.dtfc-fixed-start {
+        border-right: 1px solid #888888;
+    }
+    table tr td:first() {
+        padding-left: 1rem;
+    }
+    table tr td:last() {
+        padding-right: 1rem;
+    }
+    .dt-layout-start, .dt-layout-end {
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
+    tfoot input {
+        width: 100%;
+        padding: 3px;
+        box-sizing: border-box;
+    }
+    th.dt-type-numeric, td.dt-type-numeric {
+        text-align: left !important;
+    }
+    .dt-container {
+        margin-bottom: 1rem;
+    }
+    tbody > tr.highlighted-row > td.dtfc-fixed-start {
+        background-color: #e6efff !important;
+    }
+    tbody > tr > td.dtfc-fixed-start {
+        background-color: var(--bs-infopanel) !important;
+    }
+    tbody > tr.highlighted-row > td {
+        background-color: #f3f7ff !important;
+    }
+</style>

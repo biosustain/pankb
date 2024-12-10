@@ -2,8 +2,8 @@
 <b>The dynamic Python-based version of the website. The Django framework is used as the back-end. Data about organisms, genes, genomes, locus_tags and KEGG pathways are stored in a database (in a cloud-based Azure Cosmos DB for MongoDB). The Microsoft Azure Blob Storage is still used as a data lake to store static unstructured or semi-structured data, e.g., plots, bibliome and phylogenetic trees (i.e., data that are not used by search or any other scripts generating dynamic content).</b>
 
 ## Contributors
-- Front-end, analytics, LLM, data processing via a bioinformatics pipeline: Binhuan Sun, binsun@biosustain.dtu.dk
-- Back-end, ETL pipeline, the website and vector databases, CI/CD pipeline, the github repo maintenance, versioning and backup systems, infrastructure, DevOps: Liubov Pashkova, liupa@dtu.dk
+- Front-end, analytics, LLM, data processing via a bioinformatics pipeline: Pascal A. Pieters, paspie@biosustain.dtu.dk; Binhuan Sun, binsun@biosustain.dtu.dk
+- Back-end, ETL pipeline, the website and vector databases, CI/CD pipeline, the github repo maintenance, versioning and backup systems, infrastructure, DevOps: Pascal A. Pieters, paspie@biosustain.dtu.dk
 
 ## Server Configuration
 Tested on Linux Ubuntu 20.04 (may need tweaks for other systems).

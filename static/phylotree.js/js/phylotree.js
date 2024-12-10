@@ -1633,38 +1633,31 @@
   }
 
   function drawNode(container, node, transitions) {
-
     container = d3__namespace.select(container);
     var is_leaf = isLeafNode(node);
-
+  
     if (is_leaf) {
       container = container.attr("data-node-name", node.data.name);
     }
-
+  
     var labels = container.selectAll("text").data([node]),
       tracers = container.selectAll("line");
-
+  
     if (is_leaf || (this.showInternalName(node) && !isNodeCollapsed(node))) {
-
       labels = labels
         .enter()
         .append("text")
         .classed(this.css_classes["node_text"], true)
         .merge(labels)
-        .on("click", d=> {
+        .on("click", d => {
           this.handle_node_click(node, d);
         })
-        .attr("dy", d => {
-          return this.shown_font_size * 0.33;
-        })
-        .text(d => {
-          return this.options["show-labels"] ? this._nodeLabel(d) : "";
-        })
-        .style("font-size", d => {
-          return this.ensure_size_is_in_px(this.shown_font_size);
-        });
-
+        .attr("dy", d => this.shown_font_size * 0.33)
+        .text(d => (this.options["show-labels"] ? this._nodeLabel(d) : ""))
+        .style("font-size", d => this.ensure_size_is_in_px(this.shown_font_size));
+  
       if (this.radial()) {
+        // Handle radial layout for labels only, skip tracers
         labels = labels
           .attr("transform", d => {
             return (
@@ -1674,111 +1667,83 @@
               )
             );
           })
-          .attr("text-anchor", d => {
-            return d.text_align;
-          });
+          .attr("text-anchor", d => d.text_align);
+  
+        // Remove tracers entirely for radial layout
+        tracers.remove();
       } else {
+        // Handle non-radial layout
         labels = labels.attr("text-anchor", "start").attr("transform", d => {
-          if (this.options["layout"] == "right-to-left") {
+          if (this.options["layout"] === "right-to-left") {
             return this.d3PhylotreeSvgTranslate([-20, 0]);
           }
           return this.d3PhylotreeSvgTranslate(
             this.alignTips() ? this.shiftTip(d) : null
           );
         });
-      }
-
-      if (this.alignTips()) {
-        tracers = tracers.data([node]);
-
-        if (transitions) {
+  
+        if (this.alignTips()) {
+          // Create tracers only for non-radial layouts
+          tracers = tracers.data([node]);
           tracers = tracers
             .enter()
             .append("line")
             .classed(this.css_classes["branch-tracer"], true)
             .merge(tracers)
-            .attr("x1", d => {
-              return (
-                (d.text_align == "end" ? -1 : 1) * this.nodeBubbleSize(node)
-              );
-            })
-            .attr("x2", 0)
+            .attr("x1", d =>
+              (d.text_align === "end" ? -1 : 1) * this.nodeBubbleSize(node)
+            )
             .attr("y1", 0)
             .attr("y2", 0)
             .attr("x2", d => {
-              if (this.options["layout"] == "right-to-left") {
-                return d.screen_x;
-              }
-
-              return this.shiftTip(d)[0];
-            })
-            .attr("transform", d => {
-              return this.d3PhylotreeSvgRotate(d.text_angle);
-            })
-            .attr("x2", d => {
-              if (this.options["layout"] == "right-to-left") {
+              if (this.options["layout"] === "right-to-left") {
                 return d.screen_x;
               }
               return this.shiftTip(d)[0];
             })
-            .attr("transform", d => {
-              return this.d3PhylotreeSvgRotate(d.text_angle);
-            });
+            .attr("transform", d => this.d3PhylotreeSvgRotate(d.text_angle));
         } else {
+          tracers = tracers.data([node]);
           tracers = tracers
             .enter()
             .append("line")
             .classed(this.css_classes["branch-tracer"], true)
             .merge(tracers)
-            .attr("x1", d => {
-              return (
-                (d.text_align == "end" ? -1 : 1) * this.nodeBubbleSize(node)
-              );
-            })
-            .attr("y2", 0)
-            .attr("y1", 0)
-            .attr("x2", d => {
-              return this.shiftTip(d)[0];
-            });
-          tracers.attr("transform", d => {
-            return this.d3PhylotreeSvgRotate(d.text_angle);
-          });
+            .attr("x1", d =>
+              (d.text_align === "end" ? -1 : 1) * this.nodeBubbleSize(node) + 105
+            ) // Shift x1 by 100px
+            .attr("x2", d => this.shiftTip(d)[0] + 100); // Shift x2 by 100px
         }
-      } else {
-        tracers.remove();
       }
-
+  
       if (this.options["draw-size-bubbles"]) {
-
         var shift = this.nodeBubbleSize(node);
-
+  
         let circles = container
           .selectAll("circle")
           .data([shift])
           .enter()
           .append("circle");
-
-        circles.attr("r", function(d) {
-          return d;
-        });
-
+  
+        circles.attr("r", d => d);
+  
         if (this.shown_font_size >= 5) {
           labels = labels.attr("dx", d => {
             return (
-              (d.text_align == "end" ? -1 : 1) *
+              (d.text_align === "end" ? -1 : 1) *
               ((this.alignTips() ? 0 : shift) + this.shown_font_size * 0.33)
             );
           });
         }
       } else {
         if (this.shown_font_size >= 5) {
-          labels = labels.attr("dx", d => { // eslint-disable-line
-            return (d.text_align == "end" ? -1 : 1) * this.shown_font_size * 0.33;
+          labels = labels.attr("dx", d => {
+            return (d.text_align === "end" ? -1 : 1) * this.shown_font_size * 0.33;
           });
         }
       }
     }
-
+  
     if (!is_leaf) {
       let circles = container
           .selectAll("circle")
@@ -1786,13 +1751,11 @@
           .enter()
           .append("circle"),
         radius = this.node_circle_size()(node);
-
+  
       if (radius > 0) {
         circles
           .merge(circles)
-          .attr("r", d => {
-            return Math.min(this.shown_font_size * 0.75, radius);
-          })
+          .attr("r", d => Math.min(this.shown_font_size * 0.75, radius))
           .on("click", d => {
             this.handle_node_click(node, d);
           });
@@ -1800,13 +1763,13 @@
         circles.remove();
       }
     }
-
+  
     if (this.node_styler) {
       this.node_styler(container, node);
     }
-
+  
     return node;
-  }
+  }  
 
   function updateHasHiddenNodes() {
     let nodes = this.phylotree.nodes.descendants();
@@ -2322,7 +2285,7 @@
         svg = svg.transition(100);
       }
 
-      svg.attr("height", sizes[0]).attr("width", sizes[1]);
+      svg.attr("height", sizes[0]).attr("width", sizes[1]*0.8); //NOTE - 0.8 is a hack to make the tree fit in the svg
 
     }
 
@@ -2421,11 +2384,19 @@
 
   let d3_layout_phylotree_context_menu_id = "d3_layout_phylotree_context_menu";
 
+  //NOTE - Modified to handle issues with the positioning of the context menu
+
   function nodeDropdownMenu(node, container, phylotree, options, event) {
+    // Prevent default right-click menu if the event exists
+    if (event) {
+      event.preventDefault();
+    }
+  
+    // Select or create the context menu element
     let menu_object = d3__namespace
       .select(container)
       .select("#" + d3_layout_phylotree_context_menu_id);
-
+  
     if (menu_object.empty()) {
       menu_object = d3__namespace
         .select(container)
@@ -2433,23 +2404,20 @@
         .attr("id", d3_layout_phylotree_context_menu_id)
         .attr("class", "dropdown-menu")
         .attr("role", "menu");
+      console.log("Context menu created in container:", container);
     }
-
+  
+    // Clear previous menu contents
     menu_object.selectAll("a").remove();
     menu_object.selectAll("h6").remove();
     menu_object.selectAll("div").remove();
-
+  
+    // Check if the node is valid for displaying a menu
     if (node) {
-      if (
-        !___namespace.some([
-          Boolean(node.menu_items),
-          options["hide"],
-          options["selectable"],
-          options["collapsible"]
-        ]) ||
-        !options["show-menu"]
-      )
-        return;
+      // Skip menu creation if no valid options are available
+      if (!___namespace.some([Boolean(node.menu_items), options["hide"], options["selectable"], options["collapsible"]]) || !options["show-menu"]) return;
+  
+      // Generate menu items based on node properties
       if (!isLeafNode(node)) {
         if (options["collapsible"]) {
           menu_object
@@ -2469,7 +2437,7 @@
               .text("Toggle selection");
           }
         }
-
+  
         if (options["selectable"]) {
           menu_object
             .append("a")
@@ -2482,7 +2450,6 @@
                 phylotree.selectAllDescendants(node, true, true)
               );
             });
-
           menu_object
             .append("a")
             .attr("class", "dropdown-item")
@@ -2494,7 +2461,6 @@
                 phylotree.selectAllDescendants(node, true, false)
               );
             });
-
           menu_object
             .append("a")
             .attr("class", "dropdown-item")
@@ -2508,7 +2474,7 @@
             });
         }
       }
-
+  
       if (node.parent) {
         if (options["selectable"]) {
           menu_object
@@ -2520,7 +2486,6 @@
               menu_object.style("display", "none");
               phylotree.modifySelection([node]);
             });
-
           menu_object
             .append("a")
             .attr("class", "dropdown-item")
@@ -2530,12 +2495,10 @@
               menu_object.style("display", "none");
               this.modifySelection(this.phylotree.pathToRoot(node));
             });
-
           if (options["reroot"] || options["hide"]) {
             menu_object.append("div").attr("class", "dropdown-divider");
           }
         }
-
         if (options["reroot"]) {
           menu_object
             .append("a")
@@ -2548,8 +2511,7 @@
               this.update();
             });
         }
-
-
+  
         if (options["hide"]) {
           menu_object
             .append("a")
@@ -2563,90 +2525,43 @@
                 .update();
             });
         }
-
-        menu_object
-            .append("a")
-            .attr("class", "dropdown-item")
-            .attr("tabindex", "-1")
-            .text("Search for this strain")
-            .on("click", d => {
-              // Replace "url" with the URL of the page you want to open
-              const urlParams = new URLSearchParams(window.location.search);
-              const species = urlParams.get('species');
-              const nodename = node.data.name.substring(0, node.data.name.length - 1) + '.' + node.data.name.substring(node.data.name.length - 1);
-              let url = "../../Gene_function/genome_page/genome_page.html?species=" + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(nodename)
-              window.open(url, "_blank");
-            });
-
-      }
-
-      if (hasHiddenNodes(node)) {
-        menu_object
-          .append("a")
-          .attr("class", "dropdown-item")
-          .attr("tabindex", "-1")
-          .text("Show all descendant nodes")
-          .on("click", function(d) {
-            menu_object.style("display", "none");
-            phylotree
-              .modifySelection(
-                phylotree.selectAllDescendants(node, true, true),
-                "notshown",
-                true,
-                true,
-                "false"
-              )
-              .updateHasHiddenNodes()
-              .update();
-          });
-      }
-
-      // now see if we need to add user defined menus
-
-      var has_user_elements = [];
-      if ("menu_items" in node && typeof node["menu_items"] === "object") {
-        node["menu_items"].forEach(function(d) {
-          if (d.length == 3) {
-            if (!d[2] || d[2](node)) {
-              has_user_elements.push([d[0], d[1]]);
-            }
-          }
-        });
-      }
-
-      if (has_user_elements.length) {
-        const show_divider_options = [
-          options["hide"],
-          options["selectable"],
-          options["collapsible"]
-        ];
-
-        if (___namespace.some(show_divider_options)) {
-          menu_object.append("div").attr("class", "dropdown-divider");
-        }
-
-        has_user_elements.forEach(function(d) {
+        if (!Object.hasOwn(node.data, "children")) { // If node is leaf
           menu_object
-            .append("a")
-            .attr("class", "dropdown-item")
-            .attr("tabindex", "-1")
-            .text((d[0])(node)) // eslint-disable-line
-            .on("click", ___namespace.partial(d[1], node));
-        });
+              .append("a")
+              .attr("class", "dropdown-item")
+              .attr("tabindex", "-1")
+              .text("Search for this strain")
+              .on("click", d => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const species = urlParams.get('species');
+                const nodename = node.data.name.slice(0, -1) + '.' + node.data.name.slice(-1);
+                let url = "/gene_function/genome_info/?species=" + encodeURIComponent(species) + '&' + 'genome_id=' + encodeURIComponent(nodename);
+                window.open(url, "_blank");
+              });
+        }
       }
-
-      let tree_container = document.querySelector(container); // eslint-disable-line
-      let rect = tree_container.getBoundingClientRect();
-
-      menu_object
-        .style("position", "absolute")
-        .style("left", "" + (event.clientX - rect.x + 12 ) + "px")
-        .style("top", "" + (event.clientY - rect.y ) + "px")
-        .style("display", "block");
+  
+      // Positioning logic with error handling for missing container
+      const tree_container = document.querySelector(container);
+      if (tree_container) {
+        const rect = tree_container.getBoundingClientRect();  // Only defined if container exists
+  
+        // Calculate menu position
+        const xPos = event.clientX + 50; // Adjusted for fine-tuning
+        const yPos = event.clientY + tree_container.parentNode.scrollTop - 50;  // Adjusted for fine-tuning
+  
+        // Set the position and display the menu
+        menu_object
+          .style("position", "absolute")
+          .style("left", `${xPos}px`)
+          .style("top", `${yPos}px`)
+          .style("display", "block"); // Ensures visibility
+      } else {
+        console.error("Tree container not found for positioning.");
+      }
     } else {
       menu_object.style("display", "none");
     }
-
   }
 
   function addCustomMenu(node, name, callback, condition) {
@@ -3097,6 +3012,7 @@
           this.svg.append("defs");
         }
 
+        // d3__namespace.select(this.container).on(
         d3__namespace.select(this.container).on(
           "click",
           d => {
@@ -3577,7 +3493,7 @@
       }
 
       if (this.options["left-right-spacing"] == "fixed-step") {
-        this.size[1] = this.max_depth * this.fixed_width[1];
+        this.size[1] = this.max_depth * this.fixed_width[1]; //NOTE - this is for setting the width of the tree
 
         this.scales[1] =
           (this.size[1] - this.offsets[1] - this.options["left-offset"]) /
@@ -3918,7 +3834,7 @@
           domain_limit = this._extents[1][1];
 
           range_limit =
-            this.size[1] - this.offsets[1] - this.options["left-offset"] - this.shown_font_size;
+            this.size[1]*0.8 - this.offsets[1] - this.options["left-offset"] - this.shown_font_size; //NOTE - the factor 0.8 is set by testing, this could be causing issues and a more robust solution should be found
        }
 
         let scale = d3__namespace
@@ -4145,7 +4061,8 @@
     }
 
     handle_node_click(node, event) {
-      this.nodeDropdownMenu(node, this.container, this, this.options, event);
+      // this.nodeDropdownMenu(node, this.container, this, this.options, event);
+      this.nodeDropdownMenu(node, "#tree_and_matrix", this, this.options, event);
     }
 
     refresh() {

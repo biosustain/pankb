@@ -1,0 +1,166 @@
+{% extends "components/panel_universal.html" %}
+{% block panel_content %}
+<table id="genomes_table" class="table table-hover display" style="width: 100%;">
+    <thead>
+    <tr>
+        <th>Genome</th>
+        <th>Stain (NCBI)</th>
+        <th>Phylo Group</th>
+        <th>Length</th>
+        <th>%GC</th>
+        <th>Country</th>
+        <th>Broad Context</th>
+        <th>Local Context</th>
+        <th>Isolation Source</th>
+    </tr>
+    </thead>
+    <tbody id="tbody">
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Genome</th>
+            <th>Stain (NCBI)</th>
+            <th>Phylo Group</th>
+            <th class="no_search"></th>
+            <th class="no_search"></th>
+            <th>Country</th>
+            <th>Broad Context</th>
+            <th>Local Context</th>
+            <th>Isolation Source</th>
+        </tr>
+    </tfoot>
+</table>
+<script>
+    var genes_table = null;
+    const urlParams = new URLSearchParams(window.location.search);
+
+    $(document).ready(async function () {
+        genes_table = $('#genomes_table').DataTable({
+            // data: Gene,
+            serverSide: true,
+            ajax: {
+                url: '{% url "pangenome_analyses_genome_json" %}',
+                data: {pangenome_analysis: '{{ pangenome_analysis | safe}}'},
+                dataSrc: 'data',
+            },
+            autoWidth: true,
+            fixedColumns: true,
+            scrollX: true,
+            lengthMenu: [
+                [10, 20, 30, 40, 50, 100, -1],
+                [10, 20, 30, 40, 50, 100, 'All']
+            ],
+            columns: [
+                {
+                    data: '1',
+                    name: 'genome_id',
+                    render: function (data, type, row) {
+                        return '<a href=" {% url 'genome_info' %}?species=' + row[0] + '&genome_id=' + encodeURIComponent(data) + '">' + data + '</a>';
+                    },
+                },
+                {
+                    data: '2',
+                    name: 'strain',
+                },
+                {
+                    data: '3',
+                    name: 'phylo_group',
+                },
+                {
+                    data: '4',
+                    name: 'genome_len',
+                },
+                {
+                    data: '5',
+                    name: 'gc_content',
+                    render: function (data, type, row) {
+                        return (data*100).toFixed(2)
+                    },
+                },
+                {
+                    data: '6',
+                    name: 'country',
+                    render: function (data, type, row) {
+                        if (data == "?") {
+                            return "-"
+                        } else {
+                            return data
+                        }
+                    },
+                },
+                {
+                    data: '8',
+                    name: 'iso_cat.0',
+                    render: function (data, type, row) {
+                        if (data == "?" || data == "Missing" || data == "missing") {
+                            return "-"
+                        } else {
+                            return data
+                        }
+                    },
+                },
+                {
+                    data: '9',
+                    name: 'iso_cat.1',
+                    render: function (data, type, row) {
+                        if (data == "?" || data == "Missing" || data == "missing") {
+                            return "-"
+                        } else {
+                            return data
+                        }
+                    },
+                },
+                {
+                    data: '7',
+                    name: 'isolation_source',
+                    render: function (data, type, row) {
+                        if (data == "?" || data == "Missing" || data == "missing") {
+                            return "-"
+                        } else {
+                            return data
+                        }
+                    },
+                },
+            ],
+            language: {
+                loadingRecords: 'Loading...',
+                zeroRecords: 'Result not found.'
+            },
+            initComplete: function () {
+                this.api()
+                    .columns()
+                    .every(function () {
+                        var column = this;
+                        var title = column.footer().textContent;
+                        var footer = $(column.footer());
+                        var searchable = !footer.hasClass("no_search");
+                        if (searchable) {
+                            // Create input element and add event listener
+                            let value = "";
+                            let data_get = footer.data("get");
+                            if (data_get) {
+                                let data_get_value = urlParams.get(data_get);
+                                if (data_get_value) {
+                                    value = ' value="' + data_get_value + '"';
+                                }
+                            }
+                            $('<input type="text" class="form-control" placeholder="' + title + '"' + value + ' />')
+                                .appendTo($(column.footer()).empty())
+                                .on('keyup change clear', function () {
+                                    if (column.search() !== this.value) {
+                                        column.search(this.value).draw();
+                                    }
+                                }).keyup();
+                        }
+                    });
+            }
+        });
+
+        // Expand row on click
+        $('#genes_table tbody').on('click', 'td', function () {
+            const row = $(this).closest('tr');
+            row.toggleClass('expanded-row');
+        });
+    });
+</script>
+{% endblock %}
