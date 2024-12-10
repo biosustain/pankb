@@ -277,12 +277,12 @@ def pathway_info(request):
   except PathwayInfo.DoesNotExist:
     raise Http404()
   # pathway_info_dict = model_to_dict(pathway_info, exclude=["_id"])
-  pathway_kegg_link = f"https://www.kegg.jp/pathway/{pathway_info.pathway_id}"
+  pathway_kegg_link = f"https://www.kegg.jp/pathway/{pathway_info['pathway_id']}"
 
   # Compose a context for the template rendering: ----
   context = {
-    'pathway_name': pathway_info.pathway_name,
-    'pathway_id': pathway_info.pathway_id,
+    'pathway_name': pathway_info["pathway_name"],
+    'pathway_id': pathway_info["pathway_id"],
     'pathway_kegg_link': pathway_kegg_link,
     # 'dataGenes': genes_info_json
   }
