@@ -13,15 +13,15 @@
 </div>
 </main>
 <script>
-    $(document).ready(async function () {
+    $(document).on('preInit.dt', function (e, settings) {
         if ($(window).height() >= "2100"){
-            $('#species_table').DataTable().page.len(40).draw();
+            $('#species_table').DataTable().page.len(40);
         } else if ($(window).height() >= "1700"){
-            $('#species_table').DataTable().page.len(30).draw();
+            $('#species_table').DataTable().page.len(30);
         } else if ($(window).height() >= "1300"){
-            $('#species_table').DataTable().page.len(20).draw();
+            $('#species_table').DataTable().page.len(20);
         } else {
-            $('#species_table').DataTable().page.len(10).draw();
+            $('#species_table').DataTable().page.len(10);
         }
     });
 </script>

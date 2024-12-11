@@ -14,15 +14,15 @@
 </div>
 </main>
 <script>
-    $(document).ready(async function () {
+    $(document).on('preInit.dt', function (e, settings) {
         if ($(window).height() >= "2000"){
-            $('#publications_table').DataTable().page.len(40).draw();
+            $('#publications_table').DataTable().page.len(40);
         } else if ($(window).height() >= "1600"){
-            $('#publications_table').DataTable().page.len(30).draw();
+            $('#publications_table').DataTable().page.len(30);
         } else if ($(window).height() >= "1200"){
-            $('#publications_table').DataTable().page.len(20).draw();
+            $('#publications_table').DataTable().page.len(20);
         } else {
-            $('#publications_table').DataTable().page.len(10).draw();
+            $('#publications_table').DataTable().page.len(10);
         }
     });
 </script>
