@@ -17,15 +17,15 @@
 {% include 'components/panel_genes_table.html' with panel_name="genes_table" panel_title="Gene Annotation Table" panel_class="col-lg-12" %}
 </div>
 <script>
-    $(document).ready(async function () {
+    $(document).on('preInit.dt', function (e, settings) {
         if ($(window).height() >= "2100"){
-            $('#genes_table').DataTable().page.len(40).draw();
+            $('#genes_table').DataTable().page.len(40);
         } else if ($(window).height() >= "1700"){
-            $('#genes_table').DataTable().page.len(30).draw();
+            $('#genes_table').DataTable().page.len(30);
         } else if ($(window).height() >= "1300"){
-            $('#genes_table').DataTable().page.len(20).draw();
+            $('#genes_table').DataTable().page.len(20);
         } else {
-            $('#genes_table').DataTable().page.len(10).draw();
+            $('#genes_table').DataTable().page.len(10);
         }
     });
 </script>
