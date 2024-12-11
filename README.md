@@ -1,4 +1,4 @@
-# PanKB Website (PROD)
+# PanKB Website
 <b>The dynamic Python-based version of the website. The Django framework is used as the back-end. Data about organisms, genes, genomes, locus_tags and KEGG pathways are stored in a database (in a cloud-based Azure Cosmos DB for MongoDB). The Microsoft Azure Blob Storage is still used as a data lake to store static unstructured or semi-structured data, e.g., plots, bibliome and phylogenetic trees (i.e., data that are not used by search or any other scripts generating dynamic content).</b>
 
 ## Contributors

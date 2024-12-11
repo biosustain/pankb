@@ -5,6 +5,26 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 =======
 
+## PanKB v3.1.0 - 10.12.2024
+ - Removed djongo as a dependency
+ - Upgraded to django v5.1
+ - Used multiple gunicorn workers
+
+## PanKB v3.0.0 - 10.12.2024
+ - Improved layout/styling
+ - Improved interfacing between the Pipeline, Azure and MongoDB.
+ - Improved handling of isolation sources/countries.
+ - Integration of Aaron’s improved phylotree.
+ - Improved KEGG pathway links.
+ - iModulonDB interoperability and NCBI locus tag mapping.
+ - Dynamic loading + server side processing of large datatables.
+ - Search now immediately loads all other results, whilst the genes table shows a loading symbol.
+ - Added a “Genomes” page for each species.
+ - Improved loading speeds for many pages, including the overview pages for species.
+ - Added a panning mode to the phylotree to enable users to navigate the tree more easily.
+ - Many small improvements...
+
+
 ## PanKB v2.0.0 - 15.07.2024
 
 ### Added
