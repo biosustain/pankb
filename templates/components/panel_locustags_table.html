@@ -98,14 +98,14 @@
                 {
                     data: 'genome_id',
                     render: function(data, type, row) {
-                        return '<a href="{% url 'genome_info' %}?species={{request.GET.species|safe}}&genome_id=' + encodeURIComponent(data) + '" target="_blank">' + data + '</a>';
+                        return '<a href="{% url 'genome_info' %}?species={{request.GET.species|safe}}&genome_id=' + encodeURIComponent(data) + '">' + data + '</a>';
                     },
                 },
                 {% else %}
                 {
                     data: 'gene',
                     render: function(data, type, row) {
-                        return '<a href="{% url 'gene_info' %}?species={{request.GET.species|safe}}&gene=' + encodeURIComponent(data) + '" target="_blank">' + data + '</a>';
+                        return '<a href="{% url 'gene_info' %}?species={{request.GET.species|safe}}&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
                     },
                 },
                 {% endif %}
