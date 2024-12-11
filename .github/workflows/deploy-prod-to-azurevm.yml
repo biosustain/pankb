@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Copy files using SCP
-        uses: appleboy/scp-action@@v0.1.7
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.PANKB_PROD_HOST }}
           username: ${{ secrets.PANKB_PROD_SSH_USERNAME }}
@@ -22,7 +22,7 @@ jobs:
           target: "/projects/pankb_web/django_project"
   
       - name: Create the .env file and (re-)start containers over SSH
-        uses: appleboy/ssh-action@@v0.1.7
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.PANKB_PROD_HOST }}
           username: ${{ secrets.PANKB_PROD_SSH_USERNAME }}
