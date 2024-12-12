@@ -194,6 +194,7 @@ def gene_annotation_json(request):
 
     gene_keys = [
         "gene",
+        "species",
         "cog_category",
         "cog_name",
         "description",
