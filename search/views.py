@@ -1,11 +1,10 @@
-from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from organisms.models import Organisms
 from pangenome_analyses.models import GeneAnnotations
 from gene_function.models import PathwayInfo
-import json
-import re
+from common import csv_export
+import json, time, re
 
 
 def build_multi_search_aggregation(expression, fields):
@@ -29,31 +28,35 @@ def build_multi_search_aggregation(expression, fields):
     ]
 
 
+def clean_query(q):
+    q = re.sub(
+        r"[^A-Za-z0-9-_\s]+", "", q
+    )  # remove all symbols except letters, digits, underscores, dashes, whitespaces
+    q = q.strip()  # remove the leading and trailing spaces from the query string
+    q = " ".join(q.split())  # remove duplicated whitespaces from the query string
+    return q
+
+
 # View: Search Results Page
 def search_results(request):
     template = loader.get_template("search/search_results.html")
     # Get the query string from the URL: ----
     q_orig = request.GET.get("q")
-    # Clean the query string: ----
-    q = re.sub(
-        r"[^A-Za-z0-9-_\s]+", "", q_orig
-    )  # remove all symbols except letters, digits, underscores, dashes, whitespaces
-    q = q.strip()  # remove the leading and trailing spaces from the query string
-    q = " ".join(q.split())  # remove duplicated whitespaces from the query string
+    q = clean_query(q_orig)
 
     if (
         len(q) >= 2
     ):  # only if the cleaned query string length > 2 symbols, perform the DB searches: ----
         # Get the filtered organism families from the DB: ----
         families = list(
-            Organisms.objects.mongo_find(
+            Organisms.objects.find(
                 {"family": {"$regex": q, "$options": "i"}}, {"_id": 0, "family": 1}
             ).distinct("family")
         )
 
         # Get the filtered species from the DB: ----
         species = list(
-            Organisms.objects.mongo_find(
+            Organisms.objects.find(
                 {"species": {"$regex": q, "$options": "i"}},
                 {"_id": 0, "species": 1, "family": 1, "pangenome_analysis": 1},
             )
@@ -61,31 +64,11 @@ def search_results(request):
 
         # Get the filtered pathways from the DB: ----
         pathways = list(
-            PathwayInfo.objects.mongo_aggregate(
+            PathwayInfo.objects.aggregate(
                 build_multi_search_aggregation(q, ["pathway_id", "pathway_name"])
                 + [{"$project": {"_id": 0, "pathway_id": 1, "pathway_name": 1}}]
             )
         )
-
-        # Get the filtered genes from the DB: ----
-        # gene_keys = [
-        #     "gene",
-        #     "cog_category",
-        #     "cog_name",
-        #     "description",
-        #     "protein",
-        #     "pfams",
-        #     "frequency",
-        #     "pangenomic_class",
-        #     "pangenome_analysis",
-        # ]
-        # genes = list(
-        #     GeneAnnotations.objects.mongo_aggregate(
-        #         build_multi_search_aggregation(q, ["gene", "protein", "pfams"])
-        #         + [{"$project": {gk: int(gk != "_id") for gk in ["_id"] + gene_keys}}]
-        #     )
-        # )
-        # genes = [[g.get(gk, None) for gk in gene_keys] for g in genes]
         genes = []
 
     else:  # if the cleaned query string is too short or not set, just return the empty DFs: ----
@@ -101,8 +84,6 @@ def search_results(request):
         no_results_list.append("species")
     if not pathways:
         no_results_list.append("pathways")
-    # if not genes:
-    #     no_results_list.append("genes")
 
     # Compose the render context: ----
     context = {
@@ -115,17 +96,102 @@ def search_results(request):
     }
     return HttpResponse(template.render(context, request))
 
+
+def download_search_family_csv(request):
+    q_orig = request.GET.get("q")
+    q = clean_query(q_orig)
+    if (
+        len(q) >= 2
+    ):  # only if the cleaned query string length > 2 symbols, perform the DB searches: ----
+        # Get the filtered organism families from the DB: ----
+        families = Organisms.objects.find(
+            {"family": {"$regex": q, "$options": "i"}}, ["family"]
+        ).distinct("family")
+        families = [[f] for f in families]
+    else:
+        families = []
+    downloaded_file_name = (
+        "Search__families__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
+    )
+    response = csv_export.list_writer_response(
+        downloaded_file_name, [["family"]] + families
+    )
+    return response
+
+
+def download_search_species_csv(request):
+    q_orig = request.GET.get("q")
+    q = clean_query(q_orig)
+    fields = ["species", "family"]
+    if (
+        len(q) >= 2
+    ):  # only if the cleaned query string length > 2 symbols, perform the DB searches: ----
+        # Get the filtered organism families from the DB: ----
+        species = Organisms.objects.find(
+            {"species": {"$regex": q, "$options": "i"}},
+            fields,
+        )
+    else:
+        species = []
+    downloaded_file_name = (
+        "Search__species__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
+    )
+    response = csv_export.dict_writer_response(downloaded_file_name, fields, species)
+    return response
+
+
+def download_search_pathway_csv(request):
+    q_orig = request.GET.get("q")
+    q = clean_query(q_orig)
+    fields = ["pathway_id", "pathway_name"]
+    if len(q) >= 2:
+        projection = {f: 1 for f in fields}
+        projection["_id"] = 0
+        pathways = PathwayInfo.objects.aggregate(
+            build_multi_search_aggregation(q, ["pathway_id", "pathway_name"])
+            + [{"$project": projection}]
+        )
+    else:
+        pathways = []
+    downloaded_file_name = (
+        "Search__pathways__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
+    )
+    response = csv_export.dict_writer_response(downloaded_file_name, fields, pathways)
+    return response
+
+
+def download_search_genes_csv(request):
+    q_orig = request.GET.get("q")
+    q = clean_query(q_orig)
+    gene_keys = [
+        "gene",
+        "species",
+        "family",
+        "cog_category",
+        "cog_name",
+        "description",
+        "protein",
+        "pfams",
+        "frequency",
+        "pangenomic_class",
+    ]
+    if len(q) >= 2:
+        genes = GeneAnnotations.objects.aggregate(
+            build_multi_search_aggregation(q, ["gene", "protein", "pfams"])
+            + [{"$project": {gk: int(gk != "_id") for gk in ["_id"] + gene_keys}}]
+        )
+    else:
+        genes = []
+    downloaded_file_name = "Search__genes__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
+    response = csv_export.dict_writer_response(downloaded_file_name, gene_keys, genes)
+    return response
+
+
 # JSON data for gene datatable
 def gene_annotation_json(request):
-    q = str(request.GET["q"])
+    q_orig = str(request.GET["q"])
+    q = clean_query(q_orig)
 
-    q = re.sub(
-        r"[^A-Za-z0-9-_\s]+", "", q
-    )  # remove all symbols except letters, digits, underscores, dashes, whitespaces
-    q = q.strip()  # remove the leading and trailing spaces from the query string
-    q = " ".join(q.split())  # remove duplicated whitespaces from the query string
-
-    # Get the filtered genes from the DB: ----
     gene_keys = [
         "gene",
         "cog_category",
@@ -137,11 +203,14 @@ def gene_annotation_json(request):
         "pangenomic_class",
         "pangenome_analysis",
     ]
-    genes = list(
-        GeneAnnotations.objects.mongo_aggregate(
-            build_multi_search_aggregation(q, ["gene", "protein", "pfams"])
-            + [{"$project": {gk: int(gk != "_id") for gk in ["_id"] + gene_keys}}]
+    if len(q) >= 2:
+        genes = list(
+            GeneAnnotations.objects.aggregate(
+                build_multi_search_aggregation(q, ["gene", "protein", "pfams"])
+                + [{"$project": {gk: int(gk != "_id") for gk in ["_id"] + gene_keys}}]
+            )
         )
-    )
-    genes = [[g.get(gk, None) for gk in gene_keys] for g in genes]
+        genes = [[g.get(gk, None) for gk in gene_keys] for g in genes]
+    else:
+        genes = []
     return JsonResponse({"results": genes})

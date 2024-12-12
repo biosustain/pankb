@@ -22,10 +22,29 @@ services:
     networks:
       - pankb-net
 
-  nginx:
-    container_name: pankb-nginx
+  nginx_dev:
+    profiles:
+      - dev
+    container_name: pankb-nginx-dev
+    build:
+      context: ./nginx
+      args:
+        - PANKB_SERVER_TYPE=dev
+    image: pankb_nginx_dev:latest
+    restart: always       # for the container to be up and running again even after the VM is brought down
+    volumes:
+      - ./static:/static  # a folder, where the static content will be served from
+    ports:
+      - 80:80
+    networks:
+      - pankb-net
+
+  nginx_prod:
+    profiles:
+      - prod
+    container_name: pankb-nginx-prod
     build: ./nginx
-    image: pankb_nginx:latest
+    image: pankb_nginx_prod:latest
     restart: always       # for the container to be up and running again even after the VM is brought down
     volumes:
       - ./static:/static  # a folder, where the static content will be served from
@@ -39,6 +58,8 @@ services:
       - pankb-net
 
   certbot:
+    profiles:
+      - prod
     image: certbot/certbot:latest
     volumes:
       - ./certbot/www/:/var/www/certbot/:rw
