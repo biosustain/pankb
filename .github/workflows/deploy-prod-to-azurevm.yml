@@ -59,6 +59,6 @@ jobs:
             echo "## URL address of the separately deployed AI Assistant Web Application" >> .env
             echo AI_ASSISTANT_APP_URL="${{vars.PANKB_PROD_AI_ASSISTANT_APP_URL}}" >> .env
             cat .env
-            docker compose down
-            docker compose up -d --build --force-recreate --remove-orphans
+            docker compose --profile prod down
+            docker compose --profile prod up -d --build --force-recreate --remove-orphans
             docker system prune --all --force
