@@ -12,6 +12,7 @@
     <thead>
     <tr>
         <th>Gene</th>
+        <th>Species</th>
         <th>Class</th>
         <th>COG</th>
         <th>COG Name</th>
@@ -26,6 +27,7 @@
     <tfoot>
         <tr>
             <th>Gene</th>
+            <th>Species</th>
             <th>Class</th>
             <th>COG</th>
             <th>COG Name</th>
@@ -54,46 +56,52 @@
             ],
             order: [],
             columns: [
-            {
+                {
                     data: '0',
                     render: function (data, type, row) {
-                        return '<a href=" {% url 'gene_info' %}?species=' + row[8] + '&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
+                        return '<a href="{% url 'gene_info' %}?species=' + encodeURIComponent(row[9]) + '&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
                     },
                 },
                 {
-                    data: '7',
+                    data: '1',
+                    render: function (data, type, row) {
+                        return '<a href="{% url 'pangenome_analyses_overview' %}?species=' + encodeURIComponent(row[9]) + '">' + data + '</a>';
+                    },
                 },
                 {
-                    data: '1',
+                    data: '8',
                 },
                 {
                     data: '2',
+                },
+                {
+                    data: '3',
                     render: function (data, type, row) {
                         return wrap_table_text(data, '160px')
                     },
                 },
                 {
-                    data: '3',
+                    data: '4',
                     render: function (data, type, row) {
                         return wrap_table_text(data, '240px')
                     },
                 },
                 {
-                    data: '4',
+                    data: '5',
                     render: function (data, type, row) {
                         return wrap_table_text(data, '220px')
                     },
                     className: 'protein',
                 },
                 {
-                    data: '5',
+                    data: '6',
                     render: function (data, type, row) {
                         return wrap_table_text(data, '120px')
                     },
                     className: 'pfams',
                 },
                 {
-                    data: '6',
+                    data: '7',
                     width: '80px',
                 }
             ],
