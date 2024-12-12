@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Removed djongo as a dependency
  - Upgraded to django v5.1
  - Used multiple gunicorn workers
+ - All tables can be downloaded as CSV now, including search results.
 
 ## PanKB v3.0.0 - 10.12.2024
  - Improved layout/styling
