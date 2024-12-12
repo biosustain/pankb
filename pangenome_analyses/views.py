@@ -129,6 +129,7 @@ def hotmap_data(request):
     response["Content-Encoding"] = "gzip"
     return response
 
+
 # A view that streams potentially large presence/absence matrices
 def download_matrix_csv(request):
     species = request.GET["species"]
@@ -174,7 +175,7 @@ def download_matrix_csv(request):
         + time.strftime("%Y-%m-%d_%H-%M")
         + ".csv"
     )
-    
+
     response = csv_export.list_writer_response(downloaded_file_name, rows)
     return response
 
@@ -264,15 +265,15 @@ def download_gene_annotation_table_csv(request):
         "Gene_annotations__" + species + "__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
     )
     fields = [
-            "gene",
-            "pangenomic_class",
-            "cog_category",
-            "cog_name",
-            "description",
-            "protein",
-            "pfams",
-            "frequency",
-        ]
+        "gene",
+        "pangenomic_class",
+        "cog_category",
+        "cog_name",
+        "description",
+        "protein",
+        "pfams",
+        "frequency",
+    ]
 
     # Get a table with gene_annotations as a list of dictionaries: ----
     gene_annotations = GeneAnnotations.objects.find(
@@ -281,8 +282,11 @@ def download_gene_annotation_table_csv(request):
         sort=[("gene", 1)],
     )
 
-    response = csv_export.dict_writer_response(downloaded_file_name, fields, gene_annotations)
+    response = csv_export.dict_writer_response(
+        downloaded_file_name, fields, gene_annotations
+    )
     return response
+
 
 # A view that serves the Gene Annotation table content in the .csv format
 def download_genome_info_table_csv(request):
@@ -302,12 +306,13 @@ def download_genome_info_table_csv(request):
         "iso_cat",
     ]
 
-
     genomes = GenomeInfo.get_genome_and_isolation_info(
         {"pangenome_analysis": species}, genome_keys
     )
 
-    response = csv_export.dict_writer_response(downloaded_file_name, genome_keys, genomes)
+    response = csv_export.dict_writer_response(
+        downloaded_file_name, genome_keys, genomes
+    )
     return response
 
 
@@ -378,6 +383,7 @@ def phylotree_plot(request):
         "source_info_dataset": json.dumps(source_info),
     }
     return HttpResponse(template.render(context, request))
+
 
 # API for datatables
 def gene_annotation_json(request):

@@ -1,13 +1,14 @@
 from common import database
 
+
 # Model for the Gene Info table content
 class GeneInfo:
-    objects = database.MongoDBObjects('pankb_gene_info')
+    objects = database.MongoDBObjects("pankb_gene_info")
 
 
 # Model for the Genome Info table content
 class GenomeInfo:
-    objects = database.MongoDBObjects('pankb_genome_info')
+    objects = database.MongoDBObjects("pankb_genome_info")
 
     def get_genome_and_isolation_info_pipeline(genome_match):
         return [
@@ -37,10 +38,8 @@ class GenomeInfo:
                 projection["_id"] = 0
         if projection:
             pipeline.append({"$project": projection})
-        return GenomeInfo.objects.aggregate(
-            pipeline
-        )
+        return GenomeInfo.objects.aggregate(pipeline)
 
 
 class PathwayInfo:
-    objects = database.MongoDBObjects('pankb_pathway_info')
+    objects = database.MongoDBObjects("pankb_pathway_info")
