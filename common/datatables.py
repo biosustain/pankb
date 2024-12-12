@@ -1,5 +1,6 @@
 import re
 
+
 def _parse_get_array(req_get, name):
     data = {}
     for k, v in req_get.items():
@@ -21,6 +22,7 @@ def _parse_get_array(req_get, name):
         data[i][prop] = v
     data = [data[i] for i in range(len(data))]
     return data
+
 
 def create_datatables_api(
     mongo_aggregate, request_get, select_pipeline, out_keys, as_list=True

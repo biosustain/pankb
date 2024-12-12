@@ -14,10 +14,11 @@ else:
     )
 DB = MONOGO_CLIENT[settings.MONGODB["db_name"]]
 
+
 class MongoDBObjects:
     def __init__(self, collection_name):
         self.collection = DB[collection_name]
-    
+
     def aggregate(self, pipeline, **kwargs):
         return self.collection.aggregate(pipeline, **kwargs)
 
@@ -27,5 +28,6 @@ class MongoDBObjects:
             if not "_id" in projection:
                 projection["_id"] = 0
         return self.collection.find(filter=filter, projection=projection, **kwargs)
+
     def find_one(self, *args, **kwargs):
         return self.collection.find_one(*args, **kwargs)

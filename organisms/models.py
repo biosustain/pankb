@@ -23,6 +23,6 @@ class Organisms:
     def list(family=None, projection=None):
         filter_params = {}
         if family:  # if the family get parameter is set
-            filter_params['family'] = family
+            filter_params["family"] = family
         organisms = Organisms.objects.find(filter_params, projection)
         return list(organisms)
