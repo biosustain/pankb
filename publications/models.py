@@ -1,4 +1,4 @@
-from common import utils
+from common import database
 
 class Publication:
-    objects = utils.MongoDBObjects('pankb_publications')
+    objects = database.MongoDBObjects('pankb_publications')

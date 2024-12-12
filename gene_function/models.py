@@ -1,13 +1,13 @@
-from common import utils
+from common import database
 
 # Model for the Gene Info table content
 class GeneInfo:
-    objects = utils.MongoDBObjects('pankb_gene_info')
+    objects = database.MongoDBObjects('pankb_gene_info')
 
 
 # Model for the Genome Info table content
 class GenomeInfo:
-    objects = utils.MongoDBObjects('pankb_genome_info')
+    objects = database.MongoDBObjects('pankb_genome_info')
 
     def get_genome_and_isolation_info_pipeline(genome_match):
         return [
@@ -29,11 +29,18 @@ class GenomeInfo:
             {"$project": {"_id": 0, "isolation_info": 0}},
         ]
 
-    def get_genome_and_isolation_info(genome_match):
+    def get_genome_and_isolation_info(genome_match, projection=None):
+        pipeline = GenomeInfo.get_genome_and_isolation_info_pipeline(genome_match)
+        if isinstance(projection, list):
+            projection = {p: 1 for p in projection}
+            if not "_id" in projection:
+                projection["_id"] = 0
+        if projection:
+            pipeline.append({"$project": projection})
         return GenomeInfo.objects.aggregate(
-            GenomeInfo.get_genome_and_isolation_info_pipeline(genome_match)
+            pipeline
         )
 
 
 class PathwayInfo:
-    objects = utils.MongoDBObjects('pankb_pathway_info')
+    objects = database.MongoDBObjects('pankb_pathway_info')

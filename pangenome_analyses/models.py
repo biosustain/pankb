@@ -1,6 +1,9 @@
-from common import utils
+from common import database
 
 # Model representing info on the Organisms page: ----
 class GeneAnnotations:
-    objects = utils.MongoDBObjects('pankb_gene_annotations')
+    objects = database.MongoDBObjects('pankb_gene_annotations')
+    
+    class NotFound(Exception):
+        pass
     

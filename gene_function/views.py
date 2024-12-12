@@ -1,18 +1,12 @@
-from django.shortcuts import render
 from django.http import HttpResponse, Http404, JsonResponse
 from django.template import loader
-from django.urls import reverse
 from django.conf import settings
-import json, requests, io, csv, time
+import json, requests, io, time
 import pandas as pd
-import numpy as np
 from .models import GeneInfo, GenomeInfo, PathwayInfo
 from organisms.models import Organisms
 from pangenome_analyses.models import GeneAnnotations
-from pangenome_analyses.views import create_datatables_api
-from django.db.models import Q
-from functools import reduce
-from django.forms.models import model_to_dict
+from common import datatables, csv_export
 
 
 ################################## Gene Info Page Templates ###################################
@@ -98,14 +92,9 @@ def download_gene_info_table_csv(request):
   filter_params['pangenome_analysis'] = species
   filter_params['gene'] = gene
   # Obtain the gene info: ----
-  gene_info = list(GeneInfo.objects.find(filter_params, fields, sort=[("start_position", 1), ("end_position", 1)]))
+  gene_info = GeneInfo.objects.find(filter_params, fields, sort=[("start_position", 1), ("end_position", 1)])
 
-  # Create the HttpResponse object with the appropriate CSV header.
-  response = HttpResponse(content_type="text/csv")
-  response['Content-Disposition'] = f"attachment; filename=" + downloaded_file_name
-  writer = csv.DictWriter(response, fieldnames=fields)
-  writer.writeheader()
-  writer.writerows(gene_info)
+  response = csv_export.dict_writer_response(downloaded_file_name, fields, gene_info)
   return response
 
 
@@ -199,6 +188,24 @@ def genome_info(request):
   }
   return HttpResponse(template.render(context, request))
 
+# A view that serves the Gene Info table content in the .csv format
+def download_genome_info_gene_table_csv(request):
+  species = request.GET.get('species', None)
+  genome_id = request.GET.get('genome_id', None)
+  downloaded_file_name = "Gene_Info__" + species + "__" + genome_id + "__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
+
+  fields = ["locus_tag", "genome_id", "gene", "protein", "start_position", "end_position", "nucleotide_seq", "aminoacid_seq", "species", "original_locus_tag", "original_gene", "original_exact_match"]
+
+  # Set the filter() function parameters: ----
+  filter_params = {}
+  filter_params['pangenome_analysis'] = species
+  filter_params['genome_id'] = genome_id
+  # Obtain the gene info: ----
+  gene_info = GeneInfo.objects.find(filter_params, fields)
+
+  response = csv_export.dict_writer_response(downloaded_file_name, fields, gene_info)
+  return response
+
 
 # Template renderer for the Gene Annotation Distribution barplot of genes in a genome
 def genome_barplot(request):
@@ -266,7 +273,6 @@ def genome_gene_info(request):
   }
   return HttpResponse(template.render(context, request))
 
-
 ################################ Pathway Info Page Templates ###################################
 def pathway_info(request):
   template = loader.get_template('gene_function/pathway_info.html')
@@ -297,7 +303,7 @@ def pathway_gene_annotation_json(request):
     {"$project": {gk: 1 for gk in gene_keys}} # This projection keeps document size smaller
     ]
 
-  response = create_datatables_api(GeneAnnotations.objects.aggregate, request.GET, select_pipeline, gene_keys, as_list=False)
+  response = datatables.create_datatables_api(GeneAnnotations.objects.aggregate, request.GET, select_pipeline, gene_keys, as_list=False)
 
   for d in response["data"]:
     kegg_link = f"https://www.kegg.jp/kegg-bin/show_pathway?{pathway_id}"
