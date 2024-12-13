@@ -193,6 +193,7 @@ def download_search_genomes_csv(request):
     genome_keys = [
         "pangenome_analysis",
         "genome_id",
+        "species",
         "strain",
         "phylo_group",
         "gc_content",
@@ -269,6 +270,7 @@ def genomes_json(request):
     genome_keys = [
         "pangenome_analysis",
         "genome_id",
+        "species",
         "strain",
         "phylo_group",
         "gc_content",
