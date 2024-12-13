@@ -22,7 +22,7 @@
     // and optionally expands a row in the "Genes" table if the text found is in the "Protein" column: ----
     function highlightText(searchTerm) {
         // Get all elements potentially containing text: ----
-        const elements = document.querySelectorAll('#families_list a, #species_list a, #genes_table a, .protein div, .pfams div, #pathways_list a, .pathway_name');
+        const elements = document.querySelectorAll('#families_list a, #species_list a, #genes_table a, .protein div, .pfams div, #pathways_list a, .pathway_name, .genome_id a, .ncbi_strain, .country, .broad_context, .local_context, .extra_context, .isolation_source');
         // Loop through each of the elements: ----
         elements.forEach((element) => {
             const text = element.innerText;
@@ -64,8 +64,8 @@
     <div class="row g-3">
         <div class="col-12">
             <h4 id="search_no_results" class="d-none display-5 p-2 ps-4">No search results found for <b>"{{ request.GET.q }}"</b></h4>
-            <h4 id="search_any_results" class="display-5 p-2 ps-4">Showing {% if families_results %}<a href="#families" class="btn btn-outline-primary">family</a>&nbsp;{% endif %}{% if species_results %}<a href="#species" class="btn btn-outline-primary">species</a>&nbsp;{% endif %}{% if pathways_results %}<a href="#pathways" class="btn btn-outline-primary">pathway</a>&nbsp;{% endif %}<a id="genes-button" href="#genes" class="btn btn-outline-primary disabled"><span id="genes-spinner" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>gene</a>&nbsp; search results for <b>"{{ request.GET.q }}"</b>
-            <span id="no-results-list"{% if no_results_list %}{% else %} class="d-none"{% endif %}>; No results found in {{ no_results_list | join:', '}}<span id="no-results-list-genes" class="d-none">, genes</span>.</span></h4></div>
+            <h4 id="search_any_results" class="display-5 p-2 ps-4">Showing {% if families_results %}<a href="#families" class="btn btn-outline-primary">family</a>&nbsp;{% endif %}{% if species_results %}<a href="#species" class="btn btn-outline-primary">species</a>&nbsp;{% endif %}{% if pathways_results %}<a href="#pathways" class="btn btn-outline-primary">pathway</a>&nbsp;{% endif %}<a id="genomes-button" href="#genomes" class="btn btn-outline-primary disabled"><span id="genomes-spinner" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>genome</a>&nbsp;<a id="genes-button" href="#genes" class="btn btn-outline-primary disabled"><span id="genes-spinner" class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>gene</a>&nbsp; search results for <b>"{{ request.GET.q }}"</b>
+            <span id="no-results-list"{% if no_results_list %}{% else %} class="d-none"{% endif %}>; No results found in {{ no_results_list | join:', '}}<span id="no-results-list-genomes" class="d-none">, genomes</span><span id="no-results-list-genes" class="d-none">, genes</span>.</span></h4></div>
     </div>
     <div class="row gy-3">
         {% if families_results %}
@@ -76,6 +76,9 @@
         {% endif %}
         {% if pathways_results %}
         {% include "search/search_results_pathways.html" with panel_name="search_pathways" panel_title="<a id='pathways'>Pathways</a>" panel_class="col-lg-5" %}
+        {% endif %}
+        {% if "genomes" in no_results_list %}{% else %}
+        {% include "search/search_results_genomes.html" with panel_name="search_genomes" panel_title="<a id='genomes'>Genomes</a>" panel_class="col-lg-12 opacity-50" panel_wide_class="col-lg-12 opacity-50" %}
         {% endif %}
         {% if "genes" in no_results_list %}{% else %}
         {% include "search/search_results_genes.html" with panel_name="search_genes" panel_title="<a id='genes'>Genes</a>" panel_class="col-lg-12 opacity-50" panel_wide_class="col-lg-12 opacity-50" %}
@@ -99,7 +102,23 @@
             $('#genes-button').toggleClass('d-none', true);
             $('#no-results-list').toggleClass('d-none', false);
             $('#no-results-list-genes').toggleClass('d-none', false);
-            if (no_results_list.includes('families') && no_results_list.includes('species') && no_results_list.includes('pathways') && no_results_list.includes('genes')) {
+            if (no_results_list.includes('families') && no_results_list.includes('species') && no_results_list.includes('pathways') && no_results_list.includes('genes') && no_results_list.includes('genomes')) {
+                $('#search_any_results').toggleClass('d-none', true);
+                $('#search_no_results').toggleClass('d-none', false);
+            }
+        }
+    }
+    function update_results_overview_with_genomes(genomes_found) {
+        $('#search_genomes_panel').toggleClass('opacity-50', false);
+        $('#genomes-spinner').toggleClass('d-none', true);
+        $('#genomes-button').toggleClass('disabled', false);
+        if (!genomes_found) {
+            no_results_list.push('genomes');
+            $('#search_genomes_panel').toggleClass('d-none', true);
+            $('#genomes-button').toggleClass('d-none', true);
+            $('#no-results-list').toggleClass('d-none', false);
+            $('#no-results-list-genomes').toggleClass('d-none', false);
+            if (no_results_list.includes('families') && no_results_list.includes('species') && no_results_list.includes('pathways') && no_results_list.includes('genes') && no_results_list.includes('genomes')) {
                 $('#search_any_results').toggleClass('d-none', true);
                 $('#search_no_results').toggleClass('d-none', false);
             }
