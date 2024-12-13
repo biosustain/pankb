@@ -149,6 +149,11 @@ urlpatterns = [
     ),
     path("search/", search_views.search_results, name="search_results"),
     path(
+        "search/genomes_json/",
+        search_views.genomes_json,
+        name="search_genomes_json",
+    ),
+    path(
         "search/genes_json/",
         search_views.gene_annotation_json,
         name="search_genes_json",
@@ -167,6 +172,11 @@ urlpatterns = [
         "search/pathway/csv/",
         search_views.download_search_pathway_csv,
         name="download_search_pathway_csv",
+    ),
+    path(
+        "search/genomes/csv/",
+        search_views.download_search_genomes_csv,
+        name="download_search_genomes_csv",
     ),
     path(
         "search/genes/csv/",

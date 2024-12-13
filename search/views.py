@@ -2,7 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from organisms.models import Organisms
 from pangenome_analyses.models import GeneAnnotations
-from gene_function.models import PathwayInfo
+from gene_function.models import PathwayInfo, GenomeInfo
 from common import csv_export
 import json, time, re
 
@@ -187,6 +187,51 @@ def download_search_genes_csv(request):
     return response
 
 
+def download_search_genomes_csv(request):
+    q_orig = request.GET.get("q")
+    q = clean_query(q_orig)
+    genome_keys = [
+        "pangenome_analysis",
+        "genome_id",
+        "strain",
+        "phylo_group",
+        "gc_content",
+        "country",
+        "broad_context",
+        "local_context",
+        "extra_context",
+        "isolation_source",
+    ]
+    if len(q) >= 2 and not re.search(
+        q, "Missing", flags=re.IGNORECASE
+    ):  # Prevent too many results:
+        genomes = GenomeInfo.objects.aggregate(
+            GenomeInfo.get_genome_and_isolation_info_pipeline({})
+            + build_multi_search_aggregation(
+                q, ["genome_id", "strain", "country", "iso_cat", "isolation_source"]
+            )
+            + [
+                {
+                    "$addFields": {
+                        "broad_context": {"$arrayElemAt": ["$iso_cat", 0]},
+                        "local_context": {"$arrayElemAt": ["$iso_cat", 1]},
+                        "extra_context": {"$slice": ["$iso_cat", 2, 10]},
+                    }
+                },
+                {"$project": {gk: int(gk != "_id") for gk in ["_id"] + genome_keys}},
+            ]
+        )
+    else:
+        genomes = []
+    downloaded_file_name = (
+        "Search__genomes__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
+    )
+    response = csv_export.dict_writer_response(
+        downloaded_file_name, genome_keys, genomes
+    )
+    return response
+
+
 # JSON data for gene datatable
 def gene_annotation_json(request):
     q_orig = str(request.GET["q"])
@@ -215,3 +260,50 @@ def gene_annotation_json(request):
     else:
         genes = []
     return JsonResponse({"results": genes})
+
+# JSON data for genome datatable
+def genomes_json(request):
+    q_orig = str(request.GET["q"])
+    q = clean_query(q_orig)
+
+    genome_keys = [
+        "pangenome_analysis",
+        "genome_id",
+        "strain",
+        "phylo_group",
+        "gc_content",
+        "country",
+        "broad_context",
+        "local_context",
+        "extra_context",
+        "isolation_source",
+    ]
+    if len(q) >= 2 and not re.search(
+        q, "Missing", flags=re.IGNORECASE
+    ):  # Prevent too many results
+        genomes = GenomeInfo.objects.aggregate(
+            GenomeInfo.get_genome_and_isolation_info_pipeline({})
+            + build_multi_search_aggregation(
+                q, ["genome_id", "strain", "country", "iso_cat", "isolation_source"]
+            )
+            + [
+                {
+                    "$addFields": {
+                        "broad_context": {"$arrayElemAt": ["$iso_cat", 0]},
+                        "local_context": {"$arrayElemAt": ["$iso_cat", 1]},
+                        "extra_context": {"$slice": ["$iso_cat", 2, 10]},
+                    }
+                },
+                {"$project": {gk: int(gk != "_id") for gk in ["_id"] + genome_keys}},
+            ]
+        )
+        genomes = [
+            [
+                (str(g.get(gk, None)) if gk == "strain" else g.get(gk, None))
+                for gk in genome_keys
+            ]
+            for g in genomes
+        ]
+    else:
+        genomes = []
+    return JsonResponse({"results": genomes})
