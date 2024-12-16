@@ -3388,7 +3388,59 @@
           this.save_x = this.x;
           this.save_span = this.last_span * 0.5;
           this.is_under_collapsed_parent = true;
-          this.process_internal_node(a_node);
+          
+          let count_undefined = 0;
+
+          if (this.showInternalName(a_node)) {
+            // do in-order traversal to allow for proper internal node spacing
+            // (x/2) >> 0 is integer division
+            let half_way = (a_node.children.length / 2) >> 0;
+            let displayed_children = 0;
+            let managed_to_display = false;
+    
+            for (let child_id = 0; child_id < a_node.children.length; child_id++) {
+              let child_x = this.tree_layout(a_node.children[child_id]);//.bind(this);
+    
+              if (typeof child_x == "number") {
+                displayed_children++;
+              }
+    
+              if (displayed_children >= half_way && !managed_to_display) {
+                this._handle_single_node_layout(a_node);
+                managed_to_display = true;
+              }
+            }
+    
+            if (displayed_children == 0) {
+              a_node.notshown = true;
+              a_node.x = undefined;
+            } else {
+              if (!managed_to_display) {
+                this._handle_single_node_layout(a_node);
+              }
+            }
+          } else {
+            // postorder layout
+
+            let acc = 0.0;
+            for (let child_id = 0; child_id < a_node.children.length; child_id++) {
+              let child_x = this.tree_layout(a_node.children[child_id]);//.bind(this);
+              if (typeof child_x == "number") {
+                acc = acc + child_x;
+              } else {
+                count_undefined += 1;
+              }
+            }
+            a_node.x = acc;
+    
+            if (count_undefined == a_node.children.length) {
+              a_node.notshown = true;
+              a_node.x = undefined;
+            } else {
+              a_node.x /= a_node.children.length - count_undefined;
+            }
+          }
+
           this.is_under_collapsed_parent = false;
 
           if (typeof a_node.x === "number") {
@@ -3425,7 +3477,56 @@
           }
         } else {
           // normal node, or under a collapsed parent
-          this.process_internal_node(a_node);
+          let count_undefined = 0;
+
+          if (this.showInternalName(a_node)) {
+            // do in-order traversal to allow for proper internal node spacing
+            // (x/2) >> 0 is integer division
+            let half_way = (a_node.children.length / 2) >> 0;
+            let displayed_children = 0;
+            let managed_to_display = false;
+    
+            for (let child_id = 0; child_id < a_node.children.length; child_id++) {
+              let child_x = this.tree_layout(a_node.children[child_id]);//.bind(this);
+    
+              if (typeof child_x == "number") {
+                displayed_children++;
+              }
+    
+              if (displayed_children >= half_way && !managed_to_display) {
+                this._handle_single_node_layout(a_node);
+                managed_to_display = true;
+              }
+            }
+    
+            if (displayed_children == 0) {
+              a_node.notshown = true;
+              a_node.x = undefined;
+            } else {
+              if (!managed_to_display) {
+                this._handle_single_node_layout(a_node);
+              }
+            }
+          } else {
+            // postorder layout
+            let acc = 0.0;
+            for (let child_id = 0; child_id < a_node.children.length; child_id++) {
+              let child_x = this.tree_layout(a_node.children[child_id]);//.bind(this);
+              if (typeof child_x == "number") {
+                acc = acc + child_x;
+              } else {
+                count_undefined += 1;
+              }
+            }
+            a_node.x = acc;
+    
+            if (count_undefined == a_node.children.length) {
+              a_node.notshown = true;
+              a_node.x = undefined;
+            } else {
+              a_node.x /= a_node.children.length - count_undefined;
+            }
+          }
         }
       }
 
