@@ -216,6 +216,8 @@
     const onDragXY = (event) => {
       scrollable_x.scrollLeft = elementFrom_x - event.clientX + pointerFrom_x;
       scrollable_y.scrollTop = elementFrom_y - event.clientY + pointerFrom_y;
+      event.stopPropagation();
+      event.preventDefault();
     };
     scrollable_xy_source.addEventListener('pointerdown', (event) => {
       if (phylotree_mouse_mode == "pan") {
@@ -225,15 +227,18 @@
         elementFrom_y = scrollable_y.scrollTop;
         document.addEventListener('pointermove', onDragXY);
         event.stopPropagation();
+        event.preventDefault();
       }
     });
     document.addEventListener('pointerup', (event) => {
       if (phylotree_mouse_mode == "pan") {
         document.removeEventListener('pointermove', onDragXY);
         event.stopPropagation();
+        event.preventDefault();
       }
     });
     scrollable_xy_source.addEventListener('wheel', (event) =>{
+      event.stopPropagation();
       event.preventDefault();
       scrollable_x.scrollLeft = scrollable_x.scrollLeft + event.deltaX;
       scrollable_y.scrollTop = scrollable_y.scrollTop + event.deltaY;
