@@ -4,6 +4,7 @@
 ## Contributors
 - Front-end, analytics, LLM, data processing via a bioinformatics pipeline: Binhuan Sun (v1.0.0), Pascal A. Pieters (>=v2.0.0)
 - Back-end, ETL pipeline, the website and vector databases, CI/CD pipeline, the github repo maintenance, versioning and backup systems, infrastructure, DevOps: Liubov Pashkova (v2.0.0) Pascal A. Pieters (>=v3.0.0)
+
 For more info, contact Pascal A. Pieters, paspie@biosustain.dtu.dk
 ## Server Configuration
 Tested on Linux Ubuntu 20.04 and 24.04 (may need tweaks for other systems).
