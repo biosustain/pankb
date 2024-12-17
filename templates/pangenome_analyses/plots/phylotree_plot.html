@@ -216,6 +216,8 @@
     const onDragXY = (event) => {
       scrollable_x.scrollLeft = elementFrom_x - event.clientX + pointerFrom_x;
       scrollable_y.scrollTop = elementFrom_y - event.clientY + pointerFrom_y;
+      event.stopPropagation();
+      event.preventDefault();
     };
     scrollable_xy_source.addEventListener('pointerdown', (event) => {
       if (phylotree_mouse_mode == "pan") {
@@ -225,15 +227,18 @@
         elementFrom_y = scrollable_y.scrollTop;
         document.addEventListener('pointermove', onDragXY);
         event.stopPropagation();
+        event.preventDefault();
       }
     });
     document.addEventListener('pointerup', (event) => {
       if (phylotree_mouse_mode == "pan") {
         document.removeEventListener('pointermove', onDragXY);
         event.stopPropagation();
+        event.preventDefault();
       }
     });
     scrollable_xy_source.addEventListener('wheel', (event) =>{
+      event.stopPropagation();
       event.preventDefault();
       scrollable_x.scrollLeft = scrollable_x.scrollLeft + event.deltaX;
       scrollable_y.scrollTop = scrollable_y.scrollTop + event.deltaY;
@@ -1244,25 +1249,38 @@
     function getAllLeafNodes(tree) {
       let leafNodes = [];
 
-      // Recursive function to traverse the tree
       function traverse(node) {
         if (!node || typeof node.data === "undefined" || typeof node.data.name === "undefined") {
-          console.error("Node or node.data.name is undefined:", node);
-          return; // Exit if node or node name is undefined
+          console.error("Root node or node.data.name is undefined:", node);
+          return; // Exit if the root node or its name is undefined
         }
 
-        // Check if the current node is a leaf (no children or empty children array)
-        if (!node.children || node.children.length === 0) {
-          leafNodes.push(node.data.name); // It's a leaf node, so add the name to leafNodes
-        } else if (node.children) {
-          // Traverse the children if they exist
-          node.children.forEach(child => {
-            if (child) {
-              traverse(child); // Recursively traverse child nodes
-            } else {
-              console.error("Child node is undefined");
+        // Initialize a stack for iterative traversal
+        let stack = [node];
+
+        while (stack.length > 0) {
+          // Pop a node from the stack
+          let currentNode = stack.pop();
+
+          // Check if currentNode is valid
+          if (!currentNode || typeof currentNode.data === "undefined" || typeof currentNode.data.name === "undefined") {
+            console.error("Node or node.data.name is undefined:", currentNode);
+            continue;
+          }
+
+          // Check if it's a leaf node
+          if (!currentNode.children || currentNode.children.length === 0) {
+            leafNodes.push(currentNode.data.name); // Add the name to leafNodes
+          } else {
+            // Push children onto the stack
+            for (let i = currentNode.children.length - 1; i >= 0; i--) {
+              if (currentNode.children[i]) {
+                stack.push(currentNode.children[i]);
+              } else {
+                console.error("Child node is undefined");
+              }
             }
-          });
+          }
         }
       }
 
