@@ -5,7 +5,29 @@ from common import database
 class GeneInfo:
     objects = database.MongoDBObjects("pankb_gene_info")
 
-    def get_gene_info_and_pangenomic_class_pipeline(gene_match):
+    def get_gene_info_and_pangenomic_class_pipeline(gene_match): # This is an ugly workaround to make it compatible with Azure Cosmos DB
+        return [
+            {"$match": gene_match},
+            {
+                "$unionWith": {
+                    "coll": "pankb_gene_annotations",
+                    "pipeline": [
+                        {
+                            "$match": {
+                                "pangenome_analysis": gene_match["pangenome_analysis"]
+                            }
+                        },
+                        {"$project": {"_id": 1, "gene": 1, "pangenomic_class": 1}},
+                    ],
+                }
+            },
+            {"$group": {"_id": "$gene", "doc": {"$mergeObjects": "$$ROOT"}}},
+            {"$replaceRoot": {"newRoot": "$doc"}},
+            {"$match": {"locus_tag": {"$exists": True}}},
+            {"$fill": {"output": {"pangenomic_class": {"value": "-"}}}}
+        ]
+
+    def get_gene_info_and_pangenomic_class_pipeline_mongodb_only(gene_match):
         return [
             {"$match": gene_match},
             {
