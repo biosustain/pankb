@@ -28,6 +28,7 @@
         <th class="text-center">Genome ID</th>
         {% else %}
         <th class="text-center">Gene</th>
+        <th class="text-center">Class</th>
         {% endif %}
         <th class="text-center">Protein</th>
         <th class="text-center">Start Position</th>
@@ -46,6 +47,7 @@
             <th class="text-center">Genome ID</th>
             {% else %}
             <th class="text-center">Gene</th>
+            <th class="text-center">Class</th>
             {% endif %}
             <th class="text-center">Protein</th>
             <th class="text-center">Start Position</th>
@@ -115,6 +117,9 @@
                     render: function(data, type, row) {
                         return '<a href="{% url 'gene_info' %}?species={{request.GET.species|safe}}&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
                     },
+                },
+                {
+                    data: 'pangenomic_class',
                 },
                 {% endif %}
                 {

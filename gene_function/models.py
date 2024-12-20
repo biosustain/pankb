@@ -5,6 +5,58 @@ from common import database
 class GeneInfo:
     objects = database.MongoDBObjects("pankb_gene_info")
 
+    def get_gene_info_and_pangenomic_class_pipeline(gene_match):
+        return [
+            {"$match": gene_match},
+            {
+                "$lookup": {
+                    "from": "pankb_gene_annotations",
+                    "let": {
+                        "q_gene": "$gene",
+                        "q_pangenome_analysis": "$pangenome_analysis",
+                    },
+                    "pipeline": [
+                        {
+                            "$match": {
+                                "$expr": {
+                                    "$and": [
+                                        {"$eq": ["$gene", "$$q_gene"]},
+                                        {
+                                            "$eq": [
+                                                "$pangenome_analysis",
+                                                "$$q_pangenome_analysis",
+                                            ]
+                                        },
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    "as": "pangenomic_class",
+                }
+            },
+            {
+                "$set": {
+                    "pangenomic_class": {
+                        "$ifNull": [
+                            {"$arrayElemAt": ["$pangenomic_class.pangenomic_class", 0]},
+                            "-",
+                        ]
+                    }
+                }
+            },
+        ]
+
+    def get_gene_info_and_pangenomic_class(genome_match, projection=None):
+        pipeline = GeneInfo.get_gene_info_and_pangenomic_class_pipeline(genome_match)
+        if isinstance(projection, list):
+            projection = {p: 1 for p in projection}
+            if not "_id" in projection:
+                projection["_id"] = 0
+        if projection:
+            pipeline.append({"$project": projection})
+        return GeneInfo.objects.aggregate(pipeline)
+
 
 # Model for the Genome Info table content
 class GenomeInfo:
