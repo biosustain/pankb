@@ -180,20 +180,20 @@
                 </svg> 
             `;
             return `
-                    <div class="info-subtable-container" style="width:100%;">
-                        <table class="info-subtable" style="table-layout: auto; width: 100%;">
-                            <tr class="pb-${rowPadding} info-subtable-row">
-                                <td class="info-subtable-cell d-block">
+                    <div style="width:100%;">
+                        <table style="table-layout: auto; width: 100%;">
+                            <tr class="pb-${rowPadding}">
+                                <td class="d-block">
                                     <div>
                                         <p ${fieldFormatting}>Protein</p>
                                     </div>
                                 </td>
-                                <td class="info-subtable-cell ${fontSize}">
+                                <td class="${fontSize}">
                                     <p>${row_data.protein}</p>
                                 </td>
                             </tr>
-                            <tr class="pb-${rowPadding} info-subtable-row">
-                                <td class="info-subtable-cell d-block">
+                            <tr class="pb-${rowPadding}">
+                                <td class="d-block">
                                     <div>
                                         <p ${fieldFormatting}>Nucleotide Seq</p>
                                         <button ${buttonFormatting} onClick="navigator.clipboard.writeText('${row_data.nucleotide_seq}');">
@@ -202,11 +202,11 @@
                                         </button>
                                     </div>
                                 </td>
-                                <td class="info-subtable-cell info-subtable-cell">
+                                <td>
                                     <p ${sequenceFormatting}>${row_data.nucleotide_seq}</p>
                                 </td>
                             </tr>
-                            <tr class="pb-${rowPadding} info-subtable-row">
+                            <tr class="pb-${rowPadding}">
                                 <td class="d-block">
                                     <div>
                                         <p ${fieldFormatting}>Amino Acid Seq</p>
@@ -216,7 +216,7 @@
                                         </button>
                                     </div>
                                 </td>
-                                <td class="info-subtable-cell">
+                                <td>
                                     <p ${sequenceFormatting}>${row_data.aminoacid_seq}</p>
                                 </td>
                             </tr>
