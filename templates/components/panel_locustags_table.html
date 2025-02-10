@@ -180,20 +180,20 @@
                 </svg> 
             `;
             return `
-                    <div style="width:100%;">
-                        <table style="table-layout: auto; width: 100%;">
-                            <tr class="pb-${rowPadding}">
-                                <td class="d-block">
+                    <div class="info-subtable-container" style="width:100%;">
+                        <table class="info-subtable" style="table-layout: auto; width: 100%;">
+                            <tr class="pb-${rowPadding} info-subtable-row">
+                                <td class="info-subtable-cell d-block">
                                     <div>
                                         <p ${fieldFormatting}>Protein</p>
                                     </div>
                                 </td>
-                                <td class="${fontSize}">
+                                <td class="info-subtable-cell ${fontSize}">
                                     <p>${row_data.protein}</p>
                                 </td>
                             </tr>
-                            <tr class="pb-${rowPadding}">
-                                <td class="d-block">
+                            <tr class="pb-${rowPadding} info-subtable-row">
+                                <td class="info-subtable-cell d-block">
                                     <div>
                                         <p ${fieldFormatting}>Nucleotide Seq</p>
                                         <button ${buttonFormatting} onClick="navigator.clipboard.writeText('${row_data.nucleotide_seq}');">
@@ -202,11 +202,11 @@
                                         </button>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="info-subtable-cell info-subtable-cell">
                                     <p ${sequenceFormatting}>${row_data.nucleotide_seq}</p>
                                 </td>
                             </tr>
-                            <tr class="pb-${rowPadding}">
+                            <tr class="pb-${rowPadding} info-subtable-row">
                                 <td class="d-block">
                                     <div>
                                         <p ${fieldFormatting}>Amino Acid Seq</p>
@@ -216,7 +216,7 @@
                                         </button>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="info-subtable-cell">
                                     <p ${sequenceFormatting}>${row_data.aminoacid_seq}</p>
                                 </td>
                             </tr>
@@ -226,13 +226,14 @@
         }
 
         // Expand or collapse a table row on click: ----
-        $('#locustags_table tbody').on('click', 'td', function () {
+        $('#locustags_table > tbody > tr').on('click', 'td', function (event) {
             let tr = $(this).closest('tr')
             let row = table.row(tr);
+
             if (row.child.isShown()) {
                 row.child.hide();
             } else {
-                row.child(format_row_child(row.data())).show();
+                row.child(format_row_child(row.data(), "info-row")).show();
             }
         });
 
