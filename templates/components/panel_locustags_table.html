@@ -84,7 +84,7 @@
             data: geneData,
             autoWidth: true,
             fixedColumns: true,
-            scrollX: true,
+            // scrollX: true,
             columns: [
                 { 
                     data: 'locus_tag',
@@ -167,10 +167,41 @@
             },
         });
 
+        function format_row_child(row_data) {
+            console.log(row_data);
+            const fs = "fs-3"
+            const row_pad = 3;
+            const field_formatting = `class="fw-bold ps-2 pe-3 align-top ${fs}"`;
+            const seq_formatting = 'class="font-monospace fs-4 pe-3 pt-1" style="white-space: normal; word-break: break-word; overflow-wrap: anywhere;"';
+            return `
+                    <div style="width:100%;">
+                        <table style="table-layout: auto; width: 100%;">
+                            <tr class="pb-${row_pad}">
+                                <td ${field_formatting}>Protein</td>
+                                <td class="${fs}"><p>${row_data.protein}</p></td>
+                            </tr>
+                            <tr class="pb-${row_pad}">
+                                <td ${field_formatting}>Nucleotide Seq</td>
+                                <td><p ${seq_formatting}>${row_data.nucleotide_seq}</p></td>
+                            </tr>
+                            <tr class="pb-${row_pad}">
+                                <td ${field_formatting}>Amino Acid Seq</td>
+                                <td><p ${seq_formatting}>${row_data.aminoacid_seq}</p></td>
+                            </tr>
+                        </table>
+                    </div>
+            `;
+        }
+
         // Expand or collapse a table row on click: ----
         $('#locustags_table tbody').on('click', 'td', function () {
-            let row = $(this).closest('tr')
-            row.toggleClass('expanded-row');
+            let tr = $(this).closest('tr')
+            let row = table.row(tr);
+            if (row.child.isShown()) {
+                row.child.hide();
+            } else {
+                row.child(format_row_child(row.data())).show();
+            }
         });
 
     });
