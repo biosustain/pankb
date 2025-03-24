@@ -18,6 +18,7 @@
         <th>Description</th>
         <th>Protein</th>
         <th>PFAMs</th>
+        <th>Phylons</th>
         <th>Count</th>
     </tr>
     </thead>
@@ -32,6 +33,7 @@
             <th>Description</th>
             <th>Protein</th>
             <th>PFAMs</th>
+            <th>Phylons</th>
             <th class="no_search"></th>
         </tr>
     </tfoot>
@@ -109,11 +111,15 @@
                     className: 'pfams',
                 },
                 {
+                    data: '9',
+                    name: 'phylons',
+                },
+                {
                     data: '6',
                     name: 'frequency',
                     searchable: false,
                     width: '80px',
-                }
+                },
             ],
             language: {
                 loadingRecords: 'Loading...',

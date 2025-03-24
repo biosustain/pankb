@@ -12,8 +12,9 @@
     <thead>
     <tr>
         <th>Genome</th>
-        <th>Stain (NCBI)</th>
+        <th>Strain (NCBI)</th>
         <th>Phylo Group</th>
+        <th>Phylons</th>
         <th>Length</th>
         <th>%GC</th>
         <th>Country</th>
@@ -27,8 +28,9 @@
     <tfoot>
         <tr>
             <th>Genome</th>
-            <th>Stain (NCBI)</th>
+            <th>Strain (NCBI)</th>
             <th>Phylo Group</th>
+            <th>Phylons</th>
             <th class="no_search"></th>
             <th class="no_search"></th>
             <th>Country</th>
@@ -76,17 +78,21 @@
                 },
                 {
                     data: '4',
-                    name: 'genome_len',
+                    name: 'phylons',
                 },
                 {
                     data: '5',
+                    name: 'genome_len',
+                },
+                {
+                    data: '6',
                     name: 'gc_content',
                     render: function (data, type, row) {
                         return (data*100).toFixed(2)
                     },
                 },
                 {
-                    data: '6',
+                    data: '7',
                     name: 'country',
                     render: function (data, type, row) {
                         if (data == "?") {
@@ -97,7 +103,7 @@
                     },
                 },
                 {
-                    data: '8',
+                    data: '9',
                     name: 'iso_cat.0',
                     render: function (data, type, row) {
                         if (data == "?" || data == "Missing" || data == "missing") {
@@ -108,7 +114,7 @@
                     },
                 },
                 {
-                    data: '9',
+                    data: '10',
                     name: 'iso_cat.1',
                     render: function (data, type, row) {
                         if (data == "?" || data == "Missing" || data == "missing") {
@@ -119,7 +125,7 @@
                     },
                 },
                 {
-                    data: '7',
+                    data: '8',
                     name: 'isolation_source',
                     render: function (data, type, row) {
                         if (data == "?" || data == "Missing" || data == "missing") {

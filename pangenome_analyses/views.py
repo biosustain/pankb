@@ -1,11 +1,17 @@
+from typing import Optional
 from django.http import HttpResponse, Http404, JsonResponse
 from django.template import loader
 from django.conf import settings
+
+import phylons
+from phylons.models import Phylons
 from .models import GeneAnnotations
 from gene_function.models import GenomeInfo
 from organisms.models import Organisms
 import json, requests, gzip, time
 from common import datatables, csv_export
+import sys
+from pprint import pprint
 
 
 ################### Overview Page Templates ###################################
@@ -347,6 +353,19 @@ def get_iso_context(iso_cat, i):
     return x
 
 
+def make_phylons_strings(genome_phylons_mapping: dict[str, Optional[list[int]]]) -> dict[str, str]:
+    def make_phylons_string(phylons_list: Optional[list[int]]) -> str:
+        if phylons_list is None:
+            return "-"
+        
+        return ", ".join(str(phylon) for phylon in phylons_list)
+    
+    return {
+        genome_id: make_phylons_string(phylons)
+        for genome_id, phylons in genome_phylons_mapping.items()
+    }
+
+
 # Template renderer for the Phylogenetic Tree plot subtemplate
 def phylotree_plot(request):
     template = loader.get_template("pangenome_analyses/plots/phylotree_plot.html")
@@ -361,6 +380,19 @@ def phylotree_plot(request):
             "pangenome_analysis": species,
         }
     )
+    
+    try:
+        genome_phylons_mapping = Phylons.get_by_pangenome_analysis(species)["genome_phylons"]
+    except Phylons.NotFound:
+        raise Http404()
+    except Phylons.DuplicateEntry:
+        return HttpResponse(content=f"Duplicate phylons entries found for species: {species}", status=500)
+
+    genome_phylons_mapping = make_phylons_strings(genome_phylons_mapping) 
+
+    # Print genome_phylons_mapping to stderr for debugging
+    pprint(genome_phylons_mapping, stream=sys.stderr)
+    
     source_info = {
         g["genome_id"].replace(".", ""): {
             "Country": "-" if g["country"] == "?" else g["country"],
@@ -371,9 +403,13 @@ def phylotree_plot(request):
                 if str(g["isolation_source"]).lower() == "missing"
                 else str(g["isolation_source"])
             ),
+            "Phylons": genome_phylons_mapping.get(g["genome_id"], "-"),
         }
         for g in genome_info_dict
     }
+
+    # Print source_info to stderr for debugging
+    pprint(source_info, stream=sys.stderr)
 
     r = requests.get(url)
 
@@ -405,11 +441,23 @@ def gene_annotation_json(request):
         GeneAnnotations.objects.aggregate, request.GET, select_pipeline, gene_keys
     )
 
+    gene_phylons = Phylons.get_by_pangenome_analysis(pangenome_analysis).get("gene_phylons", {})
+    for data_entry in response["data"]:
+        gene = data_entry[0]
+        phylons = gene_phylons.get(gene, None)
+        phylons_string = '-' if phylons is None else ', '.join(str(phylon) for phylon in phylons)
+        data_entry.append(phylons_string)
+
+
+    pprint(response, stream=sys.stderr)
+
     return JsonResponse(response)
 
 
 def genome_json(request):
     pangenome_analysis = str(request.GET["pangenome_analysis"])
+    print(f'{pangenome_analysis=}', file=sys.stderr)
+    print(f'{request.GET["pangenome_analysis"]=}', file=sys.stderr)
     genome_keys = [
         "pangenome_analysis",
         "genome_id",
@@ -424,6 +472,9 @@ def genome_json(request):
     select_pipeline = GenomeInfo.get_genome_and_isolation_info_pipeline(
         {"pangenome_analysis": pangenome_analysis}
     )
+    
+    print(f'{type(request.GET)=}', file=sys.stderr)
+    print(request.GET, file=sys.stderr)
 
     response = datatables.create_datatables_api(
         GenomeInfo.objects.aggregate, request.GET, select_pipeline, genome_keys
@@ -445,4 +496,30 @@ def genome_json(request):
         else:
             cats.append("-")
         d.extend(cats)
+
+    # merge phylon data into the datatbles response
+    phylons = Phylons.get_by_pangenome_analysis(pangenome_analysis).get("genome_phylons", {})
+    phylons_idx = None
+    genome_id_idx = None
+    for i, column in enumerate(response["columns"]):
+        if column.get("name", "") == "phylons":
+            phylons_idx = i
+        
+        if column.get("name", "") == "genome_id":
+            genome_id_idx = i
+    
+
+    for data_entry in response["data"]:
+        # +1 in the indices because the first item is always pangenome_analysis
+        genome_id = data_entry[genome_id_idx + 1]
+        if genome_id not in phylons.keys():
+            phylons_string = "-"
+        else:
+            genome_phylons = phylons[genome_id]
+            phylons_string = '-' if genome_phylons is None else ', '.join(str(phylon) for phylon in genome_phylons)
+        data_entry.insert(phylons_idx + 1, phylons_string)
+
+    
+    pprint(response, stream=sys.stderr)
+
     return JsonResponse(response)

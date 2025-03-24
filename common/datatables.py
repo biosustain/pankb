@@ -116,6 +116,12 @@ def create_datatables_api(
     results_count = list(mongo_aggregate(total_count_pipeline))
     results = list(mongo_aggregate(pipeline))
 
+    # from pprint import pprint
+    # import sys
+    # print('------ results:', file=sys.stderr)
+    # pprint(results, stream=sys.stderr)
+    # print('------\n\n', file=sys.stderr)
+
     if not results and not results_count:
         data = []
         recordsTotal = 0  # TODO: this is not really correct

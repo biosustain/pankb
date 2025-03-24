@@ -1,3 +1,4 @@
+from sys import stderr
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from organisms.models import Organisms
@@ -260,6 +261,7 @@ def gene_annotation_json(request):
         genes = [[g.get(gk, None) for gk in gene_keys] for g in genes]
     else:
         genes = []
+
     return JsonResponse({"results": genes})
 
 # JSON data for genome datatable
@@ -308,4 +310,5 @@ def genomes_json(request):
         ]
     else:
         genomes = []
+
     return JsonResponse({"results": genomes})
