@@ -107,6 +107,11 @@ urlpatterns = [
         name="pangenome_analyses_phylogenetic_tree",
     ),
     path(
+        "pangenome_analyses/phylons/",
+        pangenome_analyses_views.phylons,
+        name="pangenome_analyses_phylons",
+    ),
+    path(
         "phylotree_plot/",
         pangenome_analyses_views.phylotree_plot,
         name="phylotree_plot",

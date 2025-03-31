@@ -1,4 +1,5 @@
 from common import database
+from functools import cache
 
 # Model representing Phylons info ----
 class Phylons:
@@ -10,6 +11,7 @@ class Phylons:
     class DuplicateEntry(Exception):
         pass
 
+    @cache
     def get_by_pangenome_analysis(pangenome_analysis: str):
         phylon_documents = list(
             Phylons.objects.find(

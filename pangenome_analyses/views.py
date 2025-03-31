@@ -321,6 +321,34 @@ def download_genome_info_table_csv(request):
     )
     return response
 
+######################### Phylons Page Templates #######################################
+
+# Template renderer for the Phylons Page
+def phylons(request):
+    template = loader.get_template("pangenome_analyses/phylons.html")
+    species = request.GET["species"]
+
+    try:
+        phylons_info = Phylons.get_by_pangenome_analysis(species)
+    except Phylons.NotFound:
+        raise Http404()
+    
+    try:
+        organism_info = Organisms.get_by_pangenome_analysis(
+            species,
+            ["species", "family", "genomes_num", "gene_class_distribution", "openness"],
+        )
+    except Organisms.NotFound:
+        raise Http404()
+
+    # Compose a context for the template rendering
+    context = {
+        "phylon_ids": sorted([int(phylon) for phylon in phylons_info["phylon_genomes"].keys()]), 
+        "pangenome_analysis": species, 
+        "species_data": organism_info
+    }
+    return HttpResponse(template.render(context, request))
+
 
 ################### Phylogenetic Tree Page Templates ###################################
 

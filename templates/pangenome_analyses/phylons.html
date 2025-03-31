@@ -1,0 +1,19 @@
+{% extends "index_with_infopanel.html" %}
+{% block page_title %}Genes{% endblock %}
+
+{% block header_load_datatables %}{% include 'tables/load_datatables.html' %}{% endblock %}
+
+{% block header_content %}
+{% include "navigation.html" with active_page="organisms" %}
+{% include "search/search.html" %}
+{% endblock %}
+
+{% block infopanel_content %}
+{% include 'pangenome_analyses/info_panel_genes.html' with active_subpage="phylons" %}
+{% endblock %}
+
+{% block main_content %}
+    {% for phylon_id in phylon_ids %}
+        {% include 'components/phylons_tables.html' with pangenome_analysis=pangenome_analysis phylon_id=phylon_id %}
+    {% endfor %}
+{% endblock %}
