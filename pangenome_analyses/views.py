@@ -1,3 +1,5 @@
+from multiprocessing import context
+from re import template
 from typing import Optional
 from django.http import HttpResponse, Http404, JsonResponse
 from django.template import loader
@@ -324,7 +326,7 @@ def download_genome_info_table_csv(request):
 ######################### Phylons Page Templates #######################################
 
 # Template renderer for the Phylons Page
-def phylons(request):
+def phylons(request) -> HttpResponse:
     template = loader.get_template("pangenome_analyses/phylons.html")
     species = request.GET["species"]
 
@@ -349,6 +351,83 @@ def phylons(request):
     }
     return HttpResponse(template.render(context, request))
 
+
+def phylon_genome_weights_json(request, pangenome_analysis: str, phylon_id: str) -> JsonResponse:
+    start, length = request.GET["start"], request.GET["length"]
+    start, length = int(start), int(length)
+    end = start + length
+
+    columns = [
+        {
+            "data": 0,
+            "name": "genome_id",
+            "search.value": '',
+            "searchable": 'true',
+        },
+        {
+            "data": 1,
+            "name": "A_weight",
+            "search.value": '',
+            "searchable": 'false',
+        },
+    ]
+
+    phylons_data = Phylons.get_by_pangenome_analysis(pangenome_analysis)
+
+    genome_to_weight_map = phylons_data["phylon_genome_weights"][phylon_id]
+
+    table_data = [(genome, weight) for genome, weight in genome_to_weight_map.items()]
+    table_data.sort(key=lambda tup: tup[1], reverse=True)
+    table_data = table_data[start:end]
+
+    datatables_response = {
+        "columns": columns,
+        "data": table_data,
+        "draw": int(request.GET["draw"]) + 1,
+        "recordsFiltered": len(genome_to_weight_map),
+        "recordsTotal": len(genome_to_weight_map),
+    }
+
+    return JsonResponse(datatables_response)
+
+
+def phylon_gene_weights_json(request, pangenome_analysis: str, phylon_id: str) -> JsonResponse:
+    start, length = request.GET["start"], request.GET["length"]
+    start, length = int(start), int(length)
+    end = start + length
+
+    columns = [
+        {
+            "data": 0,
+            "name": "gene",
+            "search.value": '',
+            "searchable": 'true',
+        },
+        {
+            "data": 1,
+            "name": "L_weight",
+            "search.value": '',
+            "searchable": 'false',
+        },
+    ]
+
+    phylons_data = Phylons.get_by_pangenome_analysis(pangenome_analysis)
+
+    genome_to_weight_map = phylons_data["phylon_gene_weights"][phylon_id]
+
+    table_data = [(gene, weight) for gene, weight in genome_to_weight_map.items()]
+    table_data.sort(key=lambda tup: tup[1], reverse=True)
+    table_data = table_data[start:end]
+
+    datatables_response = {
+        "columns": columns,
+        "data": table_data,
+        "draw": int(request.GET["draw"]) + 1,
+        "recordsFiltered": len(genome_to_weight_map),
+        "recordsTotal": len(genome_to_weight_map),
+    }
+
+    return JsonResponse(datatables_response)
 
 ################### Phylogenetic Tree Page Templates ###################################
 
@@ -476,16 +555,14 @@ def gene_annotation_json(request):
         phylons_string = '-' if phylons is None else ', '.join(str(phylon) for phylon in phylons)
         data_entry.append(phylons_string)
 
-
-    pprint(response, stream=sys.stderr)
+    # pprint(response, stream=sys.stderr)
+    # print(type(response), file=sys.stderr)
 
     return JsonResponse(response)
 
 
 def genome_json(request):
     pangenome_analysis = str(request.GET["pangenome_analysis"])
-    print(f'{pangenome_analysis=}', file=sys.stderr)
-    print(f'{request.GET["pangenome_analysis"]=}', file=sys.stderr)
     genome_keys = [
         "pangenome_analysis",
         "genome_id",
@@ -500,9 +577,6 @@ def genome_json(request):
     select_pipeline = GenomeInfo.get_genome_and_isolation_info_pipeline(
         {"pangenome_analysis": pangenome_analysis}
     )
-    
-    print(f'{type(request.GET)=}', file=sys.stderr)
-    print(request.GET, file=sys.stderr)
 
     response = datatables.create_datatables_api(
         GenomeInfo.objects.aggregate, request.GET, select_pipeline, genome_keys
@@ -546,8 +620,5 @@ def genome_json(request):
             genome_phylons = phylons[genome_id]
             phylons_string = '-' if genome_phylons is None else ', '.join(str(phylon) for phylon in genome_phylons)
         data_entry.insert(phylons_idx + 1, phylons_string)
-
-    
-    pprint(response, stream=sys.stderr)
 
     return JsonResponse(response)
