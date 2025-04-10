@@ -1,5 +1,6 @@
 import re
-
+from pprint import pprint
+import sys
 
 def _parse_get_array(req_get, name):
     data = {}
@@ -27,6 +28,8 @@ def _parse_get_array(req_get, name):
 def create_datatables_api(
     mongo_aggregate, request_get, select_pipeline, out_keys, as_list=True
 ):
+    print("GET:", file=sys.stderr)
+    pprint(request_get, stream=sys.stderr)
     draw = int(request_get["draw"])
     start = int(request_get["start"])
     length = int(request_get["length"])
@@ -113,14 +116,20 @@ def create_datatables_api(
         ]
     )
 
-    results_count = list(mongo_aggregate(total_count_pipeline))
-    results = list(mongo_aggregate(pipeline))
+    print("PIPELINE:", file=sys.stderr)
+    pprint(pipeline, stream=sys.stderr)
 
-    # from pprint import pprint
-    # import sys
-    # print('------ results:', file=sys.stderr)
-    # pprint(results, stream=sys.stderr)
-    # print('------\n\n', file=sys.stderr)
+    results_count = mongo_aggregate(total_count_pipeline)
+    results = mongo_aggregate(pipeline)
+
+    results_count = list(results_count)
+    print("results count done", file=sys.stderr)
+
+    results = list(results)
+    print("results done", file=sys.stderr)
+    
+    print("RESULTS:", file=sys.stderr)
+    pprint(results, stream=sys.stderr)
 
     if not results and not results_count:
         data = []

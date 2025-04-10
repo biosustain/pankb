@@ -1,28 +1,49 @@
 from common import database
 from functools import lru_cache
+from collections import defaultdict
 
 # Model representing Phylons info ----
 class Phylons:
-    objects = database.MongoDBObjects('pankb_phylons')
+    collections = {
+        "genome": database.MongoDBObjects('pankb_genome_phylons'),
+        "gene": database.MongoDBObjects('pankb_gene_phylons'),
+    }
     
     class NotFound(Exception):
         pass
 
-    class DuplicateEntry(Exception):
-        pass
+    @lru_cache(maxsize=50)
+    def get_phylon_weights(pangenome_analysis: str, collection: str) -> dict[str, dict[int, float]]:
+        assert collection in Phylons.collections.keys(), f"Invalid collection: {collection}. Must be one of {list(Phylons.collections.keys())}"
 
-    @lru_cache(maxsize=1000)
-    def get_by_pangenome_analysis(pangenome_analysis: str):
-        phylon_documents = list(
-            Phylons.objects.find(
-                {"pangenome_analysis": pangenome_analysis},
-            )
+        phylon_documents = Phylons.collections[collection].find(
+            {"pangenome_analysis": pangenome_analysis},
         )
 
-        if len(phylon_documents) == 0:
-            raise Phylons.NotFound()
-        elif len(phylon_documents) > 1:
-            raise Phylons.DuplicateEntry(f"Duplicate entries for pangenome analysis {pangenome_analysis}")
+        id_key = "genome_id" if collection == "genome" else "gene"
+
+        phylon_weights = defaultdict(dict)
+        for document in phylon_documents:
+            id = document[id_key]
+            weights = document["phylon_weights"]
+            for phylon, weight in weights.items():
+                phylon_weights[int(phylon)][id] = weight
         
-        phylon_document = phylon_documents[0]
-        return phylon_document
+        return phylon_weights
+
+
+    @lru_cache(maxsize=1000)
+    def get_phylon_ids(pangenome_analysis: str):
+        phylon_document = Phylons.collections["genome"].find_one(
+                {"pangenome_analysis": pangenome_analysis},
+            )
+        
+        import sys
+        from pprint import pprint
+        print(type(phylon_document), file=sys.stderr)
+        pprint(phylon_document, stream=sys.stderr)
+
+        if not phylon_document:
+            raise Phylons.NotFound()
+
+        return sorted(int(n) for n in phylon_document["phylon_weights"].keys())

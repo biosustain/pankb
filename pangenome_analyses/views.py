@@ -328,16 +328,16 @@ def download_genome_info_table_csv(request):
 # Template renderer for the Phylons Page
 def phylons(request) -> HttpResponse:
     template = loader.get_template("pangenome_analyses/phylons.html")
-    species = request.GET["species"]
+    pangenome_analysis = request.GET["species"]
 
     try:
-        phylons_info = Phylons.get_by_pangenome_analysis(species)
+        phylon_ids = Phylons.get_phylon_ids(pangenome_analysis)
     except Phylons.NotFound:
         raise Http404()
     
     try:
         organism_info = Organisms.get_by_pangenome_analysis(
-            species,
+            pangenome_analysis,
             ["species", "family", "genomes_num", "gene_class_distribution", "openness"],
         )
     except Organisms.NotFound:
@@ -345,8 +345,8 @@ def phylons(request) -> HttpResponse:
 
     # Compose a context for the template rendering
     context = {
-        "phylon_ids": sorted([int(phylon) for phylon in phylons_info["phylon_genomes"].keys()]), 
-        "pangenome_analysis": species, 
+        "phylon_ids": phylon_ids, 
+        "pangenome_analysis": pangenome_analysis, 
         "species_data": organism_info
     }
     return HttpResponse(template.render(context, request))
@@ -356,6 +356,7 @@ def phylon_genome_weights_json(request, pangenome_analysis: str, phylon_id: str)
     start, length = request.GET["start"], request.GET["length"]
     start, length = int(start), int(length)
     end = start + length
+    phylon_id = int(phylon_id)
 
     columns = [
         {
@@ -372,11 +373,12 @@ def phylon_genome_weights_json(request, pangenome_analysis: str, phylon_id: str)
         },
     ]
 
-    phylons_data = Phylons.get_by_pangenome_analysis(pangenome_analysis)
+    weights_by_phylon = Phylons.get_phylon_weights(pangenome_analysis, "genome")
+    genome_weights = weights_by_phylon[phylon_id]
 
-    genome_to_weight_map = phylons_data["phylon_genome_weights"][phylon_id]
+    pprint(genome_weights, stream=sys.stderr)
 
-    table_data = [(genome, weight) for genome, weight in genome_to_weight_map.items()]
+    table_data = [(genome, weight) for genome, weight in genome_weights.items()]
     table_data.sort(key=lambda tup: tup[1], reverse=True)
     table_data = table_data[start:end]
 
@@ -384,8 +386,8 @@ def phylon_genome_weights_json(request, pangenome_analysis: str, phylon_id: str)
         "columns": columns,
         "data": table_data,
         "draw": int(request.GET["draw"]) + 1,
-        "recordsFiltered": len(genome_to_weight_map),
-        "recordsTotal": len(genome_to_weight_map),
+        "recordsFiltered": len(genome_weights),
+        "recordsTotal": len(genome_weights),
     }
 
     return JsonResponse(datatables_response)
@@ -395,6 +397,7 @@ def phylon_gene_weights_json(request, pangenome_analysis: str, phylon_id: str) -
     start, length = request.GET["start"], request.GET["length"]
     start, length = int(start), int(length)
     end = start + length
+    phylon_id = int(phylon_id)
 
     columns = [
         {
@@ -411,11 +414,12 @@ def phylon_gene_weights_json(request, pangenome_analysis: str, phylon_id: str) -
         },
     ]
 
-    phylons_data = Phylons.get_by_pangenome_analysis(pangenome_analysis)
+    weights_by_phylon = Phylons.get_phylon_weights(pangenome_analysis, "gene")
+    gene_weights = weights_by_phylon[phylon_id]
 
-    genome_to_weight_map = phylons_data["phylon_gene_weights"][phylon_id]
+    pprint(gene_weights, stream=sys.stderr)
 
-    table_data = [(gene, weight) for gene, weight in genome_to_weight_map.items()]
+    table_data = [(gene, weight) for gene, weight in gene_weights.items()]
     table_data.sort(key=lambda tup: tup[1], reverse=True)
     table_data = table_data[start:end]
 
@@ -423,8 +427,8 @@ def phylon_gene_weights_json(request, pangenome_analysis: str, phylon_id: str) -
         "columns": columns,
         "data": table_data,
         "draw": int(request.GET["draw"]) + 1,
-        "recordsFiltered": len(genome_to_weight_map),
-        "recordsTotal": len(genome_to_weight_map),
+        "recordsFiltered": len(gene_weights),
+        "recordsTotal": len(gene_weights),
     }
 
     return JsonResponse(datatables_response)
@@ -489,12 +493,10 @@ def phylotree_plot(request):
     )
     
     try:
-        genome_phylons_mapping = Phylons.get_by_pangenome_analysis(species)["genome_phylons"]
+        genome_phylons_mapping = Phylons.get_phylon_ids(species)["genome_phylons"]
     except Phylons.NotFound:
         raise Http404()
-    except Phylons.DuplicateEntry:
-        return HttpResponse(content=f"Duplicate phylons entries found for species: {species}", status=500)
-
+    
     genome_phylons_mapping = make_phylons_strings(genome_phylons_mapping) 
 
     # Print genome_phylons_mapping to stderr for debugging
@@ -533,30 +535,37 @@ def gene_annotation_json(request):
     pangenome_analysis = str(request.GET["pangenome_analysis"])
     gene_keys = [
         "gene",
+        "pangenomic_class",
         "cog_category",
         "cog_name",
         "description",
         "protein",
         "pfams",
+        "gene_phylons",
         "frequency",
-        "pangenomic_class",
-        "pangenome_analysis",
     ]
-    select_pipeline = [{"$match": {"pangenome_analysis": pangenome_analysis}}]
+    select_pipeline = [
+        {"$match": {"pangenome_analysis": pangenome_analysis}},
+        {'$lookup': {
+            "from": "pankb_gene_phylons",
+            "localField": "gene",
+            "foreignField": "gene",
+            "pipeline": [
+                {'$match': {'pangenome_analysis': pangenome_analysis}}
+            ],
+            "as": "phylons_data"
+        }},
+        {'$unwind': {'path': '$phylons_data', 'preserveNullAndEmptyArrays': True}},
+        {'$addFields': {
+            "gene_phylons": {"$ifNull": ["$phylons_data.phylons", []]}
+        }},
+    ]
 
     response = datatables.create_datatables_api(
         GeneAnnotations.objects.aggregate, request.GET, select_pipeline, gene_keys
     )
 
-    gene_phylons = Phylons.get_by_pangenome_analysis(pangenome_analysis).get("gene_phylons", {})
-    for data_entry in response["data"]:
-        gene = data_entry[0]
-        phylons = gene_phylons.get(gene, None)
-        phylons_string = '-' if phylons is None else ', '.join(str(phylon) for phylon in phylons)
-        data_entry.append(phylons_string)
-
-    # pprint(response, stream=sys.stderr)
-    # print(type(response), file=sys.stderr)
+    pprint(response, stream=sys.stderr)
 
     return JsonResponse(response)
 
@@ -568,6 +577,7 @@ def genome_json(request):
         "genome_id",
         "strain",
         "phylo_group",
+        "genome_phylons",
         "genome_len",
         "gc_content",
         "country",
@@ -575,7 +585,7 @@ def genome_json(request):
         "iso_cat",
     ]
     select_pipeline = GenomeInfo.get_genome_and_isolation_info_pipeline(
-        {"pangenome_analysis": pangenome_analysis}
+        {"pangenome_analysis": pangenome_analysis}, include_phylons=True
     )
 
     response = datatables.create_datatables_api(
@@ -599,26 +609,4 @@ def genome_json(request):
             cats.append("-")
         d.extend(cats)
 
-    # merge phylon data into the datatbles response
-    phylons = Phylons.get_by_pangenome_analysis(pangenome_analysis).get("genome_phylons", {})
-    phylons_idx = None
-    genome_id_idx = None
-    for i, column in enumerate(response["columns"]):
-        if column.get("name", "") == "phylons":
-            phylons_idx = i
-        
-        if column.get("name", "") == "genome_id":
-            genome_id_idx = i
-    
-
-    for data_entry in response["data"]:
-        # +1 in the indices because the first item is always pangenome_analysis
-        genome_id = data_entry[genome_id_idx + 1]
-        if genome_id not in phylons.keys():
-            phylons_string = "-"
-        else:
-            genome_phylons = phylons[genome_id]
-            phylons_string = '-' if genome_phylons is None else ', '.join(str(phylon) for phylon in genome_phylons)
-        data_entry.insert(phylons_idx + 1, phylons_string)
-
-    return JsonResponse(response)
+    return JsonResponse(data=response)
