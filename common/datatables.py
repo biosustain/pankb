@@ -1,6 +1,8 @@
 import re
 from pprint import pprint
 import sys
+from typing import Callable
+from django.http import QueryDict
 
 def _parse_get_array(req_get, name):
     data = {}
@@ -26,9 +28,23 @@ def _parse_get_array(req_get, name):
 
 
 def create_datatables_api(
-    mongo_aggregate, request_get, select_pipeline, out_keys, as_list=True
+    mongo_aggregate: Callable, 
+    request_get: QueryDict, 
+    *,
+    db_match: dict,
+    out_keys: list[str], 
+    # the reason for having the pre and post filter pipeline is that MongoDB sort only works on index when precceded
+    # only by match
+    # See: https://www.mongodb.com/docs/manual/reference/operator/aggregation/sort/#-sort-operator-and-performance 
+    pre_filter_pipeline: list[dict] = None, 
+    post_filter_pipeline: list[dict] = None,
+    total_count_only_db_match: bool = False,
+    as_list: bool = True,
 ):
-    print("GET:", file=sys.stderr)
+    pre_filter_pipeline = pre_filter_pipeline if pre_filter_pipeline else []
+    post_filter_pipeline = post_filter_pipeline if post_filter_pipeline else []
+
+    print("GET:", type(request_get), file=sys.stderr)
     pprint(request_get, stream=sys.stderr)
     draw = int(request_get["draw"])
     start = int(request_get["start"])
@@ -41,8 +57,8 @@ def create_datatables_api(
         "regex": request_get.get("search[regex]", "false"),
     }
 
-    projection = {f"results.{gk}": 1 for gk in out_keys}
-    projection["info.filtered"] = 1
+    projection = {out_key: 1 for out_key in out_keys}
+    projection["filtered_count"] = 1
 
     filter_pipeline = []
     results_pipeline = []
@@ -54,8 +70,6 @@ def create_datatables_api(
 
     col_search = {}
     for column in columns:
-        # if column.get("searchable", "false") != "true":
-        #   continue
         if column.get("search.value", "") == "":
             continue
         q = re.sub(r"[^A-Za-z0-9-_\s]+", "", column["search.value"])
@@ -72,6 +86,8 @@ def create_datatables_api(
             if column.get("searchable", "false") != "true":
                 continue
             glob_search.append({column["name"]: {"$regex": q, "$options": "i"}})
+    
+    filter_pipeline.extend(pre_filter_pipeline)
 
     if col_search and not glob_search:
         filter_pipeline.append(
@@ -97,37 +113,57 @@ def create_datatables_api(
             {"$sort": {x["name"]: (-1 if x["dir"] == "desc" else 1) for x in order}}
         )
 
-    total_count_pipeline = select_pipeline + [
-        {"$group": {"_id": None, "count": {"$sum": 1}}}
-    ]
+    filter_pipeline.extend(post_filter_pipeline)
+
+    total_count_stage = {"$group": {"_id": None, "count": {"$sum": 1}}}
+
+    if total_count_only_db_match:
+        total_count_pipeline = [db_match] + [total_count_stage]
+    else:
+        total_count_pipeline = (
+            [db_match] +
+            pre_filter_pipeline +
+            post_filter_pipeline +
+            [total_count_stage]
+        )
+
+    filtered_count_stage = {
+        "$setWindowFields": {
+            "output": {
+                "filtered_count": {
+                    "$count": {}
+                }
+            }
+        }
+    }
 
     pipeline = (
-        select_pipeline
-        + filter_pipeline
-        + [
-            {
-                "$facet": {
-                    "info": [{"$count": "filtered"}],
-                    "results": results_pipeline,
-                }
-            },
-            {"$unwind": "$info"},
-            {"$project": projection},
-        ]
+        [db_match] +
+        [filtered_count_stage] +
+        filter_pipeline +
+        results_pipeline +
+        [{"$project": projection}]
     )
 
     print("PIPELINE:", file=sys.stderr)
     pprint(pipeline, stream=sys.stderr)
 
-    results_count = mongo_aggregate(total_count_pipeline)
-    results = mongo_aggregate(pipeline)
+    print("COUNTS PIPELINE:", file=sys.stderr)
+    pprint(total_count_pipeline, stream=sys.stderr)
 
+    print("starting results count", file=sys.stderr)
+    results_count = mongo_aggregate(total_count_pipeline)
     results_count = list(results_count)
     print("results count done", file=sys.stderr)
 
+    print("starting results", file=sys.stderr)
+    results = mongo_aggregate(pipeline)
     results = list(results)
     print("results done", file=sys.stderr)
     
+    print("RESULTS COUNT:", file=sys.stderr)
+    pprint(results_count, stream=sys.stderr)
+
     print("RESULTS:", file=sys.stderr)
     pprint(results, stream=sys.stderr)
 
@@ -140,11 +176,10 @@ def create_datatables_api(
         recordsTotal = int(results_count[0]["count"])
         recordsFiltered = 0
     else:
-        data = list(results[0]["results"])
         recordsTotal = int(results_count[0]["count"])
-        recordsFiltered = results[0]["info"]["filtered"]
+        recordsFiltered = results[0]["filtered_count"]
         if as_list:
-            data = [[g.get(gk, None) for gk in out_keys] for g in data]
+            data = [[entry.get(out_key, None) for out_key in out_keys] for entry in results]
 
     draw = draw + 1
 

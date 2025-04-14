@@ -62,37 +62,37 @@
             ],
             columns: [
                 {
-                    data: '1',
+                    data: '0',
                     name: 'genome_id',
                     render: function (data, type, row) {
                         return '<a href=" {% url 'genome_info' %}?species=' + row[0] + '&genome_id=' + encodeURIComponent(data) + '">' + data + '</a>';
                     },
                 },
                 {
-                    data: '2',
+                    data: '1',
                     name: 'strain',
                 },
                 {
-                    data: '3',
+                    data: '2',
                     name: 'phylo_group',
                 },
                 {
-                    data: '4',
+                    data: '3',
                     name: 'phylons',
                 },
                 {
-                    data: '5',
+                    data: '4',
                     name: 'genome_len',
                 },
                 {
-                    data: '6',
+                    data: '5',
                     name: 'gc_content',
                     render: function (data, type, row) {
                         return (data*100).toFixed(2)
                     },
                 },
                 {
-                    data: '7',
+                    data: '6',
                     name: 'country',
                     render: function (data, type, row) {
                         if (data == "?") {
@@ -103,7 +103,7 @@
                     },
                 },
                 {
-                    data: '9',
+                    data: '8',
                     name: 'iso_cat.0',
                     render: function (data, type, row) {
                         if (data == "?" || data == "Missing" || data == "missing") {
@@ -114,7 +114,7 @@
                     },
                 },
                 {
-                    data: '10',
+                    data: '9',
                     name: 'iso_cat.1',
                     render: function (data, type, row) {
                         if (data == "?" || data == "Missing" || data == "missing") {
@@ -125,7 +125,7 @@
                     },
                 },
                 {
-                    data: '8',
+                    data: '7',
                     name: 'isolation_source',
                     render: function (data, type, row) {
                         if (data == "?" || data == "Missing" || data == "missing") {

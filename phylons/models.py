@@ -32,18 +32,21 @@ class Phylons:
         return phylon_weights
 
 
-    @lru_cache(maxsize=1000)
-    def get_phylon_ids(pangenome_analysis: str):
+    @lru_cache(maxsize=500)
+    def get_phylon_ids(pangenome_analysis: str) -> list[int]:
         phylon_document = Phylons.collections["genome"].find_one(
                 {"pangenome_analysis": pangenome_analysis},
             )
-        
-        import sys
-        from pprint import pprint
-        print(type(phylon_document), file=sys.stderr)
-        pprint(phylon_document, stream=sys.stderr)
 
         if not phylon_document:
             raise Phylons.NotFound()
 
         return sorted(int(n) for n in phylon_document["phylon_weights"].keys())
+
+    @lru_cache(maxsize=100)
+    def get_genome_phylons(pangenome_analysis: str) -> dict[str, list[int]]:
+        phylon_documents = Phylons.collections["genome"].find(
+            {"pangenome_analysis": pangenome_analysis},
+        )
+
+        return {doc["genome_id"]: doc["phylons"] for doc in phylon_documents}

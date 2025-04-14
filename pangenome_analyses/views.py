@@ -480,27 +480,24 @@ def make_phylons_strings(genome_phylons_mapping: dict[str, Optional[list[int]]])
 # Template renderer for the Phylogenetic Tree plot subtemplate
 def phylotree_plot(request):
     template = loader.get_template("pangenome_analyses/plots/phylotree_plot.html")
-    species = request.GET["species"]
+    pangenome_analysis = request.GET["species"]
 
     url = (
-        settings.AZURE_WEB_DATA_URL + "species/" + species + "/phylogenetic_tree.newick"
+        settings.AZURE_WEB_DATA_URL + "species/" + pangenome_analysis + "/phylogenetic_tree.newick"
     )  # the url of the respective json file stored on the Microsoft Azure Blob Storage
 
     genome_info_dict = GenomeInfo.get_genome_and_isolation_info(
         {
-            "pangenome_analysis": species,
+            "pangenome_analysis": pangenome_analysis,
         }
     )
     
     try:
-        genome_phylons_mapping = Phylons.get_phylon_ids(species)["genome_phylons"]
+        genome_phylons_mapping = Phylons.get_genome_phylons(pangenome_analysis)
     except Phylons.NotFound:
         raise Http404()
     
     genome_phylons_mapping = make_phylons_strings(genome_phylons_mapping) 
-
-    # Print genome_phylons_mapping to stderr for debugging
-    pprint(genome_phylons_mapping, stream=sys.stderr)
     
     source_info = {
         g["genome_id"].replace(".", ""): {
@@ -516,9 +513,6 @@ def phylotree_plot(request):
         }
         for g in genome_info_dict
     }
-
-    # Print source_info to stderr for debugging
-    pprint(source_info, stream=sys.stderr)
 
     r = requests.get(url)
 
@@ -543,26 +537,35 @@ def gene_annotation_json(request):
         "pfams",
         "gene_phylons",
         "frequency",
+    ]        
+
+    db_match = {"$match": {"pangenome_analysis": pangenome_analysis}}
+
+    join_phylons_pipeline = [
+       {'$lookup': {'as': 'phylons_data',
+                    'from': 'pankb_gene_phylons',
+                    'let': {'q_gene': '$gene'},
+                    'pipeline': [{'$match': {'$expr': {'$and': [{'$eq': ['$pangenome_analysis',
+                                                                         pangenome_analysis]},
+                                                                {'$eq': ['$gene',
+                                                                         '$$q_gene']}]}}},
+                                 {'$project': {'_id': 0, 'phylons': 1}}]}},
     ]
-    select_pipeline = [
-        {"$match": {"pangenome_analysis": pangenome_analysis}},
-        {'$lookup': {
-            "from": "pankb_gene_phylons",
-            "localField": "gene",
-            "foreignField": "gene",
-            "pipeline": [
-                {'$match': {'pangenome_analysis': pangenome_analysis}}
-            ],
-            "as": "phylons_data"
-        }},
-        {'$unwind': {'path': '$phylons_data', 'preserveNullAndEmptyArrays': True}},
-        {'$addFields': {
-            "gene_phylons": {"$ifNull": ["$phylons_data.phylons", []]}
-        }},
+
+    phylons_field_pipeline = [
+        {"$unwind": {"path": "$phylons_data", "preserveNullAndEmptyArrays": True}},
+        {"$addFields": {"gene_phylons": "$phylons_data.phylons"}},
+        {'$project': {"_id": 0, "phylons_data": 0}},
     ]
 
     response = datatables.create_datatables_api(
-        GeneAnnotations.objects.aggregate, request.GET, select_pipeline, gene_keys
+        GeneAnnotations.objects.aggregate,
+        request.GET,
+        db_match=db_match,
+        pre_filter_pipeline=join_phylons_pipeline,
+        post_filter_pipeline=phylons_field_pipeline,
+        out_keys=gene_keys,
+        total_count_only_db_match=True,
     )
 
     pprint(response, stream=sys.stderr)
@@ -573,7 +576,6 @@ def gene_annotation_json(request):
 def genome_json(request):
     pangenome_analysis = str(request.GET["pangenome_analysis"])
     genome_keys = [
-        "pangenome_analysis",
         "genome_id",
         "strain",
         "phylo_group",
@@ -582,31 +584,59 @@ def genome_json(request):
         "gc_content",
         "country",
         "isolation_source",
-        "iso_cat",
+        "iso_cat", # must be last due to the "unwinding" at the end of this function
     ]
     select_pipeline = GenomeInfo.get_genome_and_isolation_info_pipeline(
-        {"pangenome_analysis": pangenome_analysis}, include_phylons=True
+        {"pangenome_analysis": pangenome_analysis}
     )
 
+    db_match = select_pipeline[0]
+
+    select_pipeline = select_pipeline[1:]
+
+    join_phylons_pipeline = [
+       {'$lookup': {'as': 'phylons_data',
+                    'from': 'pankb_genome_phylons',
+                    'let': {'q_genome_id': '$genome_id'},
+                    'pipeline': [{'$match': {'$expr': {'$and': [{'$eq': ['$pangenome_analysis',
+                                                                         pangenome_analysis]},
+                                                                {'$eq': ['$genome_id',
+                                                                         '$$q_genome_id']}]}}},
+                                 {'$project': {'_id': 0, 'phylons': 1}}]}},
+    ]
+
+    phylons_field_pipeline = [
+        {"$unwind": {"path": "$phylons_data", "preserveNullAndEmptyArrays": True}},
+        {"$addFields": {"genome_phylons": "$phylons_data.phylons"}},
+        {'$project': {"_id": 0, "phylons_data": 0}},
+    ]
+
     response = datatables.create_datatables_api(
-        GenomeInfo.objects.aggregate, request.GET, select_pipeline, genome_keys
+        GenomeInfo.objects.aggregate, 
+        request.GET,
+        db_match=db_match,
+        out_keys=genome_keys,
+        post_filter_pipeline=select_pipeline + join_phylons_pipeline + phylons_field_pipeline,
+        total_count_only_db_match=True,
     )
 
     for d in response["data"]:
         x = d.pop(-1)
-        cats = []
+        isolation_categories = []
         if len(x) > 0:
-            cats.append(x[0])
+            isolation_categories.append(x[0])
         else:
-            cats.append("-")
+            isolation_categories.append("-")
         if len(x) > 1:
-            cats.append(x[1])
+            isolation_categories.append(x[1])
         else:
-            cats.append("-")
+            isolation_categories.append("-")
         if len(x) > 2:
-            cats.append(x[2])
+            isolation_categories.append(x[2])
         else:
-            cats.append("-")
-        d.extend(cats)
+            isolation_categories.append("-")
+        d.extend(isolation_categories)
+
+    pprint(response, stream=sys.stderr)
 
     return JsonResponse(data=response)

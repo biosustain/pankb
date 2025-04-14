@@ -84,8 +84,8 @@ class GeneInfo:
 class GenomeInfo:
     objects = database.MongoDBObjects("pankb_genome_info")
 
-    def get_genome_and_isolation_info_pipeline(genome_match, include_phylons: bool = False):
-        pipeline = [
+    def get_genome_and_isolation_info_pipeline(genome_match):
+        return [
             {"$match": genome_match},
             {
                 "$lookup": {
@@ -101,28 +101,8 @@ class GenomeInfo:
                     "newRoot": {"$mergeObjects": ["$$ROOT", "$isolation_info"]}
                 }
             },
+            {"$project": {"_id": 0, "isolation_info": 0}},
         ]
-
-        if include_phylons:
-            pipeline += [
-                {'$lookup': {
-                    "from": "pankb_genome_phylons",
-                    "localField": "genome_id",
-                    "foreignField": "genome_id",
-                    "pipeline": [
-                        {'$match': genome_match}
-                    ],
-                    "as": "phylons_data"
-                }},
-                {'$unwind': {'path': '$phylons_data', 'preserveNullAndEmptyArrays': True}},
-                {'$addFields': {
-                    "genome_phylons": {"$ifNull": ["$phylons_data.phylons", []]}
-                }},
-            ]
-        else:
-            pipeline += {"$project": {"_id": 0, "isolation_info": 0}},
-
-        return pipeline
 
     def get_genome_and_isolation_info(genome_match, projection=None):
         pipeline = GenomeInfo.get_genome_and_isolation_info_pipeline(genome_match)
