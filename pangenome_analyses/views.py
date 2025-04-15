@@ -1,6 +1,7 @@
 from multiprocessing import context
 from re import template
 from typing import Optional
+from urllib import response
 from django.http import HttpResponse, Http404, JsonResponse
 from django.template import loader
 from django.conf import settings
@@ -323,18 +324,15 @@ def download_genome_info_table_csv(request):
     )
     return response
 
-######################### Phylons Page Templates #######################################
+######################### Phylons Pages Templates #######################################
 
-# Template renderer for the Phylons Page
-def phylons(request) -> HttpResponse:
+# Template renderer for the Phylons Page (all phylons for a specific pangenome)
+def phylons_page(request) -> HttpResponse:
     template = loader.get_template("pangenome_analyses/phylons.html")
     pangenome_analysis = request.GET["species"]
 
-    try:
-        phylon_ids = Phylons.get_phylon_ids(pangenome_analysis)
-    except Phylons.NotFound:
-        raise Http404()
-    
+    phylon_ids = Phylons.get_phylon_ids(pangenome_analysis)
+
     try:
         organism_info = Organisms.get_by_pangenome_analysis(
             pangenome_analysis,
@@ -347,17 +345,103 @@ def phylons(request) -> HttpResponse:
     context = {
         "phylon_ids": phylon_ids, 
         "pangenome_analysis": pangenome_analysis, 
-        "species_data": organism_info
+        "speciesData": organism_info
     }
     return HttpResponse(template.render(context, request))
 
+# Template renderer for the Phylon Page (a specific phylon of a pangenome)
+def phylon_page(request, phylon_id: str) -> HttpResponse:
+    template = loader.get_template("pangenome_analyses/phylon.html")
+    pangenome_analysis = request.GET["species"]
+
+    phylon_id = int(phylon_id)
+
+    print(type(request), file=sys.stderr)
+    pprint(request, stream=sys.stderr)
+
+    try:
+        organism_info = Organisms.get_by_pangenome_analysis(
+            pangenome_analysis,
+            ["species", "family", "genomes_num", "gene_class_distribution", "openness"],
+        )
+    except Organisms.NotFound:
+        raise Http404()
+    
+    context = {
+        "pangenome_analysis": pangenome_analysis,
+        "speciesData": organism_info,
+        "phylon_id": phylon_id,
+    }
+    return HttpResponse(template.render(context, request))
+
+def phylon_weights_matrix_json(request, pangenome_analysis: str, matrix: str) -> JsonResponse:
+    if matrix not in ("gene", "genome"):
+        raise Http404("Invalid matrix type. Must be 'gene' or 'genome'.")
+    
+    id_column = "gene" if matrix == "gene" else "genome_id"
+    
+    start, length = request.GET["start"], request.GET["length"]
+    start, length = int(start), int(length)
+    
+    phylon_weights = Phylons.get_item_to_phylon_weights(pangenome_analysis, matrix)
+
+    columns = [
+        {
+            "data": 0,
+            "name": id_column,
+            "search.value": '',
+            "searchable": 'true',
+        }
+    ]
+
+    phylon_ids = phylon_weights[list(phylon_weights.keys())[0]]
+    phylon_ids = sorted(list(phylon_ids))
+
+    # i and phylon should be equal in all cases
+    for i, phylon in enumerate(phylon_ids):
+        columns.append({
+            "data": i + 1,
+            "name": f'phylon_{phylon}',
+            "searchable": False,
+        })
+
+    data = []
+    for id, phylon_weights in phylon_weights.items():
+        entry = [id]
+        for phylon_id in phylon_ids:
+            entry.append(phylon_weights[phylon_id])
+        data.append(entry)
+    
+    n_entries = len(data)
+
+    if 'order[0][column]' in request.GET.keys() and 'order[0][dir]' in request.GET.keys(): 
+        sort_column = int(request.GET['order[0][column]'])
+        sort_direction = request.GET['order[0][dir]']
+    else:
+        sort_column, sort_direction = 0, 'asc'
+
+    data.sort(key=lambda entry: entry[sort_column], reverse=sort_direction == "desc")
+
+    response = {
+        "draw": int(request.GET["draw"]) + 1,
+        "recordsFiltered": n_entries,
+        "recordsTotal": n_entries,
+        "columns": columns,
+        "data": data[start : start + length],
+        "order": [{"column": sort_column, "dir": sort_direction}]
+    }
+
+    return JsonResponse(response)
+    
 
 def phylon_genome_weights_json(request, pangenome_analysis: str, phylon_id: str) -> JsonResponse:
+    # TODO: merge this and with the gene_weights function
     start, length = request.GET["start"], request.GET["length"]
     start, length = int(start), int(length)
     end = start + length
     phylon_id = int(phylon_id)
 
+    # TODO: make datatables API in datatables module
     columns = [
         {
             "data": 0,
@@ -373,7 +457,7 @@ def phylon_genome_weights_json(request, pangenome_analysis: str, phylon_id: str)
         },
     ]
 
-    weights_by_phylon = Phylons.get_phylon_weights(pangenome_analysis, "genome")
+    weights_by_phylon = Phylons.get_phylon_to_item_weights(pangenome_analysis, "genome")
     genome_weights = weights_by_phylon[phylon_id]
 
     pprint(genome_weights, stream=sys.stderr)
@@ -414,7 +498,7 @@ def phylon_gene_weights_json(request, pangenome_analysis: str, phylon_id: str) -
         },
     ]
 
-    weights_by_phylon = Phylons.get_phylon_weights(pangenome_analysis, "gene")
+    weights_by_phylon = Phylons.get_phylon_to_item_weights(pangenome_analysis, "gene")
     gene_weights = weights_by_phylon[phylon_id]
 
     pprint(gene_weights, stream=sys.stderr)
@@ -466,7 +550,7 @@ def get_iso_context(iso_cat, i):
 
 def make_phylons_strings(genome_phylons_mapping: dict[str, Optional[list[int]]]) -> dict[str, str]:
     def make_phylons_string(phylons_list: Optional[list[int]]) -> str:
-        if phylons_list is None:
+        if not phylons_list:
             return "-"
         
         return ", ".join(str(phylon) for phylon in phylons_list)
@@ -482,22 +566,18 @@ def phylotree_plot(request):
     template = loader.get_template("pangenome_analyses/plots/phylotree_plot.html")
     pangenome_analysis = request.GET["species"]
 
-    url = (
-        settings.AZURE_WEB_DATA_URL + "species/" + pangenome_analysis + "/phylogenetic_tree.newick"
-    )  # the url of the respective json file stored on the Microsoft Azure Blob Storage
+    # the url of the respective json file stored on the Microsoft Azure Blob Storage
+    url = settings.AZURE_WEB_DATA_URL + "species/" + pangenome_analysis + "/phylogenetic_tree.newick"
 
     genome_info_dict = GenomeInfo.get_genome_and_isolation_info(
         {
             "pangenome_analysis": pangenome_analysis,
         }
     )
-    
-    try:
-        genome_phylons_mapping = Phylons.get_genome_phylons(pangenome_analysis)
-    except Phylons.NotFound:
-        raise Http404()
-    
-    genome_phylons_mapping = make_phylons_strings(genome_phylons_mapping) 
+
+    genome_phylons_mapping = Phylons.get_genome_phylons(pangenome_analysis)
+
+    genome_phylons_mapping = make_phylons_strings(genome_phylons_mapping)
     
     source_info = {
         g["genome_id"].replace(".", ""): {
@@ -612,7 +692,7 @@ def genome_json(request):
     ]
 
     response = datatables.create_datatables_api(
-        GenomeInfo.objects.aggregate, 
+        GenomeInfo.objects.aggregate,
         request.GET,
         db_match=db_match,
         out_keys=genome_keys,
@@ -636,7 +716,5 @@ def genome_json(request):
         else:
             isolation_categories.append("-")
         d.extend(isolation_categories)
-
-    pprint(response, stream=sys.stderr)
 
     return JsonResponse(data=response)

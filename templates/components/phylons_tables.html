@@ -1,11 +1,15 @@
-<h4 class="display-4 px-3 mb-4">Phylon {{ phylon_id }}</h4>
+<h4 class="display-4 px-3 mb-4">Phylons</h4>
 <div class="container px-3 mx-0 mb-5">
-    <div class="row">
-        <div class="col">
-            {% include 'components/phylon_genome_weights_table.html' with pangenome_analysys=pangenome_analysis phylon_id=phylon_id panel_class='w-100' panel_title="Genome Phylon Weights" %}
-        </div>
-        <div class="col">
-            {% include 'components/phylon_gene_weights_table.html' with pangenome_analysys=pangenome_analysis phylon_id=phylon_id panel_class='w-100' panel_title="Gene Phylon Weights" %}
-        </div>
+    <p class="fw-bold mb-4">
+        Individual phylon pages: 
+        {% for phylon_id in phylon_ids %}
+            <a class="ms-2" href='/pangenome_analyses/phylon/{{ phylon_id }}/?species={{ pangenome_analysis }}'>Phylon {{ phylon_id }}</a>
+        {% endfor %}
+    </p>
+    <div class="mb-5">
+        {% include 'components/phylons_matrix_table.html' with pangenome_analysys=pangenome_analysis phylon_ids=phylon_ids matrix='genome' panel_class='w-100' panel_title="Genome Phylon Weights" %}
+    </div>
+    <div class="mb-5">
+        {% include 'components/phylons_matrix_table.html' with pangenome_analysys=pangenome_analysis phylon_ids=phylon_ids matrix='gene' panel_class='w-100' panel_title="Gene Phylon Weights" %}
     </div>
 </div>

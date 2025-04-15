@@ -1,6 +1,4 @@
 import re
-from pprint import pprint
-import sys
 from typing import Callable
 from django.http import QueryDict
 
@@ -44,8 +42,6 @@ def create_datatables_api(
     pre_filter_pipeline = pre_filter_pipeline if pre_filter_pipeline else []
     post_filter_pipeline = post_filter_pipeline if post_filter_pipeline else []
 
-    print("GET:", type(request_get), file=sys.stderr)
-    pprint(request_get, stream=sys.stderr)
     draw = int(request_get["draw"])
     start = int(request_get["start"])
     length = int(request_get["length"])
@@ -145,27 +141,11 @@ def create_datatables_api(
         [{"$project": projection}]
     )
 
-    print("PIPELINE:", file=sys.stderr)
-    pprint(pipeline, stream=sys.stderr)
-
-    print("COUNTS PIPELINE:", file=sys.stderr)
-    pprint(total_count_pipeline, stream=sys.stderr)
-
-    print("starting results count", file=sys.stderr)
     results_count = mongo_aggregate(total_count_pipeline)
     results_count = list(results_count)
-    print("results count done", file=sys.stderr)
 
-    print("starting results", file=sys.stderr)
     results = mongo_aggregate(pipeline)
     results = list(results)
-    print("results done", file=sys.stderr)
-    
-    print("RESULTS COUNT:", file=sys.stderr)
-    pprint(results_count, stream=sys.stderr)
-
-    print("RESULTS:", file=sys.stderr)
-    pprint(results, stream=sys.stderr)
 
     if not results and not results_count:
         data = []

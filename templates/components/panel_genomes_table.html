@@ -79,6 +79,15 @@
                 {
                     data: '3',
                     name: 'phylons',
+                    render: function (data, _, _) {
+                        if (data === null || data.length === 0) {
+                            return "-";
+                        } else {
+                            return data.map(function (num) {
+                                return '<a href="/pangenome_analyses/phylon/' + num + '/?' + urlParams.toString() + '">' + num + '</a>';
+                            }).join(', ');
+                        }
+                    }   
                 },
                 {
                     data: '4',
