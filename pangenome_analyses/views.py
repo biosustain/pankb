@@ -432,52 +432,11 @@ def phylon_weights_matrix_json(request, pangenome_analysis: str, matrix: str) ->
     }
 
     return JsonResponse(response)
+
+def phylon_weights_json(request, pangenome_analysis: str, phylon_id: str, type_: str) -> JsonResponse:
+    if type_ not in ("gene", "genome"):
+        raise Http404("Invalid type. Must be 'gene' or 'genome'.")
     
-
-def phylon_genome_weights_json(request, pangenome_analysis: str, phylon_id: str) -> JsonResponse:
-    # TODO: merge this and with the gene_weights function
-    start, length = request.GET["start"], request.GET["length"]
-    start, length = int(start), int(length)
-    end = start + length
-    phylon_id = int(phylon_id)
-
-    # TODO: make datatables API in datatables module
-    columns = [
-        {
-            "data": 0,
-            "name": "genome_id",
-            "search.value": '',
-            "searchable": 'true',
-        },
-        {
-            "data": 1,
-            "name": "A_weight",
-            "search.value": '',
-            "searchable": 'false',
-        },
-    ]
-
-    weights_by_phylon = Phylons.get_phylon_to_item_weights(pangenome_analysis, "genome")
-    genome_weights = weights_by_phylon[phylon_id]
-
-    pprint(genome_weights, stream=sys.stderr)
-
-    table_data = [(genome, weight) for genome, weight in genome_weights.items()]
-    table_data.sort(key=lambda tup: tup[1], reverse=True)
-    table_data = table_data[start:end]
-
-    datatables_response = {
-        "columns": columns,
-        "data": table_data,
-        "draw": int(request.GET["draw"]) + 1,
-        "recordsFiltered": len(genome_weights),
-        "recordsTotal": len(genome_weights),
-    }
-
-    return JsonResponse(datatables_response)
-
-
-def phylon_gene_weights_json(request, pangenome_analysis: str, phylon_id: str) -> JsonResponse:
     start, length = request.GET["start"], request.GET["length"]
     start, length = int(start), int(length)
     end = start + length
@@ -486,24 +445,22 @@ def phylon_gene_weights_json(request, pangenome_analysis: str, phylon_id: str) -
     columns = [
         {
             "data": 0,
-            "name": "gene",
+            "name": "gene" if type_ == "gene" else "genome_id",
             "search.value": '',
             "searchable": 'true',
         },
         {
             "data": 1,
-            "name": "L_weight",
+            "name": "L_weight" if type_ == "gene" else "A_weight",
             "search.value": '',
             "searchable": 'false',
         },
     ]
 
-    weights_by_phylon = Phylons.get_phylon_to_item_weights(pangenome_analysis, "gene")
-    gene_weights = weights_by_phylon[phylon_id]
+    weights_by_phylon = Phylons.get_phylon_to_item_weights(pangenome_analysis, type_)
+    item_weights = weights_by_phylon[phylon_id]
 
-    pprint(gene_weights, stream=sys.stderr)
-
-    table_data = [(gene, weight) for gene, weight in gene_weights.items()]
+    table_data = [(item, weight) for item, weight in item_weights.items()]
     table_data.sort(key=lambda tup: tup[1], reverse=True)
     table_data = table_data[start:end]
 
@@ -511,11 +468,12 @@ def phylon_gene_weights_json(request, pangenome_analysis: str, phylon_id: str) -
         "columns": columns,
         "data": table_data,
         "draw": int(request.GET["draw"]) + 1,
-        "recordsFiltered": len(gene_weights),
-        "recordsTotal": len(gene_weights),
+        "recordsFiltered": len(item_weights),
+        "recordsTotal": len(item_weights),
     }
 
     return JsonResponse(datatables_response)
+
 
 ################### Phylogenetic Tree Page Templates ###################################
 

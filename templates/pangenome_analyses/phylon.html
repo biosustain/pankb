@@ -1,5 +1,5 @@
 {% extends "index_with_infopanel.html" %}
-{% block page_title %}Phylons{% endblock %}
+{% block page_title %}Phylon {{ phylon_id }} - {{ pangenome_analysis }}{% endblock %}
 
 {% block header_load_datatables %}{% include 'tables/load_datatables.html' %}{% endblock %}
 
@@ -13,5 +13,15 @@
 {% endblock %}
 
 {% block main_content %}
-{% include 'components/phylon_tables.html' with pangenome_analysis=pangenome_analysis phylon_id=phylon_id %}
+<h4 class="display-4 px-3 mb-4">Phylon {{ phylon_id }}</h4>
+<div class="container px-3 mx-0 mb-5">
+    <div class="row">
+        <div class="col">
+            {% include 'components/phylon_weights_table.html' with pangenome_analysys=pangenome_analysis phylon_id=phylon_id panel_class='w-100' table_type="genome" panel_title="Genome Phylon Weights" %}
+        </div>""
+        <div class="col">
+            {% include 'components/phylon_weights_table.html' with pangenome_analysys=pangenome_analysis phylon_id=phylon_id panel_class='w-100' table_type="gene" panel_title="Gene Phylon Weights" %}
+        </div>
+    </div>
+</div>
 {% endblock %}

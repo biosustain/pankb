@@ -8,30 +8,30 @@
 </form> {% endcomment %}
 {% endblock %}
 {% block panel_content %}
-<table id="gene_weights_table_{{ phylon_id }}" class="table table-hover display w-100">
+<table id="{{ table_type }}_weights_table" class="table table-hover display w-100">
     <thead>
     <tr>
-        <th>Gene</th>
-        <th>L matrix weight</th>
+        <th>{% if table_type == "gene" %}Gene{% else %}Genome{% endif %}</th>
+        <th>{% if table_type == "gene" %}L matrix weight{% else %}L matrix weight{% endif %}</th>
     </tr>
     </thead>
     <tbody id="tbody">
     </tbody>
     <tfoot>
         <tr>
-            <th>Gene</th>
+            <th>{% if table_type == "gene" %}Gene{% else %}Genome{% endif %}</th>
             <th class="no_search"></th>
         </tr>
     </tfoot> 
 </table>
 <script>
-    var genome_weights_table = null;
+    var weights_table = null;
     
     $(document).ready(async function () {
-        genome_weights_table = $('#gene_weights_table_{{ phylon_id }}').DataTable({
+        weights_table = $('#{{ table_type }}_weights_table').DataTable({
             serverSide: true,
             ajax: {
-                url: '{% url "phylon_gene_weights" pangenome_analysis=pangenome_analysis phylon_id=phylon_id %}',
+                url: '{% url "phylon_weights" pangenome_analysis=pangenome_analysis phylon_id=phylon_id type_=table_type %}',
                 data: {pangenome_analysis: '{{ pangenome_analysis | safe}}'},
                 dataSrc: 'data',
             },
@@ -42,8 +42,8 @@
             fixedColumns: true,
             scrollX: true,
             lengthMenu: [
-                [10, 20, 30, 40, 50, 100, -1],
-                [10, 20, 30, 40, 50, 100, 'All']
+                [10, 20, 30, 40, 50],
+                [10, 20, 30, 40, 50]
             ],
             columns: [
                 {
@@ -90,7 +90,7 @@
         });
 
         // Expand row on click
-        $('#gene_weights_table_{{ phylon_id }} tbody').on('click', 'td', function () {
+        $('#{{ table_type }}_weights_table tbody').on('click', 'td', function () {
             const row = $(this).closest('tr');
             row.toggleClass('expanded-row');
         });
