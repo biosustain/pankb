@@ -9,6 +9,7 @@ class Phylons:
         "gene": database.MongoDBObjects('pankb_gene_phylons'),
     }
 
+
     @lru_cache(maxsize=50)
     def get_phylon_to_item_weights(pangenome_analysis: str, collection: str) -> dict[int, dict[str, float]]:
         assert collection in Phylons.collections.keys(), f"Invalid collection: {collection}. Must be one of {list(Phylons.collections.keys())}"
@@ -28,6 +29,8 @@ class Phylons:
         
         return phylon_weights
     
+
+    @lru_cache(maxsize=50)
     def get_item_to_phylon_weights(pangenome_analysis: str, collection: str) -> dict[str, dict[int, float]]:
         assert collection in Phylons.collections.keys(), f"Invalid collection: {collection}. Must be one of {list(Phylons.collections.keys())}"
 
@@ -47,6 +50,7 @@ class Phylons:
         
         return collection_weights
 
+
     @lru_cache(maxsize=500)
     def get_phylon_ids(pangenome_analysis: str) -> list[int]:
         phylon_document = Phylons.collections["genome"].find_one(
@@ -54,6 +58,7 @@ class Phylons:
             )
 
         return sorted(int(n) for n in phylon_document["phylon_weights"].keys())
+
 
     @lru_cache(maxsize=100)
     def get_genome_phylons(pangenome_analysis: str) -> dict[str, list[int]]:

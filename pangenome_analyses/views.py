@@ -1,12 +1,9 @@
-from multiprocessing import context
-from re import template
 from typing import Optional
-from urllib import response
-from django.http import HttpResponse, Http404, JsonResponse
+from django.http import HttpResponse, Http404, JsonResponse, StreamingHttpResponse
 from django.template import loader
 from django.conf import settings
+import csv
 
-import phylons
 from phylons.models import Phylons
 from .models import GeneAnnotations
 from gene_function.models import GenomeInfo
@@ -319,6 +316,9 @@ def download_genome_info_table_csv(request):
         {"pangenome_analysis": species}, genome_keys
     )
 
+    pprint(genome_keys, stream=sys.stderr)
+    pprint(list(genomes), stream=sys.stderr)
+
     response = csv_export.dict_writer_response(
         downloaded_file_name, genome_keys, genomes
     )
@@ -356,9 +356,6 @@ def phylon_page(request, phylon_id: str) -> HttpResponse:
 
     phylon_id = int(phylon_id)
 
-    print(type(request), file=sys.stderr)
-    pprint(request, stream=sys.stderr)
-
     try:
         organism_info = Organisms.get_by_pangenome_analysis(
             pangenome_analysis,
@@ -374,45 +371,13 @@ def phylon_page(request, phylon_id: str) -> HttpResponse:
     }
     return HttpResponse(template.render(context, request))
 
-def phylon_weights_matrix_json(request, pangenome_analysis: str, matrix: str) -> JsonResponse:
+def phylons_matrix_json(request, pangenome_analysis: str, matrix: str) -> JsonResponse:
     if matrix not in ("gene", "genome"):
         raise Http404("Invalid matrix type. Must be 'gene' or 'genome'.")
     
-    id_column = "gene" if matrix == "gene" else "genome_id"
-    
     start, length = request.GET["start"], request.GET["length"]
     start, length = int(start), int(length)
-    
-    phylon_weights = Phylons.get_item_to_phylon_weights(pangenome_analysis, matrix)
-
-    columns = [
-        {
-            "data": 0,
-            "name": id_column,
-            "search.value": '',
-            "searchable": 'true',
-        }
-    ]
-
-    phylon_ids = phylon_weights[list(phylon_weights.keys())[0]]
-    phylon_ids = sorted(list(phylon_ids))
-
-    # i and phylon should be equal in all cases
-    for i, phylon in enumerate(phylon_ids):
-        columns.append({
-            "data": i + 1,
-            "name": f'phylon_{phylon}',
-            "searchable": False,
-        })
-
-    data = []
-    for id, phylon_weights in phylon_weights.items():
-        entry = [id]
-        for phylon_id in phylon_ids:
-            entry.append(phylon_weights[phylon_id])
-        data.append(entry)
-    
-    n_entries = len(data)
+    end = start + length
 
     if 'order[0][column]' in request.GET.keys() and 'order[0][dir]' in request.GET.keys(): 
         sort_column = int(request.GET['order[0][column]'])
@@ -420,18 +385,31 @@ def phylon_weights_matrix_json(request, pangenome_analysis: str, matrix: str) ->
     else:
         sort_column, sort_direction = 0, 'asc'
 
-    data.sort(key=lambda entry: entry[sort_column], reverse=sort_direction == "desc")
-
-    response = {
-        "draw": int(request.GET["draw"]) + 1,
-        "recordsFiltered": n_entries,
-        "recordsTotal": n_entries,
-        "columns": columns,
-        "data": data[start : start + length],
-        "order": [{"column": sort_column, "dir": sort_direction}]
-    }
+    response = datatables.create_datatables_api_phylons_matrix(
+        pangenome_analysis,
+        matrix,
+        start=start,
+        end=end,
+        sort_column_index=sort_column,
+        sort_direction=sort_direction,
+        current_draw=int(request.GET["draw"])
+    )
 
     return JsonResponse(response)
+
+def download_phylons_matrix_csv(_, pangenome_analysis: str, matrix: str) -> StreamingHttpResponse:
+    datatables_data = datatables.create_datatables_api_phylons_matrix(pangenome_analysis, matrix)
+    keys, csv_data = datatables.datatables_api_to_csv_writer_dict(datatables_data)
+    
+    downloaded_file_name = f"{pangenome_analysis}_{matrix}_phylon_weights.csv"
+
+    response = csv_export.dict_writer_response(
+        downloaded_file_name,
+        keys,
+        csv_data,
+    )
+
+    return response
 
 def phylon_weights_json(request, pangenome_analysis: str, phylon_id: str, type_: str) -> JsonResponse:
     if type_ not in ("gene", "genome"):
@@ -442,38 +420,38 @@ def phylon_weights_json(request, pangenome_analysis: str, phylon_id: str, type_:
     end = start + length
     phylon_id = int(phylon_id)
 
-    columns = [
-        {
-            "data": 0,
-            "name": "gene" if type_ == "gene" else "genome_id",
-            "search.value": '',
-            "searchable": 'true',
-        },
-        {
-            "data": 1,
-            "name": "L_weight" if type_ == "gene" else "A_weight",
-            "search.value": '',
-            "searchable": 'false',
-        },
-    ]
-
-    weights_by_phylon = Phylons.get_phylon_to_item_weights(pangenome_analysis, type_)
-    item_weights = weights_by_phylon[phylon_id]
-
-    table_data = [(item, weight) for item, weight in item_weights.items()]
-    table_data.sort(key=lambda tup: tup[1], reverse=True)
-    table_data = table_data[start:end]
-
-    datatables_response = {
-        "columns": columns,
-        "data": table_data,
-        "draw": int(request.GET["draw"]) + 1,
-        "recordsFiltered": len(item_weights),
-        "recordsTotal": len(item_weights),
-    }
+    if 'order[0][column]' in request.GET.keys() and 'order[0][dir]' in request.GET.keys(): 
+        sort_column = int(request.GET['order[0][column]'])
+        sort_direction = request.GET['order[0][dir]']
+    else:
+        sort_column, sort_direction = 1, 'desc'
+    
+    datatables_response = datatables.create_datatables_api_phylon_table(
+        pangenome_analysis,
+        type_,
+        phylon_id,
+        start=start,
+        end=end,
+        sort_column_index=sort_column,
+        sort_direction=sort_direction,
+        current_draw=int(request.GET["draw"])
+    )
 
     return JsonResponse(datatables_response)
 
+def download_phylon_weights_csv(_, pangenome_analysis: str, phylon_id: str, type_: str) -> StreamingHttpResponse:
+    if type_ not in ("gene", "genome"):
+        raise Http404("Invalid type. Must be 'gene' or 'genome'.")
+    
+    datatables_response = datatables.create_datatables_api_phylon_table(pangenome_analysis, type_, phylon_id)
+
+    keys, csv_data = datatables.datatables_api_to_csv_writer_dict(datatables_response)
+
+    downloaded_file_name = f"{pangenome_analysis}_phylon_{phylon_id}_{type_}_weights.csv"
+
+    response = csv_export.dict_writer_response(downloaded_file_name, keys, csv_data)
+
+    return response
 
 ################### Phylogenetic Tree Page Templates ###################################
 

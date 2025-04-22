@@ -1,5 +1,5 @@
 {% extends "index_with_infopanel.html" %}
-{% block page_title %}Phylon {{ phylon_id }} - {{ pangenome_analysis }}{% endblock %}
+{% block page_title %}Phylon {{ phylon_id }} - {{ speciesData.species }}{% endblock %}
 
 {% block header_load_datatables %}{% include 'tables/load_datatables.html' %}{% endblock %}
 
@@ -18,7 +18,7 @@
     <div class="row">
         <div class="col">
             {% include 'components/phylon_weights_table.html' with pangenome_analysys=pangenome_analysis phylon_id=phylon_id panel_class='w-100' table_type="genome" panel_title="Genome Phylon Weights" %}
-        </div>""
+        </div>
         <div class="col">
             {% include 'components/phylon_weights_table.html' with pangenome_analysys=pangenome_analysis phylon_id=phylon_id panel_class='w-100' table_type="gene" panel_title="Gene Phylon Weights" %}
         </div>

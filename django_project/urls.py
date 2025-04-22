@@ -122,9 +122,19 @@ urlpatterns = [
         name="phylon_weights",
     ),
     path(
-        "pangenome_analyses/phylons/phylon_weights_matrix_json/<pangenome_analysis>/<matrix>",
-        pangenome_analyses_views.phylon_weights_matrix_json,
+        "pangenome_analyses/phylons/phylon_weights_csv/<pangenome_analysis>/<type_>/<phylon_id>/",
+        pangenome_analyses_views.download_phylon_weights_csv,
+        name="download_phylon_weights_csv",
+    ),
+    path(
+        "pangenome_analyses/phylons/phylon_weights_matrix_json/<pangenome_analysis>/<matrix>/",
+        pangenome_analyses_views.phylons_matrix_json,
         name="phylon_weights_matrix",
+    ),
+    path(
+        "pangenome_analyses/phylons/phylons_matrix_csv/<pangenome_analysis>/<matrix>/",
+        pangenome_analyses_views.download_phylons_matrix_csv,
+        name="download_phylons_matrix_csv",
     ),
     path(
         "phylotree_plot/",

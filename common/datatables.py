@@ -1,6 +1,8 @@
 import re
-from typing import Callable
+from typing import Any, Callable, Optional
 from django.http import QueryDict
+
+from phylons.models import Phylons
 
 def _parse_get_array(req_get, name):
     data = {}
@@ -292,3 +294,121 @@ def create_datatables_api_mongodb(
         "order": order,
     }
     return response
+
+
+def datatables_api_to_csv_writer_dict(datatables_api: dict[str, Any]) -> list[dict[str, Any]]:
+    keys = [col["name"] for col in datatables_api["columns"]]
+    data = []
+    for entry in datatables_api["data"]:
+        data.append({key: value for key, value in zip(keys, entry, strict=True)})
+    return keys, data
+
+
+def create_datatables_api_phylons_matrix(
+        pangenome_analysis: str,
+        matrix: str,
+        *,
+        start: int = 0,
+        end: Optional[int] = None,
+        sort_column_index: int = 0,
+        sort_direction: str = "asc",
+        search_term: Optional[str] = None,
+        current_draw: int = 0,
+) -> dict[str, Any]:
+    id_column = "gene" if matrix == "gene" else "genome_id"
+
+    phylon_weights = Phylons.get_item_to_phylon_weights(pangenome_analysis, matrix)
+
+    columns = [
+        {
+            "data": 0,
+            "name": id_column,
+            "search.value": '',
+            "searchable": 'true',
+        }
+    ]
+
+    phylon_ids = phylon_weights[list(phylon_weights.keys())[0]]
+    phylon_ids = sorted(list(phylon_ids))
+
+    # i and phylon should be equal in all cases
+    for i, phylon in enumerate(phylon_ids):
+        columns.append({
+            "data": i + 1,
+            "name": f'phylon_{phylon}',
+            "searchable": False,
+        })
+
+    data = []
+    for id, phylon_weights in phylon_weights.items():
+        entry = [id]
+        for phylon_id in phylon_ids:
+            entry.append(phylon_weights[phylon_id])
+        data.append(entry)
+    
+    n_entries = len(data)
+
+
+    data.sort(key=lambda entry: entry[sort_column_index], reverse=sort_direction == "desc")
+
+    if end is None:
+        data = data[start:]
+    else:
+        data = data[start : end]
+
+
+    response = {
+        "draw": current_draw + 1,
+        "recordsFiltered": n_entries,
+        "recordsTotal": n_entries,
+        "columns": columns,
+        "data": data,
+        "order": [{"column": sort_column_index, "dir": sort_direction}]
+    }
+
+    return response
+
+
+def create_datatables_api_phylon_table(
+        pangenome_analysis: str,
+        type_: str,
+        phylon_id: int,
+        *,
+        start: int = 0,
+        end: Optional[int] = None,
+        sort_column_index: int = 0,
+        sort_direction: str = "asc",
+        search_term: Optional[str] = None,
+        current_draw: int = 0,
+) -> dict[str, Any]:
+    columns = [
+        {
+            "data": 0,
+            "name": "gene" if type_ == "gene" else "genome_id",
+            "search.value": '',
+            "searchable": 'true',
+        },
+        {
+            "data": 1,
+            "name": "L_weight" if type_ == "gene" else "A_weight",
+            "search.value": '',
+            "searchable": 'false',
+        },
+    ]
+
+    weights_by_phylon = Phylons.get_phylon_to_item_weights(pangenome_analysis, type_)
+    item_weights = weights_by_phylon[phylon_id]
+
+    table_data = [(item, weight) for item, weight in item_weights.items()]
+    table_data.sort(key=lambda entry: entry[sort_column_index], reverse=sort_direction == "desc")
+    table_data = table_data[start:end]
+
+    datatables_response = {
+        "columns": columns,
+        "data": table_data,
+        "draw": current_draw + 1,
+        "recordsFiltered": len(item_weights),
+        "recordsTotal": len(item_weights),
+    }
+
+    return datatables_response
