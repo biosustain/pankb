@@ -27,7 +27,7 @@ class Phylons:
             for phylon, weight in weights.items():
                 phylon_weights[int(phylon)][id] = weight
         
-        return phylon_weights
+        return dict(phylon_weights)
     
 
     @lru_cache(maxsize=50)

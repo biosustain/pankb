@@ -445,6 +445,8 @@ def download_phylon_weights_csv(_, pangenome_analysis: str, phylon_id: str, type
     if type_ not in ("gene", "genome"):
         raise Http404("Invalid type. Must be 'gene' or 'genome'.")
     
+    phylon_id = int(phylon_id)
+    
     datatables_response = datatables.create_datatables_api_phylon_table(pangenome_analysis, type_, phylon_id)
 
     keys, csv_data = datatables.datatables_api_to_csv_writer_dict(datatables_response)
