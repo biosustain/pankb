@@ -9,7 +9,6 @@ from gene_function.models import GenomeInfo
 from organisms.models import Organisms
 import json, requests, gzip, time
 from common import datatables, csv_export
-import sys
 
 
 ################### Overview Page Templates ###################################

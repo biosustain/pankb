@@ -1,4 +1,3 @@
-from sys import stderr
 from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from organisms.models import Organisms
