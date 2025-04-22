@@ -2,7 +2,6 @@ from typing import Optional
 from django.http import HttpResponse, Http404, JsonResponse, StreamingHttpResponse
 from django.template import loader
 from django.conf import settings
-import csv
 
 from phylons.models import Phylons
 from .models import GeneAnnotations
@@ -11,7 +10,6 @@ from organisms.models import Organisms
 import json, requests, gzip, time
 from common import datatables, csv_export
 import sys
-from pprint import pprint
 
 
 ################### Overview Page Templates ###################################
@@ -316,9 +314,6 @@ def download_genome_info_table_csv(request):
         {"pangenome_analysis": species}, genome_keys
     )
 
-    pprint(genome_keys, stream=sys.stderr)
-    pprint(list(genomes), stream=sys.stderr)
-
     response = csv_export.dict_writer_response(
         downloaded_file_name, genome_keys, genomes
     )
@@ -384,6 +379,9 @@ def phylons_matrix_json(request, pangenome_analysis: str, matrix: str) -> JsonRe
         sort_direction = request.GET['order[0][dir]']
     else:
         sort_column, sort_direction = 0, 'asc'
+    
+    # assumes genome id or gene will always be column 0
+    search_term = request.GET.get("columns[0][search][value]", "")
 
     response = datatables.create_datatables_api_phylons_matrix(
         pangenome_analysis,
@@ -392,6 +390,7 @@ def phylons_matrix_json(request, pangenome_analysis: str, matrix: str) -> JsonRe
         end=end,
         sort_column_index=sort_column,
         sort_direction=sort_direction,
+        search_term=search_term,
         current_draw=int(request.GET["draw"])
     )
 
@@ -425,6 +424,8 @@ def phylon_weights_json(request, pangenome_analysis: str, phylon_id: str, type_:
         sort_direction = request.GET['order[0][dir]']
     else:
         sort_column, sort_direction = 1, 'desc'
+
+    search_term = request.GET.get("columns[0][search][value]", "")
     
     datatables_response = datatables.create_datatables_api_phylon_table(
         pangenome_analysis,
@@ -434,6 +435,7 @@ def phylon_weights_json(request, pangenome_analysis: str, phylon_id: str, type_:
         end=end,
         sort_column_index=sort_column,
         sort_direction=sort_direction,
+        search_term=search_term,
         current_draw=int(request.GET["draw"])
     )
 
@@ -583,8 +585,6 @@ def gene_annotation_json(request):
         out_keys=gene_keys,
         total_count_only_db_match=True,
     )
-
-    pprint(response, stream=sys.stderr)
 
     return JsonResponse(response)
 

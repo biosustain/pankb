@@ -346,7 +346,15 @@ def create_datatables_api_phylons_matrix(
             entry.append(phylon_weights[phylon_id])
         data.append(entry)
     
-    n_entries = len(data)
+    n_entries_total = len(data)
+
+    if search_term:
+        # assumes genome id or gene will always be column 0
+        data = filter(lambda row: search_term.lower() in row[0].lower(), data)
+        data = list(data)
+        n_entries_filtered = len(data)
+    else:
+        n_entries_filtered = n_entries_total
 
 
     data.sort(key=lambda entry: entry[sort_column_index], reverse=sort_direction == "desc")
@@ -356,11 +364,10 @@ def create_datatables_api_phylons_matrix(
     else:
         data = data[start : end]
 
-
     response = {
         "draw": current_draw + 1,
-        "recordsFiltered": n_entries,
-        "recordsTotal": n_entries,
+        "recordsFiltered": n_entries_filtered,
+        "recordsTotal": n_entries_total,
         "columns": columns,
         "data": data,
         "order": [{"column": sort_column_index, "dir": sort_direction}]
@@ -400,6 +407,17 @@ def create_datatables_api_phylon_table(
     item_weights = weights_by_phylon[phylon_id]
 
     table_data = [(item, weight) for item, weight in item_weights.items()]
+
+    n_entries_total = len(table_data)
+
+    if search_term:
+        # assumes genome id or gene will always be column 0
+        table_data = filter(lambda row: search_term.lower() in row[0].lower(), table_data)
+        table_data = list(table_data)
+        n_entries_filtered = len(table_data)
+    else:
+        n_entries_filtered = n_entries_total
+
     table_data.sort(key=lambda entry: entry[sort_column_index], reverse=sort_direction == "desc")
     table_data = table_data[start:end]
 
@@ -407,8 +425,8 @@ def create_datatables_api_phylon_table(
         "columns": columns,
         "data": table_data,
         "draw": current_draw + 1,
-        "recordsFiltered": len(item_weights),
-        "recordsTotal": len(item_weights),
+        "recordsTotal": n_entries_total,
+        "recordsFiltered": n_entries_filtered,
     }
 
     return datatables_response
