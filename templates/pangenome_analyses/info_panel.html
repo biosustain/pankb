@@ -20,6 +20,9 @@
     <li class="nav-item">
         <a class="nav-link{% if active_subpage == 'phylogenetic_tree' %} active{% endif %}" href="{% url 'pangenome_analyses_phylogenetic_tree' %}?species={{ request.GET.species }}">Phylogenetic Tree</a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link{% if active_subpage == 'phylons' %} active{% endif %}" href="{% url 'pangenome_analyses_phylons' %}?species={{ request.GET.species }}">Phylons</a>
+    </li>
 </ul>
 {% endblock %}
 
