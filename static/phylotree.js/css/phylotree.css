@@ -377,7 +377,7 @@ body {
 /* Matrix Column as a Unified Grid Layout */
 .matrix-column {
   display: grid;
-  grid-template-columns: auto auto auto auto; /* Four columns for both labels and data */
+  grid-template-columns: auto auto auto auto auto; /* Five columns for both labels and data */
   grid-auto-rows: min-content; /* Each row only as tall as its content */
   gap: 0 5px; /* Ensures no additional spacing between grid items */
   /* overflow-y: auto; */
