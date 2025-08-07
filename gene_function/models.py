@@ -1,5 +1,12 @@
 from common import database
 
+class GeneAnnotations:
+    objects = database.MongoDBObjects('pankb_gene_annotations')
+    
+    class NotFound(Exception):
+        pass
+    
+
 
 # Model for the Gene Info table content
 class GeneInfo:
@@ -29,6 +36,23 @@ class GenomeInfo:
             },
             {"$project": {"_id": 0, "isolation_info": 0}},
         ]
+
+    def get_by_genome_ids(genome_ids, projection=None):
+        """
+        Fetch one or more genomes by ID.
+
+        :param genome_ids: list[str] – genome_id values to look up
+        :param include_isolation: bool – whether to perform the $lookup join
+        :param projection: list[str] | dict | None – optional projection
+        :return: list[dict]
+        """
+        genome_match = {"genome_id": {"$in": genome_ids}}
+
+        cursor = GenomeInfo.get_genome_and_isolation_info(
+            genome_match, projection=projection
+        )
+
+        return list(cursor) 
 
     def get_genome_and_isolation_info(genome_match, projection=None):
         pipeline = GenomeInfo.get_genome_and_isolation_info_pipeline(genome_match)
