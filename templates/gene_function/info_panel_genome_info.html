@@ -11,9 +11,12 @@
 <dl class="row g-1 fs-3">
     <dt class="col-sm-12">Strain (<a href="https://www.ncbi.nlm.nih.gov/datasets/genome/{{dataGenome.genome_id|safe}}" target="_blank">NCBI</a>)</dt>
     <dd class="col-sm-12">{{ dataGenome.strain }}</dd>
-    
+    <dt class="col-sm-6">Phylogroup</dt>
+    <dd class="col-sm-6">{{ dataGenome.phylo_group }}</dd>
+
     <dt class="col-sm-12">Isolation Source</dt>
     <dd class="col-sm-12">{{ dataGenome.isolation_source }}</dd>
+    <dt class="col-sm-12">Isolation Source Categories</dt>
     <dd class="col-sm-12">
       <ol class="breadcrumb" style="--bs-breadcrumb-divider: '>';">
         {% for category in dataGenome.iso_cat %}

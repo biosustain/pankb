@@ -8,6 +8,9 @@ class Organisms:
     class NotFound(Exception):
         pass
 
+    class DuplicateOrganism(Exception):
+        pass
+
     def get_by_pangenome_analysis(pangenome_analysis, projection=None):
         organism_info = list(
             Organisms.objects.find(
@@ -15,8 +18,12 @@ class Organisms:
                 projection,
             )
         )
-        if len(organism_info) != 1:
+        
+        if len(organism_info) == 0:
             raise Organisms.NotFound()
+        elif len(organism_info) > 1:
+            raise Organisms.DuplicateOrganism(f"Duplicate entries for pangenome analysis {pangenome_analysis}")
+        
         organism_info = organism_info[0]
         return organism_info
 

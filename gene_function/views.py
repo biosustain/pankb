@@ -214,13 +214,14 @@ def genome_info(request):
     genome_info_dict = _get_genome_and_isolation_info(filter_params)
 
     # Obtain the gene info: ----
-    gene_info = GeneInfo.objects.find(
+    gene_info = GeneInfo.get_gene_info_and_pangenomic_class(
         {"pangenome_analysis": species, "genome_id": genome_id},
         [
             "gene",
             "locus_tag",
             "pangenome_analysis",
             "genome_id",
+            "pangenomic_class",
             "original_locus_tag",
             "original_gene",
             "original_exact_match",
@@ -229,7 +230,7 @@ def genome_info(request):
             "end_position",
             "nucleotide_seq",
             "aminoacid_seq",
-        ],
+        ]
     )
     gene_info = list(gene_info)
 

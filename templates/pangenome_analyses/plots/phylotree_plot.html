@@ -1130,7 +1130,7 @@
     var urlParams = new URLSearchParams(window.location.search);
     var species = urlParams.get('species');
 
-    const categories = ['Country', 'Broad Context', 'Local Context', 'Isolation Source'];  // Static definition
+    const categories = ['Phylons', 'Country', 'Broad Context', 'Local Context', 'Isolation Source'];  // Static definition
     let metadata = {{ source_info_dataset | safe }};
 
     // // Fetch metadata with caching support
