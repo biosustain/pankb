@@ -42,7 +42,7 @@ jobs:
             echo "# - 'self_deployed' (standalone, deployed on the DEV server in a docker container)" >> .env
             echo "# or" >> .env
             echo "# - 'cloud' (MongoDB Atlas or Azure CosmosDB for MongoDB)" >> .env
-            echo DB_TYPE="cloud" >> .env
+            echo DB_TYPE="self_deployed" >> .env
             echo "" >> .env
             echo "## Django: The secret key" >> .env
             echo SECRET_KEY="${{secrets.PANKB_PREPROD_DJANGO_SECRET_KEY}}" >> .env
