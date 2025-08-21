@@ -25,6 +25,7 @@ from pangenome_analyses import views as pangenome_analyses_views
 from gene_function import views as gene_function_views
 from search import views as search_views
 from ai_assistant import views as ai_assistant_views
+from interop_query import views as interop_views
 
 
 urlpatterns = [
@@ -214,5 +215,9 @@ urlpatterns = [
         name="download_search_genes_csv",
     ),
     path("ai_assistant/", ai_assistant_views.ai_assistant, name="ai_assistant"),
+    path("interop-query/query-by-strain", interop_views.query_by_strain, name="query_by_strain"),
+    path("interop-query/query-by-gene", interop_views.query_by_gene, name="query_by_gene"),
+    path("interop-query/query-by-pair", interop_views.query_by_pair, name="query_by_pair"),
+
     # path('admin/', admin.site.urls)   # make the amdin panel inaccessible via its utl (the admin admin is preserved for the potential future needs)
 ]

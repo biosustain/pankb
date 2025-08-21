@@ -172,10 +172,74 @@
             },
         });
 
+
+        function format_row_child(row_data) {
+            const fontSize = "fs-3"
+            const rowPadding = 3;
+            const fieldFormatting = `class="fw-bold ps-2 pe-3 mb-1 ${fontSize}" style="vertical-align: top;"`;
+            const sequenceFormatting = 'class="font-monospace fs-4 pe-3 pt-1" style="white-space: normal; word-break: break-word; overflow-wrap: anywhere; vertical-align: top;"';
+            const buttonFormatting = `class="btn btn-outline-dark mx-2" style="padding: 1px 5px 2px 5px; font-size: 12px; line-height: 1.5; border-radius: 3px;"`;
+            const copyIcon = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-copy" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/>
+                </svg> 
+            `;
+            return `
+                    <div style="width:100%;">
+                        <table style="table-layout: auto; width: 100%;">
+                            <tr class="pb-${rowPadding}">
+                                <td class="d-block">
+                                    <div>
+                                        <p ${fieldFormatting}>Protein</p>
+                                    </div>
+                                </td>
+                                <td class="${fontSize}">
+                                    <p>${row_data.protein}</p>
+                                </td>
+                            </tr>
+                            <tr class="pb-${rowPadding}">
+                                <td class="d-block">
+                                    <div>
+                                        <p ${fieldFormatting}>Nucleotide Seq</p>
+                                        <button ${buttonFormatting} onClick="navigator.clipboard.writeText('${row_data.nucleotide_seq}');">
+                                            ${copyIcon}
+                                            Copy
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p ${sequenceFormatting}>${row_data.nucleotide_seq}</p>
+                                </td>
+                            </tr>
+                            <tr class="pb-${rowPadding}">
+                                <td class="d-block">
+                                    <div>
+                                        <p ${fieldFormatting}>Amino Acid Seq</p>
+                                        <button ${buttonFormatting} onClick="navigator.clipboard.writeText('${row_data.aminoacid_seq}');">
+                                            ${copyIcon}
+                                            Copy
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p ${sequenceFormatting}>${row_data.aminoacid_seq}</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+            `;
+        }
+
         // Expand or collapse a table row on click: ----
-        $('#locustags_table tbody').on('click', 'td', function () {
-            let row = $(this).closest('tr')
-            row.toggleClass('expanded-row');
+        $('#locustags_table > tbody > tr').on('click', 'td', function (event) {
+            let tr = $(this).closest('tr')
+            let row = table.row(tr);
+
+            if (row.child.isShown()) {
+                row.child.hide();
+            } else {
+                row.child(format_row_child(row.data())).show();
+            }
         });
 
     });
