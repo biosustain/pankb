@@ -10,6 +10,29 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+@csrf_exempt
+@require_http_methods(["GET"])
+def genes(request):
+    """Return a flat list of all gene names."""
+    try:
+        genes = GeneAnnotations.get_all_genes()
+        return JsonResponse(genes, safe=False)
+    except Exception as e:
+        logger.exception("list_all_genes failed")
+        return JsonResponse({"message": f"Error: {e}"}, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def strains(request):
+    """Return all strains (genomes) with isolation info merged."""
+    try:
+        data = GenomeInfo.get_all_strains()
+        return JsonResponse(data, safe=False)
+    except Exception as e:
+        logger.exception("list_all_strains failed")
+        return JsonResponse({"message": f"Error: {e}"}, status=500)
+
 
 @csrf_exempt
 @require_http_methods(["POST"])

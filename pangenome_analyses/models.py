@@ -4,6 +4,18 @@ from common import database
 class GeneAnnotations:
     objects = database.MongoDBObjects('pankb_gene_annotations')
     
+    @staticmethod
+    def get_all_genes(projection=None):
+        """
+        Return a sorted list of distinct gene names.
+        """
+        cursor = GeneAnnotations.objects.find(
+            {}, projection=projection or ["gene"]
+        )
+
+        names = {doc.get("gene") for doc in cursor if "gene" in doc}
+        return sorted(n for n in names if n)
+
     def get_gene_analysis_pairs(genes):
         """
         Return all distinct (gene, pangenome_analysis) tuples

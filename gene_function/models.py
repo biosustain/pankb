@@ -127,6 +127,21 @@ class GeneInfo:
 class GenomeInfo:
     objects = database.MongoDBObjects("pankb_genome_info")
 
+    @staticmethod
+    def get_all_strains():
+        """
+        Return a sorted list of distinct genome_id values.
+        """
+        pipeline = [
+            {"$group": {"_id": "$genome_id"}},
+            {"$sort": {"_id": 1}},
+            {"$project": {"_id": 0, "genome_id": "$_id"}},
+        ]
+
+        cursor = GenomeInfo.objects.aggregate(pipeline)
+        return [doc["genome_id"] for doc in cursor if doc.get("genome_id")]
+
+
     def get_genome_and_isolation_info_pipeline(genome_match):
         return [
             {"$match": genome_match},

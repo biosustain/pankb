@@ -218,6 +218,8 @@ urlpatterns = [
     path("interop-query/query-by-strain", interop_views.query_by_strain, name="query_by_strain"),
     path("interop-query/query-by-gene", interop_views.query_by_gene, name="query_by_gene"),
     path("interop-query/query-by-pair", interop_views.query_by_pair, name="query_by_pair"),
+    path("interop-query/genes", interop_views.genes, name="genes"),
+    path("interop-query/strains", interop_views.strains, name="strains"),
 
     # path('admin/', admin.site.urls)   # make the amdin panel inaccessible via its utl (the admin admin is preserved for the potential future needs)
 ]
