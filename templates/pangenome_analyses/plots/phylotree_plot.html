@@ -1130,7 +1130,7 @@
     var urlParams = new URLSearchParams(window.location.search);
     var species = urlParams.get('species');
 
-    const categories = ['Phylons', 'Country', 'Broad Context', 'Local Context', 'Isolation Source'];  // Static definition
+    const categories = ['Country', 'Broad Context', 'Local Context', 'Isolation Source'];  // Static definition
     let metadata = {{ source_info_dataset | safe }};
 
     // // Fetch metadata with caching support
@@ -1193,8 +1193,11 @@
             const genome_id = reference.getAttribute('data-genome-id');
             const data = metadata[genome_id] || {};
             let tooltipHTML = `<strong>Genome ID:</strong> ${genome_id}<br>`;
-            Object.keys(data).forEach(key => {
-            tooltipHTML += `<strong>${key}:</strong> ${data[key]}<br>`;
+            // Only show categories defined in the categories array
+            categories.forEach(key => {
+              if (data[key]) {
+                tooltipHTML += `<strong>${key}:</strong> ${data[key]}<br>`;
+              }
             });
             return tooltipHTML;
         },
@@ -1379,8 +1382,11 @@
       if (data) {
         // If identifier is a genome_id, show detailed metadata
         tooltipHTML = `<strong>Genome ID:</strong> ${identifier}<br>`;
-        Object.keys(data).forEach(key => {
-          tooltipHTML += `<strong>${key}:</strong> ${data[key]}<br>`;
+        // Only show categories defined in the categories array
+        categories.forEach(key => {
+          if (data[key]) {
+            tooltipHTML += `<strong>${key}:</strong> ${data[key]}<br>`;
+          }
         });
       } else {
         // Otherwise, treat identifier as a simple tag

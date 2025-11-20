@@ -18,7 +18,6 @@
         <th>Description</th>
         <th>Protein</th>
         <th>PFAMs</th>
-        <th>Phylons</th>
         <th>Count</th>
     </tr>
     </thead>
@@ -33,7 +32,6 @@
             <th>Description</th>
             <th>Protein</th>
             <th>PFAMs</th>
-            <th>Phylons</th>
             <th class="no_search"></th>
         </tr>
     </tfoot>
@@ -109,19 +107,6 @@
                         return wrap_table_text(new_data, '120px')
                     },
                     className: 'pfams',
-                },
-                {
-                    data: '7',
-                    name: 'gene_phylons',
-                    render: function (data, _, _) {
-                        if (data === null || data.length === 0) {
-                            return "-";
-                        } else {
-                            return data.map(function (num) {
-                                return '<a href="/pangenome_analyses/phylon/' + num + '/?' + urlParams.toString() + '">' + num + '</a>';
-                            }).join(', ');
-                        }
-                    }   
                 },
                 {
                     data: '8',
