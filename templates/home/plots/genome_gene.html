@@ -26,7 +26,7 @@
                 const xValue = Math.max(genomeNumber, 1);
                 const yValue = Math.max(geneNumber, 1);
 
-                return {x: xValue, y: yValue, name: key};
+                return {x: xValue, y: yValue, name: key, family: organism};
             });
 
             return {
@@ -121,7 +121,7 @@
                 scatter: {
                     cursor: 'pointer',
                     tooltip: {
-                        headerFormat: '<b>{point.name}</b><br>',
+                        headerFormat: '<b>{point.family}</b><br>',
                         pointFormat: '<b>Species</b>: {point.name}<br><b>Number of genomes</b>: {point.x}<br><b>Number of genes:</b> {point.y}'
                     },
                     point: {
