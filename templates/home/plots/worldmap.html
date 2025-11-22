@@ -1,0 +1,136 @@
+<div id="worldmap_container" class="plot_container w-100" style="min-height: 500px; height: 500px;"></div>
+<script>
+    (function() {
+        const data = {{ worldmap_dataset|safe }}
+        const mapData = [];
+    for (const [code, value] of Object.entries(data)) {
+        if (code !== 'missing' && typeof value === 'number' && value > 0) {
+            mapData.push([code, value]);
+        }
+    }
+
+    const availableMapKeys = Object.keys(Highcharts.maps || {});
+    const mapKey = availableMapKeys.find(k => k.includes('world')) || availableMapKeys[0];
+
+    if (mapKey) {
+        const mapTopology = Highcharts.maps[mapKey];
+        const mapCodes = new Set(mapTopology.features.map(f => f.properties['hc-key']));
+        const matches = mapData.filter(d => mapCodes.has(d[0]));
+        const unmatched = mapData.filter(d => !mapCodes.has(d[0]));
+        console.log('Matched countries:', matches.length, '/', mapData.length); 
+        console.log('Unmatched countries:', unmatched.map(d => d[0] + '(' + d[1] + ')'));
+
+        Highcharts.mapChart('worldmap_container', {
+            chart: {
+                map: mapKey,
+                backgroundColor: 'transparent',
+                spacing: [0, 0, 0, 0],
+                margin: [10, 10, 40, 10]
+            },
+            title: {
+                text: ''
+            },
+            mapNavigation: {
+                enabled: true,
+                enableMouseWheelZoom: true,
+                buttonOptions: {
+                    verticalAlign: 'bottom',
+                    align: 'right',
+                    theme: {
+                        fill: 'white',
+                        'stroke-width': 1,
+                        stroke: '#cccccc',
+                        r: 3,
+                        style: {
+                            fontSize: '0.7rem'
+                        },
+                        states: {
+                            hover: {
+                                fill: '#f0f0f0'
+                            }
+                        }
+                    }
+                }
+            },
+            colorAxis: {
+                min: 1,
+                type: 'logarithmic',
+                stops: [
+                    [0, '#F7FCF5'],
+                    [0.25, '#C7E9C0'],
+                    [0.5, '#74C476'],
+                    [0.75, '#238B45'],
+                    [1, '#00441B']
+                ],
+                labels: {
+                    style: {
+                        fontSize: '0.75rem'
+                    }
+                }
+            },
+            legend: {
+                enabled: true,
+                align: 'left',
+                verticalAlign: 'bottom',
+                layout: 'horizontal',
+                floating: true,
+                y: -5,
+                itemStyle: {
+                    fontSize: '0.7rem'
+                },
+                title: {
+                    text: 'Strain Count',
+                    style: {
+                        fontSize: '0.75rem',
+                        fontWeight: 'normal'
+                    }
+                }
+            },
+            series: [{
+                name: 'Strains',
+                data: mapData,
+                keys: ['hc-key', 'value'],
+                joinBy: 'hc-key',
+                states: {
+                    hover: {
+                        color: '#FF9500',
+                        borderColor: '#303030',
+                        borderWidth: 2
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                tooltip: {
+                    headerFormat: '',
+                    pointFormat: '<b>{point.name}</b><br>Strains: <b>{point.value}</b>',
+                    style: {
+                        fontSize: '0.85rem'
+                    }
+                }
+            }],
+            credits: {
+                enabled: false
+            },
+            navigation: {
+                buttonOptions: {
+                    enabled: false
+                }
+            },
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        legend: {
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            }
+        });
+    }
+    })();
+</script>

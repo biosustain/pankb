@@ -15,6 +15,7 @@ def home(request):
         "organism_gene_dataset": stats["organism_gene_count"],
         "genome_gene_dataset": stats["species_genome_gene"],
         "treemap_dataset": stats["treemap"],
+        "worldmap_dataset": stats["country_strain_count"],
     }
 
     return HttpResponse(template.render(context, request))
