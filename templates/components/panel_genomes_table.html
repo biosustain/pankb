@@ -16,6 +16,9 @@
         <th>Phylo Group</th>
         <th>Length</th>
         <th>%GC</th>
+        <th>Completeness</th>
+        <th>Contamination</th>
+        <th>#Contigs</th>
         <th>Country</th>
         <th>Broad Context</th>
         <th>Local Context</th>
@@ -29,6 +32,9 @@
             <th>Genome</th>
             <th>Strain (NCBI)</th>
             <th>Phylo Group</th>
+            <th class="no_search"></th>
+            <th class="no_search"></th>
+            <th class="no_search"></th>
             <th class="no_search"></th>
             <th class="no_search"></th>
             <th>Country</th>
@@ -87,6 +93,27 @@
                 },
                 {
                     data: '6',
+                    name: 'Completeness',
+                    render: function (data, type, row) {
+                        return data != null ? data + "%" : "-"
+                    },
+                },
+                {
+                    data: '7',
+                    name: 'Contamination',
+                    render: function (data, type, row) {
+                        return data != null ? data + "%" : "-"
+                    },
+                },
+                {
+                    data: '8',
+                    name: 'num_contigs',
+                    render: function (data, type, row) {
+                        return data != null ? data : "-"
+                    },
+                },
+                {
+                    data: '9',
                     name: 'country',
                     render: function (data, type, row) {
                         if (data == "?") {
@@ -97,7 +124,7 @@
                     },
                 },
                 {
-                    data: '8',
+                    data: '11',
                     name: 'iso_cat.0',
                     render: function (data, type, row) {
                         if (data == "?" || data == "Missing" || data == "missing") {
@@ -108,7 +135,7 @@
                     },
                 },
                 {
-                    data: '9',
+                    data: '12',
                     name: 'iso_cat.1',
                     render: function (data, type, row) {
                         if (data == "?" || data == "Missing" || data == "missing") {
@@ -119,7 +146,7 @@
                     },
                 },
                 {
-                    data: '7',
+                    data: '10',
                     name: 'isolation_source',
                     render: function (data, type, row) {
                         if (data == "?" || data == "Missing" || data == "missing") {

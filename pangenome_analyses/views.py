@@ -599,6 +599,9 @@ def genome_json(request):
         "genome_phylons",
         "genome_len",
         "gc_content",
+        "Completeness",
+        "Contamination",
+        "num_contigs",
         "country",
         "isolation_source",
         "iso_cat", # must be last due to the "unwinding" at the end of this function
