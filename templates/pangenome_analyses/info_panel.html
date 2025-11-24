@@ -37,5 +37,336 @@
     
     <dt class="col-sm-12">Openness</dt>
     <dd class="col-sm-12">{{ speciesData.openness }}</dd>
+
+    <dt class="col-sm-8">Genome QC</dt>
+    <dd class="col-sm-4">
+        <a href="#" data-bs-toggle="modal" data-bs-target="#genomeQcModal" title="View Genome Quality Control">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5"/>
+                <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z"/>
+            </svg>
+        </a>
+    </dd>
 </dl>
+{% endblock %}
+
+{% block info_panel_modals %}
+<!-- Genome QC Modal -->
+<div class="modal fade" id="genomeQcModal" tabindex="-1" aria-labelledby="genomeQcModalLabel" aria-hidden="true" data-bs-backdrop="false">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <span class="modal-title" id="genomeQcModalLabel" style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 16px; font-weight: 600; color: #444;">Genome Quality Control</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-3" style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 13px; color: #444;">
+                <div id="qc-loading" class="text-center py-5">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="qc-plots" style="display: none;">
+                    <div class="mb-4">
+                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">QC Filtering Criteria</div>
+                        <div style="color: #666; line-height: 1.6;">
+                            <div class="mb-1"><strong>Hard thresholds:</strong> Completeness ≥ 90%, Contamination ≤ 5%</div>
+                            <div class="mb-1"><strong>Soft thresholds (MAD z-scores):</strong> #Contigs ≤ 2.5, N50 ≥ −2.5, |GC%| ≤ 3.5, Completeness ≥ −2.5, Contamination ≤ 2.5</div>
+                            <div><strong>Species filter:</strong> ≥ 15 QC-passed genomes required for pangenome analysis</div>
+                        </div>
+                    </div>
+                    <div style="color: #666; margin-bottom: 20px;">Distribution of QC metrics for <strong style="color: #444;" id="qc-genome-count"></strong> genomes that passed all filters in <strong style="color: #444;"><i>{{ speciesData.species }}</i></strong>:</div>
+
+                    <!-- Completeness: Histogram only with threshold line -->
+                    <div class="mb-5">
+                        <div class="d-flex justify-content-between align-items-baseline mb-2">
+                            <span style="font-size: 14px; font-weight: 600;">Completeness (%)</span>
+                            <span style="color: #666; font-size: 12px;" id="stats-completeness"></span>
+                        </div>
+                        <div id="plot-completeness" style="height: 200px;"></div>
+                        <div style="color: #666; font-size: 13px; margin-top: 4px;">Estimated genome completeness based on single-copy marker genes. Higher values indicate more complete assemblies.</div>
+                    </div>
+
+                    <!-- Contamination: Histogram only with threshold line -->
+                    <div class="mb-5">
+                        <div class="d-flex justify-content-between align-items-baseline mb-2">
+                            <span style="font-size: 14px; font-weight: 600;">Contamination (%)</span>
+                            <span style="color: #666; font-size: 12px;" id="stats-contamination"></span>
+                        </div>
+                        <div id="plot-contamination" style="height: 200px;"></div>
+                        <div style="color: #666; font-size: 13px; margin-top: 4px;">Estimated proportion of sequences from other organisms. Lower values indicate purer genome assemblies.</div>
+                    </div>
+
+                    <!-- N50: Violin with jitter points -->
+                    <div class="mb-5">
+                        <div class="d-flex justify-content-between align-items-baseline mb-2">
+                            <span style="font-size: 14px; font-weight: 600;">N50</span>
+                            <span style="color: #666; font-size: 12px;" id="stats-n50"></span>
+                        </div>
+                        <div id="plot-n50" style="height: 200px;"></div>
+                        <div style="color: #666; font-size: 13px; margin-top: 4px;">Assembly contiguity metric: the contig length at which 50% of the genome is covered. Higher N50 indicates less fragmented assemblies.</div>
+                    </div>
+
+                    <!-- #Contigs: Violin with jitter points -->
+                    <div class="mb-5">
+                        <div class="d-flex justify-content-between align-items-baseline mb-2">
+                            <span style="font-size: 14px; font-weight: 600;">#Contigs</span>
+                            <span style="color: #666; font-size: 12px;" id="stats-contigs"></span>
+                        </div>
+                        <div id="plot-contigs" style="height: 200px;"></div>
+                        <div style="color: #666; font-size: 13px; margin-top: 4px;">Number of contiguous sequences in the assembly. Fewer contigs generally indicate better assembly quality.</div>
+                    </div>
+
+                    <!-- GC Content: Violin with jitter points -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-baseline mb-2">
+                            <span style="font-size: 14px; font-weight: 600;">GC Content (%)</span>
+                            <span style="color: #666; font-size: 12px;" id="stats-gc"></span>
+                        </div>
+                        <div id="plot-gc" style="height: 200px;"></div>
+                        <div style="color: #666; font-size: 13px; margin-top: 4px;">Proportion of guanine and cytosine bases. Outliers may indicate contamination or sequencing bias.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    let qcDataLoaded = false;
+    let plotlyLoaded = false;
+    const plotlyUrl = '{% static "./js/plotly/plotly.min.js" %}';
+
+    function loadPlotly(callback) {
+        if (plotlyLoaded || typeof Plotly !== 'undefined') {
+            plotlyLoaded = true;
+            callback();
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = plotlyUrl;
+        script.onload = function() {
+            plotlyLoaded = true;
+            callback();
+        };
+        document.head.appendChild(script);
+    }
+
+    // Helper functions for statistics
+    function median(arr) {
+        const sorted = [...arr].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    }
+
+    function formatNumber(num) {
+        if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+        return num.toFixed(2);
+    }
+
+    function renderQcPlots(data) {
+        document.getElementById('qc-loading').style.display = 'none';
+        document.getElementById('qc-plots').style.display = 'block';
+
+        const plotConfig = { displayModeBar: false, responsive: true };
+        const defaultLayout = {
+            margin: { l: 60, r: 30, t: 10, b: 40 },
+            showlegend: false,
+        };
+
+        // Get sample count from any metric
+        const sampleCount = (data['Completeness'] || []).length;
+        document.getElementById('qc-genome-count').textContent = sampleCount;
+
+        // === Completeness: Histogram with 90% threshold line ===
+        const completenessVals = data['Completeness'] || [];
+        if (completenessVals.length > 0) {
+            const med = median(completenessVals);
+            const min = Math.min(...completenessVals);
+            const max = Math.max(...completenessVals);
+
+            Plotly.newPlot('plot-completeness', [{
+                type: 'histogram',
+                x: completenessVals,
+                marker: { color: '#2ecc71', opacity: 0.7 },
+                nbinsx: 20,
+            }], {
+                ...defaultLayout,
+                xaxis: { title: 'Completeness (%)' },
+                yaxis: { title: 'Count' },
+                shapes: [{
+                    type: 'line', x0: 90, x1: 90, y0: 0, y1: 1, yref: 'paper',
+                    line: { color: '#e74c3c', width: 2, dash: 'dash' }
+                }],
+                annotations: [{
+                    x: 90, y: 1, yref: 'paper', text: '90% threshold',
+                    showarrow: false, xanchor: 'left', font: { size: 10, color: '#e74c3c' }
+                }]
+            }, plotConfig);
+
+            document.getElementById('stats-completeness').textContent =
+                `Median: ${med.toFixed(2)}% | Range: [${min.toFixed(2)}%, ${max.toFixed(2)}%]`;
+        }
+
+        // === Contamination: Histogram with 5% threshold line ===
+        const contaminationVals = data['Contamination'] || [];
+        if (contaminationVals.length > 0) {
+            const med = median(contaminationVals);
+            const min = Math.min(...contaminationVals);
+            const max = Math.max(...contaminationVals);
+
+            Plotly.newPlot('plot-contamination', [{
+                type: 'histogram',
+                x: contaminationVals,
+                marker: { color: '#e74c3c', opacity: 0.7 },
+                nbinsx: 20,
+            }], {
+                ...defaultLayout,
+                xaxis: { title: 'Contamination (%)' },
+                yaxis: { title: 'Count' },
+                shapes: [{
+                    type: 'line', x0: 5, x1: 5, y0: 0, y1: 1, yref: 'paper',
+                    line: { color: '#e74c3c', width: 2, dash: 'dash' }
+                }],
+                annotations: [{
+                    x: 5, y: 1, yref: 'paper', text: '5% threshold',
+                    showarrow: false, xanchor: 'left', font: { size: 10, color: '#e74c3c' }
+                }]
+            }, plotConfig);
+
+            document.getElementById('stats-contamination').textContent =
+                `Median: ${med.toFixed(2)}% | Range: [${min.toFixed(2)}%, ${max.toFixed(2)}%]`;
+        }
+
+        // === N50: Violin with jitter points and median line ===
+        const n50Vals = data['N50'] || [];
+        if (n50Vals.length > 0) {
+            const med = median(n50Vals);
+            const min = Math.min(...n50Vals);
+            const max = Math.max(...n50Vals);
+
+            Plotly.newPlot('plot-n50', [
+                {
+                    type: 'violin',
+                    x: n50Vals,
+                    box: { visible: true },
+                    meanline: { visible: true },
+                    fillcolor: '#3498db',
+                    opacity: 0.6,
+                    line: { color: '#3498db' },
+                    orientation: 'h',
+                    side: 'positive',
+                    points: 'all',
+                    jitter: 0.3,
+                    pointpos: -0.5,
+                    marker: { size: 4, opacity: 0.5 },
+                    hoveron: 'points',
+                    hovertemplate: 'N50: %{x:,.0f} bp<extra></extra>',
+                }
+            ], {
+                ...defaultLayout,
+                xaxis: { title: 'N50 (bp)' },
+                yaxis: { showticklabels: false },
+            }, plotConfig);
+
+            document.getElementById('stats-n50').textContent =
+                `Median: ${formatNumber(med)} | Range: [${formatNumber(min)}, ${formatNumber(max)}]`;
+        }
+
+        // === #Contigs: Violin with jitter points ===
+        const contigsVals = data['num_contigs'] || [];
+        if (contigsVals.length > 0) {
+            const med = median(contigsVals);
+            const min = Math.min(...contigsVals);
+            const max = Math.max(...contigsVals);
+
+            Plotly.newPlot('plot-contigs', [
+                {
+                    type: 'violin',
+                    x: contigsVals,
+                    box: { visible: true },
+                    meanline: { visible: true },
+                    fillcolor: '#9b59b6',
+                    opacity: 0.6,
+                    line: { color: '#9b59b6' },
+                    orientation: 'h',
+                    side: 'positive',
+                    points: 'all',
+                    jitter: 0.3,
+                    pointpos: -0.5,
+                    marker: { size: 4, opacity: 0.5 },
+                    hoveron: 'points',
+                    hovertemplate: '#Contigs: %{x:,.0f}<extra></extra>',
+                }
+            ], {
+                ...defaultLayout,
+                xaxis: { title: '#Contigs' },
+                yaxis: { showticklabels: false },
+            }, plotConfig);
+
+            document.getElementById('stats-contigs').textContent =
+                `Median: ${Math.round(med)} | Range: [${min}, ${max}]`;
+        }
+
+        // === GC Content: Violin with jitter points ===
+        const gcVals = data['gc_content'] || [];
+        if (gcVals.length > 0) {
+            const med = median(gcVals);
+            const min = Math.min(...gcVals);
+            const max = Math.max(...gcVals);
+
+            Plotly.newPlot('plot-gc', [
+                {
+                    type: 'violin',
+                    x: gcVals,
+                    box: { visible: true },
+                    meanline: { visible: true },
+                    fillcolor: '#f39c12',
+                    opacity: 0.6,
+                    line: { color: '#f39c12' },
+                    orientation: 'h',
+                    side: 'positive',
+                    points: 'all',
+                    jitter: 0.3,
+                    pointpos: -0.5,
+                    marker: { size: 4, opacity: 0.5 },
+                    hoveron: 'points',
+                    hovertemplate: 'GC: %{x:.2f}%<extra></extra>',
+                }
+            ], {
+                ...defaultLayout,
+                xaxis: { title: 'GC Content (%)' },
+                yaxis: { showticklabels: false },
+            }, plotConfig);
+
+            document.getElementById('stats-gc').textContent =
+                `Median: ${med.toFixed(2)}% | Range: [${min.toFixed(2)}%, ${max.toFixed(2)}%]`;
+        }
+
+        qcDataLoaded = true;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('genomeQcModal');
+        if (!modal) return;
+
+        modal.addEventListener('show.bs.modal', function() {
+            if (qcDataLoaded) return;
+
+            const species = '{{ request.GET.species }}';
+
+            Promise.all([
+                fetch(`{% url "pangenome_analyses_genome_qc_json" %}?species=${encodeURIComponent(species)}`).then(r => r.json()),
+                new Promise(resolve => loadPlotly(resolve))
+            ])
+            .then(([data]) => renderQcPlots(data))
+            .catch(error => {
+                console.error('Error loading QC data:', error);
+                document.getElementById('qc-loading').innerHTML = '<p class="text-danger">Error loading data</p>';
+            });
+        });
+    });
+})();
+</script>
 {% endblock %}

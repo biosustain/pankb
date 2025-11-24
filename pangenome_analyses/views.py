@@ -658,3 +658,22 @@ def genome_json(request):
         d.extend(isolation_categories)
 
     return JsonResponse(data=response)
+
+
+def genome_qc_json(request):
+    pangenome_analysis = str(request.GET["species"])
+    qc_fields = ["Completeness", "Contamination", "N50", "num_contigs", "gc_content"]
+    pipeline = [
+        {"$match": {"pangenome_analysis": pangenome_analysis}},
+        {"$project": {"_id": 0, "Completeness": 1, "Contamination": 1, "N50": 1, "num_contigs": 1, "gc_content": 1}}
+    ]
+    genomes = list(GenomeInfo.objects.aggregate(pipeline))
+    qc_data = {field: [] for field in qc_fields}
+    for genome in genomes:
+        for field in qc_fields:
+            value = genome.get(field)
+            if value is not None:
+                if field == "gc_content":
+                    value = value * 100
+                qc_data[field].append(value)
+    return JsonResponse(qc_data)
