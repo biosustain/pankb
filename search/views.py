@@ -41,12 +41,17 @@ def clean_query(q):
 def search_results(request):
     template = loader.get_template("search/search_results.html")
     # Get the query string from the URL: ----
-    q_orig = request.GET.get("q")
-    q = clean_query(q_orig)
-
-    if (
-        len(q) >= 2
-    ):  # only if the cleaned query string length > 2 symbols, perform the DB searches: ----
+    q_orig = request.GET.get("q", "")
+    q = clean_query(q_orig) if q_orig else ""
+    
+    country_code = request.GET.get("country_code", "")  # ISO2 code from map
+    # if country_code is provided (from map click), only query genomes
+    if country_code:
+        families = []
+        species = []
+        pathways = []
+        genes = []
+    elif len(q) >= 2:
         # Get the filtered organism families from the DB: ----
         families = list(
             Organisms.objects.find(
@@ -70,7 +75,6 @@ def search_results(request):
             )
         )
         genes = []
-
     else:  # if the cleaned query string is too short or not set, just return the empty DFs: ----
         families = []
         species = []
@@ -84,6 +88,9 @@ def search_results(request):
         no_results_list.append("species")
     if not pathways:
         no_results_list.append("pathways")
+        
+    if country_code:
+        no_results_list.append("genes")
 
     # Compose the render context: ----
     context = {
@@ -93,6 +100,7 @@ def search_results(request):
         "genes_results": json.dumps(genes),
         "no_results_list": no_results_list,
         "q": q,
+        "country_code": country_code,
     }
     return HttpResponse(template.render(context, request))
 
@@ -265,8 +273,9 @@ def gene_annotation_json(request):
 
 # JSON data for genome datatable
 def genomes_json(request):
-    q_orig = str(request.GET["q"])
+    q_orig = str(request.GET.get("q", ""))
     q = clean_query(q_orig)
+    country_code = request.GET.get("country_code", "")  # ISO2 code from map
 
     genome_keys = [
         "pangenome_analysis",
@@ -281,7 +290,31 @@ def genomes_json(request):
         "extra_context",
         "isolation_source",
     ]
-    if len(q) >= 2 and not re.search(
+
+    # if country_code, use country_iso2 to conduct exact match
+    if country_code:
+        genomes = GenomeInfo.objects.aggregate(
+            GenomeInfo.get_genome_and_isolation_info_pipeline({})
+            + [
+                {"$match": {"country_iso2": {"$regex": f"^{country_code}$", "$options": "i"}}},
+                {
+                    "$addFields": {
+                        "broad_context": {"$arrayElemAt": ["$iso_cat", 0]},
+                        "local_context": {"$arrayElemAt": ["$iso_cat", 1]},
+                        "extra_context": {"$slice": ["$iso_cat", 2, 10]},
+                    }
+                },
+                {"$project": {gk: int(gk != "_id") for gk in ["_id"] + genome_keys}},
+            ]
+        )
+        genomes = [
+            [
+                (str(g.get(gk, None)) if gk == "strain" else g.get(gk, None))
+                for gk in genome_keys
+            ]
+            for g in genomes
+        ]
+    elif len(q) >= 2 and not re.search(
         q, "Missing", flags=re.IGNORECASE
     ):  # Prevent too many results
         genomes = GenomeInfo.objects.aggregate(

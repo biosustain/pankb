@@ -46,7 +46,7 @@
     $(document).ready(async function () {
         genomes_table = $('#genomes_table').DataTable({
             ajax: {
-                url: '{% url "search_genomes_json" %}?q={{ q }}',
+                url: '{% url "search_genomes_json" %}?q={{ q }}{% if country_code %}&country_code={{ country_code }}{% endif %}',
                 dataSrc: 'results',
             },
             autoWidth: true,
