@@ -91,6 +91,16 @@
                 data: mapData,
                 keys: ['hc-key', 'value'],
                 joinBy: 'hc-key',
+                cursor: 'pointer',
+                point: {
+                    events: {
+                        click: function() {
+                            if (this.value) {
+                                window.open("{% url 'search_results' %}?country_code=" + encodeURIComponent(this.properties['hc-key']), '_blank');
+                            }
+                        }
+                    }
+                },
                 states: {
                     hover: {
                         color: '#FF9500',
