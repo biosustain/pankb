@@ -108,6 +108,11 @@ urlpatterns = [
         name="pangenome_analyses_genome_qc_json",
     ),
     path(
+        "pangenome_analyses/genome_qc/csv/",
+        pangenome_analyses_views.download_genome_qc_csv,
+        name="download_genome_qc_csv",
+    ),
+    path(
         "pangenome_analyses/phylogenetic_tree/",
         pangenome_analyses_views.phylogenetic_tree,
         name="pangenome_analyses_phylogenetic_tree",

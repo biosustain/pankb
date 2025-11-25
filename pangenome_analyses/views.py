@@ -680,3 +680,29 @@ def genome_qc_json(request):
                     value = value * 100
                 qc_data[field].append(value)
     return JsonResponse(qc_data)
+
+
+def download_genome_qc_csv(request):
+    species = request.GET.get("species")
+    downloaded_file_name = (
+        "Genome_QC__" + species + "__" + time.strftime("%Y-%m-%d_%H-%M") + ".csv"
+    )
+    qc_keys = [
+        "pangenome_analysis",
+        "genome_id",
+        "Completeness",
+        "Contamination",
+        "N50",
+        "num_contigs",
+        "gc_content",
+    ]
+    pipeline = [
+        {"$match": {"pangenome_analysis": species}},
+        {"$project": {"_id": 0, "pangenome_analysis": 1, "genome_id": 1, "Completeness": 1, "Contamination": 1, "N50": 1, "num_contigs": 1, "gc_content": 1}}
+    ]
+    genomes = list(GenomeInfo.objects.aggregate(pipeline))
+
+    response = csv_export.dict_writer_response(
+        downloaded_file_name, qc_keys, genomes
+    )
+    return response
