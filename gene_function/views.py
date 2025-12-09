@@ -318,17 +318,23 @@ def genome_gene_info(request):
     gene = request.GET.get("gene", None)
     locus_tag = request.GET.get("locus_tag", None)
 
-    if species is None or ((genome_id is None or gene is None) and locus_tag is None):
-        raise Http404()
-
-    if (not (genome_id is None or gene is None)) and (locus_tag is None):
-        filter_params = {
-            "pangenome_analysis": species,
-            "genome_id": genome_id,
-            "gene": gene,
-        }
-    elif (genome_id is None or gene is None) and (not locus_tag is None):
-        filter_params = {"pangenome_analysis": species, "locus_tag": locus_tag}
+    # Determine filter_params based on available parameters:
+    # 1. species + genome_id + gene 
+    # 2. species + locus_tag 
+    # 3. genome_id + locus_tag 
+    if species is not None:
+        if genome_id is not None and gene is not None and locus_tag is None:
+            filter_params = {
+                "pangenome_analysis": species,
+                "genome_id": genome_id,
+                "gene": gene,
+            }
+        elif locus_tag is not None and (genome_id is None or gene is None):
+            filter_params = {"pangenome_analysis": species, "locus_tag": locus_tag}
+        else:
+            raise Http404()
+    elif genome_id is not None and locus_tag is not None:
+        filter_params = {"genome_id": genome_id, "locus_tag": locus_tag}
     else:
         raise Http404()
 
@@ -356,6 +362,8 @@ def genome_gene_info(request):
         raise Http404()
     gene_info = list(gene_info)
 
+    # Extract values from the found gene_info
+    species = gene_info[0].get("pangenome_analysis", species)
     genome_id = gene_info[0]["genome_id"]
     gene = gene_info[0]["gene"]
     locus_tag = gene_info[0]["locus_tag"]
@@ -371,6 +379,7 @@ def genome_gene_info(request):
         "gene_id": gene,
         "genome_id": genome_id,
         "locus_tag": locus_tag,
+        "species": species,
     }
     return HttpResponse(template.render(context, request))
 
