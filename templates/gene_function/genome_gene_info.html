@@ -18,7 +18,7 @@
         {% include 'components/panel_gene_info.html' with panel_name="gene_info" panel_title="Gene Info" dataGene=dGene %}
         {% endfor %}
         {% url 'genome_barplot' as url_cog_distribution %}
-        {% include 'components/panel_iframe.html' with panel_name="cog_distribution" panel_title="Annotation Distribution in Genome" panel_iframe_src=url_cog_distribution|add:"?species="|add:request.GET.species|add:"&genome_id="|add:genome_id panel_class='col-lg-12' panel_iframe_class='responsive-iframe-h30' %}
+        {% include 'components/panel_iframe.html' with panel_name="cog_distribution" panel_title="Annotation Distribution in Genome" panel_iframe_src=url_cog_distribution|add:"?species="|add:species|add:"&genome_id="|add:genome_id panel_class='col-lg-12' panel_iframe_class='responsive-iframe-h30' %}
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
