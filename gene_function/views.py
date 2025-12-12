@@ -1,4 +1,5 @@
 from django.http import HttpResponse, Http404, JsonResponse
+from django.shortcuts import redirect
 from django.template import loader
 from django.conf import settings
 import json, requests, io, time
@@ -207,8 +208,16 @@ def genome_info(request):
     species = request.GET.get("species", None)
     genome_id = request.GET.get("genome_id", None)
 
-    if species is None or genome_id is None:
+    if genome_id is None:
         raise Http404()
+
+    # If species is not provided, look it up and redirect to full URL
+    if species is None:
+        genome_doc = GenomeInfo.objects.find_one({"genome_id": genome_id}, {"pangenome_analysis": 1})
+        if genome_doc is None:
+            raise Http404()
+        species = genome_doc["pangenome_analysis"]
+        return redirect(f"{request.path}?species={species}&genome_id={genome_id}")
 
     filter_params = {"pangenome_analysis": species, "genome_id": genome_id}
     genome_info_dict = _get_genome_and_isolation_info(filter_params)
