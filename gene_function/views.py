@@ -331,6 +331,7 @@ def genome_gene_info(request):
     # 1. species + genome_id + gene 
     # 2. species + locus_tag 
     # 3. genome_id + locus_tag 
+    # 4. genome_id + gene 
     if species is not None:
         if genome_id is not None and gene is not None and locus_tag is None:
             filter_params = {
@@ -344,6 +345,8 @@ def genome_gene_info(request):
             raise Http404()
     elif genome_id is not None and locus_tag is not None:
         filter_params = {"genome_id": genome_id, "locus_tag": locus_tag}
+    elif genome_id is not None and gene is not None:
+        filter_params = {"genome_id": genome_id, "gene": gene}
     else:
         raise Http404()
 
