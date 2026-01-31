@@ -1,7 +1,7 @@
 networks:
   pankb-net:
     name: pankb-net
-    external:true
+    external: true
 
 services:
   django_gunicorn:
