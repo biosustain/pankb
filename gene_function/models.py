@@ -30,7 +30,7 @@ class GeneInfo:
         )
         for item in results:
             if item.get("genome_id") and item.get("gene"):
-                item["url"] = f"/gene_function/genome_gene_info/?genome_id={item['genome_id']}&gene={item['gene']}"
+                item["url"] = f"http://pankb-preprod.northeurope.cloudapp.azure.com/gene_function/genome_gene_info/?genome_id={item['genome_id']}&gene={item['gene']}"
         return results
 
     def get_by_gene_and_analysis(pairs):
@@ -199,7 +199,7 @@ class GenomeInfo:
         results = list(cursor)
         for genome in results:
             if genome.get("genome_id"):
-                genome["url"] = f"/gene_function/genome_info/?genome_id={genome['genome_id']}"
+                genome["url"] = f"http://pankb-preprod.northeurope.cloudapp.azure.com/gene_function/genome_info/?genome_id={genome['genome_id']}"
         return results 
 
     def get_genome_and_isolation_info(genome_match, projection=None):
