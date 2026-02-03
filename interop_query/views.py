@@ -35,6 +35,18 @@ def strains(request):
 
 
 @csrf_exempt
+@require_http_methods(["GET"])
+def gene_strain_pairs(request):
+    """Return all distinct (gene, strain) pairs for InteropDB."""
+    try:
+        pairs = GeneInfo.get_all_gene_strain_pairs()
+        return JsonResponse(pairs, safe=False)
+    except Exception as e:
+        logger.exception("get_gene_strain_pairs failed")
+        return JsonResponse({"message": f"Error: {e}"}, status=500)
+
+
+@csrf_exempt
 @require_http_methods(["POST"])
 def query_by_pair(request):
     logger.info("query by pair")

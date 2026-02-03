@@ -1,5 +1,6 @@
 from common import database
 
+
 # Model for the Gene Info table content
 class GeneInfo:
     objects = database.MongoDBObjects("pankb_gene_info")
@@ -46,7 +47,21 @@ class GeneInfo:
                 {"$or": or_conditions},
                 projection={"_id": 0}
             )
-        )    
+        )
+
+    @staticmethod
+    def get_all_gene_strain_pairs():
+        """
+        Return all distinct (gene, genome_id) pairs.
+        """
+        pipeline = [
+            {"$group": {"_id": {"gene": "$gene", "genome_id": "$genome_id"}}},
+            {"$sort": {"_id.gene": 1, "_id.genome_id": 1}},
+            {"$project": {"_id": 0, "gene": "$_id.gene", "strain": "$_id.genome_id"}},
+        ]
+
+        cursor = GeneInfo.objects.aggregate(pipeline)
+        return [doc for doc in cursor if doc.get("gene") and doc.get("strain")]    
       
     def get_gene_info_and_pangenomic_class_pipeline(gene_match): # This is an ugly workaround to make it compatible with Azure Cosmos DB
         return [
