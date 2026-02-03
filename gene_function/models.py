@@ -192,7 +192,11 @@ class GenomeInfo:
             genome_match, projection=projection
         )
 
-        return list(cursor) 
+        results = list(cursor)
+        for genome in results:
+            if genome.get("genome_id"):
+                genome["url"] = f"/gene_function/genome_info/?genome_id={genome['genome_id']}"
+        return results 
 
     def get_genome_and_isolation_info(genome_match, projection=None):
         pipeline = GenomeInfo.get_genome_and_isolation_info_pipeline(genome_match)
