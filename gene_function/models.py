@@ -22,12 +22,16 @@ class GeneInfo:
             for t in query_args
         ]
 
-        return list(
+        results = list(
             GeneInfo.objects.find(
                 {"$or": or_conditions},
                 projection={"_id": 0}
             )
         )
+        for item in results:
+            if item.get("genome_id") and item.get("gene"):
+                item["url"] = f"/gene_function/genome_gene_info/?genome_id={item['genome_id']}&gene={item['gene']}"
+        return results
 
     def get_by_gene_and_analysis(pairs):
         """
