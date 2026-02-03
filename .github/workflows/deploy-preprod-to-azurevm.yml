@@ -67,6 +67,9 @@ jobs:
             echo "" >> .env
             echo "## URL address of the separately deployed AI Assistant Web Application" >> .env
             echo AI_ASSISTANT_APP_URL="${{vars.PANKB_PREPROD_AI_ASSISTANT_APP_URL}}" >> .env
+            echo "" >> .env
+            echo "## PanKB Base URL for interop query responses" >> .env
+            echo PANKB_BASE_URL="${{secrets.PANKB_PREPROD_BASE_URL}}" >> .env
             cat .env
             docker compose --profile dev down
             docker compose --profile dev up -d --build --force-recreate --remove-orphans

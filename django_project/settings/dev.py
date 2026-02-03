@@ -5,6 +5,7 @@ DEV Server specific settings for the Django project
 import os
 
 AZURE_WEB_DATA_URL = "https://pankb.blob.core.windows.net/data/PanKB/web_data_v2/"
+PANKB_BASE_URL = os.getenv("PANKB_BASE_URL")
 
 MONGODB = {
     "host": os.getenv('MONGODB_HOST'),

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -99,6 +100,9 @@ def query_by_pair(request):
             return JsonResponse([], safe=False)
 
         results = GeneInfo.get_by_gene_analysis_genome(query)
+        for item in results:
+            if item.get("genome_id") and item.get("gene"):
+                item["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={item['genome_id']}&gene={item['gene']}"
         return JsonResponse(results, safe=False)
 
     except json.JSONDecodeError:
@@ -146,7 +150,9 @@ def query_by_strain(request):
             )
 
         genomes = GenomeInfo.get_by_genome_ids(genome_ids)
-
+        for genome in genomes:
+            if genome.get("genome_id"):
+                genome["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_info/?genome_id={genome['genome_id']}"
         return JsonResponse(genomes, safe=False)
 
     except json.JSONDecodeError:
