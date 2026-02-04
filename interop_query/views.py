@@ -1,13 +1,13 @@
+import json
+import logging
+
 from django.conf import settings
+from django.db.models import Q
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q
-from gene_function.models import GenomeInfo, GeneInfo
+from gene_function.models import GeneInfo, GenomeInfo
 from pangenome_analyses.models import GeneAnnotations
-
-import json
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -26,10 +26,17 @@ def genes(request):
 @csrf_exempt
 @require_http_methods(["GET"])
 def strains(request):
-    """Return all strains (genomes) with isolation info merged."""
+    """Return all strains (genomes) with URLs for InteropDB bulk ingest."""
     try:
-        data = GenomeInfo.get_all_strains()
-        return JsonResponse(data, safe=False)
+        strain_ids = GenomeInfo.get_all_strains()
+        # Return list of dicts with strain ID and URL
+        result = []
+        for strain_id in strain_ids:
+            result.append({
+                "strain": strain_id,
+                "url": f"{settings.PANKB_BASE_URL}/gene_function/genome_info/?genome_id={strain_id}"
+            })
+        return JsonResponse(result, safe=False)
     except Exception as e:
         logger.exception("list_all_strains failed")
         return JsonResponse({"message": f"Error: {e}"}, status=500)
@@ -38,9 +45,14 @@ def strains(request):
 @csrf_exempt
 @require_http_methods(["GET"])
 def gene_strain_pairs(request):
-    """Return all distinct (gene, strain) pairs for InteropDB."""
+    """Return all distinct (gene, strain) pairs with URLs for InteropDB."""
     try:
         pairs = GeneInfo.get_all_gene_strain_pairs()
+        for pair in pairs:
+            gene = pair.get("gene")
+            strain = pair.get("strain")
+            if gene and strain:
+                pair["gene_strain_url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={strain}&gene={gene}"
         return JsonResponse(pairs, safe=False)
     except Exception as e:
         logger.exception("get_gene_strain_pairs failed")
