@@ -61,7 +61,44 @@ class GeneInfo:
         ]
 
         cursor = GeneInfo.objects.aggregate(pipeline)
-        return [doc for doc in cursor if doc.get("gene") and doc.get("strain")]    
+        return [doc for doc in cursor if doc.get("gene") and doc.get("strain")]
+
+    @staticmethod
+    def get_gene_strain_pairs_paginated(skip: int = 0, limit: int = 10000):
+        """
+        Return paginated distinct (gene, genome_id) pairs.
+
+        Args:
+            skip: Number of records to skip
+            limit: Max records to return
+
+        Returns:
+            {
+                "pairs": [...],
+                "total": int
+            }
+        """
+        # Get total count first (cached if possible)
+        count_pipeline = [
+            {"$group": {"_id": {"gene": "$gene", "genome_id": "$genome_id"}}},
+            {"$count": "total"}
+        ]
+        count_result = list(GeneInfo.objects.aggregate(count_pipeline))
+        total = count_result[0]["total"] if count_result else 0
+
+        # Get paginated results
+        pipeline = [
+            {"$group": {"_id": {"gene": "$gene", "genome_id": "$genome_id"}}},
+            {"$sort": {"_id.gene": 1, "_id.genome_id": 1}},
+            {"$skip": skip},
+            {"$limit": limit},
+            {"$project": {"_id": 0, "gene": "$_id.gene", "strain": "$_id.genome_id"}},
+        ]
+
+        cursor = GeneInfo.objects.aggregate(pipeline)
+        pairs = [doc for doc in cursor if doc.get("gene") and doc.get("strain")]
+
+        return {"pairs": pairs, "total": total}    
       
     def get_gene_info_and_pangenomic_class_pipeline(gene_match): # This is an ugly workaround to make it compatible with Azure Cosmos DB
         return [

@@ -45,15 +45,43 @@ def strains(request):
 @csrf_exempt
 @require_http_methods(["GET"])
 def gene_strain_pairs(request):
-    """Return all distinct (gene, strain) pairs with URLs for InteropDB."""
+    """
+    Return distinct (gene, strain) pairs with URLs for InteropDB.
+
+    Query params:
+        skip: number of records to skip (default 0)
+        limit: max records to return (default 10000, max 50000)
+
+    Response:
+        {
+            "pairs": [...],
+            "total": 22000000,
+            "skip": 0,
+            "limit": 10000,
+            "has_more": true
+        }
+    """
     try:
-        pairs = GeneInfo.get_all_gene_strain_pairs()
+        skip = int(request.GET.get("skip", 0))
+        limit = min(int(request.GET.get("limit", 10000)), 50000)  # Max 50k per request
+
+        result = GeneInfo.get_gene_strain_pairs_paginated(skip=skip, limit=limit)
+        pairs = result["pairs"]
+
+        # Add URLs to pairs
         for pair in pairs:
             gene = pair.get("gene")
             strain = pair.get("strain")
             if gene and strain:
                 pair["gene_strain_url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={strain}&gene={gene}"
-        return JsonResponse(pairs, safe=False)
+
+        return JsonResponse({
+            "pairs": pairs,
+            "total": result["total"],
+            "skip": skip,
+            "limit": limit,
+            "has_more": skip + len(pairs) < result["total"]
+        })
     except Exception as e:
         logger.exception("get_gene_strain_pairs failed")
         return JsonResponse({"message": f"Error: {e}"}, status=500)
