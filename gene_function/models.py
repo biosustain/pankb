@@ -65,8 +65,13 @@ class GeneInfo:
                 "total": int
             }
         """
-        # Get total count (fast with index)
-        total = GeneInfo.objects.count_documents({"gene": {"$ne": None}, "genome_id": {"$ne": None}})
+        # Get total count using aggregation
+        count_pipeline = [
+            {"$match": {"gene": {"$ne": None}, "genome_id": {"$ne": None}}},
+            {"$count": "total"}
+        ]
+        count_result = list(GeneInfo.objects.aggregate(count_pipeline))
+        total = count_result[0]["total"] if count_result else 0
 
         # Direct find with skip/limit (fast)
         cursor = GeneInfo.objects.find(
