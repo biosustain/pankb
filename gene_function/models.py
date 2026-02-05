@@ -50,23 +50,10 @@ class GeneInfo:
         )
 
     @staticmethod
-    def get_all_gene_strain_pairs():
-        """
-        Return all distinct (gene, genome_id) pairs.
-        """
-        pipeline = [
-            {"$group": {"_id": {"gene": "$gene", "genome_id": "$genome_id"}}},
-            {"$sort": {"_id.gene": 1, "_id.genome_id": 1}},
-            {"$project": {"_id": 0, "gene": "$_id.gene", "strain": "$_id.genome_id"}},
-        ]
-
-        cursor = GeneInfo.objects.aggregate(pipeline)
-        return [doc for doc in cursor if doc.get("gene") and doc.get("strain")]
-
-    @staticmethod
     def get_gene_strain_pairs_paginated(skip: int = 0, limit: int = 10000):
         """
-        Return paginated distinct (gene, genome_id) pairs.
+        Return paginated (gene, genome_id) pairs directly from collection.
+        No $group - assumes data has no duplicates, InteropDB will upsert anyway.
 
         Args:
             skip: Number of records to skip
@@ -78,25 +65,16 @@ class GeneInfo:
                 "total": int
             }
         """
-        # Get total count first (cached if possible)
-        count_pipeline = [
-            {"$group": {"_id": {"gene": "$gene", "genome_id": "$genome_id"}}},
-            {"$count": "total"}
-        ]
-        count_result = list(GeneInfo.objects.aggregate(count_pipeline))
-        total = count_result[0]["total"] if count_result else 0
+        # Get total count (fast with index)
+        total = GeneInfo.objects.count_documents({"gene": {"$ne": None}, "genome_id": {"$ne": None}})
 
-        # Get paginated results
-        pipeline = [
-            {"$group": {"_id": {"gene": "$gene", "genome_id": "$genome_id"}}},
-            {"$sort": {"_id.gene": 1, "_id.genome_id": 1}},
-            {"$skip": skip},
-            {"$limit": limit},
-            {"$project": {"_id": 0, "gene": "$_id.gene", "strain": "$_id.genome_id"}},
-        ]
+        # Direct find with skip/limit (fast)
+        cursor = GeneInfo.objects.find(
+            {"gene": {"$ne": None}, "genome_id": {"$ne": None}},
+            projection={"_id": 0, "gene": 1, "genome_id": 1}
+        ).skip(skip).limit(limit)
 
-        cursor = GeneInfo.objects.aggregate(pipeline)
-        pairs = [doc for doc in cursor if doc.get("gene") and doc.get("strain")]
+        pairs = [{"gene": doc["gene"], "strain": doc["genome_id"]} for doc in cursor]
 
         return {"pairs": pairs, "total": total}    
       
