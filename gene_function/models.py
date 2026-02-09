@@ -75,11 +75,11 @@ class GeneInfo:
 
         # Direct find with skip/limit (fast)
         cursor = GeneInfo.objects.find(
-            {"gene": {"$ne": None}, "genome_id": {"$ne": None}},
-            projection={"_id": 0, "gene": 1, "genome_id": 1}
+            {"gene": {"$ne": None}, "genome_id": {"$ne": None}, "locus_tag": {"$ne": None}},
+            projection={"_id": 0, "gene": 1, "genome_id": 1, "locus_tag": 1}
         ).skip(skip).limit(limit)
 
-        pairs = [{"gene": doc["gene"], "strain": doc["genome_id"]} for doc in cursor]
+        pairs = [{"gene": doc["gene"], "strain": doc["genome_id"], "locus_tag": doc["locus_tag"]} for doc in cursor]
 
         return {"pairs": pairs, "total": total}    
       

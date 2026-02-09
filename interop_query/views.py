@@ -14,10 +14,21 @@ logger = logging.getLogger(__name__)
 @csrf_exempt
 @require_http_methods(["GET"])
 def genes(request):
-    """Return a flat list of all gene names."""
+    """Return all genes with URLs for InteropDB bulk ingest."""
     try:
-        genes = GeneAnnotations.get_all_genes()
-        return JsonResponse(genes, safe=False)
+        gene_list = GeneAnnotations.get_all_genes()
+        # Return list of dicts with gene name and URL
+        result = []
+        for gene_data in gene_list:
+            gene = gene_data.get("gene")
+            species = gene_data.get("pangenome_analysis")
+            if gene and species:
+                result.append({
+                    "gene": gene,
+                    "species": species,
+                    "url": f"{settings.PANKB_BASE_URL}/gene_function/gene_info/?species={species}&gene={gene}"
+                })
+        return JsonResponse(result, safe=False)
     except Exception as e:
         logger.exception("list_all_genes failed")
         return JsonResponse({"message": f"Error: {e}"}, status=500)
@@ -68,12 +79,13 @@ def gene_strain_pairs(request):
         result = GeneInfo.get_gene_strain_pairs_paginated(skip=skip, limit=limit)
         pairs = result["pairs"]
 
-        # Add URLs to pairs
+        # Add URLs to pairs (use locus_tag for unique identification)
         for pair in pairs:
             gene = pair.get("gene")
             strain = pair.get("strain")
-            if gene and strain:
-                pair["gene_strain_url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={strain}&gene={gene}"
+            locus_tag = pair.get("locus_tag")
+            if gene and strain and locus_tag:
+                pair["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={strain}&gene={gene}&locus_tag={locus_tag}"
 
         return JsonResponse({
             "pairs": pairs,
@@ -141,8 +153,11 @@ def query_by_pair(request):
 
         results = GeneInfo.get_by_gene_analysis_genome(query)
         for item in results:
-            if item.get("genome_id") and item.get("gene"):
-                item["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={item['genome_id']}&gene={item['gene']}"
+            genome_id = item.get("genome_id")
+            gene = item.get("gene")
+            locus_tag = item.get("locus_tag")
+            if genome_id and gene and locus_tag:
+                item["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={genome_id}&gene={gene}&locus_tag={locus_tag}"
         return JsonResponse(results, safe=False)
 
     except json.JSONDecodeError:
@@ -169,8 +184,17 @@ def query_by_gene(request):
             return JsonResponse([], safe=False)
 
         gene_infos = GeneInfo.get_by_gene_and_analysis(pairs)
+
+        # Add URLs to each record (use locus_tag + genome_id for unique identification)
+        for item in gene_infos:
+            genome_id = item.get("genome_id")
+            gene = item.get("gene")
+            locus_tag = item.get("locus_tag")
+            if genome_id and gene and locus_tag:
+                item["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={genome_id}&gene={gene}&locus_tag={locus_tag}"
+
         return JsonResponse(gene_infos, safe=False)
-    
+
     except json.JSONDecodeError:
         return JsonResponse({'message': 'Invalid JSON'}, status=400)
     except Exception as e:

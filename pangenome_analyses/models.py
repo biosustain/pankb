@@ -5,16 +5,26 @@ class GeneAnnotations:
     objects = database.MongoDBObjects('pankb_gene_annotations')
     
     @staticmethod
-    def get_all_genes(projection=None):
+    def get_all_genes():
         """
-        Return a sorted list of distinct gene names.
+        Return a sorted list of dicts with gene and pangenome_analysis.
+        Each unique (gene, pangenome_analysis) pair is returned once.
         """
         cursor = GeneAnnotations.objects.find(
-            {}, projection=projection or ["gene"]
+            {}, projection=["gene", "pangenome_analysis"]
         )
 
-        names = {doc.get("gene") for doc in cursor if "gene" in doc}
-        return sorted(n for n in names if n)
+        pairs = {
+            (doc["gene"], doc["pangenome_analysis"])
+            for doc in cursor
+            if doc.get("gene") and doc.get("pangenome_analysis")
+        }
+
+        result = [
+            {"gene": gene, "pangenome_analysis": species}
+            for gene, species in sorted(pairs)
+        ]
+        return result
 
     def get_gene_analysis_pairs(genes):
         """

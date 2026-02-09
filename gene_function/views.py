@@ -328,23 +328,22 @@ def genome_gene_info(request):
     locus_tag = request.GET.get("locus_tag", None)
 
     # Determine filter_params based on available parameters:
-    # 1. species + genome_id + gene 
-    # 2. species + locus_tag 
-    # 3. genome_id + locus_tag 
-    # 4. genome_id + gene 
-    if species is not None:
-        if genome_id is not None and gene is not None and locus_tag is None:
-            filter_params = {
-                "pangenome_analysis": species,
-                "genome_id": genome_id,
-                "gene": gene,
-            }
-        elif locus_tag is not None and (genome_id is None or gene is None):
-            filter_params = {"pangenome_analysis": species, "locus_tag": locus_tag}
-        else:
-            raise Http404()
-    elif genome_id is not None and locus_tag is not None:
+    # 1. genome_id + gene + locus_tag (most specific, unique)
+    # 2. genome_id + locus_tag (unique)
+    # 3. species + locus_tag (unique)
+    # 4. species + genome_id + gene (may return multiple)
+    # 5. genome_id + gene (may return multiple)
+    if genome_id is not None and locus_tag is not None:
+        # Most specific: genome_id + locus_tag (gene is optional)
         filter_params = {"genome_id": genome_id, "locus_tag": locus_tag}
+    elif species is not None and locus_tag is not None:
+        filter_params = {"pangenome_analysis": species, "locus_tag": locus_tag}
+    elif species is not None and genome_id is not None and gene is not None:
+        filter_params = {
+            "pangenome_analysis": species,
+            "genome_id": genome_id,
+            "gene": gene,
+        }
     elif genome_id is not None and gene is not None:
         filter_params = {"genome_id": genome_id, "gene": gene}
     else:
