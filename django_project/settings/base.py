@@ -47,8 +47,21 @@ INSTALLED_APPS = [
     'pangenome_analyses',
     'gene_function',
     'search',
-    'ai_assistant'
+    'ai_assistant',
+    'drf_spectacular',
+    'rest_framework',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'PanKB Developer API',
+    'DESCRIPTION': 'API documentation for PanKB.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

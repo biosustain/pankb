@@ -16,6 +16,7 @@ Including another URLconf
 
 from django.urls import path
 from django.views.generic import TemplateView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from home import views as home_views
 from about import views as about_views
@@ -191,6 +192,8 @@ urlpatterns = [
     path("interop-query/genes", interop_views.genes, name="genes"),
     path("interop-query/strains", interop_views.strains, name="strains"),
     path("interop-query/gene-strain-pairs", interop_views.gene_strain_pairs, name="gene_strain_pairs"),
-
+    
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     # path('admin/', admin.site.urls)   # make the amdin panel inaccessible via its utl (the admin admin is preserved for the potential future needs)
 ]

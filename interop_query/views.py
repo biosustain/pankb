@@ -1,23 +1,39 @@
-import json
 import logging
 
 from django.conf import settings
-from django.db.models import Q
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
 from gene_function.models import GeneInfo, GenomeInfo
 from pangenome_analyses.models import GeneAnnotations
 
 logger = logging.getLogger(__name__)
 
-@csrf_exempt
-@require_http_methods(["GET"])
+
+@extend_schema(
+    summary="List all genes",
+    description="Return all genes with species and PanKB URLs for InteropDB bulk ingest.",
+    responses={
+        200: {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "gene": {"type": "string"},
+                    "species": {"type": "string"},
+                    "url": {"type": "string", "format": "uri"},
+                },
+            },
+        }
+    },
+)
+@api_view(["GET"])
 def genes(request):
     """Return all genes with URLs for InteropDB bulk ingest."""
     try:
         gene_list = GeneAnnotations.get_all_genes()
-        # Return list of dicts with gene name and URL
         result = []
         for gene_data in gene_list:
             gene = gene_data.get("gene")
@@ -26,60 +42,91 @@ def genes(request):
                 result.append({
                     "gene": gene,
                     "species": species,
-                    "url": f"{settings.PANKB_BASE_URL}/gene_function/gene_info/?species={species}&gene={gene}"
+                    "url": f"{settings.PANKB_BASE_URL}/gene_function/gene_info/?species={species}&gene={gene}",
                 })
-        return JsonResponse(result, safe=False)
+        return Response(result)
     except Exception as e:
         logger.exception("list_all_genes failed")
-        return JsonResponse({"message": f"Error: {e}"}, status=500)
+        return Response({"message": f"Error: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@csrf_exempt
-@require_http_methods(["GET"])
+@extend_schema(
+    summary="List all strains",
+    description="Return all strains (genome IDs) with PanKB URLs for InteropDB bulk ingest.",
+    responses={
+        200: {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "strain": {"type": "string"},
+                    "url": {"type": "string", "format": "uri"},
+                },
+            },
+        }
+    },
+)
+@api_view(["GET"])
 def strains(request):
     """Return all strains (genomes) with URLs for InteropDB bulk ingest."""
     try:
         strain_ids = GenomeInfo.get_all_strains()
-        # Return list of dicts with strain ID and URL
         result = []
         for strain_id in strain_ids:
             result.append({
                 "strain": strain_id,
-                "url": f"{settings.PANKB_BASE_URL}/gene_function/genome_info/?genome_id={strain_id}"
+                "url": f"{settings.PANKB_BASE_URL}/gene_function/genome_info/?genome_id={strain_id}",
             })
-        return JsonResponse(result, safe=False)
+        return Response(result)
     except Exception as e:
         logger.exception("list_all_strains failed")
-        return JsonResponse({"message": f"Error: {e}"}, status=500)
+        return Response({"message": f"Error: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@csrf_exempt
-@require_http_methods(["GET"])
-def gene_strain_pairs(request):
-    """
-    Return distinct (gene, strain) pairs with URLs for InteropDB.
-
-    Query params:
-        skip: number of records to skip (default 0)
-        limit: max records to return (default 10000, max 50000)
-
-    Response:
-        {
-            "pairs": [...],
-            "total": 22000000,
-            "skip": 0,
-            "limit": 10000,
-            "has_more": true
+@extend_schema(
+    summary="List gene-strain pairs (paginated)",
+    description=(
+        "Return distinct (gene, strain, locus_tag) pairs with URLs for InteropDB. "
+        "Supports cursor-based pagination via skip/limit query parameters."
+    ),
+    parameters=[
+        OpenApiParameter(name="skip", type=int, location="query", description="Number of records to skip (default 0)"),
+        OpenApiParameter(name="limit", type=int, location="query", description="Max records to return (default 10000, max 50000)"),
+    ],
+    responses={
+        200: {
+            "type": "object",
+            "properties": {
+                "pairs": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "gene": {"type": "string"},
+                            "strain": {"type": "string"},
+                            "locus_tag": {"type": "string"},
+                            "url": {"type": "string", "format": "uri"},
+                        },
+                    },
+                },
+                "total": {"type": "integer"},
+                "skip": {"type": "integer"},
+                "limit": {"type": "integer"},
+                "has_more": {"type": "boolean"},
+            },
         }
-    """
+    },
+)
+@api_view(["GET"])
+def gene_strain_pairs(request):
+    """Return distinct (gene, strain) pairs with URLs for InteropDB."""
     try:
         skip = int(request.GET.get("skip", 0))
-        limit = min(int(request.GET.get("limit", 10000)), 50000)  # Max 50k per request
+        limit = min(int(request.GET.get("limit", 10000)), 50000)
 
         result = GeneInfo.get_gene_strain_pairs_paginated(skip=skip, limit=limit)
         pairs = result["pairs"]
 
-        # Add URLs to pairs (use locus_tag for unique identification)
         for pair in pairs:
             gene = pair.get("gene")
             strain = pair.get("strain")
@@ -87,32 +134,62 @@ def gene_strain_pairs(request):
             if gene and strain and locus_tag:
                 pair["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={strain}&gene={gene}&locus_tag={locus_tag}"
 
-        return JsonResponse({
+        return Response({
             "pairs": pairs,
             "total": result["total"],
             "skip": skip,
             "limit": limit,
-            "has_more": skip + len(pairs) < result["total"]
+            "has_more": skip + len(pairs) < result["total"],
         })
     except Exception as e:
         logger.exception("get_gene_strain_pairs failed")
-        return JsonResponse({"message": f"Error: {e}"}, status=500)
+        return Response({"message": f"Error: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@csrf_exempt
-@require_http_methods(["POST"])
+@extend_schema(
+    summary="Query by gene-strain pairs",
+    description="Look up detailed gene info for specific gene/strain pair combinations.",
+    request={
+        "application/json": {
+            "type": "object",
+            "properties": {
+                "pairs": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "gene": {"type": "string"},
+                            "strain": {"type": "string"},
+                        },
+                        "required": ["gene", "strain"],
+                    },
+                }
+            },
+            "required": ["pairs"],
+        }
+    },
+    responses={200: {"type": "array", "items": {"type": "object"}}},
+    examples=[
+        OpenApiExample(
+            "Example request",
+            value={"pairs": [{"gene": "adeJ", "strain": "GCF_000015425.1"}]},
+            request_only=True,
+        )
+    ],
+)
+@api_view(["POST"])
 def query_by_pair(request):
+    """Query gene info by gene/strain pairs."""
     logger.info("query by pair")
     try:
-        data = json.loads(request.body or "{}")
-        pairs = data.get("pairs", [])
+        pairs = request.data.get("pairs", [])
         if isinstance(pairs, dict):
             pairs = [pairs]
 
         if not pairs:
-            return JsonResponse({
+            return Response({
                 "count": 0,
-                "message": "No gene/strain pairs provided"
+                "message": "No gene/strain pairs provided",
             })
 
         clean_pairs = [
@@ -121,21 +198,20 @@ def query_by_pair(request):
             if "gene" in p and "strain" in p
         ]
         if not clean_pairs:
-            return JsonResponse({
+            return Response({
                 "count": 0,
-                "message": "Each pair must contain both 'gene' and 'strain'"
+                "message": "Each pair must contain both 'gene' and 'strain'",
             })
 
         genes = {p["gene"] for p in clean_pairs}
 
         try:
             ga_pairs = GeneAnnotations.get_gene_analysis_pairs(list(genes))
-            # make a quick lookup: gene -> set(pangenome_analysis)
             gene_to_analyses = {}
             for g, a in ga_pairs:
                 gene_to_analyses.setdefault(g, set()).add(a)
         except GeneAnnotations.NotFound:
-            return JsonResponse([], safe=False)
+            return Response([])
 
         query = []
         for p in clean_pairs:
@@ -145,11 +221,11 @@ def query_by_pair(request):
                     query.append({
                         "gene": p["gene"],
                         "pangenome_analysis": analysis,
-                        "genome_id": p["genome_id"]
+                        "genome_id": p["genome_id"],
                     })
 
         if not query:
-            return JsonResponse([], safe=False)
+            return Response([])
 
         results = GeneInfo.get_by_gene_analysis_genome(query)
         for item in results:
@@ -158,76 +234,116 @@ def query_by_pair(request):
             locus_tag = item.get("locus_tag")
             if genome_id and gene and locus_tag:
                 item["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={genome_id}&gene={gene}&locus_tag={locus_tag}"
-        return JsonResponse(results, safe=False)
+        return Response(results)
 
-    except json.JSONDecodeError:
-        return JsonResponse({"message": "Invalid JSON"}, status=400)
     except Exception as e:
         logger.exception("search error")
-        return JsonResponse({"message": f"Error: {e}"}, status=500)
+        return Response({"message": f"Error: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@csrf_exempt
-@require_http_methods(["POST"])
+@extend_schema(
+    summary="Query by gene IDs",
+    description="Look up detailed gene info by a list of gene names.",
+    request={
+        "application/json": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                }
+            },
+            "required": ["ids"],
+        }
+    },
+    responses={200: {"type": "array", "items": {"type": "object"}}},
+    examples=[
+        OpenApiExample(
+            "Example request",
+            value={"ids": ["adeJ", "adeK"]},
+            request_only=True,
+        )
+    ],
+)
+@api_view(["POST"])
 def query_by_gene(request):
+    """Query gene info by gene IDs."""
     logger.info("query by gene")
     try:
         genes = _parse_ids(request, "ids")
         if not genes:
-            return JsonResponse(
-                {"message": "ids must be a non-empty list"}, status=400
+            return Response(
+                {"message": "ids must be a non-empty list"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
             pairs = GeneAnnotations.get_gene_analysis_pairs(genes)
         except GeneAnnotations.NotFound:
-            return JsonResponse([], safe=False)
+            return Response([])
 
         gene_infos = GeneInfo.get_by_gene_and_analysis(pairs)
-
-        # Add URLs to each record (use locus_tag + genome_id for unique identification)
         for item in gene_infos:
             genome_id = item.get("genome_id")
             gene = item.get("gene")
             locus_tag = item.get("locus_tag")
             if genome_id and gene and locus_tag:
                 item["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={genome_id}&gene={gene}&locus_tag={locus_tag}"
+        return Response(gene_infos)
 
-        return JsonResponse(gene_infos, safe=False)
-
-    except json.JSONDecodeError:
-        return JsonResponse({'message': 'Invalid JSON'}, status=400)
     except Exception as e:
         logger.exception("search broke")
-        return JsonResponse({'message': f'Error: {e}'}, status=500)
+        return Response({"message": f"Error: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@csrf_exempt
-@require_http_methods(["POST"])
+@extend_schema(
+    summary="Query by strain IDs",
+    description="Look up genome info (with isolation data) by a list of genome IDs.",
+    request={
+        "application/json": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                }
+            },
+            "required": ["ids"],
+        }
+    },
+    responses={200: {"type": "array", "items": {"type": "object"}}},
+    examples=[
+        OpenApiExample(
+            "Example request",
+            value={"ids": ["GCF_000015425.1"]},
+            request_only=True,
+        )
+    ],
+)
+@api_view(["POST"])
 def query_by_strain(request):
+    """Query genome info by strain IDs."""
     logger.info("query by strain")
     try:
         genome_ids = _parse_ids(request, "ids")
         if not genome_ids:
-            return JsonResponse(
-                {"message": "ids must be a non-empty list"}, status=400
+            return Response(
+                {"message": "ids must be a non-empty list"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         genomes = GenomeInfo.get_by_genome_ids(genome_ids)
         for genome in genomes:
             if genome.get("genome_id"):
                 genome["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_info/?genome_id={genome['genome_id']}"
-        return JsonResponse(genomes, safe=False)
+        return Response(genomes)
 
-    except json.JSONDecodeError:
-        return JsonResponse({'message': 'Invalid JSON'}, status=400)
     except Exception as e:
         logger.exception("search broke")
-        return JsonResponse({'message': f'Error: {e}'}, status=500)
+        return Response({"message": f"Error: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 def _parse_ids(request, key):
-    """Return list of IDs from request JSON body."""
-    data = json.loads(request.body)
-    ids = data.get(key, [])
+    """Return list of IDs from request data."""
+    ids = request.data.get(key, [])
     return [ids] if isinstance(ids, str) else ids
