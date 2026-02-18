@@ -27,6 +27,9 @@
                     <li class="nav-item">
                         <a class="nav-link text-nowrap{% if active_page == 'ai_assistant' %} active{% endif %}" href="{% url 'ai_assistant' %}">AI Assistant</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-nowrap{% if active_page == 'api_docs' %} active{% endif %}" href="{% url 'swagger-ui' %}">API Docs</a>
+                    </li>
                 </ul>
             </div>
         </div>
