@@ -2,6 +2,9 @@ from common import database
 
 # Model representing info on the Organisms page: ----
 class GeneAnnotations:
+    class NotFound(Exception):
+        pass
+
     objects = database.MongoDBObjects('pankb_gene_annotations')
     
     @staticmethod
