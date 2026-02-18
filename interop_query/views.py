@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import quote
 
 from django.conf import settings
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
@@ -42,7 +43,7 @@ def genes(request):
                 result.append({
                     "gene": gene,
                     "species": species,
-                    "url": f"{settings.PANKB_BASE_URL}/gene_function/gene_info/?species={species}&gene={gene}",
+                    "url": f"{settings.PANKB_BASE_URL}/gene_function/gene_info/?species={quote(species)}&gene={quote(gene)}",
                 })
         return Response(result)
     except Exception as e:
@@ -75,7 +76,7 @@ def strains(request):
         for strain_id in strain_ids:
             result.append({
                 "strain": strain_id,
-                "url": f"{settings.PANKB_BASE_URL}/gene_function/genome_info/?genome_id={strain_id}",
+                "url": f"{settings.PANKB_BASE_URL}/gene_function/genome_info/?genome_id={quote(strain_id)}",
             })
         return Response(result)
     except Exception as e:
@@ -132,7 +133,7 @@ def gene_strain_pairs(request):
             strain = pair.get("strain")
             locus_tag = pair.get("locus_tag")
             if gene and strain and locus_tag:
-                pair["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={strain}&gene={gene}&locus_tag={locus_tag}"
+                pair["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={quote(strain)}&gene={quote(gene)}&locus_tag={quote(locus_tag)}"
 
         return Response({
             "pairs": pairs,
@@ -233,7 +234,7 @@ def query_by_pair(request):
             gene = item.get("gene")
             locus_tag = item.get("locus_tag")
             if genome_id and gene and locus_tag:
-                item["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={genome_id}&gene={gene}&locus_tag={locus_tag}"
+                item["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={quote(genome_id)}&gene={quote(gene)}&locus_tag={quote(locus_tag)}"
         return Response(results)
 
     except Exception as e:
@@ -288,7 +289,7 @@ def query_by_gene(request):
             gene = item.get("gene")
             locus_tag = item.get("locus_tag")
             if genome_id and gene and locus_tag:
-                item["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={genome_id}&gene={gene}&locus_tag={locus_tag}"
+                item["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_gene_info/?genome_id={quote(genome_id)}&gene={quote(gene)}&locus_tag={quote(locus_tag)}"
         return Response(gene_infos)
 
     except Exception as e:
@@ -335,7 +336,7 @@ def query_by_strain(request):
         genomes = GenomeInfo.get_by_genome_ids(genome_ids)
         for genome in genomes:
             if genome.get("genome_id"):
-                genome["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_info/?genome_id={genome['genome_id']}"
+                genome["url"] = f"{settings.PANKB_BASE_URL}/gene_function/genome_info/?genome_id={quote(genome['genome_id'])}"
         return Response(genomes)
 
     except Exception as e:
