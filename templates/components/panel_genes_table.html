@@ -61,7 +61,7 @@
                     data: '0',
                     name: 'gene',
                     render: function (data, type, row) {
-                        return '<a href=" {% url 'gene_info' %}?species=' + row[9] + '&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
+                        return '<a href=" {% url 'gene_info' %}?species={{ pangenome_analysis | safe }}&gene=' + encodeURIComponent(data) + '">' + data + '</a>';
                     },
                 },
                 {

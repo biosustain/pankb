@@ -559,8 +559,7 @@ def gene_annotation_json(request):
         "pfams",
         "gene_phylons",
         "frequency",
-        "pangenome_analysis",
-    ]        
+    ]
 
     db_match = {"$match": {"pangenome_analysis": pangenome_analysis}}
 
