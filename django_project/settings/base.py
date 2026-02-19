@@ -61,6 +61,12 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'API documentation for PanKB.',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'TAGS': [
+        {'name': 'Genes'},
+        {'name': 'Strains'},
+        {'name': 'Gene-Strain Pairs'},
+    ],
+    'SORT_OPERATIONS': False,
 }
 
 MIDDLEWARE = [

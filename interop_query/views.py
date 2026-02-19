@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 @extend_schema(
+    tags=["Genes"],
     summary="List all genes",
     description="Return all genes with species and PanKB URLs for InteropDB bulk ingest.",
     responses={
@@ -52,6 +53,7 @@ def genes(request):
 
 
 @extend_schema(
+    tags=["Strains"],
     summary="List all strains",
     description="Return all strains (genome IDs) with PanKB URLs for InteropDB bulk ingest.",
     responses={
@@ -85,6 +87,7 @@ def strains(request):
 
 
 @extend_schema(
+    tags=["Gene-Strain Pairs"],
     summary="List gene-strain pairs (paginated)",
     description=(
         "Return distinct (gene, strain, locus_tag) pairs with URLs for InteropDB. "
@@ -148,6 +151,7 @@ def gene_strain_pairs(request):
 
 
 @extend_schema(
+    tags=["Gene-Strain Pairs"],
     summary="Query by gene-strain pairs",
     description="Look up detailed gene info for specific gene/strain pair combinations.",
     request={
@@ -243,6 +247,7 @@ def query_by_pair(request):
 
 
 @extend_schema(
+    tags=["Genes"],
     summary="Query by gene IDs",
     description="Look up detailed gene info by a list of gene names.",
     request={
@@ -298,6 +303,7 @@ def query_by_gene(request):
 
 
 @extend_schema(
+    tags=["Strains"],
     summary="Query by strain IDs",
     description="Look up genome info (with isolation data) by a list of genome IDs.",
     request={
