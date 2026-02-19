@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 @extend_schema(
     tags=["Genes"],
     summary="List all genes",
-    description="Return all genes with species and PanKB URLs for InteropDB bulk ingest.",
+    description="Return all genes with species and PanKB URLs.",
     responses={
         200: {
             "type": "array",
@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 )
 @api_view(["GET"])
 def genes(request):
-    """Return all genes with URLs for InteropDB bulk ingest."""
+    """Return all genes with species and PanKB URLs."""
     try:
         gene_list = GeneAnnotations.get_all_genes()
         result = []
@@ -55,7 +55,7 @@ def genes(request):
 @extend_schema(
     tags=["Strains"],
     summary="List all strains",
-    description="Return all strains (genome IDs) with PanKB URLs for InteropDB bulk ingest.",
+    description="Return all strains (genome IDs) with PanKB URLs.",
     responses={
         200: {
             "type": "array",
@@ -71,7 +71,7 @@ def genes(request):
 )
 @api_view(["GET"])
 def strains(request):
-    """Return all strains (genomes) with URLs for InteropDB bulk ingest."""
+    """Return all strains (genome IDs) with PanKB URLs."""
     try:
         strain_ids = GenomeInfo.get_all_strains()
         result = []
@@ -90,7 +90,7 @@ def strains(request):
     tags=["Gene-Strain Pairs"],
     summary="List gene-strain pairs (paginated)",
     description=(
-        "Return distinct (gene, strain, locus_tag) pairs with URLs for InteropDB. "
+        "Return distinct (gene, strain, locus_tag) pairs with PanKB URLs. "
         "Supports cursor-based pagination via skip/limit query parameters."
     ),
     parameters=[
@@ -123,7 +123,7 @@ def strains(request):
 )
 @api_view(["GET"])
 def gene_strain_pairs(request):
-    """Return distinct (gene, strain) pairs with URLs for InteropDB."""
+    """Return distinct (gene, strain, locus_tag) pairs with PanKB URLs."""
     try:
         skip = int(request.GET.get("skip", 0))
         limit = min(int(request.GET.get("limit", 10000)), 50000)
@@ -177,7 +177,7 @@ def gene_strain_pairs(request):
     examples=[
         OpenApiExample(
             "Example request",
-            value={"pairs": [{"gene": "adeJ", "strain": "GCF_000015425.1"}]},
+            value={"pairs": [{"gene": "COQ3_1", "strain": "GCF_948329545.1"}]},
             request_only=True,
         )
     ],
@@ -248,7 +248,7 @@ def query_by_pair(request):
 
 @extend_schema(
     tags=["Genes"],
-    summary="Query by gene IDs",
+    summary="Query by gene names",
     description="Look up detailed gene info by a list of gene names.",
     request={
         "application/json": {
@@ -266,14 +266,14 @@ def query_by_pair(request):
     examples=[
         OpenApiExample(
             "Example request",
-            value={"ids": ["adeJ", "adeK"]},
+            value={"ids": ["COQ3_1", "COQ3_2", "COQ3_3"]},
             request_only=True,
         )
     ],
 )
 @api_view(["POST"])
 def query_by_gene(request):
-    """Query gene info by gene IDs."""
+    """Query gene info by gene names."""
     logger.info("query by gene")
     try:
         genes = _parse_ids(request, "ids")
@@ -305,7 +305,7 @@ def query_by_gene(request):
 @extend_schema(
     tags=["Strains"],
     summary="Query by strain IDs",
-    description="Look up genome info (with isolation data) by a list of genome IDs.",
+    description="Look up genome info by a list of genome IDs.",
     request={
         "application/json": {
             "type": "object",
@@ -322,7 +322,7 @@ def query_by_gene(request):
     examples=[
         OpenApiExample(
             "Example request",
-            value={"ids": ["GCF_000015425.1"]},
+            value={"ids": ["GCF_948329545.1", "GCF_000286875.2"]},
             request_only=True,
         )
     ],
