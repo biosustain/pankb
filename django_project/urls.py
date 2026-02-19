@@ -193,7 +193,7 @@ urlpatterns = [
     path("interop-query/gene-strain-pairs", interop_views.gene_strain_pairs, name="gene_strain_pairs"),
     path("interop-query/query-by-pair", interop_views.query_by_pair, name="query_by_pair"),
     
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/v1/schema/', SpectacularAPIView.as_view(api_version='v1'), name='schema-v1'),
+    path('api/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema-v1'), name='swagger-ui'),
     # path('admin/', admin.site.urls)   # make the amdin panel inaccessible via its utl (the admin admin is preserved for the potential future needs)
 ]
