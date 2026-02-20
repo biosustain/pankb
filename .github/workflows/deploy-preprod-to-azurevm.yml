@@ -55,12 +55,12 @@ jobs:
             echo "## Mongo database name - same both for the PROD and DEV servers" >> .env
             echo MONGODB_NAME="${{secrets.PANKB_PREPROD_MONGODB_NAME}}" >> .env
             echo "## Django: MongoDB-DEV (self-deployed) connection parameters" >> .env
-            echo "MONGODB_HOST = 'mongodb://mongodb:27017'" >> .env
-            echo "MONGODB_AUTH_MECHANISM = 'SCRAM-SHA-1'" >> .env
+            echo "MONGODB_HOST='mongodb://mongodb:27017'" >> .env
+            echo "MONGODB_AUTH_MECHANISM='SCRAM-SHA-1'" >> .env
             echo "" >> .env
-            echo "MONGODB_USERNAME = '${{secrets.PANKB_PREPROD_MONGODB_USERNAME}}'" >> .env
-            echo "MONGODB_PASSWORD = '${{secrets.PANKB_PREPROD_MONGODB_PASSWORD}}'" >> .env
-            echo "MONGODB_AUTH_SOURCE = '${{secrets.PANKB_PREPROD_MONGODB_NAME}}'" >> .env
+            echo "MONGODB_USERNAME='${{secrets.PANKB_PREPROD_MONGODB_USERNAME}}'" >> .env
+            echo "MONGODB_PASSWORD='${{secrets.PANKB_PREPROD_MONGODB_PASSWORD}}'" >> .env
+            echo "MONGODB_AUTH_SOURCE='${{secrets.PANKB_PREPROD_MONGODB_NAME}}'" >> .env
             echo "" >> .env
             echo "## MongoDB-PROD (Azure CosmosDB for MongoDB) Connection String" >> .env
             echo MONGODB_CONN_STRING="${{secrets.PANKB_PREPROD_MONGODB_CONN_STRING}}" >> .env
