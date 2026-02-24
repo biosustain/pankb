@@ -25,21 +25,19 @@
 
 {% block info_panel_content %}
 <dl class="row g-1 fs-3">
-    <dt class="col-sm-8">Genomes</dt>
-    <dd class="col-sm-4"><a class="infopanel_link" href="{% url 'pangenome_analyses_genome' %}?species={{ request.GET.species }}">{{ speciesData.genomes_num }}</a></dd>
-    
-    <dt class="col-sm-8">Core Genes</dt>
-    <dd class="col-sm-4"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Core">{{ speciesData.gene_class_distribution.0 }}</a></dd>
-    <dt class="col-sm-8">Accessory Genes</dt>
-    <dd class="col-sm-4"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Accessory">{{ speciesData.gene_class_distribution.1 }}</a></dd>
-    <dt class="col-sm-8">Rare Genes</dt>
-    <dd class="col-sm-4"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Rare">{{ speciesData.gene_class_distribution.2 }}</a></dd>
-    
-    <dt class="col-sm-8">Openness</dt>
-    <dd class="col-sm-4">{{ speciesData.openness }}</dd>
+    <dt class="col-sm-6">Genomes</dt>
+    <dd class="col-sm-6"><a class="infopanel_link" href="{% url 'pangenome_analyses_genome' %}?species={{ request.GET.species }}">{{ speciesData.genomes_num }}</a></dd>
+    <dt class="col-sm-6">Core Genes</dt>
+    <dd class="col-sm-6"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Core">{{ speciesData.gene_class_distribution.0 }}</a></dd>
+    <dt class="col-sm-6">Accessory Genes</dt>
+    <dd class="col-sm-6"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Accessory">{{ speciesData.gene_class_distribution.1 }}</a></dd>
+    <dt class="col-sm-6">Rare Genes</dt>
+    <dd class="col-sm-6"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Rare">{{ speciesData.gene_class_distribution.2 }}</a></dd>
+    <dt class="col-sm-6">Openness</dt>
+    <dd class="col-sm-6">{{ speciesData.openness }}</dd>
 
-    <dt class="col-sm-8">Genome QC</dt>
-    <dd class="col-sm-4">
+    <dt class="col-sm-6">Genome QC</dt>
+    <dd class="col-sm-6">
         <a href="#" data-bs-toggle="modal" data-bs-target="#genomeQcModal" title="View Genome Quality Control">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5"/>
