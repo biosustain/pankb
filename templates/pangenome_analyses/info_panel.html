@@ -25,17 +25,17 @@
 
 {% block info_panel_content %}
 <dl class="row g-1 fs-3">
-    <dt class="col-sm-8">Genomes</dt>
-    <dd class="col-sm-4"><a class="infopanel_link" href="{% url 'pangenome_analyses_genome' %}?species={{ request.GET.species }}">{{ speciesData.genomes_num }}</a></dd>
-    
-    <dt class="col-sm-8">Core Genes</dt>
-    <dd class="col-sm-4"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Core">{{ speciesData.gene_class_distribution.0 }}</a></dd>
-    <dt class="col-sm-8">Accessory Genes</dt>
-    <dd class="col-sm-4"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Accessory">{{ speciesData.gene_class_distribution.1 }}</a></dd>
-    <dt class="col-sm-8">Rare Genes</dt>
-    <dd class="col-sm-4"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Rare">{{ speciesData.gene_class_distribution.2 }}</a></dd>
-    <dt class="col-sm-8">Openness</dt>
-    <dd class="col-sm-4">{{ speciesData.openness }}</dd>
+    <dt class="col-sm-6">Genomes</dt>
+    <dd class="col-sm-6"><a class="infopanel_link" href="{% url 'pangenome_analyses_genome' %}?species={{ request.GET.species }}">{{ speciesData.genomes_num }}</a></dd>
+
+    <dt class="col-sm-6">Core Genes</dt>
+    <dd class="col-sm-6"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Core">{{ speciesData.gene_class_distribution.0 }}</a></dd>
+    <dt class="col-sm-6">Accessory Genes</dt>
+    <dd class="col-sm-6"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Accessory">{{ speciesData.gene_class_distribution.1 }}</a></dd>
+    <dt class="col-sm-6">Rare Genes</dt>
+    <dd class="col-sm-6"><a class="infopanel_link" href="{% url "pangenome_analyses_gene_annotation" %}?species={{ request.GET.species }}&class=Rare">{{ speciesData.gene_class_distribution.2 }}</a></dd>
+    <dt class="col-sm-6">Openness</dt>
+    <dd class="col-sm-6">{{ speciesData.openness }}</dd>
 
 </dl>
 {% endblock %}
