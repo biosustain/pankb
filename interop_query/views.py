@@ -52,7 +52,7 @@ def genes(request):
     """Return all genes with species and PanKB URLs (cursor-based pagination)."""
     try:
         after = request.GET.get("after")
-        limit = min(int(request.GET.get("limit", 50000)), 50000)
+        limit = min(int(request.GET.get("limit", 50000)), 200000)
 
         result = GeneAnnotations.get_all_genes_paginated(after=after, limit=limit)
         gene_list = result["genes"]
@@ -114,7 +114,7 @@ def strains(request):
     """Return all strains (genome IDs) with PanKB URLs (cursor-based pagination)."""
     try:
         after = request.GET.get("after")
-        limit = min(int(request.GET.get("limit", 50000)), 50000)
+        limit = min(int(request.GET.get("limit", 50000)), 200000)
 
         result = GenomeInfo.get_all_strains_paginated(after=after, limit=limit)
         strain_ids = result["strains"]
@@ -177,7 +177,7 @@ def gene_strain_pairs(request):
     """Return distinct (gene, strain, locus_tag) pairs with PanKB URLs (cursor-based pagination)."""
     try:
         after = request.GET.get("after")  # _id cursor from previous page
-        limit = min(int(request.GET.get("limit", 50000)), 50000)
+        limit = min(int(request.GET.get("limit", 50000)), 200000)
 
         result = GeneInfo.get_gene_strain_pairs_paginated(after=after, limit=limit)
         pairs = result["pairs"]
