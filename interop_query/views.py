@@ -49,12 +49,12 @@ logger = logging.getLogger(__name__)
 )
 @api_view(["GET"])
 def genes(request):
-    """Return all genes with species and PanKB URLs (paginated)."""
+    """Return all genes with species and PanKB URLs (cursor-based pagination)."""
     try:
-        skip = int(request.GET.get("skip", 0))
-        limit = min(int(request.GET.get("limit", 10000)), 50000)
+        after = request.GET.get("after")
+        limit = min(int(request.GET.get("limit", 50000)), 50000)
 
-        result = GeneAnnotations.get_all_genes_paginated(skip=skip, limit=limit)
+        result = GeneAnnotations.get_all_genes_paginated(after=after, limit=limit)
         gene_list = result["genes"]
 
         for gene_data in gene_list:
@@ -67,10 +67,9 @@ def genes(request):
 
         return Response({
             "genes": gene_list,
-            "total": result["total"],
-            "skip": skip,
             "limit": limit,
-            "has_more": skip + len(gene_list) < result["total"],
+            "next_cursor": result["next_cursor"],
+            "has_more": result["next_cursor"] is not None,
         })
     except Exception as e:
         logger.exception("list_all_genes failed")
@@ -112,12 +111,12 @@ def genes(request):
 )
 @api_view(["GET"])
 def strains(request):
-    """Return all strains (genome IDs) with PanKB URLs (paginated)."""
+    """Return all strains (genome IDs) with PanKB URLs (cursor-based pagination)."""
     try:
-        skip = int(request.GET.get("skip", 0))
-        limit = min(int(request.GET.get("limit", 10000)), 50000)
+        after = request.GET.get("after")
+        limit = min(int(request.GET.get("limit", 50000)), 50000)
 
-        result = GenomeInfo.get_all_strains_paginated(skip=skip, limit=limit)
+        result = GenomeInfo.get_all_strains_paginated(after=after, limit=limit)
         strain_ids = result["strains"]
 
         strain_list = []
@@ -129,10 +128,9 @@ def strains(request):
 
         return Response({
             "strains": strain_list,
-            "total": result["total"],
-            "skip": skip,
             "limit": limit,
-            "has_more": skip + len(strain_list) < result["total"],
+            "next_cursor": result["next_cursor"],
+            "has_more": result["next_cursor"] is not None,
         })
     except Exception as e:
         logger.exception("list_all_strains failed")
@@ -176,12 +174,12 @@ def strains(request):
 )
 @api_view(["GET"])
 def gene_strain_pairs(request):
-    """Return distinct (gene, strain, locus_tag) pairs with PanKB URLs."""
+    """Return distinct (gene, strain, locus_tag) pairs with PanKB URLs (cursor-based pagination)."""
     try:
-        skip = int(request.GET.get("skip", 0))
-        limit = min(int(request.GET.get("limit", 10000)), 50000)
+        after = request.GET.get("after")  # _id cursor from previous page
+        limit = min(int(request.GET.get("limit", 50000)), 50000)
 
-        result = GeneInfo.get_gene_strain_pairs_paginated(skip=skip, limit=limit)
+        result = GeneInfo.get_gene_strain_pairs_paginated(after=after, limit=limit)
         pairs = result["pairs"]
 
         for pair in pairs:
@@ -193,10 +191,9 @@ def gene_strain_pairs(request):
 
         return Response({
             "pairs": pairs,
-            "total": result["total"],
-            "skip": skip,
             "limit": limit,
-            "has_more": skip + len(pairs) < result["total"],
+            "next_cursor": result["next_cursor"],
+            "has_more": result["next_cursor"] is not None,
         })
     except Exception as e:
         logger.exception("get_gene_strain_pairs failed")

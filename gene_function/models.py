@@ -50,38 +50,40 @@ class GeneInfo:
         )
 
     @staticmethod
-    def get_gene_strain_pairs_paginated(skip: int = 0, limit: int = 10000):
+    def get_gene_strain_pairs_paginated(after: str | None = None, limit: int = 10000):
         """
-        Return paginated (gene, genome_id) pairs directly from collection.
-        No $group - assumes data has no duplicates, InteropDB will upsert anyway.
+        Return paginated (gene, genome_id) pairs using cursor-based pagination.
+        Uses _id > after to seek directly, so every page is equally fast.
 
         Args:
-            skip: Number of records to skip
+            after: The _id of the last document from the previous page (None for first page)
             limit: Max records to return
 
         Returns:
             {
                 "pairs": [...],
-                "total": int
+                "next_cursor": str | None  (None means no more data)
             }
         """
-        # Get total count using aggregation
-        count_pipeline = [
-            {"$match": {"gene": {"$ne": None}, "genome_id": {"$ne": None}}},
-            {"$count": "total"}
-        ]
-        count_result = list(GeneInfo.objects.aggregate(count_pipeline))
-        total = count_result[0]["total"] if count_result else 0
+        filter_query = {"gene": {"$ne": None}, "genome_id": {"$ne": None}, "locus_tag": {"$ne": None}}
+        if after is not None:
+            from bson import ObjectId
+            filter_query["_id"] = {"$gt": ObjectId(after)}
 
-        # Direct find with skip/limit (fast)
         cursor = GeneInfo.objects.find(
-            {"gene": {"$ne": None}, "genome_id": {"$ne": None}, "locus_tag": {"$ne": None}},
-            projection={"_id": 0, "gene": 1, "genome_id": 1, "locus_tag": 1}
-        ).skip(skip).limit(limit)
+            filter_query,
+            projection={"_id": 1, "gene": 1, "genome_id": 1, "locus_tag": 1}
+        ).sort("_id", 1).limit(limit)
 
-        pairs = [{"gene": doc["gene"], "strain": doc["genome_id"], "locus_tag": doc["locus_tag"]} for doc in cursor]
+        pairs = []
+        last_id = None
+        for doc in cursor:
+            pairs.append({"gene": doc["gene"], "strain": doc["genome_id"], "locus_tag": doc["locus_tag"]})
+            last_id = str(doc["_id"])
 
-        return {"pairs": pairs, "total": total}
+        next_cursor = last_id if len(pairs) == limit else None
+
+        return {"pairs": pairs, "next_cursor": next_cursor}
 
     def get_gene_info_and_pangenomic_class_pipeline(gene_match): # This is an ugly workaround to make it compatible with Azure Cosmos DB
         return [
@@ -177,16 +179,38 @@ class GenomeInfo:
         return [doc["genome_id"] for doc in cursor if doc.get("genome_id")]
 
     @staticmethod
-    def get_all_strains_paginated(skip=0, limit=10000):
+    def get_all_strains_paginated(after: str | None = None, limit: int = 10000):
         """
-        Return paginated distinct genome_id values.
-        Uses distinct() for fast retrieval, then slices in Python.
+        Return paginated genome_id values using cursor-based pagination.
+        Uses _id > after to seek directly, so every page is equally fast.
+
+        Args:
+            after: The _id of the last document from the previous page (None for first page)
+            limit: Max records to return
+
+        Returns:
+            {"strains": [...], "next_cursor": str | None}
         """
-        col = GenomeInfo.objects.collection
-        all_ids = sorted(col.distinct("genome_id"))
-        total = len(all_ids)
-        page = all_ids[skip:skip + limit]
-        return {"strains": page, "total": total}
+        from bson import ObjectId
+
+        filter_query = {"genome_id": {"$ne": None}}
+        if after is not None:
+            filter_query["_id"] = {"$gt": ObjectId(after)}
+
+        cursor = GenomeInfo.objects.find(
+            filter_query,
+            projection={"_id": 1, "genome_id": 1}
+        ).sort("_id", 1).limit(limit)
+
+        strains = []
+        last_id = None
+        for doc in cursor:
+            strains.append(doc["genome_id"])
+            last_id = str(doc["_id"])
+
+        next_cursor = last_id if len(strains) == limit else None
+
+        return {"strains": strains, "next_cursor": next_cursor}
 
 
     def get_genome_and_isolation_info_pipeline(genome_match):

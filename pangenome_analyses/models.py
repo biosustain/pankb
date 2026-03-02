@@ -30,21 +30,39 @@ class GeneAnnotations:
         return result
 
     @staticmethod
-    def get_all_genes_paginated(skip=0, limit=10000):
+    def get_all_genes_paginated(after: str | None = None, limit: int = 10000):
         """
-        Return paginated (gene, pangenome_analysis) pairs.
-        Uses indexed find+sort+skip+limit for performance on large collections.
+        Return paginated (gene, pangenome_analysis) pairs using cursor-based pagination.
+        Uses _id > after to seek directly, so every page is equally fast.
+
+        Args:
+            after: The _id of the last document from the previous page (None for first page)
+            limit: Max records to return
+
+        Returns:
+            {"genes": [...], "next_cursor": str | None}
         """
+        from bson import ObjectId
+
+        filter_query = {"gene": {"$ne": None}, "pangenome_analysis": {"$ne": None}}
+        if after is not None:
+            filter_query["_id"] = {"$gt": ObjectId(after)}
+
         col = GeneAnnotations.objects.collection
         cursor = col.find(
-            {"gene": {"$ne": None}, "pangenome_analysis": {"$ne": None}},
-            {"_id": 0, "gene": 1, "pangenome_analysis": 1},
-        ).sort([("pangenome_analysis", 1), ("gene", 1)]).skip(skip).limit(limit)
-        genes = list(cursor)
+            filter_query,
+            {"_id": 1, "gene": 1, "pangenome_analysis": 1},
+        ).sort("_id", 1).limit(limit)
 
-        total = col.estimated_document_count()
+        genes = []
+        last_id = None
+        for doc in cursor:
+            genes.append({"gene": doc["gene"], "pangenome_analysis": doc["pangenome_analysis"]})
+            last_id = str(doc["_id"])
 
-        return {"genes": genes, "total": total}
+        next_cursor = last_id if len(genes) == limit else None
+
+        return {"genes": genes, "next_cursor": next_cursor}
 
     def get_gene_analysis_pairs(genes):
         """
