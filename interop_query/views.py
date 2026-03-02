@@ -15,38 +15,63 @@ logger = logging.getLogger(__name__)
 
 @extend_schema(
     tags=["Genes"],
-    summary="List all genes",
-    description="Return all genes with species and PanKB URLs.",
+    summary="List all genes (paginated)",
+    description=(
+        "Return distinct (gene, species) pairs with PanKB URLs. "
+        "Supports cursor-based pagination via skip/limit query parameters."
+    ),
+    parameters=[
+        OpenApiParameter(name="skip", type=int, location="query", description="Number of records to skip (default 0)"),
+        OpenApiParameter(name="limit", type=int, location="query", description="Max records to return (default 10000, max 50000)"),
+    ],
     responses={
         200: {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "gene": {"type": "string"},
-                    "species": {"type": "string"},
-                    "url": {"type": "string", "format": "uri"},
+            "type": "object",
+            "properties": {
+                "genes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "gene": {"type": "string"},
+                            "species": {"type": "string"},
+                            "url": {"type": "string", "format": "uri"},
+                        },
+                    },
                 },
+                "total": {"type": "integer"},
+                "skip": {"type": "integer"},
+                "limit": {"type": "integer"},
+                "has_more": {"type": "boolean"},
             },
         }
     },
 )
 @api_view(["GET"])
 def genes(request):
-    """Return all genes with species and PanKB URLs."""
+    """Return all genes with species and PanKB URLs (paginated)."""
     try:
-        gene_list = GeneAnnotations.get_all_genes()
-        result = []
+        skip = int(request.GET.get("skip", 0))
+        limit = min(int(request.GET.get("limit", 10000)), 50000)
+
+        result = GeneAnnotations.get_all_genes_paginated(skip=skip, limit=limit)
+        gene_list = result["genes"]
+
         for gene_data in gene_list:
             gene = gene_data.get("gene")
             species = gene_data.get("pangenome_analysis")
             if gene and species:
-                result.append({
-                    "gene": gene,
-                    "species": species,
-                    "url": f"{settings.PANKB_BASE_URL}/gene_function/gene_info/?species={quote(species)}&gene={quote(gene)}",
-                })
-        return Response(result)
+                gene_data["species"] = species
+                gene_data["url"] = f"{settings.PANKB_BASE_URL}/gene_function/gene_info/?species={quote(species)}&gene={quote(gene)}"
+                gene_data.pop("pangenome_analysis", None)
+
+        return Response({
+            "genes": gene_list,
+            "total": result["total"],
+            "skip": skip,
+            "limit": limit,
+            "has_more": skip + len(gene_list) < result["total"],
+        })
     except Exception as e:
         logger.exception("list_all_genes failed")
         return Response({"message": f"Error: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -54,33 +79,61 @@ def genes(request):
 
 @extend_schema(
     tags=["Strains"],
-    summary="List all strains",
-    description="Return all strains (genome IDs) with PanKB URLs.",
+    summary="List all strains (paginated)",
+    description=(
+        "Return all strains (genome IDs) with PanKB URLs. "
+        "Supports cursor-based pagination via skip/limit query parameters."
+    ),
+    parameters=[
+        OpenApiParameter(name="skip", type=int, location="query", description="Number of records to skip (default 0)"),
+        OpenApiParameter(name="limit", type=int, location="query", description="Max records to return (default 10000, max 50000)"),
+    ],
     responses={
         200: {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "strain": {"type": "string"},
-                    "url": {"type": "string", "format": "uri"},
+            "type": "object",
+            "properties": {
+                "strains": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "strain": {"type": "string"},
+                            "url": {"type": "string", "format": "uri"},
+                        },
+                    },
                 },
+                "total": {"type": "integer"},
+                "skip": {"type": "integer"},
+                "limit": {"type": "integer"},
+                "has_more": {"type": "boolean"},
             },
         }
     },
 )
 @api_view(["GET"])
 def strains(request):
-    """Return all strains (genome IDs) with PanKB URLs."""
+    """Return all strains (genome IDs) with PanKB URLs (paginated)."""
     try:
-        strain_ids = GenomeInfo.get_all_strains()
-        result = []
+        skip = int(request.GET.get("skip", 0))
+        limit = min(int(request.GET.get("limit", 10000)), 50000)
+
+        result = GenomeInfo.get_all_strains_paginated(skip=skip, limit=limit)
+        strain_ids = result["strains"]
+
+        strain_list = []
         for strain_id in strain_ids:
-            result.append({
+            strain_list.append({
                 "strain": strain_id,
                 "url": f"{settings.PANKB_BASE_URL}/gene_function/genome_info/?genome_id={quote(strain_id)}",
             })
-        return Response(result)
+
+        return Response({
+            "strains": strain_list,
+            "total": result["total"],
+            "skip": skip,
+            "limit": limit,
+            "has_more": skip + len(strain_list) < result["total"],
+        })
     except Exception as e:
         logger.exception("list_all_strains failed")
         return Response({"message": f"Error: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -266,7 +319,7 @@ def query_by_pair(request):
     examples=[
         OpenApiExample(
             "Example request",
-            value={"ids": ["COQ3_1", "COQ3_2", "COQ3_3"]},
+            value={"ids": ["AAH1"]},
             request_only=True,
         )
     ],

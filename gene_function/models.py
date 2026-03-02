@@ -176,6 +176,18 @@ class GenomeInfo:
         cursor = GenomeInfo.objects.aggregate(pipeline)
         return [doc["genome_id"] for doc in cursor if doc.get("genome_id")]
 
+    @staticmethod
+    def get_all_strains_paginated(skip=0, limit=10000):
+        """
+        Return paginated distinct genome_id values.
+        Uses distinct() for fast retrieval, then slices in Python.
+        """
+        col = GenomeInfo.objects.collection
+        all_ids = sorted(col.distinct("genome_id"))
+        total = len(all_ids)
+        page = all_ids[skip:skip + limit]
+        return {"strains": page, "total": total}
+
 
     def get_genome_and_isolation_info_pipeline(genome_match):
         return [

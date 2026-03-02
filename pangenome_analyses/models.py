@@ -29,6 +29,23 @@ class GeneAnnotations:
         ]
         return result
 
+    @staticmethod
+    def get_all_genes_paginated(skip=0, limit=10000):
+        """
+        Return paginated (gene, pangenome_analysis) pairs.
+        Uses indexed find+sort+skip+limit for performance on large collections.
+        """
+        col = GeneAnnotations.objects.collection
+        cursor = col.find(
+            {"gene": {"$ne": None}, "pangenome_analysis": {"$ne": None}},
+            {"_id": 0, "gene": 1, "pangenome_analysis": 1},
+        ).sort([("pangenome_analysis", 1), ("gene", 1)]).skip(skip).limit(limit)
+        genes = list(cursor)
+
+        total = col.estimated_document_count()
+
+        return {"genes": genes, "total": total}
+
     def get_gene_analysis_pairs(genes):
         """
         Return all distinct (gene, pangenome_analysis) tuples
