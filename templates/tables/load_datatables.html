@@ -1,5 +1,6 @@
-<link href="https://cdn.datatables.net/v/bs5/dt-2.1.8/fc-5.0.4/datatables.min.css" rel="stylesheet">
-<script src="https://cdn.datatables.net/v/bs5/dt-2.1.8/fc-5.0.4/datatables.min.js"></script>
+{% load static %}
+<link href="{% static 'js/datatables/css/datatables.min.css' %}" rel="stylesheet">
+<script src="{% static 'js/datatables/datatables.min.js' %}"></script>
 <script>
     function wrap_table_text(text, width) {
         return '<div class="wrap-table-text" style="max-width: ' + width + ';">' + text + '</div>';
