@@ -1,4 +1,5 @@
 {% extends "index_with_infopanel.html" %}
+{% load static %}
 {% block page_title %}Gene &amp; Genome Info{% endblock %}
 
 {% block header_content %}
@@ -21,7 +22,7 @@
         {% include 'components/panel_iframe.html' with panel_name="cog_distribution" panel_title="Annotation Distribution in Genome" panel_iframe_src=url_cog_distribution|add:"?species="|add:species|add:"&genome_id="|add:genome_id panel_class='col-lg-12' panel_iframe_class='responsive-iframe-h30' %}
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="{% static 'js/jquery/jquery-3.5.1.min.js' %}"></script>
 <script>
 $(function () {
     $('[data-toggle="tooltip"]').tooltip()
