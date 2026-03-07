@@ -2,7 +2,7 @@
 
 {% block info_panel_titles %}
 <h5 class="card-title display-5">{{ gene_id }} <span class="fs-3">({{ locus_tag }})</span></h5>
-<h6 class="card-subtitle mb-2 text-body-secondary display-6 pt-1"><a style="color: var(--bs-body-secondary-color); text-decoration-color: var(--bs-body-secondary-color) !important;" href="{% url 'genome_info' %}?species={{ dataGenome.pangenome_analysis }}&genome_id={{ datatGenome.genome_id }}">{{ dataGenome.genome_id }}</a></h6>
+<h6 class="card-subtitle mb-2 text-body-secondary display-6 pt-1"><a style="color: var(--bs-body-secondary-color); text-decoration-color: var(--bs-body-secondary-color) !important;" href="{% url 'genome_info' %}?species={{ dataGenome.pangenome_analysis }}&genome_id={{ dataGenome.genome_id }}">{{ dataGenome.genome_id }}</a></h6>
 <h6 class="card-subtitle mb-2 text-body-secondary display-6 pt-1"><a style="color: var(--bs-body-secondary-color); text-decoration-color: var(--bs-body-secondary-color) !important;" href="{% url 'pangenome_analyses_overview' %}?species={{ dataGenome.pangenome_analysis }}">({{ dataGenome.species }})</a></h6>
 {% endblock %}
 
