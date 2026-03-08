@@ -18,14 +18,15 @@ logger = logging.getLogger(__name__)
     summary="List all genes (paginated)",
     description=(
         "Return distinct (gene, species) pairs with PanKB URLs. "
-        "Supports cursor-based pagination via skip/limit query parameters."
+        "Supports cursor-based pagination via after/limit query parameters."
     ),
     parameters=[
-        OpenApiParameter(name="skip", type=int, location="query", description="Number of records to skip (default 0)"),
-        OpenApiParameter(name="limit", type=int, location="query", description="Max records to return (default 10000, max 50000)"),
+        OpenApiParameter(name="after", type=str, location="query", description="Cursor from previous page (next_cursor value)"),
+        OpenApiParameter(name="limit", type=int, location="query", description="Max records to return (default 50000, max 200000)"),
     ],
     responses={
         200: {
+            "description": "Paginated list of genes with PanKB URLs.",
             "type": "object",
             "properties": {
                 "genes": {
@@ -39,12 +40,12 @@ logger = logging.getLogger(__name__)
                         },
                     },
                 },
-                "total": {"type": "integer"},
-                "skip": {"type": "integer"},
                 "limit": {"type": "integer"},
+                "next_cursor": {"type": "string", "nullable": True},
                 "has_more": {"type": "boolean"},
             },
-        }
+        },
+        500: {"description": "Unexpected server error."},
     },
 )
 @api_view(["GET"])
@@ -81,14 +82,15 @@ def genes(request):
     summary="List all strains (paginated)",
     description=(
         "Return all strains (genome IDs) with PanKB URLs. "
-        "Supports cursor-based pagination via skip/limit query parameters."
+        "Supports cursor-based pagination via after/limit query parameters."
     ),
     parameters=[
-        OpenApiParameter(name="skip", type=int, location="query", description="Number of records to skip (default 0)"),
-        OpenApiParameter(name="limit", type=int, location="query", description="Max records to return (default 10000, max 50000)"),
+        OpenApiParameter(name="after", type=str, location="query", description="Cursor from previous page (next_cursor value)"),
+        OpenApiParameter(name="limit", type=int, location="query", description="Max records to return (default 50000, max 200000)"),
     ],
     responses={
         200: {
+            "description": "Paginated list of strains with PanKB URLs.",
             "type": "object",
             "properties": {
                 "strains": {
@@ -101,12 +103,12 @@ def genes(request):
                         },
                     },
                 },
-                "total": {"type": "integer"},
-                "skip": {"type": "integer"},
                 "limit": {"type": "integer"},
+                "next_cursor": {"type": "string", "nullable": True},
                 "has_more": {"type": "boolean"},
             },
-        }
+        },
+        500: {"description": "Unexpected server error."},
     },
 )
 @api_view(["GET"])
@@ -142,14 +144,15 @@ def strains(request):
     summary="List gene-strain pairs (paginated)",
     description=(
         "Return distinct (gene, strain, locus_tag) pairs with PanKB URLs. "
-        "Supports cursor-based pagination via skip/limit query parameters."
+        "Supports cursor-based pagination via after/limit query parameters."
     ),
     parameters=[
-        OpenApiParameter(name="skip", type=int, location="query", description="Number of records to skip (default 0)"),
-        OpenApiParameter(name="limit", type=int, location="query", description="Max records to return (default 10000, max 50000)"),
+        OpenApiParameter(name="after", type=str, location="query", description="Cursor from previous page (next_cursor value)"),
+        OpenApiParameter(name="limit", type=int, location="query", description="Max records to return (default 50000, max 200000)"),
     ],
     responses={
         200: {
+            "description": "Paginated list of gene-strain pairs with PanKB URLs.",
             "type": "object",
             "properties": {
                 "pairs": {
@@ -164,12 +167,12 @@ def strains(request):
                         },
                     },
                 },
-                "total": {"type": "integer"},
-                "skip": {"type": "integer"},
                 "limit": {"type": "integer"},
+                "next_cursor": {"type": "string", "nullable": True},
                 "has_more": {"type": "boolean"},
             },
-        }
+        },
+        500: {"description": "Unexpected server error."},
     },
 )
 @api_view(["GET"])
@@ -203,7 +206,13 @@ def gene_strain_pairs(request):
 @extend_schema(
     tags=["Gene-Strain Pairs"],
     summary="Query by gene-strain pairs",
-    description="Look up detailed gene info for specific gene/strain pair combinations.",
+    description=(
+        "Look up detailed gene info for specific gene/strain pair combinations. "
+        "Accepts JSON body: {\"pairs\": [{\"gene\": \"...\", \"strain\": \"...\"}]}. "
+        "Both 'gene' and 'strain' must be strings (not arrays). Each pair represents one gene-strain combination. "
+        "Returns 400 if the pairs list is empty or entries are missing required fields. "
+        "IDs not found in the database are silently omitted from the response."
+    ),
     request={
         "application/json": {
             "type": "object",
@@ -223,7 +232,30 @@ def gene_strain_pairs(request):
             "required": ["pairs"],
         }
     },
-    responses={200: {"type": "array", "items": {"type": "object"}}},
+    responses={
+        200: {
+            "description": "Gene info for matched gene/strain pairs.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "gene": {"type": "string"},
+                    "locus_tag": {"type": "string"},
+                    "genome_id": {"type": "string"},
+                    "protein": {"type": "string"},
+                    "species": {"type": "string"},
+                    "pangenome_analysis": {"type": "string"},
+                    "start_position": {"type": "integer"},
+                    "end_position": {"type": "integer"},
+                    "nucleotide_seq": {"type": "string"},
+                    "aminoacid_seq": {"type": "string"},
+                    "url": {"type": "string", "format": "uri"},
+                },
+            },
+        },
+        400: {"description": "Invalid or empty input."},
+        500: {"description": "Unexpected server error."},
+    },
     examples=[
         OpenApiExample(
             "Example request",
@@ -242,20 +274,23 @@ def query_by_pair(request):
             pairs = [pairs]
 
         if not pairs:
-            return Response({
-                "count": 0,
-                "message": "No gene/strain pairs provided",
-            })
+            return Response(
+                {"message": "pairs must be a non-empty list"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        clean_pairs = [
-            {"gene": p["gene"], "genome_id": p["strain"]}
-            for p in pairs
-            if "gene" in p and "strain" in p
-        ]
+        seen = set()
+        clean_pairs = []
+        for p in pairs:
+            if "gene" in p and "strain" in p:
+                key = (p["gene"], p["strain"])
+                if key not in seen:
+                    seen.add(key)
+                    clean_pairs.append({"gene": p["gene"], "genome_id": p["strain"]})
         if not clean_pairs:
-            return Response({
-                "count": 0,
-                "message": "Each pair must contain both 'gene' and 'strain'",
+            return Response(
+                {"message": "Each pair must contain both 'gene' and 'strain'"},
+                status=status.HTTP_400_BAD_REQUEST,
             })
 
         genes = {p["gene"] for p in clean_pairs}
@@ -299,7 +334,12 @@ def query_by_pair(request):
 @extend_schema(
     tags=["Genes"],
     summary="Query by gene names",
-    description="Look up detailed gene info by a list of gene names.",
+    description=(
+        "Look up detailed gene info by a list of gene names. "
+        "Accepts JSON body: {\"ids\": [\"geneA\", \"geneB\"]}. "
+        "Returns 400 if the ids list is empty or missing. "
+        "IDs not found in the database are silently omitted from the response."
+    ),
     request={
         "application/json": {
             "type": "object",
@@ -312,7 +352,30 @@ def query_by_pair(request):
             "required": ["ids"],
         }
     },
-    responses={200: {"type": "array", "items": {"type": "object"}}},
+    responses={
+        200: {
+            "description": "Gene info for matched gene names.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "gene": {"type": "string"},
+                    "locus_tag": {"type": "string"},
+                    "genome_id": {"type": "string"},
+                    "protein": {"type": "string"},
+                    "species": {"type": "string"},
+                    "pangenome_analysis": {"type": "string"},
+                    "start_position": {"type": "integer"},
+                    "end_position": {"type": "integer"},
+                    "nucleotide_seq": {"type": "string"},
+                    "aminoacid_seq": {"type": "string"},
+                    "url": {"type": "string", "format": "uri"},
+                },
+            },
+        },
+        400: {"description": "Invalid or empty input."},
+        500: {"description": "Unexpected server error."},
+    },
     examples=[
         OpenApiExample(
             "Example request",
@@ -355,7 +418,12 @@ def query_by_gene(request):
 @extend_schema(
     tags=["Strains"],
     summary="Query by strain IDs",
-    description="Look up genome info by a list of genome IDs.",
+    description=(
+        "Look up genome info by a list of genome IDs. "
+        "Accepts JSON body: {\"ids\": [\"GCF_...\", \"GCF_...\"]}. "
+        "Returns 400 if the ids list is empty or missing. "
+        "IDs not found in the database are silently omitted from the response."
+    ),
     request={
         "application/json": {
             "type": "object",
@@ -368,7 +436,31 @@ def query_by_gene(request):
             "required": ["ids"],
         }
     },
-    responses={200: {"type": "array", "items": {"type": "object"}}},
+    responses={
+        200: {
+            "description": "Genome info for matched strain IDs.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "genome_id": {"type": "string"},
+                    "strain": {"type": "string"},
+                    "species": {"type": "string"},
+                    "pangenome_analysis": {"type": "string"},
+                    "gc_content": {"type": "number"},
+                    "genome_len": {"type": "integer"},
+                    "gene_class_distribution": {"type": "array", "items": {"type": "integer"}},
+                    "phylo_group": {"type": "string"},
+                    "isolation_source": {"type": "string"},
+                    "country": {"type": "string"},
+                    "geo_loc_name": {"type": "string"},
+                    "url": {"type": "string", "format": "uri"},
+                },
+            },
+        },
+        400: {"description": "Invalid or empty input."},
+        500: {"description": "Unexpected server error."},
+    },
     examples=[
         OpenApiExample(
             "Example request",
