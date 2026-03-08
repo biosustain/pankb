@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
     tags=["Genes"],
     summary="List all genes (paginated)",
     description=(
-        "Return distinct (gene, species) pairs with PanKB URLs. "
+        "Return distinct (gene, species) pairs with PanKB URLs.\n\n"
         "Supports cursor-based pagination via after/limit query parameters."
     ),
     parameters=[
@@ -80,7 +80,7 @@ def genes(request):
     tags=["Strains"],
     summary="List all strains (paginated)",
     description=(
-        "Return all strains (genome IDs) with PanKB URLs. "
+        "Return all strains (genome IDs) with PanKB URLs.\n\n"
         "Supports cursor-based pagination via after/limit query parameters."
     ),
     parameters=[
@@ -142,7 +142,7 @@ def strains(request):
     tags=["Gene-Strain Pairs"],
     summary="List gene-strain pairs (paginated)",
     description=(
-        "Return distinct (gene, strain, locus_tag) pairs with PanKB URLs. "
+        "Return distinct (gene, strain, locus_tag) pairs with PanKB URLs.\n\n"
         "Supports cursor-based pagination via after/limit query parameters."
     ),
     parameters=[
@@ -206,10 +206,10 @@ def gene_strain_pairs(request):
     tags=["Gene-Strain Pairs"],
     summary="Query by gene-strain pairs",
     description=(
-        "Look up detailed gene info for specific gene/strain pair combinations. "
-        "Accepts JSON body: {\"pairs\": [{\"gene\": \"...\", \"strain\": \"...\"}]}. "
-        "Both 'gene' and 'strain' must be strings (not arrays). Each pair represents one gene-strain combination. "
-        "Returns 400 if the pairs list is empty or entries are missing required fields. "
+        "Look up detailed gene info for specific gene/strain pair combinations.\n\n"
+        "Accepts JSON body: {\"pairs\": [{\"gene\": \"...\", \"strain\": \"...\"}]}.\n\n"
+        "Both 'gene' and 'strain' must be strings (not arrays). Each pair represents one gene-strain combination.\n\n"
+        "Returns 400 if the pairs list is empty or entries are missing required fields.\n\n"
         "IDs not found in the database are silently omitted from the response."
     ),
     request={
@@ -326,9 +326,9 @@ def query_by_pair(request):
     tags=["Genes"],
     summary="Query by gene names",
     description=(
-        "Look up detailed gene info by a list of gene names. "
-        "Accepts JSON body: {\"ids\": [\"geneA\", \"geneB\"]}. "
-        "Returns 400 if the ids list is empty or missing. "
+        "Look up detailed gene info by a list of gene names.\n\n"
+        "Accepts JSON body: {\"ids\": [\"geneA\", \"geneB\"]}.\n\n"
+        "Returns 400 if the ids list is empty or missing.\n\n"
         "IDs not found in the database are silently omitted from the response."
     ),
     request={
@@ -410,9 +410,9 @@ def query_by_gene(request):
     tags=["Strains"],
     summary="Query by strain IDs",
     description=(
-        "Look up genome info by a list of genome IDs. "
-        "Accepts JSON body: {\"ids\": [\"GCF_...\", \"GCF_...\"]}. "
-        "Returns 400 if the ids list is empty or missing. "
+        "Look up genome info by a list of genome IDs.\n\n"
+        "Accepts JSON body: {\"ids\": [\"GCF_...\", \"GCF_...\"]}.\n\n"
+        "Returns 400 if the ids list is empty or missing.\n\n"
         "IDs not found in the database are silently omitted from the response."
     ),
     request={
