@@ -293,26 +293,18 @@ def query_by_pair(request):
                 status=status.HTTP_400_BAD_REQUEST,
             })
 
-        genes = {p["gene"] for p in clean_pairs}
-
-        try:
-            ga_pairs = GeneAnnotations.get_gene_analysis_pairs(list(genes))
-            gene_to_analyses = {}
-            for g, a in ga_pairs:
-                gene_to_analyses.setdefault(g, set()).add(a)
-        except GeneAnnotations.NotFound:
-            return Response([])
+        genome_ids = list({p["genome_id"] for p in clean_pairs})
+        genome_to_analysis = GenomeInfo.get_pangenome_analysis_by_genome_ids(genome_ids)
 
         query = []
         for p in clean_pairs:
-            analyses = gene_to_analyses.get(p["gene"])
-            if analyses:
-                for analysis in analyses:
-                    query.append({
-                        "gene": p["gene"],
-                        "pangenome_analysis": analysis,
-                        "genome_id": p["genome_id"],
-                    })
+            analysis = genome_to_analysis.get(p["genome_id"])
+            if analysis:
+                query.append({
+                    "gene": p["gene"],
+                    "pangenome_analysis": analysis,
+                    "genome_id": p["genome_id"],
+                })
 
         if not query:
             return Response([])

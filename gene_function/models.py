@@ -250,6 +250,16 @@ class GenomeInfo:
 
         return list(cursor)
 
+    def get_pangenome_analysis_by_genome_ids(genome_ids):
+        """
+        Return a dict mapping genome_id -> pangenome_analysis.
+        """
+        cursor = GenomeInfo.objects.find(
+            {"genome_id": {"$in": genome_ids}},
+            projection={"_id": 0, "genome_id": 1, "pangenome_analysis": 1}
+        )
+        return {doc["genome_id"]: doc["pangenome_analysis"] for doc in cursor}
+
     def get_genome_and_isolation_info(genome_match, projection=None):
         pipeline = GenomeInfo.get_genome_and_isolation_info_pipeline(genome_match)
         if isinstance(projection, list):
