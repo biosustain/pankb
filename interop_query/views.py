@@ -3,12 +3,11 @@ from urllib.parse import quote
 
 from django.conf import settings
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
+from gene_function.models import GeneInfo, GenomeInfo
+from pangenome_analyses.models import GeneAnnotations
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
-from gene_function.models import GeneInfo, GenomeInfo
-from pangenome_analyses.models import GeneAnnotations
 
 logger = logging.getLogger(__name__)
 
@@ -291,7 +290,7 @@ def query_by_pair(request):
             return Response(
                 {"message": "Each pair must contain both 'gene' and 'strain'"},
                 status=status.HTTP_400_BAD_REQUEST,
-            })
+            )
 
         genome_ids = list({p["genome_id"] for p in clean_pairs})
         genome_to_analysis = GenomeInfo.get_pangenome_analysis_by_genome_ids(genome_ids)
